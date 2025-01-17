@@ -290,6 +290,12 @@ def main():
                 help="Enter AFP_L3 value in ng/dl"
                  
             )
+
+            Cirrhosis_Dx_Child_Pugh_class_EMR = st.selectbox(
+                "Cirrhosis_Dx_Child-Pugh Class EMR",
+                options=["Class A","Class B","Class C","NA"]
+
+            )
             # Validation for Cirrhosis_Dx_Child-Pugh Points EMR
             def validate_input(value):
                 if value.isdigit() and 5 <= int(value) <= 15:
@@ -404,7 +410,7 @@ def main():
                         "Cirrhosis_Dx_Date of Labs in Window" : Cirrhosis_Dx_Date_of_Labs_in_Window,
                         "Cirrhosis_Dx_AFP" : Cirrhosis_Dx_AFP,
                         "Cirrhosis_Dx_AFP_L3" : Cirrhosis_Dx_AFP_L3,
-                        "Cirrhosis_Dx_Child-Pugh Class EMR" : Cirrhosis_Dx_Child_Pugh_Class_EMR,
+                        "Cirrhosis_Dx_Child-Pugh Class EMR" : Cirrhosis_Dx_Child_Pugh_class_EMR,
                         "Cirrhosis_Dx_Child-Pugh Points EMR" : Cirrhosis_Dx_Child_Pugh_Points_EMR,
                         "Cirrhosis_Dx_MELD Score EMR" : Cirrhosis_Dx_MELD_Score_EMR,
                         "Cirrhosis_Dx_MELD-Na Score EMR" : Cirrhosis_Dx_MELD_NA_Score_EMR,
