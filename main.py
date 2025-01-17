@@ -699,8 +699,8 @@ def main():
             else:
                 dayy90_data = {
                       "DAYY90_AFP" : dayy90_afp,
-                      #"DAYY90_AFP Prior to TARE " : dayy90_afp_prior_to_tare,
-                      "AFP_PreY90 or DAYY90" : afp_prey90,
+                      "DAYY90_AFP Prior to TARE " : dayy90_afp_prior_to_tare,
+                      #"AFP_PreY90 or DAYY90" : afp_prey90,
                       "DAYY90_sodium" : dayy90_sodium,
                       "DAYY90_creatinine" : dayy90_creatinine,
                       "DAYY90_inr" : dayy90_inr,
