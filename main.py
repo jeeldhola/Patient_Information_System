@@ -591,12 +591,7 @@ def main():
    
 
 # Calculation of AFP_PreY90 or DAYY90
-            if dayy90_afp_prior_to_tare != 'NA':
-                afp_prey90 = dayy90_afp_prior_to_tare      
-            elif pre90_afp_prior_to_tare != 'NA':
-                afp_prey90 = pre90_afp_prior_to_tare
-            else:
-                afp_prey90 = "NA"
+            
           
    
         # Inputs for other variables
@@ -704,7 +699,7 @@ def main():
             else:
                 dayy90_data = {
                       "DAYY90_AFP" : dayy90_afp,
-                      "DAYY90_AFP Prior to TARE " : dayy90_afp_prior_to_tare,
+                      #"DAYY90_AFP Prior to TARE " : dayy90_afp_prior_to_tare,
                       "AFP_PreY90 or DAYY90" : afp_prey90,
                       "DAYY90_sodium" : dayy90_sodium,
                       "DAYY90_creatinine" : dayy90_creatinine,
