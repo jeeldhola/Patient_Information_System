@@ -21,7 +21,7 @@ def main():
         st.session_state.form_data = []
 
     # Create tabs
-    tab1, tab2, tab3, tab5, tab7, tab9 = st.tabs(["Patient Info", "Patient Demographics", "Cirrhosis PMH", "Previous Therapy for HCC","Day_Y90","Other_post_TARE"])
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab9 = st.tabs(["Patient Info", "Patient Demographics", "Cirrhosis PMH","HCC Diagnosis", "Previous Therapy for HCC","Pre Y90","Day_Y90","Other_post_TARE"])
 
     with tab1:
         st.subheader("Patient Information")
@@ -56,6 +56,7 @@ def main():
                         "Procedure_Technique": procedure_technique,
                         "Age_at_TARE": age
                     }
+                    st.session_state.form_data.append(st.session_state['tab1_data'])
                     st.success("Patient information saved! Please proceed to Demographics tab.")
 
     with tab2:
@@ -296,6 +297,8 @@ def main():
                 options=["Class A","Class B","Class C","NA"]
 
             )
+               
+                
             # Validation for Cirrhosis_Dx_Child-Pugh Points EMR
             def validate_input(value):
                 if value.isdigit() and 5 <= int(value) <= 15:
@@ -386,6 +389,7 @@ def main():
                     st.error("Please fill out Patient Info tab first!")
                 else:
                     cirrhosis_pmh_data = {
+                        **st.session_state['tab1_data'],
                         "Cir_PMH_HBV Status": cir_pmh_hbv_status,
                         "Cir_PMH_HBV Free Text": cir_pmh_hbv_free_text,
                         "Cir_PMH_HBV ART": cir_pmh_hbv_art,
@@ -423,6 +427,243 @@ def main():
                     st.session_state.form_data.append(cirrhosis_pmh_data)
                     st.success("Cirrhosis PMH information saved successfully!")
     
+    with tab4:
+        st.subheader("HCC Diagnosis")
+        with st.form("hcc_dx_form"):
+            # Fields for HCC Diagnosis
+            hcc_dx_hcc_diagnosis_date = st.date_input("HCC_Dx_HCC Diagnosis Date", help="Enter the HCC diagnosis date")
+
+            hcc_dx_method_of_diagnosis = st.selectbox(
+                "HCC_Dx_Method of Diagnosis",   
+                options=["Biopsy", "Imaging", "Unknown"],
+                #format_func=lambda x: f"{x} ({1 if x == 'Biopsy' else 2 if x == 'Imaging' else 'NA'})"
+            )
+
+            hcc_dx_date_of_labs = st.date_input("HCC_Dx_Date of Labs in Window")
+
+            hcc_dx_afp = st.number_input("HCC_Dx_AFP", help="Enter AFP value in ng/dl")
+            hcc_dx_afp_l3_date_free_text = st.text_area("HCC_Dx_AFP L3 & Date Free Text", help="Enter AFP L3 and date details")
+
+            hcc_dx_bilirubin = st.number_input("HCC_Dx_Bilirubin", help="Enter the bilirubin value in mg/dl", min_value=1)
+            hcc_dx_albumin = st.number_input("HCC_Dx_Albumin", help="Enter the albumin value in g/dl")
+            hcc_dx_inr = st.number_input("HCC_Dx_INR", help="Enter the INR value")
+            hcc_dx_creatinine = st.number_input("HCC_Dx_Creatinine", help="Enter the creatinine value in mg/dl")
+            hcc_dx_sodium = st.number_input("HCC_Dx_Sodium", help="Enter the sodium value in mmol/L")
+
+            hcc_dx_ascites = st.selectbox(
+                "HCC_Dx_Ascites",
+                options=["none", "Asymptomatic", "Minimal ascities/Mild abd distension, no sx",
+                        "Symptomatic", "moderate ascities/Symptomatic medical intervention",
+                        "Severe symptoms, invasive intervention indicated",
+                        "Life Threatening: Urgent operation intervention indicated"]
+            )
+
+            hcc_dx_ascites_binary_classification = 1 if hcc_dx_ascites != "none" else 0
+            #st.info(f"HCC_Dx_Ascites Binary Classification: {ascites_binary}")
+
+            hcc_dx_ascites_free_text = "NA" if hcc_dx_ascites == 'none' else st.text_area(
+                "HCC_Dx_Ascites Free Text",
+                "Hospitalized (yes/no): \nDiuretics (yes/no): \nParacentesis (yes/no): \nAny other complications (free_text):",
+                
+            )
+
+            hcc_dx_ascites_labs_free_text = "NA" if hcc_dx_ascites == 'none' else st.text_area(
+                "HCC_Dx_Ascites Labs Free Text",
+                """Bilirubin (mg/dl): \nAlbumin (g/dl): \nINR: \nCreatinine (mg/dl): \nSodium (mmol/L): 
+                AST (U/L): \nALT (U/L): \nAlk Phos: \nPlatelets:""",
+        
+            )
+
+            hcc_dx_hepatic_encephalopathy = st.selectbox(
+                "HCC_Dx_Hepatic Encephalopathy",
+                options=["Yes", "No"],
+                #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})"
+            )
+
+            hcc_dx_ecog_performance_status = st.selectbox("HCC_Dx_ECOG Performance Status", options=["0", "1", "2", "3", "4", "NA"])
+
+            hcc_dx_lirads_score = st.selectbox(
+                "HCC_Dx_LIRADS Score",
+                options=["LR-1", "LR-2", "LR-3", "LR-4", "LR-5", "LR-5V", "LR-M"]
+            )
+
+            hcc_dx_child_pugh_class_emr = st.selectbox(
+                "HCC_Dx_Child-Pugh Class EMR",
+                options=["Class A", "Class B", "Class C", "NA"]
+            )
+
+            # Validation of hcc_dx_child_pugh_points_emr
+
+            def validate_input(value):
+                if value.isdigit() and 5 <= int(value) <= 15:
+                    return value  # Valid number
+                elif value.upper() == "NA":
+                    return "NA"  # Valid 'NA'
+                else:
+                    return "NA" 
+
+            input_value3 = st.text_input(
+                "HCC_Dx_Child-Pugh Points EMR",
+                help="Specify the Child-Pugh points if in EMR number 5-15 or NA"                
+            )
+
+            hcc_dx_child_pugh_points_emr = validate_input(input_value3)
+
+
+            hcc_dx_bclc_stage_emr = st.selectbox(
+                "HCC_Dx_BCLC Stage EMR",
+                options=["0", "A", "B", "C", "D"]
+            )
+
+            # Validating hcc_dx_meld/na score
+            def validate_input2(value):
+                if value.isdigit() and 6 <= int(value) <= 40:
+                    return value  # Valid number
+                elif value.upper() == "NA":
+                    return "NA"  # Valid 'NA'
+                else:
+                    return "NA" 
+
+    
+            input_value4 = st.text_input(
+                "HCC_Dx_MELD Score EMR",
+                help="Write in number in range 6-40, or NA"
+            )
+
+
+            hcc_dx_meld_score_emr = validate_input2(input_value4)
+
+            input_value5 = st.text_input(
+                "HCC_Dx_MELD-Na Score EMR",
+                 help="Write in number in range 6-40, or NA"
+            )
+
+            hcc_dx_meld_na_score_emr = validate_input2(input_value5)
+
+
+            hcc_dx_albi_score_emr = st.number_input("HCC_Dx_ALBI Score EMR")
+
+            #  calculation of child_pugh_points_clac
+
+            def calculatepoints(bilirubin, albumin, inr, ascites, encephalopathy):
+                if bilirubin < 2:
+                    bilirubin_points = 1
+                elif 2 <= bilirubin <= 3:
+                    bilirubin_points = 2
+                else:
+                    bilirubin_points = 3
+
+                if albumin > 3.5:
+                    albumin_points = 1
+                elif 2.8 <= albumin <= 3.5:
+                    albumin_points = 2
+                else:
+                    albumin_points = 3
+
+    # Points for INR
+                if inr < 1.7:
+                    inr_points = 1
+                elif 1.7 <= inr <= 2.3:
+                    inr_points = 2
+                else:
+                    inr_points = 3
+
+    # Points for Ascites
+                if ascites == 'none':
+                    ascites_points = 1
+                elif ascites == 'Asymptomatic' or ascites == 'Minimal ascities/Mild abd distension, no sx' or ascites == "Symptomatic" :
+                    ascites_points = 2
+                else:  # 'moderate/severe'
+                    ascites_points = 3
+
+    # Points for Hepatic Encephalopathy
+                if encephalopathy == 'No':
+                    encephalopathy_points = 1
+                elif encephalopathy == 'Yes':
+                    encephalopathy_points = 2
+                else:  # 'grade iii-iv'
+                    encephalopathy_points = 3
+
+    # Total Child-Pugh score
+                total_score = (
+                    bilirubin_points + albumin_points + inr_points + ascites_points + encephalopathy_points
+                )
+
+                return total_score
+
+                    
+
+            hcc_dx_child_pugh_points_calc = calculatepoints(hcc_dx_bilirubin,hcc_dx_albumin,hcc_dx_inr,hcc_dx_ascites,hcc_dx_hepatic_encephalopathy)
+
+            # Calculations for classses
+
+            def calculate_class(poin):
+                if 5 <= poin <= 6:
+                    return 'A'
+                elif 7 <= poin <= 9:
+                    return 'B'
+                elif 10 <= poin <= 15:
+                    return 'C'
+                else:
+                     return "Invalid points: must be between 5 and 15."
+       
+            hcc_dx_child_pugh_class_calc = calculate_class(hcc_dx_child_pugh_points_calc)
+         
+            #bclc_stage_calc = st.text_input("HCC_Dx_BCLC Stage calc")
+            hcc_dx_meld_score_calc = (3.78*(int(hcc_dx_bilirubin)))+(11.2*(int(hcc_dx_inr)))+(9.57*(int(hcc_dx_creatinine)))+6.43
+            hcc_dx_meld_na_score_calc = hcc_dx_meld_score_calc + 1.32*(137-int(hcc_dx_sodium)) - (0.033*hcc_dx_meld_score_calc*(137-int(hcc_dx_sodium)))
+            def albi_calc(a,b):
+                a=int(a)
+                b=int(b)
+                t = math.log(a, 10)
+                answer = (t * 0.66) + (b * -0.085)
+                return answer
+            
+            hcc_dx_albi_score_calc = albi_calc(hcc_dx_bilirubin, hcc_dx_albumin)
+           
+
+            submit_tab4 = st.form_submit_button("Save HCC Diagnosis")
+            if submit_tab4:
+                if 'tab1_data' not in st.session_state:
+                    st.error("Please fill out Patient Info tab first!")
+                
+                else:
+                    hcc_data = {
+                         **st.session_state['tab1_data'],
+                        "HCC_Dx_HCC Diagnosis Date": hcc_dx_hcc_diagnosis_date.strftime("%Y-%m-%d"),
+                        "HCC_Dx_Method of Diagnosis": hcc_dx_method_of_diagnosis,
+                        "HCC_Dx_Date of Labs in Window": hcc_dx_date_of_labs.strftime("%Y-%m-%d"),
+                        "HCC_Dx_AFP": hcc_dx_afp,
+                        "HCC_Dx_AFP L3 & Date Free Text": hcc_dx_afp_l3_date_free_text,
+                        "HCC_Dx_Bilirubin": hcc_dx_bilirubin,
+                        "HCC_Dx_Albumin": hcc_dx_albumin,
+                        "HCC_Dx_INR": hcc_dx_inr,
+                        "HCC_Dx_Creatinine": hcc_dx_creatinine,
+                        "HCC_Dx_Sodium": hcc_dx_sodium,
+                        "HCC_Dx_Ascites": hcc_dx_ascites,
+                        "HCC_Dx_Ascites Binary Classification": hcc_dx_ascites_binary_classification,
+                        "HCC_Dx_Ascites Free Text": hcc_dx_ascites_free_text,
+                        "HCC_Dx_Ascites Labs Free Text": hcc_dx_ascites_labs_free_text,
+                        "HCC_Dx_Hepatic Encephalopathy": hcc_dx_hepatic_encephalopathy,
+                        "HCC_Dx_ECOG Performance Status": hcc_dx_ecog_performance_status,
+                        "HCC_Dx_LIRADS Score": hcc_dx_lirads_score,
+                        "HCC_Dx_Child-Pugh Class EMR": hcc_dx_child_pugh_class_emr,
+                        "HCC_Dx_Child-Pugh Points EMR": hcc_dx_child_pugh_points_emr,
+                        "HCC_Dx_BCLC Stage EMR": hcc_dx_bclc_stage_emr,
+                        "HCC_Dx_MELD Score EMR": hcc_dx_meld_score_emr,
+                        "HCC_Dx_MELD-Na Score EMR": hcc_dx_meld_na_score_emr,
+                        "HCC_Dx_ALBI Score EMR": hcc_dx_albi_score_emr,
+                        "HCC_Dx_Child-Pugh Class calc": hcc_dx_child_pugh_class_calc,
+                        "HCC_Dx_Child-Pugh Points calc": hcc_dx_child_pugh_points_calc,
+                        #"HCC_Dx_BCLC Stage calc": hcc_dx_bclc_stage_calc,
+                        "HCC_Dx_MELD Score calc": hcc_dx_meld_score_calc,
+                        "HCC_Dx_MELD-Na Score calc": hcc_dx_meld_na_score_calc,
+                        "HCC_Dx_ALBI Score calc": hcc_dx_albi_score_calc
+                    }
+                    st.session_state.form_data.append(hcc_data)
+                    st.success("All information submitted successfully!")
+                  
+
     with tab5:
         st.subheader("Previous Therapy for HCC")
         with st.form("previous_therapy_form"):
@@ -539,6 +780,7 @@ def main():
                     st.error("Please fill out Patient Info tab first!")
                 else:
                     previous_therapy_data = {
+                        **st.session_state['tab1_data'],
                         "PRVTHER_Prior LDT Therapy": PRVTHER_Prior_LDT_Therapy,
                         "PRVTHER_Prior RFA Therapy" : PRVTHER_Prior_RFA_Therapy,
                         "PRVTHER_Prior TARE Therapy" : PRVTHER_Prior_TARE_Therapy,
@@ -560,10 +802,209 @@ def main():
                     }
                     st.session_state.form_data.append(previous_therapy_data)
                     st.success("Previous therapy information saved successfully!")
+    with tab6:
+        st.subheader("Pre Y90")
+        with st.form("pre_y90_form"):
+            # Fields for Pre Y90
+            prey90_symptoms = st.multiselect(
+                "PREY90_symptoms",
+                options=[
+                    "portal vein HTN", 
+                    "GI bleeding", 
+                    "Limb edema", 
+                    "Ischemic liver injury", 
+                    "Variceal Bleeding", 
+                    "Biliary Obstruction", 
+                    "Infection"
+                ],
+                help="Select all that apply"
+            )
+            
+            prey90_date_of_labs = st.date_input("PREY90_date of labs in window", help="Enter the date of lab tests")
+            prey90_afp = st.text_input("PREY90_AFP", help="Enter AFP value in ng/dl or NA")
+            
+            def process_input(value):
+                 
+    # Handle the 'NA' case
+                 if value.upper() == "NA":
+                     return "NA"
+    # Handle numeric cases
+                 elif value.isdigit():
+                    numeric_value = int(value)
+                    return 1 if numeric_value < 200 else 2
+                 else:
+                    return "Invalid Input"
 
+            
+           
+            prey90_afp_prior_to_tare = process_input(prey90_afp)
+            
+            
+            prey90_bilirubin = st.number_input("PREY90_Bilirubin", help="Enter the bilirubin value in mg/dl",min_value=1)
+            prey90_albumin = st.number_input("PREY90_Albumin", help="Enter the albumin value in g/dl")
+            prey90_inr = st.number_input("PREY90_inr", help="Enter the INR value")
+            prey90_creatinine = st.number_input("PREY90_creatinine", help="Enter the creatinine value in mg/dl")
+            prey90_sodium = st.number_input("PREY90_sodium", help="Enter the sodium value in mmol/L")
+            prey90_ast = st.number_input("PREY90_AST", help="Enter AST value in U/L")
+            prey90_alt = st.number_input("PREY90_ALT", help="Enter ALT value in U/L")
+            prey90_alkaline_phosphatase = st.number_input("PREY90_Alkaline Phosphatase", help="Enter Alkaline Phosphatase value in U/L")
+            prey90_potassium = st.number_input("PREY90_potassium", help="Enter the potassium value in mmol/L")
+            
+            prey90_ascites = st.selectbox(
+                "PREY90_Ascites",
+                options=[
+                    "none", 
+                    "Asymptomatic", 
+                    "Minimal ascities/Mild abd distension, no sx", 
+                    "Symptomatic", 
+                    "moderate ascities/Symptomatic medical intervention", 
+                    "Severe symptoms, invasive intervention indicated", 
+                    "Life Threatening: Urgent operation intervention indicated"
+                ],
+                help="Select the appropriate ascites classification"
+            )
+            
+            prey90_ascites_binary = 1 if prey90_ascites != "none" else 0
+            st.info(f"PREY90_Ascites Binary Classification: {prey90_ascites_binary}")
+            
+            prey90_ascites_free_text = st.text_area(
+                "PREY90_Ascites Free Text",
+                "Hospitalized (yes/no): \nDiuretics (yes/no): \nParacentesis (yes/no): \nAny other complications (free_text):",
+                help="Provide details about hospitalization, diuretics, paracentesis, and other complications"
+            )
+            
+            prey90_he = st.selectbox(
+                "PREY90_he", 
+                options=["No", "Yes", "NA (not in chart)"], 
+                help="Select hepatic encephalopathy status"
+            )
+            
+            prey90_ecog = st.selectbox(
+                "PREY90_ecog",
+                options=["0", "1", "2", "3", "4", "NA"],
+                help="Select ECOG Performance Status"
+            )
+            
+            prey90_child_pugh_class = st.selectbox(
+                "PREY90_Child-Pugh Class Emr",
+                options=["Class A", "Class B", "Class C", "NA"],
+                help="Select the Child-Pugh class"
+            )
+            def validate_inputt(value):
+                if value.isdigit() and 5 <= int(value) <= 15:
+                    return value  # Valid number
+                elif value.upper() == "NA":
+                    return "NA"  # Valid 'NA'
+                else:
+                    return "NA" 
+
+            input_value3t = st.text_input(
+                "PREY90_Child-Pugh Points Emr",
+                help="Write in number in range 5-15, or NA"              
+            )
+
+            prey90_child_pugh_points = validate_inputt(input_value3t)
+
+
+
+            
+            prey90_bclc_stage = st.selectbox(
+                "PREY90_BCLC Stage EMR",
+                options=["0", "A", "B", "C", "D"],
+                help="Select the BCLC stage"
+            )
+
+            def validate_input2t(value):
+                if value.isdigit() and 6 <= int(value) <= 40:
+                    return value  # Valid number
+                elif value.upper() == "NA":
+                    return "NA"  # Valid 'NA'
+                else:
+                    return "NA" 
+
+            input_value4t = st.text_input(
+                "PREY90_MELD Score EMR",
+                help="Write in number in range 6-40, or NA"                
+            )
+
+            prey90_meld_score = validate_input2t(input_value4t)
+
+            input_value5t = st.text_input(
+                "PREY90_MELD-Na Score EMR",
+                help="Write in number in range 6-40, or NA"               
+            )
+
+            prey90_meld_na_score = validate_input2t(input_value5t)
+              
+            prey90_albi_score = st.text_input(
+                "PREY90_ALBI Score EMR",
+                help="Enter ALBI score"
+            )
+            
+            # Claculation of class and points
+            prey90_child_pugh_points_calc = calculatepoints(prey90_bilirubin,prey90_albumin,prey90_inr,prey90_ascites,prey90_he)
+       
+            prey90_child_pugh_class_calc = calculate_class(prey90_child_pugh_points_calc)
+            # Additional Calculated Fields
+            
+            #prey90_bclc_stage_calc = st.text_input("PREY90_BCLC Stage calc", help="Enter calculated BCLC stage")
+            prey90_meld_score_calc = (3.78*(int(prey90_bilirubin)))+(11.2*(int(prey90_inr)))+(9.57*(int(prey90_creatinine)))+6.43
+            prey90_meld_na_score_calc = prey90_meld_score_calc + 1.32*(137-int(prey90_sodium)) - (0.033*prey90_meld_score_calc*(137-int(prey90_sodium)))
+            
+            prey90_albi_score_calc = albi_calc(prey90_bilirubin,prey90_albumin)
+        
+            st.subheader("Mapping Y90")
+            my90_date = st.date_input("MY90_date", help="Enter the date")
+            my90_lung_shunt = st.number_input("MY90_Lung_shunt", min_value=0, step=1, help="Enter the lung shunt value")
+
+
+            submit_tab4 = st.form_submit_button("Save Pre Y90")
+
+            if submit_tab4:
+                if 'tab1_data' not in st.session_state:
+                    st.error("Please fill out Patient Info tab first!")
+                else:
+                    prey90_data = {
+                        **st.session_state['tab1_data'],
+                        "PREY90_symptoms": prey90_symptoms,
+                        "PREY90_date of labs in window": prey90_date_of_labs.strftime("%Y-%m-%d"),
+                        "PREY90_AFP": prey90_afp,
+                        "PRE90_AFP Prior to TARE": prey90_afp_prior_to_tare,
+                        "PREY90_Bilirubin": prey90_bilirubin,
+                        "PREY90_Albumin": prey90_albumin,
+                        "PREY90_inr": prey90_inr,
+                        "PREY90_creatinine": prey90_creatinine,
+                        "PREY90_sodium": prey90_sodium,
+                        "PREY90_AST": prey90_ast,
+                        "PREY90_ALT": prey90_alt,
+                        "PREY90_Alkaline Phosphatase": prey90_alkaline_phosphatase,
+                        "PREY90_potassium": prey90_potassium,
+                        "PREY90_Ascites": prey90_ascites,
+                        "PREY90_Ascites Binary Classification": prey90_ascites_binary,
+                        "PREY90_Ascites Free Text": prey90_ascites_free_text,
+                        "PREY90_he": prey90_he,
+                        "PREY90_ecog": prey90_ecog,
+                        "PREY90_Child-Pugh Class Emr": prey90_child_pugh_class,
+                        "PREY90_Child-Pugh Points Emr": prey90_child_pugh_points,
+                        "PREY90_BCLC Stage EMR": prey90_bclc_stage,
+                        "PREY90_MELD Score EMR": prey90_meld_score,
+                        "PREY90_MELD-Na Score EMR": prey90_meld_na_score,
+                        "PREY90_ALBI Score EMR": prey90_albi_score,
+                        "PREY90_Child-Pugh Class calc": prey90_child_pugh_class_calc,
+                        "PREY90_Child-Pugh Points calc": prey90_child_pugh_points_calc,
+                        #"PREY90_BCLC Stage calc": prey90_bclc_stage_calc,
+                        "PREY90_MELD Score calc": prey90_meld_score_calc,
+                        "PREY90_MELD-Na Score calc": prey90_meld_na_score_calc,
+                        "PREY90_ALBI Score calc": prey90_albi_score_calc,
+                        "MY90_date" : my90_date,
+                        "MY90_Lung_shunt" : my90_lung_shunt
+                    }
+                    st.session_state.form_data.append(prey90_data)
+                    st.success("Pre Y90 information saved successfully!")
     with tab7:
         st.subheader("Day_Y90")
         with st.form("day_y90_form"):
+
             dayy90_afp = st.text_input("DAYY90_AFP")
             def process_input(value):
                  
@@ -577,21 +1018,28 @@ def main():
                  else:
                     return "Invalid Input"
 
-            inputx = st.text_input("DAYY90_AFP", placeholder="Enter AFP value in ng/dl or NA")
+        
            
 
 # Calucation of DAYY90_AFP Prior to TARE 
             
 
 # Process the input
-            dayy90_afp_prior_to_tare = process_input(inputx)
+            dayy90_afp_prior_to_tare = process_input(dayy90_afp)
+
+            if dayy90_afp_prior_to_tare != 'NA':
+                afp_prey90 = dayy90_afp_prior_to_tare      
+            elif prey90_afp_prior_to_tare != 'NA':
+                afp_prey90 = prey90_afp_prior_to_tare
+            else:
+                afp_prey90 = "NA"
            
             
             
    
 
 # Calculation of AFP_PreY90 or DAYY90
-            
+    
           
    
         # Inputs for other variables
@@ -599,7 +1047,7 @@ def main():
             dayy90_creatinine = st.number_input("DAYY90_creatinine (mg/dl)")
             dayy90_inr = st.number_input("DAYY90_inr")
             dayy90_albumin = st.number_input("DAYY90_albumin (g/dl)")
-            dayy90_bilirubin = st.number_input("DAYY90_bilirubin (mg/dl)", value=0)
+            dayy90_bilirubin = st.number_input("DAYY90_bilirubin (mg/dl)",value=1.0, step=0.1)
             dayy90_ast = st.number_input("DAYY90_AST (U/L)")
             dayy90_alt = st.number_input("DAYY90_ALT (U/L)")
             dayy90_alkaline_phosphatase = st.number_input(
@@ -665,21 +1113,27 @@ def main():
             dayy90_albi_emr = st.number_input("DAYY90_Albi EMR")
 
             prey90_ecog = st.selectbox("PREY90_ECOG", options=["0", "1", "2", "3", "4", "NA"])
+            dayy90_child_pugh_points_calc = calculatepoints(dayy90_bilirubin,dayy90_albumin,dayy90_inr,dayy90_ascites,dayy90_hepatic_encephalopathy)
+            dayy90_child_pugh_class_calc = calculate_class(dayy90_child_pugh_points_calc)
             # Formula Calculation
             dayy90_meld_calc = (3.78*(int(dayy90_bilirubin)))+(11.2*(int(dayy90_inr)))+(9.57*(int(dayy90_creatinine)))+6.43
             dayy90_meld_na_calc = dayy90_meld_calc + 1.32*(137-int(dayy90_sodium)) - (0.033*dayy90_meld_calc*(137-int(dayy90_sodium)))
-            #dayy90_albi_calc = ((math.log(int(dayy90_bilirubin)))*(0.66))+(dayy90_albumin*(-0.085))
-            dayy90_bilirubin = float(dayy90_bilirubin)
-            dayy90_albumin = float(dayy90_albumin)
+            
+
+            def albi_calc(a,b):
+                a=int(a)
+                b=int(b)
+                t = math.log(a, 10)
+                answer = (t * 0.66) + (b * -0.085)
+                return answer
+            
+            dayy90_albi_calc = albi_calc(dayy90_bilirubin,dayy90_albumin)
             #dayy90_albi_calc = (math.log(dayy90_bilirubin) * 0.66) + (dayy90_albumin * -0.085)
 
 
-            dayy90_child_pugh_class_calc = st.text_input("DAYY90_Child-Pugh class Calc (formula)")
-            dayy90_child_pugh_points_calc = st.text_input("DAYY90_Child-Pugh points Calc (formula)")
-            dayy90_bclc_calc = st.text_input("DAYY90_BCLC Calc (formula)")
-            #dayy90_meld_calc = st.text_input("DAYY90_MELD Calc (formula)")
-            #dayy90_meld_na_calc = st.text_input("DAYY90_MELD Na Calc (formula)")
-            #dayy90_albi_calc = st.text_input("DAYY90_Albi Calc (formula)")
+       
+            #dayy90_bclc_calc = st.text_input("DAYY90_BCLC Calc (formula)")
+            
 
             dayy90_type_of_sphere = st.selectbox(
                 "DAYY90_Type of Sphere", options=["Therasphere-1", "SIR-2"]
@@ -698,9 +1152,10 @@ def main():
                     st.error("Please fill out Patient Info tab first!")
             else:
                 dayy90_data = {
+                      #**st.session_state['tab1_data'],
                       "DAYY90_AFP" : dayy90_afp,
                       "DAYY90_AFP Prior to TARE " : dayy90_afp_prior_to_tare,
-                      #"AFP_PreY90 or DAYY90" : afp_prey90,
+                      "AFP_PreY90 or DAYY90" : afp_prey90,
                       "DAYY90_sodium" : dayy90_sodium,
                       "DAYY90_creatinine" : dayy90_creatinine,
                       "DAYY90_inr" : dayy90_inr,
@@ -722,10 +1177,10 @@ def main():
                       "PREY90_ECOG" : prey90_ecog,
                       "DAYY90_Child-Pugh class Calc" : dayy90_child_pugh_class_calc,
                       "DAYY90_Child-Pugh points calc" : dayy90_child_pugh_points_calc,
-                      "DAYY90_BCLC calc" : dayy90_bclc_calc,
+                      #"DAYY90_BCLC calc" : dayy90_bclc_calc,
                       "DAYY90_MELD calc" : dayy90_meld_calc,
                       "DAYY90_MELD Na calc" : dayy90_meld_na_calc,
-                      #"DAYY90_Albi calc" : dayy90_albi_calc,
+                      "DAYY90_Albi calc" : dayy90_albi_calc,
                       "DAYY90_Type of Sphere" : dayy90_type_of_sphere,
                       "DAYY90_LT_notes_ftx" : dayy90_lt_notes_ftx,
                       "ken_ChildPughscore" : ken_childpughscore,
@@ -735,7 +1190,7 @@ def main():
                     
                     
                 }
-                st.session_state.form_data.append(dayy90_data)
+                #st.session_state.form_data.append(dayy90_data)
                 st.success("Day Y90 saved successfully!")
 
     with tab9:
@@ -771,6 +1226,7 @@ def main():
                         st.error("Please fill out Patient Info tab first!")
                     else:
                         k_other_data = {
+                            **st.session_state['tab1_data'],
                             "OC_Liver_transplant" : oc_liver_transplant,
                             "OC_Liver_transplant_date" : oc_liver_transplant_date,
                             "K_ken_ToxgtG3" : k_ken_toxgtg3,
