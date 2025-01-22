@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import math
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -447,7 +448,8 @@ def login_page():
 def add_new_data():
     st.title("Patient Information System")
 
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["Patient Info", "Patient Demographics", "Cirrhosis PMH","HCC Diagnosis", "Previous Therapy for HCC", "Pre Y90", "Day_Y90", "Post Y90 Within 30 Days Labs"])
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11 = st.tabs(["Patient Info", "Patient Demographics", "Cirrhosis PMH","HCC Diagnosis", "Previous Therapy for HCC", "Pre Y90", "Day_Y90", "Post Y90 Within 30 Days Labs", "Other Post Tare","Imaging Date","Dosimetry Data"])
+    
     with tab1:
         st.subheader("Patient Information")
         with st.form("patient_info_form"):
@@ -468,7 +470,7 @@ def add_new_data():
             
             age = st.number_input("Age at time of TARE", min_value=0, max_value=150, step=1)
         
-            submit_tab1 = st.form_submit_button("Submit Patient Info")
+            submit_tab1 = st.form_submit_button("Submit")
             if submit_tab1:
                 if mrn in st.session_state.data["MRN"].values:
                     st.error(f"MRN {mrn} already exists. Please enter a unique MRN.")
@@ -483,7 +485,7 @@ def add_new_data():
                         } ])], ignore_index=True)
                     st.session_state.temp_mrn = mrn
                     st.success("Patient Information saved. Proceed to Patient Description tab.")
-                    st.dataframe(st.session_state.data)
+        st.dataframe(st.session_state.data, use_container_width=True , height=250)
                     #st.dataframe(st.session_state.data)
                    
     with tab2:
@@ -559,7 +561,7 @@ def add_new_data():
                 # Display calculated fields (read-only)
                 st.info(f"Comorbidities Total Count: {total_count}")
                 st.info(f"Comorbidities Binary Value: {binary_value}")
-                submit_tab2 = st.form_submit_button("Submit Patient Description")
+                submit_tab2 = st.form_submit_button("Submit")
                 if submit_tab2:
                     index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
                     st.session_state.data.at[index, "Gender"] = gender
@@ -573,7 +575,7 @@ def add_new_data():
                     st.session_state.data.at[index, "Comorbitieis Binary"] = binary_value
                     st.success("Patient Description added successfully.")
                     st.write("Updated Data:")
-                    st.dataframe(st.session_state.data)
+        st.dataframe(st.session_state.data, use_container_width=True , height=250)
 
     with tab3:
         st.subheader("Cirrhosis PMH")
@@ -801,7 +803,7 @@ def add_new_data():
             
                 )
 
-                submit_tab3 = st.form_submit_button("Submit Cirrhosis PMH")
+                submit_tab3 = st.form_submit_button("Submit")
                 if submit_tab3:
 
                     index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
@@ -841,7 +843,7 @@ def add_new_data():
                     
                     st.success("Patient Description added successfully.")
                     st.write("Updated Data:")
-                    st.dataframe(st.session_state.data)
+        st.dataframe(st.session_state.data, use_container_width=True , height=250)
 
     with tab4:
         st.subheader("HCC Diagnosis")
@@ -1034,7 +1036,7 @@ def add_new_data():
                 hcc_dx_albi_score_calc = albi_calc(hcc_dx_bilirubin, hcc_dx_albumin)
             
 
-                submit_tab4 = st.form_submit_button("Save HCC Diagnosis")
+                submit_tab4 = st.form_submit_button("Submit")
                 if submit_tab4:
                         index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
                         st.session_state.data.at[index, "HCC_Dx_HCC Diagnosis Date"] = hcc_dx_hcc_diagnosis_date.strftime("%Y-%m-%d")
@@ -1068,7 +1070,7 @@ def add_new_data():
 
                         st.success("HCC Dx added successfully.")
                         st.write("Updated Data:")
-                        st.dataframe(st.session_state.data)
+        st.dataframe(st.session_state.data, use_container_width=True , height=250)
   
     with tab5:
         if "MRN" not in st.session_state.data:
@@ -1181,7 +1183,7 @@ def add_new_data():
                     help="Enter AFP value in ng/dl or NA"
                 )
 
-                submit_tab5 = st.form_submit_button("Submit Previous Therapy Form")
+                submit_tab5 = st.form_submit_button("Submit")
 
                 if submit_tab5:
                         index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
@@ -1206,7 +1208,7 @@ def add_new_data():
                         
                         st.success("Previous Therapy for HCC added successfully.")
                         st.write("Updated Data:")
-                        st.dataframe(st.session_state.data)
+        st.dataframe(st.session_state.data, use_container_width=True , height=250)
 
     with tab6:
         if "MRN" not in st.session_state.data:
@@ -1363,7 +1365,7 @@ def add_new_data():
                 my90_date = st.date_input("MY90_date", help="Enter the date")
                 my90_lung_shunt = st.number_input("MY90_Lung_shunt", min_value=0, step=1, help="Enter the lung shunt value")
 
-                submit_tab4 = st.form_submit_button("Save Pre Y90")
+                submit_tab4 = st.form_submit_button("Submit")
 
                 if submit_tab4:
                     index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
@@ -1402,8 +1404,8 @@ def add_new_data():
 
                     st.success("Pre Y90 added successfully.")
                     st.write("Updated Data:")
-                    st.dataframe(st.session_state.data)             
-
+        st.dataframe(st.session_state.data, use_container_width=True , height=250)
+                              
     with tab7:
         st.subheader("Day_Y90")
         with st.form("day_y90_form"):
@@ -1562,7 +1564,7 @@ def add_new_data():
                     
                     st.success("DAYY90 added successfully.")
                     st.write("Updated Data:")
-                    st.dataframe(st.session_state.data)
+        st.dataframe(st.session_state.data, use_container_width=True , height=250)
     
     with tab8:
         st.subheader("Post Y90 Within 30 Days Labs")
@@ -1785,7 +1787,7 @@ def add_new_data():
                         help="(if AE is present after 30 days but before 90 write it here and the date)"
                     )
 
-                    submit_tab8 = st.form_submit_button("Save Post POST90 Labs")
+                    submit_tab8 = st.form_submit_button("Submit")
 
                     if submit_tab8:
                             
@@ -1851,8 +1853,981 @@ def add_new_data():
 
                             st.success("DAYY90 added successfully.")
                             st.write("Updated Data:")
-                            st.dataframe(st.session_state.data)
-                            
+        st.dataframe(st.session_state.data, use_container_width=True , height=250)
+
+    with tab9:
+        st.subheader("Other_post_TARE")
+        with st.form("other_post_tare_form"):
+                if "MRN" not in st.session_state.data:
+                    st.warning("Please complete the Patient Information tab first.")
+                else:
+                    oc_liver_transplant = st.radio("OC_Liver_transplant", options=["yes", "no"])
+                    oc_liver_transplant_date = st.date_input("OC_Liver_transplant_date")
+
+                    st.subheader("K_other")
+        # with st.form("k_other_form"):
+
+                    k_ken_toxgtg3 = st.number_input("K_ken_ToxgtG3")
+                    if k_ken_toxgtg3 > 3:
+                        k_ken_toxgtg3 = 1
+                    else:
+                        k_ken_toxgtg3 =0
+                                    
+                    k_ken_toxgtg2 = st.number_input("K_ken_ToxgtG2")
+                    if k_ken_toxgtg2 > 2:
+                        k_ken_toxgtg2 = 1
+                    else:
+                        k_ken_toxgtg2 =0
+
+                    def albigrade(intx):
+                        if intx <= -2.60:
+                            return "Grade 1"
+                        elif -2.60 < intx <= -1.39:
+                            return "Grade 2"
+                        else:
+                            return "Grade 3"
+
+                    k_ken_albipretareraw = albi_calc(prey90_bilirubin,prey90_albumin)
+                    k_ken_albipretaregrade = albigrade(k_ken_albipretareraw)
+                    k_ken_albiposttareraw = albi_calc(posty90_bilirubin,posty90_albumin)
+                    k_ken_albiposttaregrade = albigrade(k_ken_albiposttareraw)
+
+                    submit_tab9 = st.form_submit_button("Submit")
+
+                    if submit_tab9:
+                        #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
+
+                        st.session_state.data.at[index, "OC_Liver_transplant"] = oc_liver_transplant
+                        st.session_state.data.at[index, "OC_Liver_transplant_date"] = oc_liver_transplant_date
+                        st.session_state.data.at[index, "K_ken_ToxgtG3"] = k_ken_toxgtg3
+                        st.session_state.data.at[index, "K_ken_ToxgtG2"] = k_ken_toxgtg2
+                        st.session_state.data.at[index, "K_ken_AlbiPreTARERaw"] = k_ken_albipretareraw
+                        st.session_state.data.at[index, "K_ken_AlbiPreTAREGrade"] = k_ken_albipretaregrade
+                        st.session_state.data.at[index, "K_ken_AlbiPostTARERaw"] = k_ken_albiposttareraw
+                        st.session_state.data.at[index, "K_ken_AliPostTAREGrade"] = k_ken_albiposttaregrade
+
+                        st.success("Other Post Tare added successfully.")
+                        st.write("Updated Data:")
+        st.dataframe(st.session_state.data, use_container_width=True , height=250)
+                    
+    with tab10:
+        st.subheader("Imaging Date")
+        with st.form("imaging_date_form"):
+                if "MRN" not in st.session_state.data:
+                    st.warning("Please complete the Patient Information tab first.")
+                else:
+            
+                    st.subheader("Imaging PreY90")
+                    
+                    PREY90_prescan_modality = st.selectbox(
+                            "PREY90_prescan_modality",
+                            options=["CT","MRI"],
+                    )
+                    PREY90_Imaging_Date = st.date_input("PREY90_Imaging Date")
+                    PREY90_total_number_of_lesions = st.selectbox(
+                            "PREY90_total number of lesions",
+                            options=["1","2",">3"],
+                    )
+                    PREY90_Number_Involved_Lobes = st.selectbox(
+                            "PREY90_Number Involved Lobes",
+                            options=["Unilobar","Bilobar"],
+                    )
+                    PREY90_target_lesion_1_segments = st.multiselect(
+                            "PREY90_target_lesion_1_segments",
+                            options=["1","2","3","4a","4b","5","6","7","8","NA"],
+                    )
+                    PREY90_TL1_LAD = st.number_input(
+                        "PREY90_TL1_LAD",
+                        format="%.2f"
+                    )
+
+                    PREY90_Target_Lesion_1_PAD = st.number_input(
+                        "PREY90_Target Lesion 1 PAD",
+                        format="%.2f"
+                    )
+
+                    PREY90_Target_Lesion_1_CCD = st.number_input(
+                        "PREY90_Target Lesion 1 CCD",
+                        format="%.2f"
+                    )
+                    PREY90_Target_Lesion_1_VOL = 4/3*3.14*(PREY90_Target_Lesion_1_PAD)*(PREY90_TL1_LAD)*PREY90_Target_Lesion_1_CCD
+                    PREY90_Target_Lesion_2_segments = st.selectbox(
+                            "PREY90_Target_Lesion_2_segments",
+                            options=["1","2","3","4a","4b","5","6","7","8","NA"],
+                    )
+                    PREY90_Target_Lesion_2_LAD = st.number_input(
+                        "PREY90_Target_Lesion_2_LAD",
+                        format="%.2f"
+                    )
+                    PREY90_Target_Lesion_2_PAD = st.number_input(
+                        "PREY90_Target Lesion 2 PAD",
+                        format="%.2f"
+                    )
+
+                    PREY90_Target_Lesion_2_CCD = st.number_input(
+                        "PREY90_Target Lesion 2 CCD",
+                        format="%.2f"
+                    )
+                    PREY90_Target_Lesion_2_VOL = 4/3*3.14*(PREY90_Target_Lesion_2_PAD)*(PREY90_Target_Lesion_2_LAD)*PREY90_Target_Lesion_2_CCD
+
+                    PREY90_pretx_targeted_Lesion_Dia_Sum = max(PREY90_TL1_LAD,PREY90_Target_Lesion_1_PAD,PREY90_Target_Lesion_1_CCD)+max(PREY90_Target_Lesion_2_PAD,PREY90_Target_Lesion_2_LAD,PREY90_Target_Lesion_2_CCD)
+
+                    PREY90_Non_Target_Lesion_Location = st.selectbox( "PREY90_Non-Target Lesion Location" , options=["1","2","3","4a","4b","5","6","7","8","NA"])
+
+                    PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
+                        "PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc",
+                        format="%.2f"
+                    )
+                    PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
+                        "PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc",
+                        format="%.2f"
+                    )
+
+                    PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
+                        "PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc",
+                        format="%.2f"
+                    )
+                    PREY90_Non_targeted_Lesion_Dia_Sum = max(PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc)
+
+                    PREY90_Reviewers_Initials = st.text_input(
+                        "PREY90_Reviewers Initials",
+                        help="Free-text input for reviewer name"
+                    )
+
+                    PREY90_Pre_Y90_Extrahepatic_Disease = st.selectbox(
+                        "PREY90_Pre Y90 Extrahepatic Disease",
+                        options=["Yes", "No", "N/A"]
+                    )
+
+                    PREY90_Pre_Y90_Extrahepatic_Disease_Location = st.text_input(
+                        "PREY90_Pre Y90 Extrahepatic Disease Location",
+                        help="Free Text"
+                    )
+
+                    PREY90_PVT = st.selectbox(
+                        "PREY90_PVT",
+                        options=["Yes", "No", "N/A"]
+                    )
+
+                    PREY90_PVT_Location = st.selectbox(
+                        "PREY90_PVT Location",
+                        options=["RPV", "LPV"]
+                    )
+
+                    PREY90_Features_of_cirrhosis = st.selectbox(
+                        "PREY90_Features of cirrhosis",
+                        options=["Yes", "No", "N/A"]
+                    )
+
+                    st.subheader("Imaging_1st_Followup")
+
+                    FU_Scan_Modality = st.selectbox(
+                        "1st_FU_Scan Modality",
+                        options=["CT", "MRI"]
+                    )
+
+                    FU_Imaging_Date = st.date_input("1st_FU_Imaging Date")
+
+                    # Assuming "Months Since Y90" is calculated elsewhere in the code
+                    # FU_Months_Since_Y90 = calculated_value
+                    FU_Months_Since_Y90 = relativedelta(FU_Imaging_Date, tare_date).months
+
+                    FU_Total_number_of_lesions = st.selectbox(
+                        "1st_FU_Total number of lesions",
+                        options=["1", "2", ">3"]
+                    )
+
+                    FU_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
+                        "1st_FU_Target Lesion 1 LAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
+                        "1st_FU_Target Lesion 1 PAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
+                        "1st_FU_Target Lesion 1 CCD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU_Target_Lesion_2_Segments = st.selectbox(
+                        "1st_FU_Target Lesion 2 Segments",
+                        options=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"]
+                    )
+
+                    FU_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
+                        "1st_FU_Target Lesion 2 LAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
+                        "1st_FU_Target Lesion 2 PAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
+                        "1st_FU_Target Lesion 2 CCD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    # Assuming "Follow up 1 targeted Lesion Dia Sum" is calculated elsewhere in the code
+                    # FU_Follow_up_1_targeted_Lesion_Dia_Sum = calculated_value
+                    FU_Follow_up_1_targeted_Lesion_Dia_Sum = max(FU_Target_Lesion_1_CCD_Art_Enhanc,FU_Target_Lesion_1_PAD_Art_Enhanc,FU_Target_Lesion_1_LAD_Art_Enhanc)+max(FU_Target_Lesion_2_CCD_Art_Enhanc,FU_Target_Lesion_2_PAD_Art_Enhanc,FU_Target_Lesion_2_LAD_Art_Enhanc)
+
+
+                    FU_Non_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
+                        "1st_FU_Non-Target Lesion 2 LAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU_Non_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
+                        "1st_FU_Non-Target Lesion 2 PAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU_Non_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
+                        "1st_FU_Non-Target Lesion 2 CCD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    # Assuming "Non-targeted Lesion Dia Sum" is calculated elsewhere in the code
+                    FU_Non_targeted_Lesion_Dia_Sum = max(FU_Non_Target_Lesion_2_LAD_Art_Enhanc,FU_Non_Target_Lesion_2_PAD_Art_Enhanc,FU_Non_Target_Lesion_2_CCD_Art_Enhanc)
+
+                    FU_Lesion_Necrosis = st.selectbox(
+                        "1st_FU_Lesion Necrosis",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU_Reviewers_Initials = st.text_input(
+                        "1st_FU_Reviewers Initials",
+                        help="Free-text input for reviewer name"
+                    )
+
+                    FU_Non_target_lesion_response = st.selectbox(
+                        "1st_FU_Non target lesion response",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU_New_Lesions = st.selectbox(
+                        "1st_FU_New Lesions",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU_NEW_Extrahepatic_Disease = st.selectbox(
+                        "1st_FU_NEW Extrahepatic Disease",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU_NEW_Extrahepatic_Dz_Location = st.text_input(
+                        "1st_FU_NEW Extrahepatic Dz Location",
+                        help="Free text"
+                    )
+
+                    FU_NEW_Extrahepatic_Dz_Date = st.date_input("1st_FU_NEW Extrahepatic Dz Date")
+
+                    FU_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU_Non_targeted_Lesion_Dia_Sum)/max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
+
+                    FU_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU_Follow_up_1_targeted_Lesion_Dia_Sum)/max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
+
+                    FU_Free_Text = st.text_area(
+                        "1st_FU_Free Text",
+                        help="Free text"
+                    )
+
+                    st.subheader("Imaging_2nd_Followup")
+
+                    FU2_Scan_Modality = st.selectbox(
+                        "2nd_FU_Scan Modality",
+                        options=["CT", "MRI"]
+                    )
+
+                    FU2_Imaging_Date = st.date_input("2nd_FU_Imaging Date")
+
+                    FU2_Months_Since_Y90 = relativedelta(FU2_Imaging_Date, tare_date).months
+
+                    FU2_Total_number_of_lesions = st.selectbox(
+                        "2nd_FU_Total number of lesions",
+                        options=["1", "2", ">3"]
+                    )
+
+                    FU2_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
+                        "2nd_FU_Target Lesion 1 LAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU2_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
+                        "2nd_FU_Target Lesion 1 PAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU2_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
+                        "2nd_FU_Target Lesion 1 CCD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU2_Target_Lesion_2_Segments = st.selectbox(
+                        "2nd_FU_Target Lesion 2 Segments",
+                        options=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"]
+                    )
+
+                    FU2_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
+                        "2nd_FU_Target Lesion 2 LAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU2_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
+                        "2nd_FU_Target Lesion 2 PAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU2_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
+                        "2nd_FU_Target Lesion 2 CCD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU2_Follow_up_2_targeted_Lesion_Dia_Sum = max(FU2_Target_Lesion_1_CCD_Art_Enhanc, FU2_Target_Lesion_1_PAD_Art_Enhanc, FU2_Target_Lesion_1_LAD_Art_Enhanc) + max(FU2_Target_Lesion_2_CCD_Art_Enhanc, FU2_Target_Lesion_2_PAD_Art_Enhanc, FU2_Target_Lesion_2_LAD_Art_Enhanc)
+
+                    FU2_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
+                        "2nd_FU_Non-Target Lesion 1 LAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU2_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
+                        "2nd_FU_Non-Target Lesion 1 PAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU2_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
+                        "2nd_FU_Non-Target Lesion 1 CCD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU2_Non_targeted_Lesion_Dia_Sum = max(FU2_Non_Target_Lesion_1_LAD_Art_Enhanc, FU2_Non_Target_Lesion_1_PAD_Art_Enhanc, FU2_Non_Target_Lesion_1_CCD_Art_Enhanc)
+
+                    FU2_Lesion_Necrosis = st.selectbox(
+                        "2nd_FU_Lesion Necrosis",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU2_Reviewers_Initials = st.text_input(
+                        "2nd_FU_Reviewers Initials",
+                        help="Free-text input for reviewer name"
+                    )
+
+                    FU2_Non_target_lesion_response = st.selectbox(
+                        "2nd_FU_Non target lesion response",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU2_New_Lesions = st.selectbox(
+                        "2nd_FU_New Lesions",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU2_NEW_Extrahepatic_Disease = st.selectbox(
+                        "2nd_FU_NEW Extrahepatic Disease",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU2_NEW_Extrahepatic_Dz_Location = st.text_input(
+                        "2nd_FU_NEW Extrahepatic Dz Location",
+                        help="Free text"
+                    )
+
+                    FU2_NEW_Extrahepatic_Dz_Date = st.date_input("2nd_FU_NEW Extrahepatic Dz Date")
+
+                    FU2_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU2_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+
+                    FU2_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU2_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+
+                    FU2_Free_Text = st.text_area(
+                        "2nd_FU_Free Text",
+                        help="Free text"
+                    )
+
+                    # Repeat the same structure for 3rd, 4th, and 5th follow-ups with variable names changed accordingly
+
+                    # 3rd Imaging Follow-up
+                    st.subheader("Imaging_3rd_Followup")
+
+                    FU3_Scan_Modality = st.selectbox(
+                        "3rd_FU_Scan Modality",
+                        options=["CT", "MRI"]
+                    )
+
+                    FU3_Imaging_Date = st.date_input("3rd_FU_Imaging Date")
+
+                    FU3_Months_Since_Y90 = relativedelta(FU3_Imaging_Date, tare_date).months
+
+                    FU3_Total_number_of_lesions = st.selectbox(
+                        "3rd_FU_Total number of lesions",
+                        options=["1", "2", ">3"]
+                    )
+
+                    FU3_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
+                        "3rd_FU_Target Lesion 1 LAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU3_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
+                        "3rd_FU_Target Lesion 1 PAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU3_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
+                        "3rd_FU_Target Lesion 1 CCD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU3_Target_Lesion_2_Segments = st.selectbox(
+                        "3rd_FU_Target Lesion 2 Segments",
+                        options=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"]
+                    )
+
+                    FU3_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
+                        "3rd_FU_Target Lesion 2 LAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU3_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
+                        "3rd_FU_Target Lesion 2 PAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU3_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
+                        "3rd_FU_Target Lesion 2 CCD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU3_Follow_up_2_targeted_Lesion_Dia_Sum = max(FU3_Target_Lesion_1_CCD_Art_Enhanc, FU3_Target_Lesion_1_PAD_Art_Enhanc, FU3_Target_Lesion_1_LAD_Art_Enhanc) + max(FU3_Target_Lesion_2_CCD_Art_Enhanc, FU3_Target_Lesion_2_PAD_Art_Enhanc, FU3_Target_Lesion_2_LAD_Art_Enhanc)
+
+                    FU3_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
+                        "3rd_FU_Non-Target Lesion 1 LAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU3_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
+                        "3rd_FU_Non-Target Lesion 1 PAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU3_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
+                        "3rd_FU_Non-Target Lesion 1 CCD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU3_Non_targeted_Lesion_Dia_Sum = max(FU3_Non_Target_Lesion_1_LAD_Art_Enhanc, FU3_Non_Target_Lesion_1_PAD_Art_Enhanc, FU3_Non_Target_Lesion_1_CCD_Art_Enhanc)
+
+                    FU3_Lesion_Necrosis = st.selectbox(
+                        "3rd_FU_Lesion Necrosis",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU3_Reviewers_Initials = st.text_input(
+                        "3rd_FU_Reviewers Initials",
+                        help="Free-text input for reviewer name"
+                    )
+
+                    FU3_Non_target_lesion_response = st.selectbox(
+                        "3rd_FU_Non target lesion response",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU3_New_Lesions = st.selectbox(
+                        "3rd_FU_New Lesions",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU3_NEW_Extrahepatic_Disease = st.selectbox(
+                        "3rd_FU_NEW Extrahepatic Disease",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU3_NEW_Extrahepatic_Dz_Location = st.text_input(
+                        "3rd_FU_NEW Extrahepatic Dz Location",
+                        help="Free text"
+                    )
+
+                    FU3_NEW_Extrahepatic_Dz_Date = st.date_input("3rd_FU_NEW Extrahepatic Dz Date")
+
+                    FU3_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU3_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+
+                    FU3_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU3_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+
+                    FU3_Free_Text = st.text_area(
+                        "3rd_FU_Free Text",
+                        help="Free text"
+                    )
+
+                    # 4th Imaging Follow-up
+                    st.subheader("Imaging_4th_Followup")
+
+                    FU4_Scan_Modality = st.selectbox(
+                        "4th_FU_Scan Modality",
+                        options=["CT", "MRI"]
+                    )
+
+                    FU4_Imaging_Date = st.date_input("4th_FU_Imaging Date")
+
+                    FU4_Months_Since_Y90 = relativedelta(FU4_Imaging_Date, tare_date).months
+
+                    FU4_Total_number_of_lesions = st.selectbox(
+                        "4th_FU_Total number of lesions",
+                        options=["1", "2", ">3"]
+                    )
+
+                    FU4_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
+                        "4th_FU_Target Lesion 1 LAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU4_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
+                        "4th_FU_Target Lesion 1 PAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU4_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
+                        "4th_FU_Target Lesion 1 CCD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU4_Target_Lesion_2_Segments = st.selectbox(
+                        "4th_FU_Target Lesion 2 Segments",
+                        options=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"]
+                    )
+
+                    FU4_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
+                        "4th_FU_Target Lesion 2 LAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU4_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
+                        "4th_FU_Target Lesion 2 PAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU4_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
+                        "4th_FU_Target Lesion 2 CCD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU4_Follow_up_2_targeted_Lesion_Dia_Sum = max(FU4_Target_Lesion_1_CCD_Art_Enhanc, FU4_Target_Lesion_1_PAD_Art_Enhanc, FU4_Target_Lesion_1_LAD_Art_Enhanc) + max(FU4_Target_Lesion_2_CCD_Art_Enhanc, FU4_Target_Lesion_2_PAD_Art_Enhanc, FU4_Target_Lesion_2_LAD_Art_Enhanc)
+
+                    FU4_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
+                        "4th_FU_Non-Target Lesion 1 LAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU4_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
+                        "4th_FU_Non-Target Lesion 1 PAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU4_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
+                        "4th_FU_Non-Target Lesion 1 CCD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU4_Non_targeted_Lesion_Dia_Sum = max(FU4_Non_Target_Lesion_1_LAD_Art_Enhanc, FU4_Non_Target_Lesion_1_PAD_Art_Enhanc, FU4_Non_Target_Lesion_1_CCD_Art_Enhanc)
+
+                    FU4_Lesion_Necrosis = st.selectbox(
+                        "4th_FU_Lesion Necrosis",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU4_Reviewers_Initials = st.text_input(
+                        "4th_FU_Reviewers Initials",
+                        help="Free-text input for reviewer name"
+                    )
+
+                    FU4_Non_target_lesion_response = st.selectbox(
+                        "4th_FU_Non target lesion response",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU4_New_Lesions = st.selectbox(
+                        "4th_FU_New Lesions",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU4_NEW_Extrahepatic_Disease = st.selectbox(
+                        "4th_FU_NEW Extrahepatic Disease",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU4_NEW_Extrahepatic_Dz_Location = st.text_input(
+                        "4th_FU_NEW Extrahepatic Dz Location",
+                        help="Free text"
+                    )
+
+                    FU4_NEW_Extrahepatic_Dz_Date = st.date_input("4th_FU_NEW Extrahepatic Dz Date")
+
+                    FU4_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU4_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+
+                    FU4_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU4_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+
+                    FU4_Free_Text = st.text_area(
+                        "4th_FU_Free Text",
+                        help="Free text"
+                    )
+
+                    # 5th Imaging Follow-up
+                    st.subheader("Imaging_5th_Followup")
+
+                    FU5_Scan_Modality = st.selectbox(
+                        "5th_FU_Scan Modality",
+                        options=["CT", "MRI"]
+                    )
+
+                    FU5_Imaging_Date = st.date_input("5th_FU_Imaging Date")
+
+                    FU5_Months_Since_Y90 = relativedelta(FU5_Imaging_Date, tare_date).months
+
+                    FU5_Total_number_of_lesions = st.selectbox(
+                        "5th_FU_Total number of lesions",
+                        options=["1", "2", ">3"]
+                    )
+
+                    FU5_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
+                        "5th_FU_Non-Target Lesion 1 LAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU5_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
+                        "5th_FU_Non-Target Lesion 1 PAD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU5_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
+                        "5th_FU_Non-Target Lesion 1 CCD Art Enhanc",
+                        format="%.2f"
+                    )
+
+                    FU5_Non_targeted_Lesion_Dia_Sum = max(FU5_Non_Target_Lesion_1_LAD_Art_Enhanc, FU5_Non_Target_Lesion_1_PAD_Art_Enhanc, FU5_Non_Target_Lesion_1_CCD_Art_Enhanc)
+
+                    FU5_Lesion_Necrosis = st.selectbox(
+                        "5th_FU_Lesion Necrosis",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU5_Reviewers_Initials = st.text_input(
+                        "5th_FU_Reviewers Initials",
+                        help="Free-text input for reviewer name"
+                    )
+
+                    FU5_Non_target_lesion_response = st.selectbox(
+                        "5th_FU_Non target lesion response",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU5_New_Lesions = st.selectbox(
+                        "5th_FU_New Lesions",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU5_NEW_Extrahepatic_Disease = st.selectbox(
+                        "5th_FU_NEW Extrahepatic Disease",
+                        options=["No", "Yes", "NA"]
+                    )
+
+                    FU5_NEW_Extrahepatic_Dz_Location = st.text_input(
+                        "5th_FU_NEW Extrahepatic Dz Location",
+                        help="Free text"
+                    )
+
+                    FU5_NEW_Extrahepatic_Dz_Date = st.date_input("5th_FU_NEW Extrahepatic Dz Date")
+
+                    FU5_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU5_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+
+
+                    FU5_Free_Text = st.text_area(
+                        "5th_FU_Free Text",
+                        help="Free text"
+                    )
+
+                    st.subheader("Imaging_Dates for OS or PFS")
+
+                    dead = st.selectbox(
+                            "Dead",
+                            options=["0", "1"],
+                            format_func=lambda x:{
+                                    "0":"No",
+                                    "1":"Yes"
+                            }[x],
+                    )
+
+                    Date_of_Death = 'NA' if dead == 0 else st.date_input("Date of Death")
+                    Time_to_Death = 'NA' if dead == 0 else relativedelta(Date_of_Death, tare_date).months
+
+                    OLT = st.selectbox(
+                            "OLT",
+                            options=["0", "1"],
+                            format_func=lambda x:{
+                                    "0":"No",
+                                    "1":"Yes"
+                            }[x]
+                    )
+
+                    Date_of_OLT = 'NA' if OLT == 0 else st.date_input("Date of OLT")
+                    Time_to_OLT = 'NA' if OLT == 0 else relativedelta(Date_of_Death, tare_date).months
+                    
+                    Repeat_tx_post_Y90 = st.selectbox(
+                            "Repeat tx post Y90",
+                            options=["0", "1"],
+                            format_func=lambda x:{
+                                    "0":"No",
+                                    "1":"Yes"
+                            }[x]
+                    )
+
+                    Date_of_Repeat_tx_Post_Y90 = 'NA' if Repeat_tx_post_Y90 == 0 else st.date_input("Date of Repeat tx Post Y90")
+                    Time_to_Repeat_Tx_Post_Y90 = 'NA' if Repeat_tx_post_Y90 == 0 else relativedelta(Date_of_Death, tare_date).months
+
+                    Date_of_Localized_Progression = st.text_input("Date of Localized Progression")
+
+                    if Date_of_Localized_Progression == "No Progression":
+                            Time_to_localized_progression = 'NA'
+                    else:
+                            Time_to_Localized_Progression = relativedelta(Date_of_Localized_Progression, tare_date).years
+
+                    Date_of_Overall_Progression = st.text_input("Date of Overall Progression")
+
+                    if Date_of_Overall_Progression == "No Progression":
+                            Time_to_overall_progression = 'NA'
+                    else:
+                            Time_to_overall_Progression = relativedelta(Date_of_Overall_Progression, tare_date).years
+
+                    Date_of_Last_Follow_up_last_imaging_date = 'NA' if dead == 1 and OLT == 1 else st.date_input("Date of Last Follow-up/last imaging date")
+
+                    Time_to_Last_Follow_up_last_imaging_date = 'NA' if dead == 1 and OLT == 1 else relativedelta(Date_of_Last_Follow_up_last_imaging_date, tare_date).years 
+
+                    submit_tab10 = st.form_submit_button("Submit")
+
+                    if submit_tab10:
+                        index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
+
+                        st.session_state.data.at[index, "PREY90_prescan_modality"] = PREY90_prescan_modality
+                        st.session_state.data.at[index, "PREY90_Imaging Date"] = PREY90_Imaging_Date
+                        st.session_state.data.at[index, "PREY90_total number of lesions"] = PREY90_total_number_of_lesions
+                        st.session_state.data.at[index, "PREY90_Number Involved Lobes"] = PREY90_Number_Involved_Lobes
+                        st.session_state.data.at[index, "PREY90_target_lesion_1_segments"] = PREY90_target_lesion_1_segments
+                        st.session_state.data.at[index, "PREY90_TL1_LAD"] = PREY90_TL1_LAD
+                        st.session_state.data.at[index, "PREY90_Target Lesion 1 PAD"] = PREY90_Target_Lesion_1_PAD
+                        st.session_state.data.at[index, "PREY90_Target Lesion 1 CCD"] = PREY90_Target_Lesion_1_CCD
+                        st.session_state.data.at[index, "PREY90_Target Lesion 1 VOL"] = PREY90_Target_Lesion_1_VOL
+                        st.session_state.data.at[index, "PREY90_Target lesion 2 Segments"] = PREY90_Target_Lesion_2_segments
+                        st.session_state.data.at[index, "PREY90_Target Lesion 2 LAD"] = PREY90_Target_Lesion_2_LAD
+                        st.session_state.data.at[index, "PREY90_Target Lesion 2 PAD"] = PREY90_Target_Lesion_2_PAD
+                        st.session_state.data.at[index, "PREY90_Target Lesion 2 CCD"] = PREY90_Target_Lesion_2_CCD
+                        st.session_state.data.at[index, "PREY90_Target Lesion 2 VOL"] = PREY90_Target_Lesion_2_VOL
+                        st.session_state.data.at[index, "PREY90_pretx targeted Lesion Dia Sum"] = PREY90_pretx_targeted_Lesion_Dia_Sum
+                        st.session_state.data.at[index, "PREY90_Non-Target Lesion Location"] = PREY90_Non_Target_Lesion_Location
+                        st.session_state.data.at[index, "PREY90_Non-Target Lesion 2 LAD Art Enhanc"] = PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc
+                        st.session_state.data.at[index, "PREY90_Non-Target Lesion 2 PAD Art Enhanc"] = PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc
+                        st.session_state.data.at[index, "PREY90_Non-Target Lesion 2 CCD Art Enhanc"] = PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc
+                        st.session_state.data.at[index, "PREY90_Non-targeted Lesion Dia Sum"] = PREY90_Non_targeted_Lesion_Dia_Sum
+                        st.session_state.data.at[index, "PREY90_Reviewers Initials"] = PREY90_Reviewers_Initials
+                        st.session_state.data.at[index, "PREY90_Pre Y90 Extrahepatic Disease"] = PREY90_Pre_Y90_Extrahepatic_Disease
+                        st.session_state.data.at[index, "PREY90_Pre Y90 Extrahepatic Disease Location"] = PREY90_Pre_Y90_Extrahepatic_Disease_Location
+                        st.session_state.data.at[index, "PREY90_PVT"] = PREY90_PVT
+                        st.session_state.data.at[index, "PREY90_PVT Location"] = PREY90_PVT_Location
+                        st.session_state.data.at[index, "PREY90_Features of cirrhosis"] = PREY90_Features_of_cirrhosis
+                        st.session_state.data.at[index, "1st_FU_Scan Modality"] = FU_Scan_Modality
+                        st.session_state.data.at[index, "1st_FU_Imaging Date"] = FU_Imaging_Date
+                        st.session_state.data.at[index, "1st_FU_Months Since Y90"] = FU_Months_Since_Y90
+                        st.session_state.data.at[index, "1st_FU_Total number of lesions"] = FU_Total_number_of_lesions
+                        st.session_state.data.at[index, "1st_FU_Target Lesion 1 LAD Art Enhanc"] = FU_Target_Lesion_1_LAD_Art_Enhanc
+                        st.session_state.data.at[index, "1st_FU_Target Lesion 1 PAD Art Enhanc"] = FU_Target_Lesion_1_PAD_Art_Enhanc
+                        st.session_state.data.at[index, "1st_FU_Target Lesion 1 CCD Art Enhanc"] = FU_Target_Lesion_1_CCD_Art_Enhanc
+                        st.session_state.data.at[index, "1st_FU_Target Lesion 2 Segments"] = FU_Target_Lesion_2_Segments
+                        st.session_state.data.at[index, "1st_FU_Target Lesion 2 LAD Art Enhanc"] = FU_Target_Lesion_2_LAD_Art_Enhanc
+                        st.session_state.data.at[index, "1st_FU_Target Lesion 2 PAD Art Enhanc"] = FU_Target_Lesion_2_PAD_Art_Enhanc
+                        st.session_state.data.at[index, "1st_FU_Target Lesion 2 CCD Art Enhanc"] = FU_Target_Lesion_2_CCD_Art_Enhanc
+                        st.session_state.data.at[index, "1st_FU_Follow up 1 targeted Lesion Dia Sum"] = FU_Follow_up_1_targeted_Lesion_Dia_Sum
+                        st.session_state.data.at[index, "1st_FU_Non-Target Lesion 2 LAD Art Enhanc"] = FU_Non_Target_Lesion_2_LAD_Art_Enhanc
+                        st.session_state.data.at[index, "1st_FU_Non-Target Lesion 2 PAD Art Enhanc"] = FU_Non_Target_Lesion_2_PAD_Art_Enhanc
+                        st.session_state.data.at[index, "1st_FU_Non-Target Lesion 2 CCD Art Enhanc"] = FU_Non_Target_Lesion_2_CCD_Art_Enhanc
+                        st.session_state.data.at[index, "1st_FU_Non-targeted Lesion Dia Sum"] = FU_Non_targeted_Lesion_Dia_Sum
+                        st.session_state.data.at[index, "1st_FU_Lesion Necrosis"] = FU_Lesion_Necrosis
+                        st.session_state.data.at[index, "1st_FU_Reviewers Initials"] = FU_Reviewers_Initials
+                        st.session_state.data.at[index, "1st_FU_Non target lesion response"] = FU_Non_target_lesion_response
+                        st.session_state.data.at[index, "1st_FU_New Lesions"] = FU_New_Lesions
+                        st.session_state.data.at[index, "1st_FU_NEW Extrahepatic Disease"] = FU_NEW_Extrahepatic_Disease
+                        st.session_state.data.at[index, "1st_FU_NEW Extrahepatic Dz Location"] = FU_NEW_Extrahepatic_Dz_Location
+                        st.session_state.data.at[index, "1st_FU_NEW Extrahepatic Dz Date"] = FU_NEW_Extrahepatic_Dz_Date
+                        st.session_state.data.at[index, "1st_FU_% change non target lesion"] = FU_change_non_target_lesion
+                        st.session_state.data.at[index, "1st_FU_% Change target dia"] = FU_change_target_lesion
+                        st.session_state.data.at[index, "1st_FU_Free Text"] = FU_Free_Text
+                        st.session_state.data.at[index, "2nd_FU_Scan Modality"] = FU2_Scan_Modality
+                        st.session_state.data.at[index, "2nd_FU_Imaging Date"] = FU2_Imaging_Date
+                        st.session_state.data.at[index, "2nd_FU_Months Since Y90"] = FU2_Months_Since_Y90
+                        st.session_state.data.at[index, "2nd_FU_Total number of lesions"] = FU2_Total_number_of_lesions
+                        st.session_state.data.at[index, "2nd_FU_Target Lesion 1 LAD Art Enhanc"] = FU2_Target_Lesion_1_LAD_Art_Enhanc
+                        st.session_state.data.at[index, "2nd_FU_Target Lesion 1 PAD Art Enhanc"] = FU2_Target_Lesion_1_PAD_Art_Enhanc
+                        st.session_state.data.at[index, "2nd_FU_Target Lesion 1 CCD Art Enhanc"] = FU2_Target_Lesion_1_CCD_Art_Enhanc
+                        st.session_state.data.at[index, "2nd_FU_Target Lesion 2 Segments"] = FU2_Target_Lesion_2_Segments
+                        st.session_state.data.at[index, "2nd_FU_Target Lesion 2 LAD Art Enhanc"] = FU2_Target_Lesion_2_LAD_Art_Enhanc
+                        st.session_state.data.at[index, "2nd_FU_Target Lesion 2 PAD Art Enhanc"] = FU2_Target_Lesion_2_PAD_Art_Enhanc
+                        st.session_state.data.at[index, "2nd_FU_Target Lesion 2 CCD Art Enhanc"] = FU2_Target_Lesion_2_CCD_Art_Enhanc
+                        st.session_state.data.at[index, "2nd_FU_Follow up 2 targeted Lesion Dia Sum"] = FU2_Follow_up_2_targeted_Lesion_Dia_Sum
+                        st.session_state.data.at[index, "2nd_FU_Non-Target Lesion 1 LAD Art Enhanc"] = FU2_Non_Target_Lesion_1_LAD_Art_Enhanc
+                        st.session_state.data.at[index, "2nd_FU_Non-Target Lesion 1 PAD Art Enhanc"] = FU2_Non_Target_Lesion_1_PAD_Art_Enhanc
+                        st.session_state.data.at[index, "2nd_FU_Non-Target Lesion 1 CCD Art Enhanc"] = FU2_Non_Target_Lesion_1_CCD_Art_Enhanc
+                        st.session_state.data.at[index, "2nd_FU_Non-targeted Lesion Dia Sum"] = FU2_Non_targeted_Lesion_Dia_Sum
+                        st.session_state.data.at[index, "2nd_FU_Lesion Necrosis"] = FU2_Lesion_Necrosis
+                        st.session_state.data.at[index, "2nd_FU_Reviewers Initials"] = FU2_Reviewers_Initials
+                        st.session_state.data.at[index, "2nd_FU_Non target lesion response"] = FU2_Non_target_lesion_response
+                        st.session_state.data.at[index, "2nd_FU_New Lesions"] = FU2_New_Lesions
+                        st.session_state.data.at[index, "2nd_FU_Extrahepatic Disease"] = FU2_NEW_Extrahepatic_Disease
+                        st.session_state.data.at[index, "2nd_FU_NEW Extrahepatic Dz Location"] = FU2_NEW_Extrahepatic_Dz_Location
+                        st.session_state.data.at[index, "2nd_FU_NEW Extrahepatic Dz Date"] = FU2_NEW_Extrahepatic_Dz_Date
+                        st.session_state.data.at[index, "2nd_FU_% change non target lesion"] = FU2_change_non_target_lesion
+                        st.session_state.data.at[index, "2nd_FU_% Change Target Dia"] = FU2_change_target_lesion
+                        st.session_state.data.at[index, "2nd_FU_Free Text"] = FU2_Free_Text
+                        st.session_state.data.at[index, "3rd_FU_Scan Modality"] = FU3_Scan_Modality
+                        st.session_state.data.at[index, "3rd_FU_Imaging Date"] = FU3_Imaging_Date
+                        st.session_state.data.at[index, "3rd_FU_Months Since Y90"] = FU3_Months_Since_Y90
+                        st.session_state.data.at[index, "3rd_FU_Total number of lesions"] = FU3_Total_number_of_lesions
+                        st.session_state.data.at[index, "3rd_FU_Target Lesion 1 LAD Art Enhanc"] = FU3_Target_Lesion_1_LAD_Art_Enhanc
+                        st.session_state.data.at[index, "3rd_FU_Target Lesion 1 PAD Art Enhanc"] = FU3_Target_Lesion_1_PAD_Art_Enhanc
+                        st.session_state.data.at[index, "3rd_FU_Target Lesion 1 CCD Art Enhanc"] = FU3_Target_Lesion_1_CCD_Art_Enhanc
+                        st.session_state.data.at[index, "3rd_FU_Target Lesion 2 Segments"] = FU3_Target_Lesion_2_Segments
+                        st.session_state.data.at[index, "3rd_FU_Target Lesion 2 LAD Art Enhanc"] = FU3_Target_Lesion_2_LAD_Art_Enhanc
+                        st.session_state.data.at[index, "3rd_FU_Target Lesion 2 PAD Art Enhanc"] = FU3_Target_Lesion_2_PAD_Art_Enhanc
+                        st.session_state.data.at[index, "3rd_FU_Target Lesion 2 CCD Art Enhanc"] = FU3_Target_Lesion_2_CCD_Art_Enhanc
+                        st.session_state.data.at[index, "3rd_FU_Follow up 2 targeted Lesion Dia Sum"] = FU3_Follow_up_2_targeted_Lesion_Dia_Sum
+                        st.session_state.data.at[index, "3rd_FU_Non-Target Lesion 1 LAD Art Enhanc"] = FU3_Non_Target_Lesion_1_LAD_Art_Enhanc
+                        st.session_state.data.at[index, "3rd_FU_Non-Target Lesion 1 PAD Art Enhanc"] = FU3_Non_Target_Lesion_1_PAD_Art_Enhanc
+                        st.session_state.data.at[index, "3rd_FU_Non-Target Lesion 1 CCD Art Enhanc"] = FU3_Non_Target_Lesion_1_CCD_Art_Enhanc
+                        st.session_state.data.at[index, "3rd_FU_Non-targeted Lesion Dia Sum"] = FU3_Non_targeted_Lesion_Dia_Sum
+                        st.session_state.data.at[index, "3rd_FU_Lesion Necrosis"] = FU3_Lesion_Necrosis
+                        st.session_state.data.at[index, "3rd_FU_Reviewers Initials"] = FU3_Reviewers_Initials
+                        st.session_state.data.at[index, "3rd_FU_Non target lesion response"] = FU3_Non_target_lesion_response
+                        st.session_state.data.at[index, "3rd_FU_New Lesions"] = FU3_New_Lesions
+                        st.session_state.data.at[index, "3rd_FU_Extrahepatic Disease"] = FU3_NEW_Extrahepatic_Disease
+                        st.session_state.data.at[index, "3rd_FU_NEW Extrahepatic Dz Location"] = FU3_NEW_Extrahepatic_Dz_Location
+                        st.session_state.data.at[index, "3rd_FU_NEW Extrahepatic Dz Date"] = FU3_NEW_Extrahepatic_Dz_Date
+                        st.session_state.data.at[index, "3rd_FU_% change for non target lesion"] = FU3_change_non_target_lesion
+                        st.session_state.data.at[index, "3rd_FU_% Change Target Dia"] = FU3_change_target_lesion
+                        st.session_state.data.at[index, "3rd_FU_Free Text"] = FU3_Free_Text
+                        st.session_state.data.at[index, "4th_FU_Scan Modality"] = FU4_Scan_Modality
+                        st.session_state.data.at[index, "4th_FU_Imaging Date"] = FU4_Imaging_Date
+                        st.session_state.data.at[index, "4th_FU_Months Since Y90"] = FU4_Months_Since_Y90
+                        st.session_state.data.at[index, "4th_FU_Total number of lesions"] = FU4_Total_number_of_lesions
+                        st.session_state.data.at[index, "4th_FU_Target Lesion 1 LAD Art Enhanc"] = FU4_Target_Lesion_1_LAD_Art_Enhanc
+                        st.session_state.data.at[index, "4th_FU_Target Lesion 1 PAD Art Enhanc"] = FU4_Target_Lesion_1_PAD_Art_Enhanc
+                        st.session_state.data.at[index, "4th_FU_Target Lesion 1 CCD Art Enhanc"] = FU4_Target_Lesion_1_CCD_Art_Enhanc
+                        st.session_state.data.at[index, "4th_FU_Target Lesion 2 Segments"] = FU4_Target_Lesion_2_Segments
+                        st.session_state.data.at[index, "4th_FU_Target Lesion 2 LAD Art Enhanc"] = FU4_Target_Lesion_2_LAD_Art_Enhanc
+                        st.session_state.data.at[index, "4th_FU_Target Lesion 2 PAD Art Enhanc"] = FU4_Target_Lesion_2_PAD_Art_Enhanc
+                        st.session_state.data.at[index, "4th_FU_Target Lesion 2 CCD Art Enhanc"] = FU4_Target_Lesion_2_CCD_Art_Enhanc
+                        st.session_state.data.at[index, "4th_FU_Follow up 2 targeted Lesion Dia Sum"] = FU4_Follow_up_2_targeted_Lesion_Dia_Sum
+                        st.session_state.data.at[index, "4th_FU_Non-Target Lesion 1 LAD Art Enhanc"] = FU4_Non_Target_Lesion_1_LAD_Art_Enhanc
+                        st.session_state.data.at[index, "4th_FU_Non-Target Lesion 1 PAD Art Enhanc"] = FU4_Non_Target_Lesion_1_PAD_Art_Enhanc
+                        st.session_state.data.at[index, "4th_FU_Non-Target Lesion 1 CCD Art Enhanc"] = FU4_Non_Target_Lesion_1_CCD_Art_Enhanc
+                        st.session_state.data.at[index, "4th_FU_Non-targeted Lesion Dia Sum"] = FU4_Non_targeted_Lesion_Dia_Sum
+                        st.session_state.data.at[index, "4th_FU_Lesion Necrosis"] = FU4_Lesion_Necrosis
+                        st.session_state.data.at[index, "4th_FU_Reviewers Initials"] = FU4_Reviewers_Initials
+                        st.session_state.data.at[index, "4th_FU_Non target lesion response"] = FU4_Non_target_lesion_response
+                        st.session_state.data.at[index, "4th_FU_New Lesions"] = FU4_New_Lesions
+                        st.session_state.data.at[index, "4th_FU_Extrahepatic Disease"] = FU4_NEW_Extrahepatic_Disease
+                        st.session_state.data.at[index, "4th_FU_NEW Extrahepatic Dz Location"] = FU4_NEW_Extrahepatic_Dz_Location
+                        st.session_state.data.at[index, "4th_FU_NEW Extrahepatic Dz Date"] = FU4_NEW_Extrahepatic_Dz_Date
+                        st.session_state.data.at[index, "4th_FU_% change non target lesion"] = FU4_change_non_target_lesion
+                        st.session_state.data.at[index, "4th_FU_% Change target dia"] = FU4_change_target_lesion
+                        st.session_state.data.at[index, "4th_FU_Free Text"] = FU4_Free_Text
+                        st.session_state.data.at[index, "5th_FU_Imaging Date"] = FU5_Imaging_Date
+                        st.session_state.data.at[index, "5th_FU_Months Since Y90"] = FU5_Months_Since_Y90
+                        st.session_state.data.at[index, "5th_FU_Total number of lesions"] = FU5_Total_number_of_lesions
+                        st.session_state.data.at[index, "5th_FU_Non-Target Lesion 1 LAD Art Enhanc"] = FU5_Non_Target_Lesion_1_LAD_Art_Enhanc
+                        st.session_state.data.at[index, "5th_FU_Non-Target Lesion 1 PAD Art Enhanc"] = FU5_Non_Target_Lesion_1_PAD_Art_Enhanc
+                        st.session_state.data.at[index, "5th_FU_Non-Target Lesion 1 CCD Art Enhanc"] = FU5_Non_Target_Lesion_1_CCD_Art_Enhanc
+                        st.session_state.data.at[index, "5th_FU_Non-targeted Lesion Dia Sum"] = FU5_Non_targeted_Lesion_Dia_Sum
+                        st.session_state.data.at[index, "5th_FU_Non target lesion response"] = FU5_Non_target_lesion_response
+                        st.session_state.data.at[index, "5th_FU_New Lesions"] = FU5_New_Lesions
+                        st.session_state.data.at[index, "5th_FU_Extrahepatic Disease"] = FU5_NEW_Extrahepatic_Disease
+                        st.session_state.data.at[index, "5th_FU_NEW Extrahepatic Dz Location"] = FU5_NEW_Extrahepatic_Dz_Location
+                        st.session_state.data.at[index, "5th_FU_NEW Extrahepatic Dz Date"] = FU5_NEW_Extrahepatic_Dz_Date
+                        st.session_state.data.at[index, "5th_FU_% change non target lesion"] = FU5_change_non_target_lesion
+                        st.session_state.data.at[index, "Dead"] = dead
+                        st.session_state.data.at[index, "Date of Death"] = Date_of_Death
+                        st.session_state.data.at[index, "Time to Death"] = Time_to_Death
+                        st.session_state.data.at[index, "OLT"] = OLT
+                        st.session_state.data.at[index, "Date of OLT"] = Date_of_OLT
+                        st.session_state.data.at[index, "Time to OLT"] = Time_to_OLT
+                        st.session_state.data.at[index, "Repeat tx post Y90"] = Repeat_tx_post_Y90
+                        st.session_state.data.at[index, "Date of Repeat tx Post Y90"] = Date_of_Repeat_tx_Post_Y90
+                        st.session_state.data.at[index, "Time to Repeat Tx Post Y90"] = Time_to_Repeat_Tx_Post_Y90
+                        st.session_state.data.at[index, "Date of Localized Progression"] = Date_of_Localized_Progression
+                        
+                    
+                        st.success("Imagine Data dubmitted")
+                        st.write("Updated Data:")
+        st.dataframe(st.session_state.data, use_container_width=True , height=250)
+
+    with tab11: 
+        st.subheader("Dosimetry Data")
+        with st.form("dosimetry_data_form"):
+                if "MRN" not in st.session_state.data:
+                    st.warning("Please complete the Patient Information tab first.")
+                else:
+       
+                    gtv_mean_dose = st.number_input("GTV mean dose", help="Enter GTV mean dose")
+                    tx_vol_mean_dose = st.number_input("Tx vol mean dose", help="Enter Tx vol mean dose")
+                    healthy_liver_mean_dose = st.number_input("Healthy Liver mean dose (liver - tx vol)", help="Enter Healthy Liver mean dose")
+                    gtv_vol = st.number_input("GTV Vol", help="Enter GTV Vol")
+                    tx_vol = st.number_input("Tx vol", help="Enter Tx vol")
+                    liver_vol = st.number_input("Liver vol", help="Enter Liver vol")
+                    healthy_liver_vol = st.number_input("Healthy Liver Vol", help="Enter Healthy Liver Vol")
+                    gtv_liver_percentage = st.number_input("GTV/ Liver (%)", help="Enter GTV/ Liver (%)")
+                    d98_gy = st.text_input("D98 (Gy)", help="Enter D98 (Gy)")
+                    d90_gy = st.text_input("D90 (Gy)", help="Enter D90 (Gy)")
+                    d95_gy = st.text_input("D95 (Gy)", help="Enter D95 (Gy)")
+                    d80_gy = st.text_input("D80 (Gy)", help="Enter D80 (Gy)")
+                    d70_gy = st.text_input("D70 (Gy)", help="Enter D70 (Gy)")
+                    v100_percentage = st.number_input("V100(%)", help="Enter V100(%)")
+                    v200_percentage = st.number_input("V200(%)", help="Enter V200(%)")
+                    v300_percentage = st.number_input("V300(%)", help="Enter V300(%)")
+                    v400_percentage = st.number_input("V400(%)", help="Enter V400(%)")
+                    activity_bq = st.text_input("Activity(Bq)", help="Enter Activity(Bq)")
+                    activity_ci = st.text_input("Activity(Ci)", help="Enter Activity(Ci)")
+                    tx_vol_activity_density = st.number_input("Tx vol Activity Density (Ci/cc)", help="Enter Tx vol Activity Density (Ci/cc)")
+
+                    submit_dosimetry_data = st.form_submit_button("Submit")
+
+                    if submit_dosimetry_data:
+                        index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
+
+                        st.session_state.data.at[index, "GTV mean dose"] = gtv_mean_dose
+                        st.session_state.data.at[index, "Tx vol mean dose"] = tx_vol_mean_dose
+                        st.session_state.data.at[index, "Healthy Liver mean dose (liver - tx vol)"] = healthy_liver_mean_dose
+                        st.session_state.data.at[index, "GTV Vol"] = gtv_vol
+                        st.session_state.data.at[index, "Tx vol"] = tx_vol
+                        st.session_state.data.at[index, "Liver vol"] = liver_vol
+                        st.session_state.data.at[index, "Healthy Liver Vol"] = healthy_liver_vol
+                        st.session_state.data.at[index, "GTV/ Liver (%)"] = gtv_liver_percentage
+                        st.session_state.data.at[index, "D98 (Gy)"] = d98_gy
+                        st.session_state.data.at[index, "D90 (Gy)"] = d90_gy
+                        st.session_state.data.at[index, "D95 (Gy)"] = d95_gy
+                        st.session_state.data.at[index, "D80 (Gy)"] = d80_gy
+                        st.session_state.data.at[index, "D70 (Gy)"] = d70_gy
+                        st.session_state.data.at[index, "V100(%)"] = v100_percentage
+                        st.session_state.data.at[index, "V200(%)"] = v200_percentage
+                        st.session_state.data.at[index, "V300(%)"] = v300_percentage
+                        st.session_state.data.at[index, "V400(%)"] = v400_percentage
+                        st.session_state.data.at[index, "Activity(Bq)"] = activity_bq
+                        st.session_state.data.at[index, "Activity(Ci)"] = activity_ci
+                        st.session_state.data.at[index, "Tx vol Activity Density (Ci/cc)"] = tx_vol_activity_density
+
+                        st.success("Dosimetry Data added successfully.")
+                        st.write("Updated Data:")
+        st.dataframe(st.session_state.data, use_container_width=True , height=250)
+                                
+                        
+                  
+
 # Edit Existing Data Page
 def edit_existing_data():
     st.title("Edit Existing Data")
@@ -1862,10 +2837,10 @@ def edit_existing_data():
     else:
 
         st.write("Current Data:")
-        st.dataframe(st.session_state.data)
+        st.dataframe(st.session_state.data, use_container_width=True , height=250)
 
-        mrn = st.text_input("Enter MRN to edit")
-        #load_button = st.button("Load Data")
+        mrn = st.text_input("Enter MRN to edit and Press Enter")
+        #load_button = st.button("Edit Data")
         #if load_button:
         if mrn not in st.session_state.data["MRN"].values:
             st.error(f"No data found for MRN {mrn}.")
@@ -1876,8 +2851,9 @@ def edit_existing_data():
 
             record = st.session_state.data[st.session_state.data["MRN"] == mrn]
             index = st.session_state.data[st.session_state.data["MRN"] == mrn].index[0]
-            tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(["Patient Demographics", "Cirrhosis PMH","HCC Diagnosis", "Previous Therapy for HCC", "Pre Y90", "Day_Y90", "Post Y90 Within 30 Days Labs"])
-           
+            tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11 = st.tabs(["Patient Demographics", "Cirrhosis PMH","HCC Diagnosis", "Previous Therapy for HCC", "Pre Y90", "Day_Y90", "Post Y90 Within 30 Days Labs", "Other Post Tare","Imaging Date","Dosimetry Data"])
+            tare_date = record.loc[index, "TARE Tx Date"]
+            tare_date = datetime.strptime(tare_date, "%Y-%m-%d").date()
             with tab2:
                 st.subheader("Patient Demographics")
                 with st.form("demographics_form"):
@@ -1963,7 +2939,7 @@ def edit_existing_data():
                         st.session_state.data.loc[index, "Comorbitieis Binary"] = binary_value
                         st.success("Patient Description added successfully.")
                         st.write("Updated Data:")
-                        st.dataframe(st.session_state.data)
+                        st.dataframe(st.session_state.data, use_container_width=True , height=250)
 
             with tab3:
                 st.subheader("Cirrhosis PMH")
@@ -2229,7 +3205,7 @@ def edit_existing_data():
                             
                             st.success("Patient Description added successfully.")
                             st.write("Updated Data:")
-                            st.dataframe(st.session_state.data)
+                            st.dataframe(st.session_state.data, use_container_width=True , height=250)
 
             with tab4:
                 st.subheader("HCC Diagnosis")
@@ -2459,7 +3435,7 @@ def edit_existing_data():
 
                                 st.success("HCC Dx added successfully.")
                                 st.write("Updated Data:")
-                                st.dataframe(st.session_state.data)
+                                st.dataframe(st.session_state.data, use_container_width=True , height=250)
         
             with tab5:
                 
@@ -2596,8 +3572,7 @@ def edit_existing_data():
                                 
                                 st.success("Previous Therapy for HCC added successfully.")
                                 st.write("Updated Data:")
-                                st.dataframe(st.session_state.data)
-
+                                st.dataframe(st.session_state.data, use_container_width=True , height=250)
             with tab6:
                 
                     st.subheader("Pre Y90")
@@ -2788,8 +3763,8 @@ def edit_existing_data():
 
                             st.success("Pre Y90 added successfully.")
                             st.write("Updated Data:")
-                            st.dataframe(st.session_state.data)             
-
+                                        
+                            st.dataframe(st.session_state.data, use_container_width=True , height=250)
             with tab7:
                 st.subheader("Day_Y90")
                 with st.form("day_y90_form"):
@@ -2818,7 +3793,7 @@ def edit_existing_data():
                         else:
                             afp_prey90 = "NA"
                     
-          
+        
                         dayy90_sodium = st.number_input("DAYY90_sodium (mmol/L)")
                         dayy90_creatinine = st.number_input("DAYY90_creatinine (mg/dl)")
                         dayy90_inr = st.number_input("DAYY90_inr")
@@ -2896,7 +3871,7 @@ def edit_existing_data():
                             return answer
                         
                         dayy90_albi_calc = albi_calc(dayy90_bilirubin,dayy90_albumin)
-                     
+                    
                         dayy90_type_of_sphere = st.selectbox(
                             "DAYY90_Type of Sphere", options=["Therasphere-1", "SIR-2"]
                         )
@@ -2947,13 +3922,13 @@ def edit_existing_data():
                             
                             st.success("DAYY90 added successfully.")
                             st.write("Updated Data:")
-                            st.dataframe(st.session_state.data)
-            
+                            #st.dataframe(st.session_state.data)
+                            st.dataframe(st.session_state.data, use_container_width=True , height=250)
             with tab8:
                 st.subheader("Post Y90 Within 30 Days Labs")
                 with st.form("post_y90_form"):
                         
-               
+            
                             posty90_date_labs = st.date_input("POSTY90_30DY_date_labs", help="Enter the date of lab tests")
                             input90 = st.text_input("POSTY90_30DY_afp", help="Enter AFP value in ng/dl or NA")
                             posty90_afp = process_input(input90)
@@ -3014,7 +3989,7 @@ def edit_existing_data():
 
                             posty90_child_pugh_points_calc = calculatepoints(posty90_bilirubin,posty90_albumin,posty90_inr,prey90_ascites,prey90_he)
                             posty90_child_pugh_class_calc = calculate_class(posty90_child_pugh_points_calc)
-                          
+                        
                             posty90_meld_calc = (3.78*(int(posty90_bilirubin)))+(11.2*(int(posty90_inr)))+(9.57*(int(posty90_creatinine)))+6.43
                             posty90_meld_na_calc = posty90_meld_calc + 1.32*(137-int(posty90_sodium)) - (0.033*posty90_meld_calc*(137-int(posty90_sodium)))
 
@@ -3231,9 +4206,972 @@ def edit_existing_data():
 
                                     st.success("DAYY90 added successfully.")
                                     st.write("Updated Data:")
-                                    st.dataframe(st.session_state.data)
-                    
-  
+                                    #st.dataframe(st.session_state.data)
+                st.dataframe(st.session_state.data, use_container_width=True , height=250)
+            with tab9:
+                st.subheader("Other_post_TARE")
+                with st.form("other_post_tare_form"):
+                        
+                            oc_liver_transplant = st.radio("OC_Liver_transplant", options=["yes", "no"])
+                            oc_liver_transplant_date = st.date_input("OC_Liver_transplant_date")
+
+                            st.subheader("K_other")
+                # with st.form("k_other_form"):
+
+                            k_ken_toxgtg3 = st.number_input("K_ken_ToxgtG3")
+                            if k_ken_toxgtg3 > 3:
+                                k_ken_toxgtg3 = 1
+                            else:
+                                k_ken_toxgtg3 =0
+                                            
+                            k_ken_toxgtg2 = st.number_input("K_ken_ToxgtG2")
+                            if k_ken_toxgtg2 > 2:
+                                k_ken_toxgtg2 = 1
+                            else:
+                                k_ken_toxgtg2 =0
+
+                            def albigrade(intx):
+                                if intx <= -2.60:
+                                    return "Grade 1"
+                                elif -2.60 < intx <= -1.39:
+                                    return "Grade 2"
+                                else:
+                                    return "Grade 3"
+
+                            k_ken_albipretareraw = albi_calc(prey90_bilirubin,prey90_albumin)
+                            k_ken_albipretaregrade = albigrade(k_ken_albipretareraw)
+                            k_ken_albiposttareraw = albi_calc(posty90_bilirubin,posty90_albumin)
+                            k_ken_albiposttaregrade = albigrade(k_ken_albiposttareraw)
+
+                            submit_tab9 = st.form_submit_button("Submit")
+
+                            if submit_tab9:
+                                #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
+
+                                st.session_state.data.at[index, "OC_Liver_transplant"] = oc_liver_transplant
+                                st.session_state.data.at[index, "OC_Liver_transplant_date"] = oc_liver_transplant_date
+                                st.session_state.data.at[index, "K_ken_ToxgtG3"] = k_ken_toxgtg3
+                                st.session_state.data.at[index, "K_ken_ToxgtG2"] = k_ken_toxgtg2
+                                st.session_state.data.at[index, "K_ken_AlbiPreTARERaw"] = k_ken_albipretareraw
+                                st.session_state.data.at[index, "K_ken_AlbiPreTAREGrade"] = k_ken_albipretaregrade
+                                st.session_state.data.at[index, "K_ken_AlbiPostTARERaw"] = k_ken_albiposttareraw
+                                st.session_state.data.at[index, "K_ken_AliPostTAREGrade"] = k_ken_albiposttaregrade
+
+                                st.success("Other Post Tare added successfully.")
+                                st.write("Updated Data:")
+                                #st.dataframe(st.session_state.data)
+                                st.dataframe(st.session_state.data, use_container_width=True , height=250)          
+            with tab10:
+                st.subheader("Imaging Date")
+                with st.form("imaging_date_form"):
+                        
+                
+                            st.subheader("Imaging PreY90")
+                        
+                            PREY90_prescan_modality = st.selectbox(
+                                    "PREY90_prescan_modality",
+                                    options=["CT","MRI"],
+                            )
+                            PREY90_Imaging_Date = st.date_input("PREY90_Imaging Date")
+                            PREY90_total_number_of_lesions = st.selectbox(
+                                    "PREY90_total number of lesions",
+                                    options=["1","2",">3"],
+                            )
+                            PREY90_Number_Involved_Lobes = st.selectbox(
+                                    "PREY90_Number Involved Lobes",
+                                    options=["Unilobar","Bilobar"],
+                            )
+                            PREY90_target_lesion_1_segments = st.multiselect(
+                                    "PREY90_target_lesion_1_segments",
+                                    options=["1","2","3","4a","4b","5","6","7","8","NA"],
+                            )
+                            PREY90_TL1_LAD = st.number_input(
+                                "PREY90_TL1_LAD",
+                                format="%.2f"
+                            )
+
+                            PREY90_Target_Lesion_1_PAD = st.number_input(
+                                "PREY90_Target Lesion 1 PAD",
+                                format="%.2f"
+                            )
+
+                            PREY90_Target_Lesion_1_CCD = st.number_input(
+                                "PREY90_Target Lesion 1 CCD",
+                                format="%.2f"
+                            )
+                            PREY90_Target_Lesion_1_VOL = 4/3*3.14*(PREY90_Target_Lesion_1_PAD)*(PREY90_TL1_LAD)*PREY90_Target_Lesion_1_CCD
+                            PREY90_Target_Lesion_2_segments = st.selectbox(
+                                    "PREY90_Target_Lesion_2_segments",
+                                    options=["1","2","3","4a","4b","5","6","7","8","NA"],
+                            )
+                            PREY90_Target_Lesion_2_LAD = st.number_input(
+                                "PREY90_Target_Lesion_2_LAD",
+                                format="%.2f"
+                            )
+                            PREY90_Target_Lesion_2_PAD = st.number_input(
+                                "PREY90_Target Lesion 2 PAD",
+                                format="%.2f"
+                            )
+
+                            PREY90_Target_Lesion_2_CCD = st.number_input(
+                                "PREY90_Target Lesion 2 CCD",
+                                format="%.2f"
+                            )
+                            PREY90_Target_Lesion_2_VOL = 4/3*3.14*(PREY90_Target_Lesion_2_PAD)*(PREY90_Target_Lesion_2_LAD)*PREY90_Target_Lesion_2_CCD
+
+                            PREY90_pretx_targeted_Lesion_Dia_Sum = max(PREY90_TL1_LAD,PREY90_Target_Lesion_1_PAD,PREY90_Target_Lesion_1_CCD)+max(PREY90_Target_Lesion_2_PAD,PREY90_Target_Lesion_2_LAD,PREY90_Target_Lesion_2_CCD)
+
+                            PREY90_Non_Target_Lesion_Location = st.selectbox( "PREY90_Non-Target Lesion Location" , options=["1","2","3","4a","4b","5","6","7","8","NA"])
+
+                            PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
+                                "PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc",
+                                format="%.2f"
+                            )
+                            PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
+                                "PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc",
+                                format="%.2f"
+                            )
+
+                            PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
+                                "PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc",
+                                format="%.2f"
+                            )
+                            PREY90_Non_targeted_Lesion_Dia_Sum = max(PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc)
+
+                            PREY90_Reviewers_Initials = st.text_input(
+                                "PREY90_Reviewers Initials",
+                                help="Free-text input for reviewer name"
+                            )
+
+                            PREY90_Pre_Y90_Extrahepatic_Disease = st.selectbox(
+                                "PREY90_Pre Y90 Extrahepatic Disease",
+                                options=["Yes", "No", "N/A"]
+                            )
+
+                            PREY90_Pre_Y90_Extrahepatic_Disease_Location = st.text_input(
+                                "PREY90_Pre Y90 Extrahepatic Disease Location",
+                                help="Free Text"
+                            )
+
+                            PREY90_PVT = st.selectbox(
+                                "PREY90_PVT",
+                                options=["Yes", "No", "N/A"]
+                            )
+
+                            PREY90_PVT_Location = st.selectbox(
+                                "PREY90_PVT Location",
+                                options=["RPV", "LPV"]
+                            )
+
+                            PREY90_Features_of_cirrhosis = st.selectbox(
+                                "PREY90_Features of cirrhosis",
+                                options=["Yes", "No", "N/A"]
+                            )
+
+                            st.subheader("Imaging_1st_Followup")
+
+                            FU_Scan_Modality = st.selectbox(
+                                "1st_FU_Scan Modality",
+                                options=["CT", "MRI"]
+                            )
+
+                            FU_Imaging_Date = st.date_input("1st_FU_Imaging Date")
+
+                            # Assuming "Months Since Y90" is calculated elsewhere in the code
+                            # FU_Months_Since_Y90 = calculated_value
+                            
+                            FU_Months_Since_Y90 = relativedelta(FU_Imaging_Date, tare_date).months
+
+                            FU_Total_number_of_lesions = st.selectbox(
+                                "1st_FU_Total number of lesions",
+                                options=["1", "2", ">3"]
+                            )
+
+                            FU_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
+                                "1st_FU_Target Lesion 1 LAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
+                                "1st_FU_Target Lesion 1 PAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
+                                "1st_FU_Target Lesion 1 CCD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU_Target_Lesion_2_Segments = st.selectbox(
+                                "1st_FU_Target Lesion 2 Segments",
+                                options=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"]
+                            )
+
+                            FU_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
+                                "1st_FU_Target Lesion 2 LAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
+                                "1st_FU_Target Lesion 2 PAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
+                                "1st_FU_Target Lesion 2 CCD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            # Assuming "Follow up 1 targeted Lesion Dia Sum" is calculated elsewhere in the code
+                            # FU_Follow_up_1_targeted_Lesion_Dia_Sum = calculated_value
+                            FU_Follow_up_1_targeted_Lesion_Dia_Sum = max(FU_Target_Lesion_1_CCD_Art_Enhanc,FU_Target_Lesion_1_PAD_Art_Enhanc,FU_Target_Lesion_1_LAD_Art_Enhanc)+max(FU_Target_Lesion_2_CCD_Art_Enhanc,FU_Target_Lesion_2_PAD_Art_Enhanc,FU_Target_Lesion_2_LAD_Art_Enhanc)
+
+
+                            FU_Non_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
+                                "1st_FU_Non-Target Lesion 2 LAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU_Non_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
+                                "1st_FU_Non-Target Lesion 2 PAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU_Non_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
+                                "1st_FU_Non-Target Lesion 2 CCD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            # Assuming "Non-targeted Lesion Dia Sum" is calculated elsewhere in the code
+                            FU_Non_targeted_Lesion_Dia_Sum = max(FU_Non_Target_Lesion_2_LAD_Art_Enhanc,FU_Non_Target_Lesion_2_PAD_Art_Enhanc,FU_Non_Target_Lesion_2_CCD_Art_Enhanc)
+
+                            FU_Lesion_Necrosis = st.selectbox(
+                                "1st_FU_Lesion Necrosis",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU_Reviewers_Initials = st.text_input(
+                                "1st_FU_Reviewers Initials",
+                                help="Free-text input for reviewer name"
+                            )
+
+                            FU_Non_target_lesion_response = st.selectbox(
+                                "1st_FU_Non target lesion response",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU_New_Lesions = st.selectbox(
+                                "1st_FU_New Lesions",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU_NEW_Extrahepatic_Disease = st.selectbox(
+                                "1st_FU_NEW Extrahepatic Disease",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU_NEW_Extrahepatic_Dz_Location = st.text_input(
+                                "1st_FU_NEW Extrahepatic Dz Location",
+                                help="Free text"
+                            )
+
+                            FU_NEW_Extrahepatic_Dz_Date = st.date_input("1st_FU_NEW Extrahepatic Dz Date")
+
+                            FU_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU_Non_targeted_Lesion_Dia_Sum)/max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
+
+                            FU_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU_Follow_up_1_targeted_Lesion_Dia_Sum)/max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
+
+                            FU_Free_Text = st.text_area(
+                                "1st_FU_Free Text",
+                                help="Free text"
+                            )
+
+                            st.subheader("Imaging_2nd_Followup")
+
+                            FU2_Scan_Modality = st.selectbox(
+                                "2nd_FU_Scan Modality",
+                                options=["CT", "MRI"]
+                            )
+
+                            FU2_Imaging_Date = st.date_input("2nd_FU_Imaging Date")
+
+                            FU2_Months_Since_Y90 = relativedelta(FU2_Imaging_Date, tare_date).months
+
+                            FU2_Total_number_of_lesions = st.selectbox(
+                                "2nd_FU_Total number of lesions",
+                                options=["1", "2", ">3"]
+                            )
+
+                            FU2_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
+                                "2nd_FU_Target Lesion 1 LAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU2_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
+                                "2nd_FU_Target Lesion 1 PAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU2_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
+                                "2nd_FU_Target Lesion 1 CCD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU2_Target_Lesion_2_Segments = st.selectbox(
+                                "2nd_FU_Target Lesion 2 Segments",
+                                options=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"]
+                            )
+
+                            FU2_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
+                                "2nd_FU_Target Lesion 2 LAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU2_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
+                                "2nd_FU_Target Lesion 2 PAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU2_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
+                                "2nd_FU_Target Lesion 2 CCD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU2_Follow_up_2_targeted_Lesion_Dia_Sum = max(FU2_Target_Lesion_1_CCD_Art_Enhanc, FU2_Target_Lesion_1_PAD_Art_Enhanc, FU2_Target_Lesion_1_LAD_Art_Enhanc) + max(FU2_Target_Lesion_2_CCD_Art_Enhanc, FU2_Target_Lesion_2_PAD_Art_Enhanc, FU2_Target_Lesion_2_LAD_Art_Enhanc)
+
+                            FU2_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
+                                "2nd_FU_Non-Target Lesion 1 LAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU2_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
+                                "2nd_FU_Non-Target Lesion 1 PAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU2_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
+                                "2nd_FU_Non-Target Lesion 1 CCD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU2_Non_targeted_Lesion_Dia_Sum = max(FU2_Non_Target_Lesion_1_LAD_Art_Enhanc, FU2_Non_Target_Lesion_1_PAD_Art_Enhanc, FU2_Non_Target_Lesion_1_CCD_Art_Enhanc)
+
+                            FU2_Lesion_Necrosis = st.selectbox(
+                                "2nd_FU_Lesion Necrosis",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU2_Reviewers_Initials = st.text_input(
+                                "2nd_FU_Reviewers Initials",
+                                help="Free-text input for reviewer name"
+                            )
+
+                            FU2_Non_target_lesion_response = st.selectbox(
+                                "2nd_FU_Non target lesion response",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU2_New_Lesions = st.selectbox(
+                                "2nd_FU_New Lesions",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU2_NEW_Extrahepatic_Disease = st.selectbox(
+                                "2nd_FU_NEW Extrahepatic Disease",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU2_NEW_Extrahepatic_Dz_Location = st.text_input(
+                                "2nd_FU_NEW Extrahepatic Dz Location",
+                                help="Free text"
+                            )
+
+                            FU2_NEW_Extrahepatic_Dz_Date = st.date_input("2nd_FU_NEW Extrahepatic Dz Date")
+
+                            FU2_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU2_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+
+                            FU2_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU2_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+
+                            FU2_Free_Text = st.text_area(
+                                "2nd_FU_Free Text",
+                                help="Free text"
+                            )
+
+                            # Repeat the same structure for 3rd, 4th, and 5th follow-ups with variable names changed accordingly
+
+                            # 3rd Imaging Follow-up
+                            st.subheader("Imaging_3rd_Followup")
+
+                            FU3_Scan_Modality = st.selectbox(
+                                "3rd_FU_Scan Modality",
+                                options=["CT", "MRI"]
+                            )
+
+                            FU3_Imaging_Date = st.date_input("3rd_FU_Imaging Date")
+
+                            FU3_Months_Since_Y90 = relativedelta(FU3_Imaging_Date, tare_date).months
+
+                            FU3_Total_number_of_lesions = st.selectbox(
+                                "3rd_FU_Total number of lesions",
+                                options=["1", "2", ">3"]
+                            )
+
+                            FU3_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
+                                "3rd_FU_Target Lesion 1 LAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU3_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
+                                "3rd_FU_Target Lesion 1 PAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU3_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
+                                "3rd_FU_Target Lesion 1 CCD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU3_Target_Lesion_2_Segments = st.selectbox(
+                                "3rd_FU_Target Lesion 2 Segments",
+                                options=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"]
+                            )
+
+                            FU3_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
+                                "3rd_FU_Target Lesion 2 LAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU3_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
+                                "3rd_FU_Target Lesion 2 PAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU3_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
+                                "3rd_FU_Target Lesion 2 CCD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU3_Follow_up_2_targeted_Lesion_Dia_Sum = max(FU3_Target_Lesion_1_CCD_Art_Enhanc, FU3_Target_Lesion_1_PAD_Art_Enhanc, FU3_Target_Lesion_1_LAD_Art_Enhanc) + max(FU3_Target_Lesion_2_CCD_Art_Enhanc, FU3_Target_Lesion_2_PAD_Art_Enhanc, FU3_Target_Lesion_2_LAD_Art_Enhanc)
+
+                            FU3_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
+                                "3rd_FU_Non-Target Lesion 1 LAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU3_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
+                                "3rd_FU_Non-Target Lesion 1 PAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU3_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
+                                "3rd_FU_Non-Target Lesion 1 CCD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU3_Non_targeted_Lesion_Dia_Sum = max(FU3_Non_Target_Lesion_1_LAD_Art_Enhanc, FU3_Non_Target_Lesion_1_PAD_Art_Enhanc, FU3_Non_Target_Lesion_1_CCD_Art_Enhanc)
+
+                            FU3_Lesion_Necrosis = st.selectbox(
+                                "3rd_FU_Lesion Necrosis",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU3_Reviewers_Initials = st.text_input(
+                                "3rd_FU_Reviewers Initials",
+                                help="Free-text input for reviewer name"
+                            )
+
+                            FU3_Non_target_lesion_response = st.selectbox(
+                                "3rd_FU_Non target lesion response",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU3_New_Lesions = st.selectbox(
+                                "3rd_FU_New Lesions",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU3_NEW_Extrahepatic_Disease = st.selectbox(
+                                "3rd_FU_NEW Extrahepatic Disease",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU3_NEW_Extrahepatic_Dz_Location = st.text_input(
+                                "3rd_FU_NEW Extrahepatic Dz Location",
+                                help="Free text"
+                            )
+
+                            FU3_NEW_Extrahepatic_Dz_Date = st.date_input("3rd_FU_NEW Extrahepatic Dz Date")
+
+                            FU3_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU3_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+
+                            FU3_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU3_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+
+                            FU3_Free_Text = st.text_area(
+                                "3rd_FU_Free Text",
+                                help="Free text"
+                            )
+
+                            # 4th Imaging Follow-up
+                            st.subheader("Imaging_4th_Followup")
+
+                            FU4_Scan_Modality = st.selectbox(
+                                "4th_FU_Scan Modality",
+                                options=["CT", "MRI"]
+                            )
+
+                            FU4_Imaging_Date = st.date_input("4th_FU_Imaging Date")
+
+                            FU4_Months_Since_Y90 = relativedelta(FU4_Imaging_Date, tare_date).months
+
+                            FU4_Total_number_of_lesions = st.selectbox(
+                                "4th_FU_Total number of lesions",
+                                options=["1", "2", ">3"]
+                            )
+
+                            FU4_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
+                                "4th_FU_Target Lesion 1 LAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU4_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
+                                "4th_FU_Target Lesion 1 PAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU4_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
+                                "4th_FU_Target Lesion 1 CCD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU4_Target_Lesion_2_Segments = st.selectbox(
+                                "4th_FU_Target Lesion 2 Segments",
+                                options=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"]
+                            )
+
+                            FU4_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
+                                "4th_FU_Target Lesion 2 LAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU4_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
+                                "4th_FU_Target Lesion 2 PAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU4_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
+                                "4th_FU_Target Lesion 2 CCD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU4_Follow_up_2_targeted_Lesion_Dia_Sum = max(FU4_Target_Lesion_1_CCD_Art_Enhanc, FU4_Target_Lesion_1_PAD_Art_Enhanc, FU4_Target_Lesion_1_LAD_Art_Enhanc) + max(FU4_Target_Lesion_2_CCD_Art_Enhanc, FU4_Target_Lesion_2_PAD_Art_Enhanc, FU4_Target_Lesion_2_LAD_Art_Enhanc)
+
+                            FU4_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
+                                "4th_FU_Non-Target Lesion 1 LAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU4_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
+                                "4th_FU_Non-Target Lesion 1 PAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU4_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
+                                "4th_FU_Non-Target Lesion 1 CCD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU4_Non_targeted_Lesion_Dia_Sum = max(FU4_Non_Target_Lesion_1_LAD_Art_Enhanc, FU4_Non_Target_Lesion_1_PAD_Art_Enhanc, FU4_Non_Target_Lesion_1_CCD_Art_Enhanc)
+
+                            FU4_Lesion_Necrosis = st.selectbox(
+                                "4th_FU_Lesion Necrosis",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU4_Reviewers_Initials = st.text_input(
+                                "4th_FU_Reviewers Initials",
+                                help="Free-text input for reviewer name"
+                            )
+
+                            FU4_Non_target_lesion_response = st.selectbox(
+                                "4th_FU_Non target lesion response",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU4_New_Lesions = st.selectbox(
+                                "4th_FU_New Lesions",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU4_NEW_Extrahepatic_Disease = st.selectbox(
+                                "4th_FU_NEW Extrahepatic Disease",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU4_NEW_Extrahepatic_Dz_Location = st.text_input(
+                                "4th_FU_NEW Extrahepatic Dz Location",
+                                help="Free text"
+                            )
+
+                            FU4_NEW_Extrahepatic_Dz_Date = st.date_input("4th_FU_NEW Extrahepatic Dz Date")
+
+                            FU4_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU4_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+
+                            FU4_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU4_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+
+                            FU4_Free_Text = st.text_area(
+                                "4th_FU_Free Text",
+                                help="Free text"
+                            )
+
+                            # 5th Imaging Follow-up
+                            st.subheader("Imaging_5th_Followup")
+
+                            FU5_Scan_Modality = st.selectbox(
+                                "5th_FU_Scan Modality",
+                                options=["CT", "MRI"]
+                            )
+
+                            FU5_Imaging_Date = st.date_input("5th_FU_Imaging Date")
+
+                            FU5_Months_Since_Y90 = relativedelta(FU5_Imaging_Date, tare_date).months
+
+                            FU5_Total_number_of_lesions = st.selectbox(
+                                "5th_FU_Total number of lesions",
+                                options=["1", "2", ">3"]
+                            )
+
+                            FU5_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
+                                "5th_FU_Non-Target Lesion 1 LAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU5_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
+                                "5th_FU_Non-Target Lesion 1 PAD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU5_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
+                                "5th_FU_Non-Target Lesion 1 CCD Art Enhanc",
+                                format="%.2f"
+                            )
+
+                            FU5_Non_targeted_Lesion_Dia_Sum = max(FU5_Non_Target_Lesion_1_LAD_Art_Enhanc, FU5_Non_Target_Lesion_1_PAD_Art_Enhanc, FU5_Non_Target_Lesion_1_CCD_Art_Enhanc)
+
+                            FU5_Lesion_Necrosis = st.selectbox(
+                                "5th_FU_Lesion Necrosis",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU5_Reviewers_Initials = st.text_input(
+                                "5th_FU_Reviewers Initials",
+                                help="Free-text input for reviewer name"
+                            )
+
+                            FU5_Non_target_lesion_response = st.selectbox(
+                                "5th_FU_Non target lesion response",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU5_New_Lesions = st.selectbox(
+                                "5th_FU_New Lesions",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU5_NEW_Extrahepatic_Disease = st.selectbox(
+                                "5th_FU_NEW Extrahepatic Disease",
+                                options=["No", "Yes", "NA"]
+                            )
+
+                            FU5_NEW_Extrahepatic_Dz_Location = st.text_input(
+                                "5th_FU_NEW Extrahepatic Dz Location",
+                                help="Free text"
+                            )
+
+                            FU5_NEW_Extrahepatic_Dz_Date = st.date_input("5th_FU_NEW Extrahepatic Dz Date")
+
+                            FU5_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU5_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+
+
+                            FU5_Free_Text = st.text_area(
+                                "5th_FU_Free Text",
+                                help="Free text"
+                            )
+
+                            st.subheader("Imaging_Dates for OS or PFS")
+
+                            dead = st.selectbox(
+                                    "Dead",
+                                    options=["0", "1"],
+                                    format_func=lambda x:{
+                                            "0":"No",
+                                            "1":"Yes"
+                                    }[x],
+                            )
+
+                            Date_of_Death = 'NA' if dead == 0 else st.date_input("Date of Death")
+                            Time_to_Death = 'NA' if dead == 0 else relativedelta(Date_of_Death, tare_date).months
+
+                            OLT = st.selectbox(
+                                    "OLT",
+                                    options=["0", "1"],
+                                    format_func=lambda x:{
+                                            "0":"No",
+                                            "1":"Yes"
+                                    }[x]
+                            )
+
+                            Date_of_OLT = 'NA' if OLT == 0 else st.date_input("Date of OLT")
+                            Time_to_OLT = 'NA' if OLT == 0 else relativedelta(Date_of_Death, tare_date).months
+                            
+                            Repeat_tx_post_Y90 = st.selectbox(
+                                    "Repeat tx post Y90",
+                                    options=["0", "1"],
+                                    format_func=lambda x:{
+                                            "0":"No",
+                                            "1":"Yes"
+                                    }[x]
+                            )
+
+                            Date_of_Repeat_tx_Post_Y90 = 'NA' if Repeat_tx_post_Y90 == 0 else st.date_input("Date of Repeat tx Post Y90")
+                            Time_to_Repeat_Tx_Post_Y90 = 'NA' if Repeat_tx_post_Y90 == 0 else relativedelta(Date_of_Death, tare_date).months
+
+                            Date_of_Localized_Progression = st.text_input("Date of Localized Progression")
+
+                            if Date_of_Localized_Progression == "No Progression":
+                                    Time_to_localized_progression = 'NA'
+                            else:
+                                    Time_to_Localized_Progression = relativedelta(Date_of_Localized_Progression, tare_date).years
+
+                            Date_of_Overall_Progression = st.text_input("Date of Overall Progression")
+
+                            if Date_of_Overall_Progression == "No Progression":
+                                    Time_to_overall_progression = 'NA'
+                            else:
+                                    Time_to_overall_Progression = relativedelta(Date_of_Overall_Progression, tare_date).years
+
+                            Date_of_Last_Follow_up_last_imaging_date = 'NA' if dead == 1 and OLT == 1 else st.date_input("Date of Last Follow-up/last imaging date")
+
+                            Time_to_Last_Follow_up_last_imaging_date = 'NA' if dead == 1 and OLT == 1 else relativedelta(Date_of_Last_Follow_up_last_imaging_date, tare_date).years 
+
+                            submit_tab10 = st.form_submit_button("Submit")
+
+                            if submit_tab10:
+                                #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
+
+                                st.session_state.data.at[index, "PREY90_prescan_modality"] = PREY90_prescan_modality
+                                st.session_state.data.at[index, "PREY90_Imaging Date"] = PREY90_Imaging_Date
+                                st.session_state.data.at[index, "PREY90_total number of lesions"] = PREY90_total_number_of_lesions
+                                st.session_state.data.at[index, "PREY90_Number Involved Lobes"] = PREY90_Number_Involved_Lobes
+                                st.session_state.data.at[index, "PREY90_target_lesion_1_segments"] = PREY90_target_lesion_1_segments
+                                st.session_state.data.at[index, "PREY90_TL1_LAD"] = PREY90_TL1_LAD
+                                st.session_state.data.at[index, "PREY90_Target Lesion 1 PAD"] = PREY90_Target_Lesion_1_PAD
+                                st.session_state.data.at[index, "PREY90_Target Lesion 1 CCD"] = PREY90_Target_Lesion_1_CCD
+                                st.session_state.data.at[index, "PREY90_Target Lesion 1 VOL"] = PREY90_Target_Lesion_1_VOL
+                                st.session_state.data.at[index, "PREY90_Target lesion 2 Segments"] = PREY90_Target_Lesion_2_segments
+                                st.session_state.data.at[index, "PREY90_Target Lesion 2 LAD"] = PREY90_Target_Lesion_2_LAD
+                                st.session_state.data.at[index, "PREY90_Target Lesion 2 PAD"] = PREY90_Target_Lesion_2_PAD
+                                st.session_state.data.at[index, "PREY90_Target Lesion 2 CCD"] = PREY90_Target_Lesion_2_CCD
+                                st.session_state.data.at[index, "PREY90_Target Lesion 2 VOL"] = PREY90_Target_Lesion_2_VOL
+                                st.session_state.data.at[index, "PREY90_pretx targeted Lesion Dia Sum"] = PREY90_pretx_targeted_Lesion_Dia_Sum
+                                st.session_state.data.at[index, "PREY90_Non-Target Lesion Location"] = PREY90_Non_Target_Lesion_Location
+                                st.session_state.data.at[index, "PREY90_Non-Target Lesion 2 LAD Art Enhanc"] = PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc
+                                st.session_state.data.at[index, "PREY90_Non-Target Lesion 2 PAD Art Enhanc"] = PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc
+                                st.session_state.data.at[index, "PREY90_Non-Target Lesion 2 CCD Art Enhanc"] = PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc
+                                st.session_state.data.at[index, "PREY90_Non-targeted Lesion Dia Sum"] = PREY90_Non_targeted_Lesion_Dia_Sum
+                                st.session_state.data.at[index, "PREY90_Reviewers Initials"] = PREY90_Reviewers_Initials
+                                st.session_state.data.at[index, "PREY90_Pre Y90 Extrahepatic Disease"] = PREY90_Pre_Y90_Extrahepatic_Disease
+                                st.session_state.data.at[index, "PREY90_Pre Y90 Extrahepatic Disease Location"] = PREY90_Pre_Y90_Extrahepatic_Disease_Location
+                                st.session_state.data.at[index, "PREY90_PVT"] = PREY90_PVT
+                                st.session_state.data.at[index, "PREY90_PVT Location"] = PREY90_PVT_Location
+                                st.session_state.data.at[index, "PREY90_Features of cirrhosis"] = PREY90_Features_of_cirrhosis
+                                st.session_state.data.at[index, "1st_FU_Scan Modality"] = FU_Scan_Modality
+                                st.session_state.data.at[index, "1st_FU_Imaging Date"] = FU_Imaging_Date
+                                st.session_state.data.at[index, "1st_FU_Months Since Y90"] = FU_Months_Since_Y90
+                                st.session_state.data.at[index, "1st_FU_Total number of lesions"] = FU_Total_number_of_lesions
+                                st.session_state.data.at[index, "1st_FU_Target Lesion 1 LAD Art Enhanc"] = FU_Target_Lesion_1_LAD_Art_Enhanc
+                                st.session_state.data.at[index, "1st_FU_Target Lesion 1 PAD Art Enhanc"] = FU_Target_Lesion_1_PAD_Art_Enhanc
+                                st.session_state.data.at[index, "1st_FU_Target Lesion 1 CCD Art Enhanc"] = FU_Target_Lesion_1_CCD_Art_Enhanc
+                                st.session_state.data.at[index, "1st_FU_Target Lesion 2 Segments"] = FU_Target_Lesion_2_Segments
+                                st.session_state.data.at[index, "1st_FU_Target Lesion 2 LAD Art Enhanc"] = FU_Target_Lesion_2_LAD_Art_Enhanc
+                                st.session_state.data.at[index, "1st_FU_Target Lesion 2 PAD Art Enhanc"] = FU_Target_Lesion_2_PAD_Art_Enhanc
+                                st.session_state.data.at[index, "1st_FU_Target Lesion 2 CCD Art Enhanc"] = FU_Target_Lesion_2_CCD_Art_Enhanc
+                                st.session_state.data.at[index, "1st_FU_Follow up 1 targeted Lesion Dia Sum"] = FU_Follow_up_1_targeted_Lesion_Dia_Sum
+                                st.session_state.data.at[index, "1st_FU_Non-Target Lesion 2 LAD Art Enhanc"] = FU_Non_Target_Lesion_2_LAD_Art_Enhanc
+                                st.session_state.data.at[index, "1st_FU_Non-Target Lesion 2 PAD Art Enhanc"] = FU_Non_Target_Lesion_2_PAD_Art_Enhanc
+                                st.session_state.data.at[index, "1st_FU_Non-Target Lesion 2 CCD Art Enhanc"] = FU_Non_Target_Lesion_2_CCD_Art_Enhanc
+                                st.session_state.data.at[index, "1st_FU_Non-targeted Lesion Dia Sum"] = FU_Non_targeted_Lesion_Dia_Sum
+                                st.session_state.data.at[index, "1st_FU_Lesion Necrosis"] = FU_Lesion_Necrosis
+                                st.session_state.data.at[index, "1st_FU_Reviewers Initials"] = FU_Reviewers_Initials
+                                st.session_state.data.at[index, "1st_FU_Non target lesion response"] = FU_Non_target_lesion_response
+                                st.session_state.data.at[index, "1st_FU_New Lesions"] = FU_New_Lesions
+                                st.session_state.data.at[index, "1st_FU_NEW Extrahepatic Disease"] = FU_NEW_Extrahepatic_Disease
+                                st.session_state.data.at[index, "1st_FU_NEW Extrahepatic Dz Location"] = FU_NEW_Extrahepatic_Dz_Location
+                                st.session_state.data.at[index, "1st_FU_NEW Extrahepatic Dz Date"] = FU_NEW_Extrahepatic_Dz_Date
+                                st.session_state.data.at[index, "1st_FU_% change non target lesion"] = FU_change_non_target_lesion
+                                st.session_state.data.at[index, "1st_FU_% Change target dia"] = FU_change_target_lesion
+                                st.session_state.data.at[index, "1st_FU_Free Text"] = FU_Free_Text
+                                st.session_state.data.at[index, "2nd_FU_Scan Modality"] = FU2_Scan_Modality
+                                st.session_state.data.at[index, "2nd_FU_Imaging Date"] = FU2_Imaging_Date
+                                st.session_state.data.at[index, "2nd_FU_Months Since Y90"] = FU2_Months_Since_Y90
+                                st.session_state.data.at[index, "2nd_FU_Total number of lesions"] = FU2_Total_number_of_lesions
+                                st.session_state.data.at[index, "2nd_FU_Target Lesion 1 LAD Art Enhanc"] = FU2_Target_Lesion_1_LAD_Art_Enhanc
+                                st.session_state.data.at[index, "2nd_FU_Target Lesion 1 PAD Art Enhanc"] = FU2_Target_Lesion_1_PAD_Art_Enhanc
+                                st.session_state.data.at[index, "2nd_FU_Target Lesion 1 CCD Art Enhanc"] = FU2_Target_Lesion_1_CCD_Art_Enhanc
+                                st.session_state.data.at[index, "2nd_FU_Target Lesion 2 Segments"] = FU2_Target_Lesion_2_Segments
+                                st.session_state.data.at[index, "2nd_FU_Target Lesion 2 LAD Art Enhanc"] = FU2_Target_Lesion_2_LAD_Art_Enhanc
+                                st.session_state.data.at[index, "2nd_FU_Target Lesion 2 PAD Art Enhanc"] = FU2_Target_Lesion_2_PAD_Art_Enhanc
+                                st.session_state.data.at[index, "2nd_FU_Target Lesion 2 CCD Art Enhanc"] = FU2_Target_Lesion_2_CCD_Art_Enhanc
+                                st.session_state.data.at[index, "2nd_FU_Follow up 2 targeted Lesion Dia Sum"] = FU2_Follow_up_2_targeted_Lesion_Dia_Sum
+                                st.session_state.data.at[index, "2nd_FU_Non-Target Lesion 1 LAD Art Enhanc"] = FU2_Non_Target_Lesion_1_LAD_Art_Enhanc
+                                st.session_state.data.at[index, "2nd_FU_Non-Target Lesion 1 PAD Art Enhanc"] = FU2_Non_Target_Lesion_1_PAD_Art_Enhanc
+                                st.session_state.data.at[index, "2nd_FU_Non-Target Lesion 1 CCD Art Enhanc"] = FU2_Non_Target_Lesion_1_CCD_Art_Enhanc
+                                st.session_state.data.at[index, "2nd_FU_Non-targeted Lesion Dia Sum"] = FU2_Non_targeted_Lesion_Dia_Sum
+                                st.session_state.data.at[index, "2nd_FU_Lesion Necrosis"] = FU2_Lesion_Necrosis
+                                st.session_state.data.at[index, "2nd_FU_Reviewers Initials"] = FU2_Reviewers_Initials
+                                st.session_state.data.at[index, "2nd_FU_Non target lesion response"] = FU2_Non_target_lesion_response
+                                st.session_state.data.at[index, "2nd_FU_New Lesions"] = FU2_New_Lesions
+                                st.session_state.data.at[index, "2nd_FU_Extrahepatic Disease"] = FU2_NEW_Extrahepatic_Disease
+                                st.session_state.data.at[index, "2nd_FU_NEW Extrahepatic Dz Location"] = FU2_NEW_Extrahepatic_Dz_Location
+                                st.session_state.data.at[index, "2nd_FU_NEW Extrahepatic Dz Date"] = FU2_NEW_Extrahepatic_Dz_Date
+                                st.session_state.data.at[index, "2nd_FU_% change non target lesion"] = FU2_change_non_target_lesion
+                                st.session_state.data.at[index, "2nd_FU_% Change Target Dia"] = FU2_change_target_lesion
+                                st.session_state.data.at[index, "2nd_FU_Free Text"] = FU2_Free_Text
+                                st.session_state.data.at[index, "3rd_FU_Scan Modality"] = FU3_Scan_Modality
+                                st.session_state.data.at[index, "3rd_FU_Imaging Date"] = FU3_Imaging_Date
+                                st.session_state.data.at[index, "3rd_FU_Months Since Y90"] = FU3_Months_Since_Y90
+                                st.session_state.data.at[index, "3rd_FU_Total number of lesions"] = FU3_Total_number_of_lesions
+                                st.session_state.data.at[index, "3rd_FU_Target Lesion 1 LAD Art Enhanc"] = FU3_Target_Lesion_1_LAD_Art_Enhanc
+                                st.session_state.data.at[index, "3rd_FU_Target Lesion 1 PAD Art Enhanc"] = FU3_Target_Lesion_1_PAD_Art_Enhanc
+                                st.session_state.data.at[index, "3rd_FU_Target Lesion 1 CCD Art Enhanc"] = FU3_Target_Lesion_1_CCD_Art_Enhanc
+                                st.session_state.data.at[index, "3rd_FU_Target Lesion 2 Segments"] = FU3_Target_Lesion_2_Segments
+                                st.session_state.data.at[index, "3rd_FU_Target Lesion 2 LAD Art Enhanc"] = FU3_Target_Lesion_2_LAD_Art_Enhanc
+                                st.session_state.data.at[index, "3rd_FU_Target Lesion 2 PAD Art Enhanc"] = FU3_Target_Lesion_2_PAD_Art_Enhanc
+                                st.session_state.data.at[index, "3rd_FU_Target Lesion 2 CCD Art Enhanc"] = FU3_Target_Lesion_2_CCD_Art_Enhanc
+                                st.session_state.data.at[index, "3rd_FU_Follow up 2 targeted Lesion Dia Sum"] = FU3_Follow_up_2_targeted_Lesion_Dia_Sum
+                                st.session_state.data.at[index, "3rd_FU_Non-Target Lesion 1 LAD Art Enhanc"] = FU3_Non_Target_Lesion_1_LAD_Art_Enhanc
+                                st.session_state.data.at[index, "3rd_FU_Non-Target Lesion 1 PAD Art Enhanc"] = FU3_Non_Target_Lesion_1_PAD_Art_Enhanc
+                                st.session_state.data.at[index, "3rd_FU_Non-Target Lesion 1 CCD Art Enhanc"] = FU3_Non_Target_Lesion_1_CCD_Art_Enhanc
+                                st.session_state.data.at[index, "3rd_FU_Non-targeted Lesion Dia Sum"] = FU3_Non_targeted_Lesion_Dia_Sum
+                                st.session_state.data.at[index, "3rd_FU_Lesion Necrosis"] = FU3_Lesion_Necrosis
+                                st.session_state.data.at[index, "3rd_FU_Reviewers Initials"] = FU3_Reviewers_Initials
+                                st.session_state.data.at[index, "3rd_FU_Non target lesion response"] = FU3_Non_target_lesion_response
+                                st.session_state.data.at[index, "3rd_FU_New Lesions"] = FU3_New_Lesions
+                                st.session_state.data.at[index, "3rd_FU_Extrahepatic Disease"] = FU3_NEW_Extrahepatic_Disease
+                                st.session_state.data.at[index, "3rd_FU_NEW Extrahepatic Dz Location"] = FU3_NEW_Extrahepatic_Dz_Location
+                                st.session_state.data.at[index, "3rd_FU_NEW Extrahepatic Dz Date"] = FU3_NEW_Extrahepatic_Dz_Date
+                                st.session_state.data.at[index, "3rd_FU_% change for non target lesion"] = FU3_change_non_target_lesion
+                                st.session_state.data.at[index, "3rd_FU_% Change Target Dia"] = FU3_change_target_lesion
+                                st.session_state.data.at[index, "3rd_FU_Free Text"] = FU3_Free_Text
+                                st.session_state.data.at[index, "4th_FU_Scan Modality"] = FU4_Scan_Modality
+                                st.session_state.data.at[index, "4th_FU_Imaging Date"] = FU4_Imaging_Date
+                                st.session_state.data.at[index, "4th_FU_Months Since Y90"] = FU4_Months_Since_Y90
+                                st.session_state.data.at[index, "4th_FU_Total number of lesions"] = FU4_Total_number_of_lesions
+                                st.session_state.data.at[index, "4th_FU_Target Lesion 1 LAD Art Enhanc"] = FU4_Target_Lesion_1_LAD_Art_Enhanc
+                                st.session_state.data.at[index, "4th_FU_Target Lesion 1 PAD Art Enhanc"] = FU4_Target_Lesion_1_PAD_Art_Enhanc
+                                st.session_state.data.at[index, "4th_FU_Target Lesion 1 CCD Art Enhanc"] = FU4_Target_Lesion_1_CCD_Art_Enhanc
+                                st.session_state.data.at[index, "4th_FU_Target Lesion 2 Segments"] = FU4_Target_Lesion_2_Segments
+                                st.session_state.data.at[index, "4th_FU_Target Lesion 2 LAD Art Enhanc"] = FU4_Target_Lesion_2_LAD_Art_Enhanc
+                                st.session_state.data.at[index, "4th_FU_Target Lesion 2 PAD Art Enhanc"] = FU4_Target_Lesion_2_PAD_Art_Enhanc
+                                st.session_state.data.at[index, "4th_FU_Target Lesion 2 CCD Art Enhanc"] = FU4_Target_Lesion_2_CCD_Art_Enhanc
+                                st.session_state.data.at[index, "4th_FU_Follow up 2 targeted Lesion Dia Sum"] = FU4_Follow_up_2_targeted_Lesion_Dia_Sum
+                                st.session_state.data.at[index, "4th_FU_Non-Target Lesion 1 LAD Art Enhanc"] = FU4_Non_Target_Lesion_1_LAD_Art_Enhanc
+                                st.session_state.data.at[index, "4th_FU_Non-Target Lesion 1 PAD Art Enhanc"] = FU4_Non_Target_Lesion_1_PAD_Art_Enhanc
+                                st.session_state.data.at[index, "4th_FU_Non-Target Lesion 1 CCD Art Enhanc"] = FU4_Non_Target_Lesion_1_CCD_Art_Enhanc
+                                st.session_state.data.at[index, "4th_FU_Non-targeted Lesion Dia Sum"] = FU4_Non_targeted_Lesion_Dia_Sum
+                                st.session_state.data.at[index, "4th_FU_Lesion Necrosis"] = FU4_Lesion_Necrosis
+                                st.session_state.data.at[index, "4th_FU_Reviewers Initials"] = FU4_Reviewers_Initials
+                                st.session_state.data.at[index, "4th_FU_Non target lesion response"] = FU4_Non_target_lesion_response
+                                st.session_state.data.at[index, "4th_FU_New Lesions"] = FU4_New_Lesions
+                                st.session_state.data.at[index, "4th_FU_Extrahepatic Disease"] = FU4_NEW_Extrahepatic_Disease
+                                st.session_state.data.at[index, "4th_FU_NEW Extrahepatic Dz Location"] = FU4_NEW_Extrahepatic_Dz_Location
+                                st.session_state.data.at[index, "4th_FU_NEW Extrahepatic Dz Date"] = FU4_NEW_Extrahepatic_Dz_Date
+                                st.session_state.data.at[index, "4th_FU_% change non target lesion"] = FU4_change_non_target_lesion
+                                st.session_state.data.at[index, "4th_FU_% Change target dia"] = FU4_change_target_lesion
+                                st.session_state.data.at[index, "4th_FU_Free Text"] = FU4_Free_Text
+                                st.session_state.data.at[index, "5th_FU_Imaging Date"] = FU5_Imaging_Date
+                                st.session_state.data.at[index, "5th_FU_Months Since Y90"] = FU5_Months_Since_Y90
+                                st.session_state.data.at[index, "5th_FU_Total number of lesions"] = FU5_Total_number_of_lesions
+                                st.session_state.data.at[index, "5th_FU_Non-Target Lesion 1 LAD Art Enhanc"] = FU5_Non_Target_Lesion_1_LAD_Art_Enhanc
+                                st.session_state.data.at[index, "5th_FU_Non-Target Lesion 1 PAD Art Enhanc"] = FU5_Non_Target_Lesion_1_PAD_Art_Enhanc
+                                st.session_state.data.at[index, "5th_FU_Non-Target Lesion 1 CCD Art Enhanc"] = FU5_Non_Target_Lesion_1_CCD_Art_Enhanc
+                                st.session_state.data.at[index, "5th_FU_Non-targeted Lesion Dia Sum"] = FU5_Non_targeted_Lesion_Dia_Sum
+                                st.session_state.data.at[index, "5th_FU_Non target lesion response"] = FU5_Non_target_lesion_response
+                                st.session_state.data.at[index, "5th_FU_New Lesions"] = FU5_New_Lesions
+                                st.session_state.data.at[index, "5th_FU_Extrahepatic Disease"] = FU5_NEW_Extrahepatic_Disease
+                                st.session_state.data.at[index, "5th_FU_NEW Extrahepatic Dz Location"] = FU5_NEW_Extrahepatic_Dz_Location
+                                st.session_state.data.at[index, "5th_FU_NEW Extrahepatic Dz Date"] = FU5_NEW_Extrahepatic_Dz_Date
+                                st.session_state.data.at[index, "5th_FU_% change non target lesion"] = FU5_change_non_target_lesion
+                                st.session_state.data.at[index, "Dead"] = dead
+                                st.session_state.data.at[index, "Date of Death"] = Date_of_Death
+                                st.session_state.data.at[index, "Time to Death"] = Time_to_Death
+                                st.session_state.data.at[index, "OLT"] = OLT
+                                st.session_state.data.at[index, "Date of OLT"] = Date_of_OLT
+                                st.session_state.data.at[index, "Time to OLT"] = Time_to_OLT
+                                st.session_state.data.at[index, "Repeat tx post Y90"] = Repeat_tx_post_Y90
+                                st.session_state.data.at[index, "Date of Repeat tx Post Y90"] = Date_of_Repeat_tx_Post_Y90
+                                st.session_state.data.at[index, "Time to Repeat Tx Post Y90"] = Time_to_Repeat_Tx_Post_Y90
+                                st.session_state.data.at[index, "Date of Localized Progression"] = Date_of_Localized_Progression
+                                
+                            
+                                st.success("Imagine Data dubmitted")
+                                st.write("Updated Data:")
+                                st.dataframe(st.session_state.data, use_container_width=True , height=250)
+            with tab11: 
+                st.subheader("Dosimetry Data")
+                with st.form("dosimetry_data_form"):
+                        
+            
+                            gtv_mean_dose = st.number_input("GTV mean dose", help="Enter GTV mean dose")
+                            tx_vol_mean_dose = st.number_input("Tx vol mean dose", help="Enter Tx vol mean dose")
+                            healthy_liver_mean_dose = st.number_input("Healthy Liver mean dose (liver - tx vol)", help="Enter Healthy Liver mean dose")
+                            gtv_vol = st.number_input("GTV Vol", help="Enter GTV Vol")
+                            tx_vol = st.number_input("Tx vol", help="Enter Tx vol")
+                            liver_vol = st.number_input("Liver vol", help="Enter Liver vol")
+                            healthy_liver_vol = st.number_input("Healthy Liver Vol", help="Enter Healthy Liver Vol")
+                            gtv_liver_percentage = st.number_input("GTV/ Liver (%)", help="Enter GTV/ Liver (%)")
+                            d98_gy = st.text_input("D98 (Gy)", help="Enter D98 (Gy)")
+                            d90_gy = st.text_input("D90 (Gy)", help="Enter D90 (Gy)")
+                            d95_gy = st.text_input("D95 (Gy)", help="Enter D95 (Gy)")
+                            d80_gy = st.text_input("D80 (Gy)", help="Enter D80 (Gy)")
+                            d70_gy = st.text_input("D70 (Gy)", help="Enter D70 (Gy)")
+                            v100_percentage = st.number_input("V100(%)", help="Enter V100(%)")
+                            v200_percentage = st.number_input("V200(%)", help="Enter V200(%)")
+                            v300_percentage = st.number_input("V300(%)", help="Enter V300(%)")
+                            v400_percentage = st.number_input("V400(%)", help="Enter V400(%)")
+                            activity_bq = st.text_input("Activity(Bq)", help="Enter Activity(Bq)")
+                            activity_ci = st.text_input("Activity(Ci)", help="Enter Activity(Ci)")
+                            tx_vol_activity_density = st.number_input("Tx vol Activity Density (Ci/cc)", help="Enter Tx vol Activity Density (Ci/cc)")
+
+                            submit_dosimetry_data = st.form_submit_button("Submit")
+
+                            if submit_dosimetry_data:
+                                #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
+
+                                st.session_state.data.at[index, "GTV mean dose"] = gtv_mean_dose
+                                st.session_state.data.at[index, "Tx vol mean dose"] = tx_vol_mean_dose
+                                st.session_state.data.at[index, "Healthy Liver mean dose (liver - tx vol)"] = healthy_liver_mean_dose
+                                st.session_state.data.at[index, "GTV Vol"] = gtv_vol
+                                st.session_state.data.at[index, "Tx vol"] = tx_vol
+                                st.session_state.data.at[index, "Liver vol"] = liver_vol
+                                st.session_state.data.at[index, "Healthy Liver Vol"] = healthy_liver_vol
+                                st.session_state.data.at[index, "GTV/ Liver (%)"] = gtv_liver_percentage
+                                st.session_state.data.at[index, "D98 (Gy)"] = d98_gy
+                                st.session_state.data.at[index, "D90 (Gy)"] = d90_gy
+                                st.session_state.data.at[index, "D95 (Gy)"] = d95_gy
+                                st.session_state.data.at[index, "D80 (Gy)"] = d80_gy
+                                st.session_state.data.at[index, "D70 (Gy)"] = d70_gy
+                                st.session_state.data.at[index, "V100(%)"] = v100_percentage
+                                st.session_state.data.at[index, "V200(%)"] = v200_percentage
+                                st.session_state.data.at[index, "V300(%)"] = v300_percentage
+                                st.session_state.data.at[index, "V400(%)"] = v400_percentage
+                                st.session_state.data.at[index, "Activity(Bq)"] = activity_bq
+                                st.session_state.data.at[index, "Activity(Ci)"] = activity_ci
+                                st.session_state.data.at[index, "Tx vol Activity Density (Ci/cc)"] = tx_vol_activity_density
+
+                                st.success("Dosimetry Data added successfully.")
+                                st.write("Updated Data:")
+                                #st.dataframe(st.session_state.data)              
+                                st.dataframe(st.session_state.data, use_container_width=True , height=250)
 # Main App Logic
 if st.session_state.logged_in:
     # Navigation options
