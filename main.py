@@ -4656,7 +4656,7 @@ def edit_existing_data():
                                     st.success("DAYY90 added successfully.")
                                     st.write("Updated Data:")
                                     #st.dataframe(st.session_state.data)
-                st.dataframe(st.session_state.data, use_container_width=True , height=250)
+                st.dataframe(st.session_state.data, use_container_width=True)
             with tab9:
                 st.subheader("Other_post_TARE")
                 with st.form("other_post_tare_form"):
@@ -4709,7 +4709,7 @@ def edit_existing_data():
                                 st.success("Other Post Tare added successfully.")
                                 st.write("Updated Data:")
                                 #st.dataframe(st.session_state.data)
-                                st.dataframe(st.session_state.data, use_container_width=True , height=250)          
+                                st.dataframe(st.session_state.data, use_container_width=True)          
             with tab10:
                 st.subheader("Imaging Date")
                 with st.form("imaging_date_form"):
@@ -5658,7 +5658,7 @@ def edit_existing_data():
                             
                                 st.success("Imagine Data dubmitted")
                                 st.write("Updated Data:")
-                                st.dataframe(st.session_state.data, use_container_width=True , height=250)
+                                st.dataframe(st.session_state.data, use_container_width=True )
             with tab11: 
                 st.subheader("Dosimetry Data")
                 with st.form("dosimetry_data_form"):
@@ -5714,15 +5714,8 @@ def edit_existing_data():
                                 st.success("Dosimetry Data added successfully.")
                                 st.write("Updated Data:")
                                 #st.dataframe(st.session_state.data)              
-                                st.dataframe(st.session_state.data, use_container_width=True , height=250)
+                                st.dataframe(st.session_state.data, use_container_width=True )
    
-
-
-
-
-
-
-
 
 
 if st.session_state.logged_in:
