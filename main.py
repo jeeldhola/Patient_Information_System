@@ -66,220 +66,216 @@ if "data" not in st.session_state:
     st.session_state.data = pd.DataFrame(
         columns=["Name",
     "MRN",
-    "TARE Tx Date",
-    "Procedure Technique",
-    "Age at time of Tare",
+    "Duplicate",
+    "TAREdate",
+    "PTech",
+    "Tareage",
     "Gender",
     "Ethnicity",
-    "PMHx Hypertension",
-    "PMHx Diabetes (T1 or T2)",
+    "PMHxHTN",
+    "PMHxDM",
     "Hypercholesterolemia",
-    "Hx of Smoking",
+    "PMHxSmoking",
     "Obesity",
-    "Comorbitieis Total Count",
-    "Comorbitieis Binary",
-    "Cir_PMH_HBV Status",
-    "Cir_PMH_HBV Free Text",
-    "Cir_PMH_HBV ART",
-    "Cir_PMH_HCV Status",
-    "Cir_PMH_HCV Free Text",
-    "Cir_PMH_HCV ART",
-    "Cir_PMH_Alcohol Use Disorder",
-    "Cir_PMH_Duration of Alcohol Use Years",
-    "Cir_PMH_Alcohol Free Text",
-    "Cir_PMH_IVDU Status",
-    "Cir_PMH_Duration of IVDU Years",
-    "Cir_PMH_IVDU Free Text",
-    "Cir_PMH_Other Contributing Factors",
-    "Cirrhosis_Dx_Diagnosis Date",
-    "Cirrhosis_Dx_Diagnosis Method",
-    "Cirrhosis_Dx_HPI EMR Note Free Text",
-    "Cirrhosis_Dx_Imaging Findings EMR Note Free Text",
-    "Cirrhosis_Dx_Metavir Score",
-    "Cirrhosis_Dx_Complications at Time of Diagnosis",
-    "Cirrhosis_Dx_Complications at Time of Diagnosis Binary",
-    "Cirrhosis_Dx_Complications Free Text",
-    "Cirrhosis_Dx_Date of Labs in Window",
-    "Cirrhosis_Dx_AFP",
-    "Cirrhosis_Dx_AFP_L3",
-    "Cirrhosis_Dx_Child-Pugh Class EMR",
-    "Cirrhosis_Dx_Child-Pugh Points EMR",
-    "Cirrhosis_Dx_MELD Score EMR",
-    "Cirrhosis_Dx_MELD-Na Score EMR",
-    "Cirrhosis_Dx_Ascites",
-    "Cirrhosis_Dx_Ascites Binary Classification",
-    "Cirrhosis_Dx_Ascites Free Text",
-    "Cirrhosis_Dx_Ascites Labs Free Text",
-    "Cirrhosis_Dx_Hepatic Encephalopathy",
-    "HCC_Dx_HCC Diagnosis Date",
-    "HCC_Dx_Method of Diagnosis",
-    "HCC_Dx_Date of Labs in Window",
-    "HCC_Dx_AFP",
-    "HCC_Dx_AFP L3 & Date Free Text",
-    "HCC_Dx_Bilirubin",
-    "HCC_Dx_Albumin",
-    "HCC_Dx_INR",
-    "HCC_Dx_Creatinine",
-    "HCC_Dx_Sodium",
-    "HCC_Dx_Ascites",
-    "HCC_Dx_Ascites Binary Classification",
-    "HCC_Dx_Ascites Free Text",
-    "HCC_Dx_Ascites Labs Free Text",
-    "HCC_Dx_Hepatic Encephalopathy",
-    "HCC_Dx_ECOG Performance Status",
-    "HCC_Dx_LIRADS Score",
-    "HCC_Dx_Child-Pugh Class EMR",
-    "HCC_Dx_Child-Pugh Points EMR",
-    "HCC_Dx_BCLC Stage EMR",
-    "HCC_Dx_MELD Score EMR",
-    "HCC_Dx_MELD-Na Score EMR",
-    "HCC_Dx_ALBI Score EMR",
-    "HCC_Dx_Child-Pugh Class calc",
-    "HCC_Dx_Child-Pugh Points calc",
-    "HCC_Dx_BCLC Stage calc",
-    "HCC_Dx_MELD Score calc",
-    "HCC_Dx_MELD-Na Score calc",
-    "HCC_Dx_ALBI Score calc",
-    "PRVTHER_Prior LDT Therapy",
-    "PRVTHER_Prior RFA Therapy",
-    "PRVTHER_Prior TARE Therapy",
-    "PRVTHER_Prior SBRT Therapy",
-    "PRVTHER_Prior TACE Therapy",
-    "PRVTHER_Prior MWA Therapy",
-    "PRVTHER_Previous Therapy Sum",
-    "PRVTHER_Previous Therapy Date(s)",
-    "PRVTHER_Total Recurrences HCC",
-    "PRVTHER_Binary for ANY Recurrences HCC Binary",
-    "PRVTHER_Location of Previous Treatment HCC",
-    "PRVTHER_Recurrence Date/Location Free Text",
-    "PRVTHER_New HCC Outside Previous Treatment Site",
-    "PRVTHER_New HCC Adjacent to Previous Treatment Site",
-    "PRVTHER_Residual HCC",
-    "PRVTHER_Systemic Therapy Free Text",
-    "PRVTHER_Date of Labs in Window",
+    "CirPMH_HBV",
+    "CirPMH_HBVFT",
+    "CirPMH_HBVART",
+    "CirPMH_HCV",
+    "CirPMH_HCVFT",
+    "CirPMH_HCVART",
+    "CirPMH_AUD",
+    "CirPMH_AUDFT",
+    "CirPMH_IVDU",
+    "CirPMH_IVDUFT",
+    "CirPMH_Liverfactors"
+    "Cirdx_Dxdate",
+    "Cirdx_Dxmethod",
+    "Cirdx_HPIFT",
+    "Cirdx_ImageemrFT",
+    "Cirdx_Metavir",
+    "Cirdx_Compatdx",
+    "Cirdx_Compatdxbinary",
+    "Cirdx_CompFT",
+    "Cirdx_DateLabs",
+    "Cirdx_AFP",
+    "Cirdx_AFP L3",
+    "Cirdx_AFPL3DateFT",
+    "Cirdx_AscitesCTCAE",
+    "Cirdx_AscitesCTCAEnumb",
+    "Cirdx_AscitesFT",
+    "HCCdx_HCCdxdate",
+    "HCCdx_Methoddx",
+    "HCCdx_Datelabs",
+    "HCCdx_AFP",
+    "HCCdx_AFP L3",
+    "HCCdx_AFPL3dateFT",
+    "HCCdx_Bilirubin",
+    "HCCdx_Albumin",
+    "HCCdx_INR",
+    "HCCdx_Creatinine",
+    "HCCdx_Sodium",
+    "HCCdx_AscitesCTCAE",
+    "HCCdx_AscitesCTCAEnumb",
+    "HCCdx_Ascitesdiruetics",
+    "HCCdx_Ascitesparacentesis",
+    "HCCdx_Asciteshospitalization",
+    "HCCdx_HEgrade",
+    "HCCdx_ECOG",
+    "HCCdx_LIRADS",
+    "HCCdx_CPcalc",
+    "HCCdx_CPclass",
+    "HCCdx_MELD",
+    "HCCdx_MELDNa",
+    "HCCdx_Albiscore",
+    "HCCdx_Albigrade",
+    "HCCdx_BCLC",
+    "PRVTHER_LDT",
+    "PRVTHER_RFA",
+    "PRVTHER_RFAdate",
+    "PRVTHER_TARE",
+    "PRVTHER_TAREdate",
+    "PRVTHER_SBRT",
+    "PRVTHER_SBRTdate",
+    "PRVTHER_TACE",
+    "PRVTHER_TACEdate",
+    "PRVTHER_MWA",
+    "PRVTHER_MWAdate",
+    "PRVTHER_Resection",
+    "PRVTHER_Resection date",
+    "PRVTHER_Prevtxsum",
+    "PRVTHER_NotesFT",
+    "PRVTHER_Totalrecur",
+    "PRVTHER_Locationprevtxseg",
+    "PRVTHER_Location of Previous Tx Segments FT",
+    "PRVTHER_RecurLocationFT",
+    "PRVTHER_RecurDate",
+    "PRVTHER_Recurrence Seg",
+    "PRVTHER_NewHCCoutsideprevsite",
+    "PRVTHER_NewHCCadjacentprevsite",
+    "PRVTHER_ResidualHCCnoteFT",
+    "PRVTHER_ResidualHCC",
+    "PRVTHER_SystemictherapyFT",
+    "PRVTHER_DateAFP",
     "PRVTHER_AFP",
-    "PREY90_symptoms",
-    "PREY90_date of labs in window",
+    "PREY90_sx",
+    "PREY90_Datelabs",
     "PREY90_AFP",
-    "PRE90_AFP Prior to TARE",
+    "PRE90_AFPbinary",
     "PREY90_Bilirubin",
     "PREY90_Albumin",
-    "PREY90_inr",
-    "PREY90_creatinine",
-    "PREY90_sodium",
+    "PREY90_INR",
+    "PREY90_Creatinine",
+    "PREY90_Sodium",
     "PREY90_AST",
     "PREY90_ALT",
     "PREY90_Alkaline Phosphatase",
-    "PREY90_potassium",
-    "PREY90_Ascites",
-    "PREY90_Ascites Binary Classification",
-    "PREY90_Ascites Free Text",
-    "PREY90_he",
-    "PREY90_ecog",
-    "PREY90_Child-Pugh Class Emr",
-    "PREY90_Child-Pugh Points Emr",
-    "PREY90_BCLC Stage EMR",
-    "PREY90_MELD Score EMR",
-    "PREY90_MELD-Na Score EMR",
-    "PREY90_ALBI Score EMR",
-    "PREY90_Child-Pugh Class calc",
-    "PREY90_Child-Pugh Points calc",
-    "PREY90_BCLC Stage calc",
-    "PREY90_MELD Score calc",
-    "PREY90_MELD-Na Score calc",
-    "PREY90_ALBI Score calc",
+    "PREY90_Potassium",
+    "PREY90_AscitesCTCAE",
+    "PREY90_AscitesCTCAEnumb",
+    "PREY90_AscitesFT",
+    "PREY90_Ascitesdiruetics",
+    "PREY90_Ascitesparacentesis",
+    "PREY90_Asciteshospitalization",
+    "PREY90_HEgrade",
+    "PREY90_ECOG",
+    "PREY90_CPcalc",
+    "PREY90_CPclass",
+    "PREY90_MELD",
+    "PREY90_MELDNa",
+    "PREY90_Albiscore",
+    "PREY90_Albigrade",
+    "PREY90_BCLC",
     "MY90_date",
     "MY90_Lung_shunt",
     "DAYY90_AFP",
-    "DAYY90_AFP Prior to TARE",
-    "AFP_PreY90 or DAYY90",
-    "DAYY90_sodium",
-    "DAYY90_creatinine",
-    "DAYY90_inr",
-    "DAYY90_albumin",
-    "DAYY90_bilirubin",
+    "DAYY90_AFP Binary",
+    "PRE90_AFP BinaryDup",
+    "DAYY90_Sodium",
+    "DAYY90_Creatinine",
+    "DAYY90_INR",
+    "DAYY90_Albumin",
+    "DAYY90_Bilirubin",
     "DAYY90_AST",
     "DAYY90_ALT",
-    "DAYY90_Alkaline Phosphatase",
-    "DAYY90_leukocytes",
-    "DAYY90_platelets",
-    "DAYY90_ascities",
-    "DAYY90_Hepatic Encephalopathy",
-    "DAYY90_Child-Pugh class EMR",
-    "DAYY90_Child-Pugh points EMR",
-    "DAYY90_BCLC EMR",
-    "DAYY90_MELD EMR",
-    "DAYY90_MELD Na EMR",
-    "DAYY90_Albi EMR",
-    "PREY90_ECOG",
-    "DAYY90_Child-Pugh class Calc",
-    "DAYY90_Child-Pugh points calc",
-    "DAYY90_BCLC calc",
-    "DAYY90_MELD calc",
-    "DAYY90_MELD Na calc",
-    "DAYY90_Albi calc",
-    "DAYY90_Type of Sphere",
-    "DAYY90_LT_notes_ftx",
+    "DAYY90_Alkphos",
+    "DAYY90_Leukocytes",
+    "DAYY90_Platelets",
+    "DAY90_Potassium",
+    "Day90_AscitesCTCAE",
+    "Day90_AscitesCTCAEnumb",
+    "Day90_HEgrade",
+    "Day90_ECOG",
+    "DAYY90_CPcalc",
+    "DAYY90_CPclass",
+    "DAYY90_MELD",
+    "DAYY90_MELDNa",
+    "DAYY90_Albiscore",
+    "DAYY90_Albigrade",
+    "DAYY90_BCLC",
+    "DAYY90_Sphere",
+    "DAYY90_LTnoteFT",
     "ken_ChildPughscore",
-    "ken_MELDpreTARE",
-    "POSTY90_30DY_date_labs",
-    "POSTY90_30DY_afp",
-    "POSTY90_30DY_afp DATE",
+    "ken_MELDpreTARE (MELDpreTARE)",
+    "POSTY90_30DY_Datelabs",
+    "POSTY90_30DY_AFP",
+    "POSTY90_30DY_AFPdate",
     "POSTY90_30DY_Sodium",
-    "POSTY90_30DY_creatinine",
+    "POSTY90_30DY_Creatinine",
     "POSTY90_30DY_INR",
-    "POSTY90_30DY_albumin",
-    "POSTY90_30DY_bilirubin",
+    "POSTY90_30DY_Albumin",
+    "POSTY90_30DY_Bilirubin",
     "POSTY90_30DY_AST",
     "POSTY90_30DY_ALT",
-    "POSTY90_30DY_Alkaline Phosphatase",
-    "POSTY90_30DY_leukocytes",
-    "POSTY90_30DY_platelets",
-    "POSTY90_30DY_potassium",
+    "POSTY90_30DY_ALP",
+    "POSTY90_30DY_Leukocytes",
+    "POSTY90_30DY_Platelets",
+    "POSTY90_30DY_Potassium",
+    "30DY_AE_AscitesCTCAE",
+    "30DY_AE_AscitesCTCAEnumb",
+    "30DY_AE_Ascitesdiruetics",
+    "30DY_AE_Ascitesparacentesis",
+    "30DY_AE_Asciteshospitalization",
+    "30DY_AE_HEgrade",
+    "30DY_AE_ascities_freetext",
     "POSTY90_30DY_ECOG",
-    "POSTY90_30DY_Child-Pugh Class EMR",
-    "POSTY90_30DY_Child-Pugh Points EMR",
-    "POSTY90_30DY_BCLC EMR",
-    "POSTY90_30DY_MELD EMR",
-    "POSTY90_30DY_MELD Na EMR",
-    "POSTY90_30DY_ALBI EMR",
-    "POSTY90_30DY_Child-Pugh Class calc",
-    "POSTY90_30DY_Child-Pugh Points calc",
-    "POSTY90_30DY_BCLC calc",
-    "POSTY90_30DY_MELD calc",
-    "POSTY90_30DY_MELD Na calc",
-    "POSTY90_30DY_ALBI calc",
+    "POSTY90_30DY_CPcalc",
+    "POSTY90_30DY_CPclass",
+    "POSTY90_30DY_MELD",
+    "POSTY90_30DY_MELDNa",
+    "POSTY90_30DY_ALBIscore",
+    "POSTY90_30DY_ALBIgrade",
+    "POSTY90_30DY_BCLC",
     "Ken_BCLCStagepost90",
-    "Ken_MELD_Stagepost90",
-    "30DYAE_CTCAE_portal_htn",
-    "30DYAE_CTCAE_Vascular comp",
-    "30DYAE_CTCAE_fatigue",
-    "30DYAE_CTCAE_diarrhea",
-    "30DYAE_CTCAE_hypoalbuminemia emr",
-    "30DYAE_CTCAE_hyperbilirubinemia emr",
-    "30DYAE_CTCAE_Increase_creatinine emr",
-    "30DYAE_CTCAE_abdominal pain",
-    "30DYAE_CTCAE_sepsis",
-    "30DYAE_CTCAE_ascites",
-    "30DYAE_CTCAE_ascites Binary classification",
-    "30DYAE_CTCAE_ascites_ftx",
-    "30DYAE_CTCAE_bacterial_peritonitis",
-    "30DYAE_CTCAE_hemorrhage",
-    "30DYAE_CTCAE_anorexia",
-    "30DYAE_CTCAE_intrahepatic_fistula",
-    "30DYAE_CTCAE_constipation",
-    "30DYAE_CTCAE_nausea",
-    "30DYAE_CTCAE_vomiting",
-    "30DYAE_CTCAE_Hepatic Encephalopathy",
-    "30DYAE_CTCAE_he_ftx",
-    "30DYAE_CTCAE_cholecystitis",
-    "30DYAE_CTCAE_gastric_ulcers",
-    "30DYAE_CTCAE_hyperkalemia",
-    "30DYAE_CTCAE_respiratory_failure",
-    "30DYAE_CTCAE_AKI",
-    "30DYAE_CTCAE_Radiation_pneumonitis",
-    "30DY_AE_other",
-    "90DY_AE_date_of_AE",
+    "Ken_MELD_Stagepost90"
+    "30DY_AE_Portalhtn",
+    "30DY_AE_Vascularcomp",
+    "30DY_AE_Fatigue",
+    "30DY_AE_Diarrhea",
+    "30DY_AE_Hypoalbuminemia",
+    "30DY_AE_Hyperbilirubinemia",
+    "30DY_AE_Increasecreatine",
+    "30DY_AE_Abdominalpain",
+    "30DY_AE_Sepsis",
+    "30DY_AE_BacterialPer",
+    "30DY_AE_Hemorrhage",
+    "30DY_AE_Anorexia",
+    "30DY_AE_Intrahepaticfistula",
+    "30DY_AE_Constipation",
+    "30DY_AE_Nausea",
+    "30DY_AE_Vomiting",
+    "30DY_AE_Cholecystitis",
+    "30DY_AE_Gastriculcer",
+    "30DY_AE_Hyperkalemia",
+    "30DY_AE_Respfailure",
+    "30DY_AE_AKI",
+    "30DY_AE_Radiationpneumonitis",
+    "30DY_AE_Other",
+    "90DY_AE_DateofAE",
+    "Additional Notes FT",
+    "90DY_AE_Hosp3mo",
+    "90DY_AE_Datehosp3mo",
+    "90DY_AE_Hosp6mo",
+    "90DY_AE_DeathduetoAE",
     "OC_Liver_transplant",
     "OC_Liver_transplant_date",
     "K_ken_ToxgtG3",
@@ -460,26 +456,25 @@ if "data" not in st.session_state:
     "Date of Overall (Local or systemic) Progression",
     "Time to Overall (Local or systemic) Progression",
     "Date of Last Follow up or last imaging date (if not OLT, Death, Repeat tx)",
-    "GTV mean dose",
-    "Tx vol mean dose",
-    "Healthy Liver mean dose (liver - tx vol)",
-    "GTV Vol",
-    "Tx vol",
-    "Liver vol",
-    "Healthy Liver Vol",
-    "GTV/ Liver (%)",
-    "D98 (Gy)",
-    "D90 (Gy)",
-    "D95 (Gy)",
-    "D80 (Gy)",
-    "D70 (Gy)",
-    "V100(%)",
-    "V200(%)",
-    "V300(%)",
-    "V400(%)",
-    "Activity(Bq)",
-    "Activity(Ci)",
-    "Tx vol Activity Density (Ci/cc)"]
+    "GTV mean dose", "Tx vol mean dose", "Liver Vol Mean dose", "Healthy Liver mean dose", 
+    "GTV Vol", "Tx vol", "Liver vol", "Healthy Liver Vol", "GTV/Liver", 
+    "D98", "D95", "D90", "D80", "D70", 
+    "V100", "V200", "V300", "V400", "ActivityBq", 
+    "ActivityCi", "Tx vol Activity Density", "NEW", 
+    "GTV < D95 Vol_ml", "GTV < D95 Mean Dose", "GTV < D95 Min Dose", 
+    "GTV < D95 SD", "GTV < D95 Vol_1", "GTV < D95 Mean Dose_1", 
+    "GTV < D95 Min Dose_1", "GTV < D95 SD_1", "GTV < D95 Vol_2", 
+    "GTV < D95 Mean Dose_2", "GTV < D95 Min Dose_2", "GTV < D95 SD_2", 
+    "GTV < 100 Gy Vol", "GTV < 100 Gy Mean Dose", "GTV < 100 Gy Min Dose", "GTV < 100 Gy SD",
+    "1AFP Date", "1AFP", "2AFP Date", "2AFP", "3AFP Date", "3AFP", "4AFP Date", "4AFP",
+    "5AFP Date", "5AFP", "6AFP Date", "6AFP", "7AFP Date", "7AFP", "8AFP Date", "8AFP",
+    "9AFP Date", "9AFP", "10AFP Date", "10AFP", "11AFP Date", "11AFP", "12AFP Date", "12AFP",
+    "13AFP Date", "13AFP", "14AFP Date", "14AFP", "15AFP Date", "15AFP", "16AFP Date", "16AFP",
+    "17AFP Date", "17AFP", "18AFP DATE", "18AFP", "19AFP DATE", "19AFP", "20AFP DATE", "20AFP",
+    "21AFP DATE", "21AFP", "22AFP DATE", "22AFP", "23AFP DATE", "23AFP", "24AFP DATE", "24AFP",
+    "25AFP DATE", "25AFP", "26AFP DATE", "26AFP", "27AFP DATE", "27AFP", "28AFP DATE", "28AFP",
+    "29AFP DATE", "29AFP", "30AFP DATE", "30AFP", "31AFP Date", "31AFP", "32AFP DATE", "32AFP",
+    "33AFP DATE", "33AFP", "34AFP DATE", "34AFP",]
     )
 # List of 11 tabs
 def calculate_comorbidities_total(hypertension, diabetes, hypercholesterolemia, smoking, obesity):
@@ -537,12 +532,14 @@ def add_new_data():
                             ascites_points = 3
 
             # Points for Hepatic Encephalopathy
-                        if encephalopathy == 'No':
+                        if encephalopathy == "1":
                             encephalopathy_points = 1
-                        elif encephalopathy == 'Yes':
+                        elif encephalopathy == "2":
                             encephalopathy_points = 2
-                        else:  # 'grade iii-iv'
+                        else:
                             encephalopathy_points = 3
+                             
+                             
 
             # Total Child-Pugh score
                         total_score = (
@@ -550,7 +547,7 @@ def add_new_data():
                         )
 
                         return total_score
-    
+
     def calculate_class(poin):
                         if 5 <= poin <= 6:
                             return 'A'
@@ -562,12 +559,20 @@ def add_new_data():
                             return "Invalid points: must be between 5 and 15."
     
     def albi_calc(a,b):
-                        a=int(a)
+                        a=int(a)*17.1
                         b=int(b)
                         t = math.log(a, 10)
-                        answer = (t * 0.66) + (b * -0.085)
+                        answer = round((t * 0.66) + (b * -0.085))
                         return answer
     
+    def albi_class(albi_score):
+        if albi_score <= -2.60:
+            return "Grade 1"
+        elif albi_score > -2.60 and albi_score <= -1.39:
+             return "Grade 2"
+        else:
+             return "Grade 3"
+
     def process_input(value):
                         
             # Handle the 'NA' case
@@ -598,12 +603,11 @@ def add_new_data():
     # start main page
     st.title("Patient Information System")
 
-    tabs = ["Patient Info", "Patient Demographics", "Cirrhosis PMH","HCC Diagnosis", "Previous Therapy for HCC", "Pre Y90", "Day_Y90", "Post Y90 Within 30 Days Labs", "Other Post Tare","Imaging Date","Dosimetry Data"]
+    tabs = ["Patient Info", "Patient Demographics", "Cirrhosis PMH","HCC Diagnosis", "Previous Therapy for HCC", "Pre Y90", "Day_Y90", "Post Y90 Within 30 Days Labs", "Other Post Tare","Imaging Date","Dosimetry Data","AFP"]
     if "selected_tab" not in st.session_state:
         st.session_state.selected_tab = tabs[0]
 
     col1, col2 = st.columns([0.3, 0.7],gap="small")
-
 
     # Left column for vertical tabs
     with col1:
@@ -615,25 +619,36 @@ def add_new_data():
         #st.header(st.session_state.selected_tab)
         
         if st.session_state.selected_tab == "Patient Info":
-            st.subheader("Patient Information")
+            st.subheader("Patient_Info")
             with st.form("patient_info_form"):
                 # Patient Info Section
                 col1, col2 = st.columns(2)
                 last_name = col1.text_input("Last Name")
+                last_name = last_name.lower()
                 first_name = col2.text_input("First Name")
+                first_name = first_name.lower()
                 
-                mrn = st.text_input("MRN", help="Enter patient's Medical Record Number")
+                mrn = st.text_input("MRN",help="Enter patient's Medical Record Number")
+                
+                duplicate_procedure_check = 0
+                if mrn in st.session_state.data["MRN"].values:
+                    st.write("Are you sure this is a duplicate")
+                    duplicate_procedure_check = 1
                 
                 tare_date = st.date_input("TARE Tx Date", help="Select the treatment date")
                 
                 procedure_technique = st.selectbox(
                 "Procedure Technique",
-                options=["Lobar", "Segmental"],  # Exclude placeholder from the options
+                options=["1", "2"],
+                format_func=lambda x: {
+                                    "1": "Lobar",
+                                    "2": " Segmental",
+                                }[x],
                 index=None,  # No default selection
                 placeholder="Choose an option",
                 )
 
-                age = st.number_input("Age at time of TARE", min_value=0, max_value=150, step=1)
+                age = st.number_input("Age at time of TARE", min_value=0, max_value=150, step=1, format="%d")
             
                 submit_tab1 = st.form_submit_button("Submit")
                 if submit_tab1:
@@ -644,16 +659,16 @@ def add_new_data():
                         [st.session_state.data, pd.DataFrame([{
                             "Name": f"{last_name}, {first_name}",
                             "MRN": mrn,
-                            "TARE Tx Date": tare_date.strftime("%Y-%m-%d"),
-                            "Procedure Technique": procedure_technique,
-                            "Age at time of Tare": age
+                            "Duplicate" : duplicate_procedure_check,
+                            "TAREdate": tare_date.strftime("%Y-%m-%d"),
+                            "PTech": procedure_technique,
+                            "Tareage": age
                             } ])], ignore_index=True)
                         st.session_state.temp_mrn = mrn
                         st.success("Patient Information saved. Proceed to Patient Description tab.")
             
-              
         elif st.session_state.selected_tab == "Patient Demographics":
-            st.subheader("Patient Demographics")
+            st.subheader("Patient_Demographics")
             with st.form("demographics_form"):
                 #st.subheader("Patient Description")
                 if "MRN" not in st.session_state.data:
@@ -671,27 +686,14 @@ def add_new_data():
                         ethnicity = st.selectbox(
                             "Ethnicity",
                             options=["Black","White", "Asian", "Hispanic", "Other", "NA", "0"],
-                            format_func=lambda x: {
-                                    "Black": " (1) Black",
-                                    "White": " (2) White ",
-                                    "Asian": "(3) Asian ",
-                                    "Hispanic": " (4) Hispanic ",
-                                    "Other": " (5) Other",
-                                    "NA": " NA (can't find it in sheet)",
-                                    "0": "0 (not present)"
-                                }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                             
                         )
 
-                        # Medical History - Yes/No dropdowns
-                        st.subheader("Medical History")
-                        
                         hypertension = st.selectbox(
                             "PMHx Hypertension",
                             options=["No", "Yes"],
-                            format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
@@ -699,7 +701,6 @@ def add_new_data():
                         diabetes = st.selectbox(
                             "PMHx Diabetes (T1 or T2)",
                             options=["No", "Yes"],
-                            format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
@@ -707,7 +708,6 @@ def add_new_data():
                         hypercholesterolemia = st.selectbox(
                             "Hypercholesterolemia",
                             options=["No", "Yes"],
-                            format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
@@ -715,7 +715,6 @@ def add_new_data():
                         smoking = st.selectbox(
                             "Hx of Smoking",
                             options=["No", "Yes"],
-                            format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
@@ -723,7 +722,6 @@ def add_new_data():
                         obesity = st.selectbox(
                             "Obesity",
                             options=["No", "Yes"],
-                            format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
@@ -747,13 +745,11 @@ def add_new_data():
                             index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
                             st.session_state.data.at[index, "Gender"] = gender
                             st.session_state.data.at[index, "Ethnicity"] = ethnicity
-                            st.session_state.data.at[index, "PMHx Hypertension"] = hypertension
-                            st.session_state.data.at[index, "PMHx Diabetes (T1 or T2)"] = diabetes
+                            st.session_state.data.at[index, "PMHxHTN"] = hypertension
+                            st.session_state.data.at[index, "PMHxDM"] = diabetes
                             st.session_state.data.at[index, "Hypercholesterolemia"] = hypercholesterolemia
-                            st.session_state.data.at[index, "Hx of Smoking"] = smoking
+                            st.session_state.data.at[index, "PMHxSmoking"] = smoking
                             st.session_state.data.at[index, "Obesity"] = obesity
-                            st.session_state.data.at[index, "Comorbitieis Total Count"] = total_count
-                            st.session_state.data.at[index, "Comorbitieis Binary"] = binary_value
                             st.success("Patient Description added successfully.")
                     except:
                         st.warning("Please Fill Patient Information Page")
@@ -766,23 +762,22 @@ def add_new_data():
                     st.warning("Please complete the Patient Information tab first.")
                 else:
                     try:
+                    
                 # Cirrhosis PMH Fields
                         cir_pmh_hbv_status = st.selectbox(
-                            "Cir_PMH_HBV Status",
+                            "Cir PMH HBV Status",
                             options=["Yes", "No"],
-                        # format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             help="Select HBV Status",
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
 
                         cir_pmh_hbv_free_text = "0" if cir_pmh_hbv_status == "No" else st.text_input(
-                            "Cir_PMH_HBV Free Text",
-                            help="Provide additional details for HBV Status"
+                            "Cir PMH HBV Free Text"
                         )
                         
                         cir_pmh_hbv_art = "0" if cir_pmh_hbv_status == "No" else st.selectbox(
-                            "Cir_PMH_HBV ART",
+                            "Cir PMH HBV ART",
                             options=["Entecavir", "Tenofovir", "NA"],
                             index=None,  # No default selection
                             placeholder="Choose an option",
@@ -791,19 +786,17 @@ def add_new_data():
                         cir_pmh_hcv_status = st.selectbox(
                             "Cir_PMH_HCV Status",
                             options=["Yes", "No"],
-                        # format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                            help="Select HCV Status",
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
 
-                        cir_pmh_hcv_free_text = "0" if cir_pmh_hcv_status == "No" else st.text_input(
+                        cir_pmh_hcv_free_text = "No" if cir_pmh_hcv_status == "No" else st.text_input(
                             "Cir_PMH_HCV Free Text",
                             help="Provide additional details for HCV Status",
                         )
 
-                        cir_pmh_hcv_art = "0" if cir_pmh_hcv_status == "No" else st.selectbox(
-                            "Cir_PMH_HBV ART",
+                        cir_pmh_hcv_art = "No" if cir_pmh_hcv_status == "No" else st.selectbox(
+                            "Cir_PMH_HCV ART",
                             options=["sofosbuvir/velpatasvir", "ledipasvir/sofosbuvir", "NA", "Glecaprevir/pibrentasvi"],
                             help="Select ART treatment for HCV",
                             index=None,  # No default selection
@@ -814,19 +807,13 @@ def add_new_data():
                         cir_pmh_alcohol_use_disorder = st.selectbox( 
                             "Cir_PMH_Alcohol Use Disorder",
                             options=["Yes", "No"],
-                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             help="Select Alcohol Disorder",
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
 
-                        cir_pmh_duration_of_alcohol_use_years = "0" if cir_pmh_alcohol_use_disorder == "No" else st.number_input(
-                            "Cir_PMH_Duration of Alcohol Use Years",
-                            help="Provide Duration of Alchohol Use Years",
-                        )
-
                         cir_pmh_alcohol_free_text = "0" if cir_pmh_alcohol_use_disorder == "No" else st.text_input(
-                            "Cir_PMH_HCV Free Text",
+                            "Cir_PMH_Alcohol Free Text",
                             help="Provide additional details for Alcohol Disorder",
                         )
 
@@ -839,19 +826,14 @@ def add_new_data():
                             placeholder="Choose an option",
                         )
 
-                        cir_pmh_duration_of_ivdu_years = "0" if cir_pmh_ivdu_status == "No" else st.number_input(
-                            "Cir_PMH_Duration of IVDU Years",
-                            help="Provide Duration of IVDU Disorder",
-                        )
-
                         cir_pmh_ivdu_free_text = "0" if cir_pmh_ivdu_status == "No" else st.text_input(
-                            "Cir_PMH_HCV Free Text",
+                            "Cir_PMH_IVDU Free Text",
                             help="Provide additional details for IVDU"
                     
                         )
 
-                        cir_pmh_other_contributing_factors = st.selectbox(
-                            "Cir_PMH_Other Contributing Factors",
+                        cir_pmh_liver_addtional_factor = st.selectbox(
+                            "Cir_PMH_Liver Additional Factors",
                             options=["NAFLD", "MAFLD", "NASH", "Autoimmune Hepatitis", "Hereditary Hemochromatosis","none"],
                             help="Select Other Contributing Factors",
                             index=None,  # No default selection
@@ -859,7 +841,7 @@ def add_new_data():
                         )
                 
                         st.subheader("Cirrhosis Dx")
-                        Cirrhosis_Dx_Diagnosis_Date = st.date_input("Cirrhosis_Dx_Diagnosis Date",help="Select Diagnosis date")
+                        Cirrhosis_Dx_Diagnosis_Date = st.date_input("Cirrhosis Dx Diagnosis Date",help="Select Diagnosis date")
 
                         Cirrhosis_Dx_Diagnosis_Method = st.selectbox(
                             "Cirrhosis_Dx_Diagnosis Method",
@@ -868,11 +850,11 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         ) 
-                        Cirrhosis_Dx_HPI_EMR_Note_Free_Text = st.text_input(
+                        Cirrhosis_Dx_HPI_EMR_Note_Free_Text = st.text_area(
                             "Cirrhosis_Dx_HPI EMR Note Free Text",
                             help="Provide details of HPI EMR"
                         )
-                        Cirrhosis_Dx_Imaging_Findings_EMR_Note_Free_Text = st.text_input(
+                        Cirrhosis_Dx_Imaging_Findings_EMR_Note_Free_Text = st.text_area(
                             "Cirrhosis_Dx_Imaging Findings EMR Note Free Text",
                             help="Provide details of Imaging Findings"
                         )
@@ -887,7 +869,7 @@ def add_new_data():
 
                         Cirrhosis_Dx_Complications_at_Time_of_Diagnosis = st.multiselect(
                             "Cirrhosis_Dx_Complications at Time of Diagnosis",
-                            options=["ascites", " variceal hemorrhage","hepatic encephalopathy","jaundice","SBP", "Hepatorenal Syndrome", "Coagulopathy", "Portal HTN", "PVT", "PVTT", "none"],
+                            options=["ascites", " ariceal hemorrhage","Hepatic encephalopathy","jaundice","SBP", "Hepatorenal Syndrome", "Coagulopathy", "Portal HTN", "PVT", "PVTT","Portal Vein Thrombosis" "none"],
                             help="Provide details of Compilications at time of Diagnosis",
                             placeholder="Select all that apply"
                         )
@@ -904,7 +886,7 @@ def add_new_data():
                             placeholder="Choose an option",
                         )
 
-                        Cirrhosis_Dx_Complications_Free_Text =  st.text_input(
+                        Cirrhosis_Dx_Complications_Free_Text =  st.text_area(
                             "Cirrhosis_Dx_Complications Free Text",
                             help="Provide details of Complications"
                         )
@@ -918,129 +900,75 @@ def add_new_data():
                         )
 
                         Cirrhosis_Dx_AFP_L3 = st.text_input(
-                            "Cirrhosis_Dx_AFP_L3",
+                            "Cirrhosis_Dx_AFP L3",
                             help="Enter AFP_L3 value in ng/dl"
                             
                         )
+                        Cirrhosis_Dx_AFP_L3_Date_Free_Text = st.text_area("Cirrhosis_Dx_AFP L3 Date Free Text")
 
-                        Cirrhosis_Dx_Child_Pugh_class_EMR = st.selectbox(
-                            "Cirrhosis_Dx_Child-Pugh Class EMR",
-                            options=["Class A","Class B","Class C","NA"],
-                            index=None,  # No default selection
-                            placeholder="Choose an option",
+                        Cirrhosis_Dx_Ascites_CTCAE = st.selectbox (
+                            "Cirrhosis_Dx_Ascites CTCAE",
+                            options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
+                            format_func=lambda x: {
+                            "none": "0. none",
+                            "Asymptomatic": "1. Asymptomatic",
+                            "Minimal ascities/Mild abd distension": "1. Minimal ascities/Mild abd distension",
+                            "Symptomatic": "2. Symptomatic",
+                            "moderate ascities/Symptomatic medical intervention" : " 2. moderate ascities/Symptomatic medical intervention",
+                            "Severe symptoms, invasive intervention indicated": " 3. Severe symptoms, invasive intervention indicated",
+                            "Life Threatening: Urgent operation intervention indicated" : "4. Life Threatening: Urgent operation intervention indicated",
 
-                        )
-                        
-                            
-                        # Validation for Cirrhosis_Dx_Child-Pugh Points EMR
-                        def validate_input(value):
-                            if value.isdigit() and 5 <= int(value) <= 15:
-                                return value  # Valid number
-                            elif value.upper() == "NA":
-                                return "NA"  # Valid 'NA'
-                            else:
-                                return "NA" 
-
-                        input_value = st.text_input(
-                            "Cirrhosis_Dx_Child-Pugh Points EMR",
-                            help="Specify the Child-Pugh points if in EMR 'number 5-15 or NA"                
-                        )
-
-                        Cirrhosis_Dx_Child_Pugh_Points_EMR = validate_input(input_value)
-
-            # Validation for MELD Score EMR
-
-                        def validate_input_EMR(value):
-                            if value.isdigit() and 6 <= int(value) <= 40:
-                                return value  # Valid number
-                            elif value.upper() == "NA":
-                                return "NA"  # Valid 'NA'
-                            else:
-                                return "NA" 
-                                        
-                        input_value1 = st.text_input(
-                            "Cirrhosis_Dx_MELD Score EMR",
-                            help="Specify the MELD Score if in EMR 'number 6-40 or NA"                
-                        )
-
-                        Cirrhosis_Dx_MELD_Score_EMR = validate_input_EMR(input_value1)
-
-                        input_value2 = st.text_input(
-                            "Cirrhosis_Dx_MELD-NA_Score_EMR",
-                            help="Specify the MELD Score NA if in EMR 'number 6-40 or NA"                
-                        )
-
-                        Cirrhosis_Dx_MELD_NA_Score_EMR = validate_input_EMR(input_value2)
-
-                        Cirrhosis_Dx_Ascites = st.selectbox (
-                            "Cirrhosis_Dx_Ascites",
-                            options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic"," moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
+                            }[x],
                             help="Select Metavir_score",
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         ) 
-
-                        Cirrhosis_Dx_Ascites_Binary_Classification = 0 if Cirrhosis_Dx_Ascites == "none" else 1
+                        def findascitesclass(score):
+                            if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
+                                 return "Slight"
+                            elif score == "Symptomatic" or score == "moderate ascities/Symptomatic medical intervention":
+                                 return "Moderate"
+                            elif score == "Severe symptoms, invasive intervention indicated" or score == "Life Threatening: Urgent operation intervention indicated" :
+                                 return "Severe"
                         
-                        Cirrhosis_Dx_Ascites_Free_Text = "NA" if Cirrhosis_Dx_Ascites == "none" else st.text_area(
+                        Cirrhosis_Dx_Ascites_Classification = "Absent" if Cirrhosis_Dx_Ascites_CTCAE == "none" else findascitesclass(Cirrhosis_Dx_Ascites_CTCAE)
+                        
+                        Cirrhosis_Dx_Ascites_Free_Text = "NA" if Cirrhosis_Dx_Ascites_CTCAE == "none" else st.text_area(
                             "Cirrhosis_Dx_Ascites Free Text",
                             "Hospitalized (yes/no): \nDiuretics (yes/no): \nParacentesis (yes/no): \nAny other complications (free_text):",
                         
-                        )
-
-                        Cirrhosis_Dx_Ascites_Labs_Free_Text = "NA" if Cirrhosis_Dx_Ascites == "none" else st.text_area(
-                            "Cirrhosis_Dx_Ascites Labs Free Text",
-                            "Bilirubin (mg/dl): \nAlbumin (g/dl): \nINR: \nCreatinine (mg/dl): \nSodium (mmol/L): \nAST (U/L): \nALT (U/L): \nAlk Phos: \nPlatelets:",
-                            
-                        )
-
-                        Cirrhosis_Dx_Hepatic_Encephalopathy = st.selectbox(
-                            "Cirrhosis_Dx_Hepatic_Encephalopathy",
-                            options=["Yes", "No"],
-                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                            help="Hepatic_Encephalopathy",
-                            index=None,  # No default selection
-                            placeholder="Choose an option",
-                    
                         )
 
                         submit_tab3 = st.form_submit_button("Submit")
                         if submit_tab3:
 
                             index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
-                            st.session_state.data.at[index, "Cir_PMH_HBV Status"] = cir_pmh_hbv_status
-                            st.session_state.data.at[index, "Cir_PMH_HBV Free Text"] = cir_pmh_hbv_free_text
-                            st.session_state.data.at[index, "Cir_PMH_HBV ART"] = cir_pmh_hbv_art
-                            st.session_state.data.at[index, "Cir_PMH_HCV Status"] = cir_pmh_hcv_status
-                            st.session_state.data.at[index, "Cir_PMH_HCV Free Text"] = cir_pmh_hcv_free_text
-                            st.session_state.data.at[index, "Cir_PMH_HCV ART"] = cir_pmh_hcv_art
-                            st.session_state.data.at[index, "Cir_PMH_Alcohol Use Disorder"] = cir_pmh_alcohol_use_disorder
-                            st.session_state.data.at[index, "Cir_PMH_Duration of Alcohol Use Years"] = cir_pmh_duration_of_alcohol_use_years
-                            st.session_state.data.at[index, "Cir_PMH_Alcohol Free Text"] = cir_pmh_alcohol_free_text
-                            st.session_state.data.at[index, "Cir_PMH_IVDU Status"] = cir_pmh_ivdu_status
-                            st.session_state.data.at[index, "Cir_PMH_Duration of IVDU Years"] = cir_pmh_duration_of_ivdu_years
-                            st.session_state.data.at[index, "Cir_PMH_IVDU Free Text"] = cir_pmh_ivdu_free_text
-                            st.session_state.data.at[index, "Cir_PMH_Other Contributing Factors"] = cir_pmh_other_contributing_factors
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Diagnosis Date"] = Cirrhosis_Dx_Diagnosis_Date
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Diagnosis Method"] = Cirrhosis_Dx_Diagnosis_Method
-                            st.session_state.data.at[index, "Cirrhosis_Dx_HPI EMR Note Free Text"] = Cirrhosis_Dx_HPI_EMR_Note_Free_Text
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Imaging Findings EMR Note Free Text"] = Cirrhosis_Dx_Imaging_Findings_EMR_Note_Free_Text
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Metavir Score"] = Cirrhosis_Dx_Metavir_Score
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Complications at Time of Diagnosis"] = Cirrhosis_Dx_Complications_at_Time_of_Diagnosis
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Complications at Time of Diagnosis Binary"] = Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Complications Free Text"] = Cirrhosis_Dx_Complications_Free_Text
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Date of Labs in Window"] = Cirrhosis_Dx_Date_of_Labs_in_Window
-                            st.session_state.data.at[index, "Cirrhosis_Dx_AFP"] = Cirrhosis_Dx_AFP
-                            st.session_state.data.at[index, "Cirrhosis_Dx_AFP_L3"] = Cirrhosis_Dx_AFP_L3
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Child-Pugh Class EMR"] = Cirrhosis_Dx_Child_Pugh_class_EMR
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Child-Pugh Points EMR"] = Cirrhosis_Dx_Child_Pugh_Points_EMR
-                            st.session_state.data.at[index, "Cirrhosis_Dx_MELD Score EMR"] = Cirrhosis_Dx_MELD_Score_EMR
-                            st.session_state.data.at[index, "Cirrhosis_Dx_MELD-Na Score EMR"] = Cirrhosis_Dx_MELD_NA_Score_EMR
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Ascites"] = Cirrhosis_Dx_Ascites
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Ascites Binary Classification"] = Cirrhosis_Dx_Ascites_Binary_Classification
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Ascites Free Text"] = Cirrhosis_Dx_Ascites_Free_Text
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Ascites Labs Free Text"] = Cirrhosis_Dx_Ascites_Labs_Free_Text
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Hepatic Encephalopathy"] = Cirrhosis_Dx_Hepatic_Encephalopathy
+                            st.session_state.data.at[index, "CirPMH_HBV"] = cir_pmh_hbv_status
+                            st.session_state.data.at[index, "CirPMH_HBVFT"] = cir_pmh_hbv_free_text
+                            st.session_state.data.at[index, "CirPMH_HBVART"] = cir_pmh_hbv_art
+                            st.session_state.data.at[index, "CirPMH_HCV"] = cir_pmh_hcv_status
+                            st.session_state.data.at[index, "CirPMH_HCVFT"] = cir_pmh_hcv_free_text
+                            st.session_state.data.at[index, "CirPMH_HCVART"] = cir_pmh_hcv_art
+                            st.session_state.data.at[index, "CirPMH_AUD"] = cir_pmh_alcohol_use_disorder
+                            st.session_state.data.at[index, "CirPMH_AUDFT"] = cir_pmh_alcohol_free_text
+                            st.session_state.data.at[index, "CirPMH_IVDU"] = cir_pmh_ivdu_status
+                            st.session_state.data.at[index, "CirPMH_IVDUFT"] = cir_pmh_ivdu_free_text
+                            st.session_state.data.at[index, "CirPMH_Liverfactors"] = cir_pmh_liver_addtional_factor
+                            st.session_state.data.at[index, "Cirdx_Dxdate"] = Cirrhosis_Dx_Diagnosis_Date
+                            st.session_state.data.at[index, "Cirdx_Dxmethod"] = Cirrhosis_Dx_Diagnosis_Method
+                            st.session_state.data.at[index, "Cirdx_HPIFT"] = Cirrhosis_Dx_HPI_EMR_Note_Free_Text
+                            st.session_state.data.at[index, "Cirdx_ImageemrFT"] = Cirrhosis_Dx_Imaging_Findings_EMR_Note_Free_Text
+                            st.session_state.data.at[index, "Cirdx_Metavir"] = Cirrhosis_Dx_Metavir_Score
+                            st.session_state.data.at[index, "Cirdx_Compatdx"] = Cirrhosis_Dx_Complications_at_Time_of_Diagnosis
+                            st.session_state.data.at[index, "Cirdx_Compatdxbinary"] = Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary
+                            st.session_state.data.at[index, "Cirdx_CompFT"] = Cirrhosis_Dx_Complications_Free_Text
+                            st.session_state.data.at[index, "Cirdx_DateLabs"] = Cirrhosis_Dx_Date_of_Labs_in_Window
+                            st.session_state.data.at[index, "Cirdx_AFP"] = Cirrhosis_Dx_AFP
+                            st.session_state.data.at[index, "Cirdx_AFP L3"] = Cirrhosis_Dx_AFP_L3
+                            st.session_state.data.at[index, "Cirdx_AFPL3DateFT"] = Cirrhosis_Dx_AFP_L3_Date_Free_Text
+                            st.session_state.data.at[index, "Cirdx_AscitesCTCAE"] = Cirrhosis_Dx_Ascites_CTCAE
+                            st.session_state.data.at[index, "Cirdx_AscitesCTCAEnumb"] = Cirrhosis_Dx_Ascites_Classification
+                            st.session_state.data.at[index, "Cirdx_AscitesFT"] = Cirrhosis_Dx_Ascites_Free_Text
                             
                             st.success("Patient Description added successfully.")
                     except:
@@ -1067,7 +995,8 @@ def add_new_data():
                         hcc_dx_date_of_labs = st.date_input("HCC_Dx_Date of Labs in Window")
 
                         hcc_dx_afp = st.number_input("HCC_Dx_AFP", help="Enter AFP value in ng/dl")
-                        hcc_dx_afp_l3_date_free_text = st.text_area("HCC_Dx_AFP L3 & Date Free Text", help="Enter AFP L3 and date details")
+                        hcc_dx_afp_l3 = st.number_input("HCC_Dx_AFP L3", help="Enter AFP L3 and date details")
+                        hcc_dx_afp_l3_date_free_text = st.text_area("HCC_Dx_AFP L3 Date Free Text")
 
                         hcc_dx_bilirubin = st.number_input("HCC_Dx_Bilirubin", help="Enter the bilirubin value in mg/dl", min_value=1)
                         hcc_dx_albumin = st.number_input("HCC_Dx_Albumin", help="Enter the albumin value in g/dl")
@@ -1075,40 +1004,69 @@ def add_new_data():
                         hcc_dx_creatinine = st.number_input("HCC_Dx_Creatinine", help="Enter the creatinine value in mg/dl")
                         hcc_dx_sodium = st.number_input("HCC_Dx_Sodium", help="Enter the sodium value in mmol/L")
 
-                        hcc_dx_ascites = st.selectbox(
-                            "HCC_Dx_Ascites",
-                            options=["none", "Asymptomatic", "Minimal ascities/Mild abd distension, no sx",
-                                    "Symptomatic", "moderate ascities/Symptomatic medical intervention",
-                                    "Severe symptoms, invasive intervention indicated",
-                                    "Life Threatening: Urgent operation intervention indicated"],
+                        hcc_dx_ascites_CTCAE = st.selectbox (
+                            "HCC_Dx_Ascites CTCAE",
+                            options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
+                            format_func=lambda x: {
+                            "none": "0. none",
+                            "Asymptomatic": "1. Asymptomatic",
+                            "Minimal ascities/Mild abd distension": "1. Minimal ascities/Mild abd distension",
+                            "Symptomatic": "2. Symptomatic",
+                            "moderate ascities/Symptomatic medical intervention": " 2. moderate ascities/Symptomatic medical intervention",
+                            "Severe symptoms, invasive intervention indicated": " 3. Severe symptoms, invasive intervention indicated",
+                            "Life Threatening: Urgent operation intervention indicated" : "4. Life Threatening: Urgent operation intervention indicated",
+
+                        }[x],
+                            help="Select Metavir_score",
                             index=None,  # No default selection
                             placeholder="Choose an option",
+                        ) 
+                        def findascitesclass(score):
+                            if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
+                                 return "Slight"
+                            elif score == "Symptomatic" or score == "moderate ascities/Symptomatic medical intervention":
+                                 return "Moderate"
+                            elif score == "Severe symptoms, invasive intervention indicated" or score == "Life Threatening: Urgent operation intervention indicated" :
+                                 return "Severe"
+                        
+                        hCC_dx_ascites_classification = "Absent" if hcc_dx_ascites_CTCAE == "none" else findascitesclass(hcc_dx_ascites_CTCAE)
+
+                        hcc_dx_ascites_diruetics = 0 if hcc_dx_ascites_CTCAE == "none" else st.selectbox(
+                            "HCC_Dx_Ascites Diruetics",
+                            options = ["Yes","No"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+            
+                        )
+                        hcc_dx_ascites_paracentesis = 0 if hcc_dx_ascites_CTCAE == "none" else st.selectbox(
+                            "HCC_Dx_Ascites Paracentesis ",
+                            options = ["Yes","No"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+            
+                        )
+                        hcc_dx_ascites_hospitalization = 0 if hcc_dx_ascites_CTCAE == "none" else st.selectbox(
+                            "HCC_Dx_Ascites Hospitalization",
+                            options = ["Yes","No"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+            
                         )
 
-                        hcc_dx_ascites_binary_classification = 1 if hcc_dx_ascites != "none" else 0
-                        #st.info(f"HCC_Dx_Ascites Binary Classification: {ascites_binary}")
-
-                        hcc_dx_ascites_free_text = "NA" if hcc_dx_ascites == 'none' else st.text_area(
-                            "HCC_Dx_Ascites Free Text",
-                            "Hospitalized (yes/no): \nDiuretics (yes/no): \nParacentesis (yes/no): \nAny other complications (free_text):",
+                        hcc_dx_he_grade = st.selectbox(
+                            "HCC_Dx_HE Grade",
+                            options=["1","2","3"],
+                            format_func=lambda x: {
+                            "1": "None",
+                            "2": "Grade 1-2",
+                            "3": "Grade 3-4",
                             
-                        )
-
-                        hcc_dx_ascites_labs_free_text = "NA" if hcc_dx_ascites == 'none' else st.text_area(
-                            "HCC_Dx_Ascites Labs Free Text",
-                            """Bilirubin (mg/dl): \nAlbumin (g/dl): \nINR: \nCreatinine (mg/dl): \nSodium (mmol/L): 
-                            AST (U/L): \nALT (U/L): \nAlk Phos: \nPlatelets:""",
-                    
-                        )
-
-                        hcc_dx_hepatic_encephalopathy = st.selectbox(
-                            "HCC_Dx_Hepatic Encephalopathy",
-                            options=["Yes", "No"],
-                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
+                        }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
-                        )
 
+                        )
+                       
                         hcc_dx_ecog_performance_status = st.selectbox("HCC_Dx_ECOG Performance Status", options=["0", "1", "2", "3", "4", "NA"],
                             index=None,  # No default selection
                             placeholder="Choose an option",)
@@ -1120,114 +1078,52 @@ def add_new_data():
                             placeholder="Choose an option",
                         )
 
-                        hcc_dx_child_pugh_class_emr = st.selectbox(
-                            "HCC_Dx_Child-Pugh Class EMR",
-                            options=["Class A", "Class B", "Class C", "NA"],
-                            index=None,  # No default selection
-                            placeholder="Choose an option",
-                        )
-
-                        # Validation of hcc_dx_child_pugh_points_emr
-
-                        def validate_input(value):
-                            if value.isdigit() and 5 <= int(value) <= 15:
-                                return value  # Valid number
-                            elif value.upper() == "NA":
-                                return "NA"  # Valid 'NA'
-                            else:
-                                return "NA" 
-
-                        input_value3 = st.text_input(
-                            "HCC_Dx_Child-Pugh Points EMR",
-                            help="Specify the Child-Pugh points if in EMR number 5-15 or NA"                
-                        )
-
-                        hcc_dx_child_pugh_points_emr = validate_input(input_value3)
-
-
-                        hcc_dx_bclc_stage_emr = st.selectbox(
-                            "HCC_Dx_BCLC Stage EMR",
-                            options=["0", "A", "B", "C", "D"],
-                            index=None,  # No default selection
-                            placeholder="Choose an option",
-                        )
-
-                        # Validating hcc_dx_meld/na score
-                        def validate_input2(value):
-                            if value.isdigit() and 6 <= int(value) <= 40:
-                                return value  # Valid number
-                            elif value.upper() == "NA":
-                                return "NA"  # Valid 'NA'
-                            else:
-                                return "NA" 
-
-                        input_value4 = st.text_input(
-                            "HCC_Dx_MELD Score EMR",
-                            help="Write in number in range 6-40, or NA"
-                        )
-
-                        hcc_dx_meld_score_emr = validate_input2(input_value4)
-
-                        input_value5 = st.text_input(
-                            "HCC_Dx_MELD-Na Score EMR",
-                            help="Write in number in range 6-40, or NA"
-                        )
-
-                        hcc_dx_meld_na_score_emr = validate_input2(input_value5)
-
-                        hcc_dx_albi_score_emr = st.number_input("HCC_Dx_ALBI Score EMR")
-
-                        #  calculation of child_pugh_points_clac
-
-                        
-                        hcc_dx_child_pugh_points_calc = calculatepoints(hcc_dx_bilirubin,hcc_dx_albumin,hcc_dx_inr,hcc_dx_ascites,hcc_dx_hepatic_encephalopathy)
+                        hcc_dx_child_pugh_points_calc = calculatepoints(hcc_dx_bilirubin,hcc_dx_albumin,hcc_dx_inr,hcc_dx_ascites_CTCAE,hcc_dx_he_grade)
                         hcc_dx_child_pugh_class_calc = calculate_class(hcc_dx_child_pugh_points_calc)
                     
                         #bclc_stage_calc = st.text_input("HCC_Dx_BCLC Stage calc")
                         hcc_dx_meld_score_calc = (3.78*(int(hcc_dx_bilirubin)))+(11.2*(int(hcc_dx_inr)))+(9.57*(int(hcc_dx_creatinine)))+6.43
                         hcc_dx_meld_na_score_calc = hcc_dx_meld_score_calc + 1.32*(137-int(hcc_dx_sodium)) - (0.033*hcc_dx_meld_score_calc*(137-int(hcc_dx_sodium)))
                         def albi_calc(a,b):
-                            a=int(a)
+                            a=int(a)*17.1
                             b=int(b)
                             t = math.log(a, 10)
-                            answer = (t * 0.66) + (b * -0.085)
+                            answer = round((t * 0.66) + (b * -0.085))
                             return answer
                         
                         hcc_dx_albi_score_calc = albi_calc(hcc_dx_bilirubin, hcc_dx_albumin)
-                    
+                        hcc_dx_albi_grade = albi_class(hcc_dx_albi_score_calc)
 
+                        hcc_dx_bclc_calc = st.text_area("HCC_Dx_BCLC Stage calc")
                         submit_tab4 = st.form_submit_button("Submit")
                         if submit_tab4:
                                 index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
-                                st.session_state.data.at[index, "HCC_Dx_HCC Diagnosis Date"] = hcc_dx_hcc_diagnosis_date.strftime("%Y-%m-%d")
-                                st.session_state.data.at[index, "HCC_Dx_Method of Diagnosis"] = hcc_dx_method_of_diagnosis
-                                st.session_state.data.at[index, "HCC_Dx_Date of Labs in Window"] = hcc_dx_date_of_labs.strftime("%Y-%m-%d")
-                                st.session_state.data.at[index, "HCC_Dx_AFP"] = hcc_dx_afp
-                                st.session_state.data.at[index, "HCC_Dx_AFP L3 & Date Free Text"] = hcc_dx_afp_l3_date_free_text
-                                st.session_state.data.at[index, "HCC_Dx_Bilirubin"] = hcc_dx_bilirubin
-                                st.session_state.data.at[index, "HCC_Dx_Albumin"] = hcc_dx_albumin
-                                st.session_state.data.at[index, "HCC_Dx_INR"] = hcc_dx_inr
-                                st.session_state.data.at[index, "HCC_Dx_Creatinine"] = hcc_dx_creatinine
-                                st.session_state.data.at[index, "HCC_Dx_Sodium"] = hcc_dx_sodium
-                                st.session_state.data.at[index, "HCC_Dx_Ascites"] = hcc_dx_ascites
-                                st.session_state.data.at[index, "HCC_Dx_Ascites Binary Classification"] = hcc_dx_ascites_binary_classification
-                                st.session_state.data.at[index, "HCC_Dx_Ascites Free Text"] = hcc_dx_ascites_free_text
-                                st.session_state.data.at[index, "HCC_Dx_Ascites Labs Free Text"] = hcc_dx_ascites_labs_free_text
-                                st.session_state.data.at[index, "HCC_Dx_Hepatic Encephalopathy"] = hcc_dx_hepatic_encephalopathy
-                                st.session_state.data.at[index, "HCC_Dx_ECOG Performance Status"] = hcc_dx_ecog_performance_status
-                                st.session_state.data.at[index, "HCC_Dx_LIRADS Score"] = hcc_dx_lirads_score
-                                st.session_state.data.at[index, "HCC_Dx_Child-Pugh Class EMR"] = hcc_dx_child_pugh_class_emr
-                                st.session_state.data.at[index, "HCC_Dx_Child-Pugh Points EMR"] = hcc_dx_child_pugh_points_emr
-                                st.session_state.data.at[index, "HCC_Dx_BCLC Stage EMR"] = hcc_dx_bclc_stage_emr
-                                st.session_state.data.at[index, "HCC_Dx_MELD Score EMR"] = hcc_dx_meld_score_emr
-                                st.session_state.data.at[index, "HCC_Dx_MELD-Na Score EMR"] = hcc_dx_meld_na_score_emr
-                                st.session_state.data.at[index, "HCC_Dx_ALBI Score EMR"] = hcc_dx_albi_score_emr
-                                st.session_state.data.at[index, "HCC_Dx_Child-Pugh Class calc"] = hcc_dx_child_pugh_class_calc
-                                st.session_state.data.at[index, "HCC_Dx_Child-Pugh Points calc"] = hcc_dx_child_pugh_points_calc
-                                st.session_state.data.at[index, "HCC_Dx_MELD Score calc"] = hcc_dx_meld_score_calc
-                                st.session_state.data.at[index, "HCC_Dx_MELD-Na Score calc"] = hcc_dx_meld_na_score_calc
-                                st.session_state.data.at[index, "HCC_Dx_ALBI Score calc"] = hcc_dx_albi_score_calc
-
+                                st.session_state.data.at[index, "HCCdx_HCCdxdate"] = hcc_dx_hcc_diagnosis_date.strftime("%Y-%m-%d")
+                                st.session_state.data.at[index, "HCCdx_Methoddx"] = hcc_dx_method_of_diagnosis
+                                st.session_state.data.at[index, "HCCdx_Datelabs"] = hcc_dx_date_of_labs.strftime("%Y-%m-%d")
+                                st.session_state.data.at[index, "HCCdx_AFP"] = hcc_dx_afp
+                                st.session_state.data.at[index, "HCCdx_AFP L3"] = hcc_dx_afp_l3
+                                st.session_state.data.at[index, "HCCdx_AFPL3dateFT"] = hcc_dx_afp_l3_date_free_text
+                                st.session_state.data.at[index, "HCCdx_Bilirubin"] = hcc_dx_bilirubin
+                                st.session_state.data.at[index, "HCCdx_Albumin"] = hcc_dx_albumin
+                                st.session_state.data.at[index, "HCCdx_INR"] = hcc_dx_inr
+                                st.session_state.data.at[index, "HCCdx_Creatinine"] = hcc_dx_creatinine
+                                st.session_state.data.at[index, "HCCdx_Sodium"] = hcc_dx_sodium
+                                st.session_state.data.at[index, "HCCdx_AscitesCTCAE"] = hcc_dx_ascites_CTCAE
+                                st.session_state.data.at[index, "HCCdx_AscitesCTCAEnumb"] = hCC_dx_ascites_classification
+                                st.session_state.data.at[index, "HCCdx_Ascitesdiruetics"] = hcc_dx_ascites_diruetics
+                                st.session_state.data.at[index, "HCCdx_Ascitesparacentesis"] = hcc_dx_ascites_paracentesis
+                                st.session_state.data.at[index, "HCCdx_Asciteshospitalization"] = hcc_dx_ascites_hospitalization
+                                st.session_state.data.at[index, "HCCdx_HEgrade"] = hcc_dx_he_grade
+                                st.session_state.data.at[index, "HCCdx_ECOG"] = hcc_dx_ecog_performance_status
+                                st.session_state.data.at[index, "HCCdx_LIRADS"] = hcc_dx_lirads_score
+                                st.session_state.data.at[index, "HCCdx_CPcalc"] = hcc_dx_child_pugh_points_calc
+                                st.session_state.data.at[index, "HCCdx_CPclass"] = hcc_dx_child_pugh_class_calc
+                                st.session_state.data.at[index, "HCCdx_MELD"] = hcc_dx_meld_score_calc
+                                st.session_state.data.at[index, "HCCdx_MELDNa"] = hcc_dx_meld_na_score_calc
+                                st.session_state.data.at[index, "HCCdx_Albiscore"] = hcc_dx_albi_score_calc
+                                st.session_state.data.at[index, "HCCdx_Albigrade"] = hcc_dx_albi_grade
+                                st.session_state.data.at[index, "HCCdx_BCLC"] = hcc_dx_bclc_calc
                                 st.success("HCC Dx added successfully.")
                     except:
                         st.warning("Please Fill Patient Information Page")
@@ -1255,7 +1151,8 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                    
+                        PRVTHER_Prior_RFA_Date = 0 if PRVTHER_Prior_RFA_Therapy == 'No' else st.date_input("PRVTHER_Prior RFA Date")
+
                         PRVTHER_Prior_TARE_Therapy = st.selectbox(
                             "PRVTHER_Prior TARE Therapy",
                             options=["Yes", "No","NA"],
@@ -1264,6 +1161,7 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
+                        PRVTHER_Prior_TARE_Date = 0 if PRVTHER_Prior_TARE_Therapy == 'No' else st.date_input("PRVTHER_Prior TARE Date")
                     
                         PRVTHER_Prior_SBRT_Therapy = st.selectbox(
                             "PRVTHER_Prior SBRT Therapy",
@@ -1273,6 +1171,8 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
+                        
+                        PRVTHER_Prior_SBRT_Date = 0 if PRVTHER_Prior_SBRT_Therapy == 'No' else st.date_input("PRVTHER_Prior SBRT Date")
                     
                         PRVTHER_Prior_TACE_Therapy = st.selectbox(
                             "PRVTHER_Prior TACE Therapy",
@@ -1282,6 +1182,9 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
+                        
+                        PRVTHER_Prior_TACE_Date = 0 if PRVTHER_Prior_TACE_Therapy == 'No' else st.date_input("PRVTHER_Prior TACE Date")
+
                         PRVTHER_Prior_MWA_Therapy = st.selectbox(
                             "PRVTHER_Prior MWA Therapy",
                             options=["Yes", "No","NA"],
@@ -1290,8 +1193,19 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
+                        PRVTHER_Prior_MWA_Date = 0 if PRVTHER_Prior_MWA_Therapy == 'No' else st.date_input("PRVTHER_Prior MWA Date")
 
-                        list1=[PRVTHER_Prior_LDT_Therapy, PRVTHER_Prior_RFA_Therapy, PRVTHER_Prior_TARE_Therapy, PRVTHER_Prior_SBRT_Therapy, PRVTHER_Prior_TACE_Therapy, PRVTHER_Prior_MWA_Therapy]
+                        PRVTHER_Resection = st.selectbox(
+                            "PRVTHER_Resection",
+                            options=["Yes", "No","NA"],
+                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
+                            help="Prior MWA Therapy",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+                        )
+                        PRVTHER_Resection_Date = 0 if PRVTHER_Resection == 'No' else st.date_input("PRVTHER_Resection Date")
+
+                        list1=[PRVTHER_Prior_LDT_Therapy, PRVTHER_Prior_RFA_Therapy, PRVTHER_Prior_TARE_Therapy, PRVTHER_Prior_SBRT_Therapy, PRVTHER_Prior_TACE_Therapy, PRVTHER_Prior_MWA_Therapy, PRVTHER_Resection ]
                         sum=0
                         for item in list1:
                             if item == "Yes" :
@@ -1303,42 +1217,61 @@ def add_new_data():
 
                     # PRVTHER_Previous_Therapy_Sum = PRVTHER_Prior_LDT_Therapy + PRVTHER_Prior_RFA_Therapy + PRVTHER_Prior_TARE_Therapy + PRVTHER_Prior_SBRT_Therapy + PRVTHER_Prior_TACE_Therapy + PRVTHER_Prior_MWA_Therapy
 
-                        PRVTHER_Previous_Therapy_Dates = st.text_area(
-                        "PRVTHER_Previous Therapy Date(s) ",
-                        help=" Enter previous therapy date or NA"
+                        PRVTHER_NotesFT = st.text_area(
+                        "PRVTHER_NotesFT",
                         )
 
-                        PRVTHER_Total_Recurrences_HCC = st.selectbox(
+                        PRVTHER_Total_Recurrences_HCC = st.text_area(
                             "PRVTHER_Total Recurrences HCC",
-                            options=["0","1","2","3","4","NA"],
-                            help="select total recurrences of HCC",
-                            index=None,  # No default selection
-                            placeholder="Choose an option",
                         )
-                    
-                        PRVTHER_Binary_for_ANY_Recurrences_HCC_Binary = 1 if PRVTHER_Previous_Therapy_Sum == "YES" or PRVTHER_Prior_LDT_Therapy == "Yes" or PRVTHER_Prior_RFA_Therapy == "Yes" or PRVTHER_Prior_TARE_Therapy == "Yes" or PRVTHER_Prior_SBRT_Therapy == "Yes" or PRVTHER_Prior_TACE_Therapy == "Yes" or PRVTHER_Prior_MWA_Therapy == "Yes" else 0
-
-                        PRVTHER_Location_of_Previous_Treatment_HCC = st.text_input(
-                            "PRVTHER_Location of Previous Treatment HCC",
-                            help="Provide Location of Previous HCC treatment"
+                        PRVTHER_Location_of_Previous_Treatment_segments = st.selectbox(
+                            "PRVTHER_Location of Previous Treatment Segments",
+                            options=["1","2","3","4a","4b","5","6","7","8","NA"],
+                            index=None,
+                            placeholder="Choose an option"
                         )
-
-                        PRVTHER_Recurrence_Date_Location_Free_Text = st.text_input(
-                            "PRVTHER_Recurrence Date/Location Free Text",
-                            help="Provide Date and Location on Recurrence"
-                        )   
-                        PRVTHER_New_HCC_Outside_Previous_Treatment_Site = st.text_input(
+                        PRVTHER_Location_of_Previous_Tx_segments_ft = st.text_area(
+                            "PRVTHER_Location of Previous Tx Segments FT",
+                          
+                        )
+                        PRVTHER_recurrence_location_note = st.selectbox(
+                            "PRVTHER_Recurrence Location Note",
+                            options=["1","2","3","4a","4b","5","6","7","8","NA"],
+                            index=None,
+                            placeholder="Choose an option"
+                        )
+                        PRVTHER_recurrence_date = st.text_area(
+                            "PRVTHER_Recurrence Date",
+                          
+                        )
+                        PRVTHER_recurrence_seg =  st.text_input(
+                             "PRVTHER_Recurrence Seg"
+                        )
+                        PRVTHER_New_HCC_Outside_Previous_Treatment_Site = st.selectbox(
                             "PRVTHER_New HCC Outside Previous Treatment Site",
-                            help="new HCC occurrence that has developed in a diff location in the liver, separate from the area that was previously tx"
+                            options = ["Yes","No","NA"],
+                            help="new HCC occurrence that has developed in a diff location in the liver, separate from the area that was previously tx",
+                            index=None,
+                            placeholder="Choose an option"
                         )   
-                        PRVTHER_New_HCC_Adjacent_to_Previous_Treatment_Site = st.text_input(
+                        PRVTHER_New_HCC_Adjacent_to_Previous_Treatment_Site = st.selectbox(
                             "PRVTHER_New HCC Adjacent to Previous Treatment Site",
-                            help=" new HCC occurrence that has developed close to, but not directly in, the area that was previously treated"
+                            options = ["Yes","No","NA"],
+                            help=" new HCC occurrence that has developed close to, but not directly in, the area that was previously treated",
+                            index=None,
+                            placeholder="Choose an option"
                         )   
-                        PRVTHER_Residual_HCC = st.text_input(
-                            "PRVTHER_Residual HCC",
+                        PRVTHER_Residual_HCC_Note = st.text_area(
+                            "PRVTHER_Residual HCC Note",
                             help="Provide information of Residual HCC"
                         ) 
+                        PRVTHER_Residual_HCC = st.selectbox(
+                            "PRVTHER_Residual HCC",
+                            options = ["Yes","No","NA"],
+                            help="new HCC occurrence that has developed in a diff location in the liver, separate from the area that was previously tx",
+                            index=None,
+                            placeholder="Choose an option"
+                        )   
 
                         PRVTHER_Systemic_Therapy_Free_Text = st.selectbox(
                             "PRVTHER_Systemic Therapy Free Text",
@@ -1350,38 +1283,47 @@ def add_new_data():
                         )
 
                         PRVTHER_Date_of_Labs_in_Window = st.date_input(
-                            "PRVTHER_Date of Labs in Window",
+                            "PRVTHER_Date of Labs for AFP",
                             help="select date of labs in window"
                         )
 
-                        PRVTHER_AFP = st.text_input(
+                        PRVTHER_AFP = st.number_input(
                             "PRVTHER_AFP",
                             help="Enter AFP value in ng/dl or NA"
                         )
 
                         submit_tab5 = st.form_submit_button("Submit")
-
                         if submit_tab5:
                                 index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
-                                st.session_state.data.at[index, "PRVTHER_Prior LDT Therapy"] = PRVTHER_Prior_LDT_Therapy
-                                st.session_state.data.at[index, "PRVTHER_Prior RFA Therapy"] = PRVTHER_Prior_RFA_Therapy
-                                st.session_state.data.at[index, "PRVTHER_Prior TARE Therapy"] = PRVTHER_Prior_TARE_Therapy
-                                st.session_state.data.at[index, "PRVTHER_Prior SBRT Therapy"] = PRVTHER_Prior_SBRT_Therapy
-                                st.session_state.data.at[index, "PRVTHER_Prior TACE Therapy"] = PRVTHER_Prior_TACE_Therapy
-                                st.session_state.data.at[index, "PRVTHER_Prior MWA Therapy"] = PRVTHER_Prior_MWA_Therapy
-                                st.session_state.data.at[index, "PRVTHER_Previous Therapy Sum"] = PRVTHER_Previous_Therapy_Sum
-                                st.session_state.data.at[index, "PRVTHER_Previous Therapy Date(s)"] = PRVTHER_Previous_Therapy_Dates
-                                st.session_state.data.at[index, "PRVTHER_Total Recurrences HCC"] = PRVTHER_Total_Recurrences_HCC
-                                st.session_state.data.at[index, "PRVTHER_Binary for ANY Recurrences HCC Binary"] = PRVTHER_Binary_for_ANY_Recurrences_HCC_Binary
-                                st.session_state.data.at[index, "PRVTHER_Location of Previous Treatment HCC"] = PRVTHER_Location_of_Previous_Treatment_HCC
-                                st.session_state.data.at[index, "PRVTHER_Recurrence Date/Location Free Text"] = PRVTHER_Recurrence_Date_Location_Free_Text
-                                st.session_state.data.at[index, "PRVTHER_New HCC Outside Previous Treatment Site"] = PRVTHER_New_HCC_Outside_Previous_Treatment_Site
-                                st.session_state.data.at[index, "PRVTHER_New HCC Adjacent to Previous Treatment Site"] = PRVTHER_New_HCC_Adjacent_to_Previous_Treatment_Site
-                                st.session_state.data.at[index, "PRVTHER_Residual HCC"] = PRVTHER_Residual_HCC
-                                st.session_state.data.at[index, "PRVTHER_Systemic Therapy Free Text"] = PRVTHER_Systemic_Therapy_Free_Text
-                                st.session_state.data.at[index, "PRVTHER_Date of Labs in Window"] = PRVTHER_Date_of_Labs_in_Window
+
+                                st.session_state.data.at[index, "PRVTHER_LDT"] = PRVTHER_Prior_LDT_Therapy
+                                st.session_state.data.at[index, "PRVTHER_RFA"] = PRVTHER_Prior_RFA_Therapy
+                                st.session_state.data.at[index, "PRVTHER_RFAdate"] = PRVTHER_Prior_RFA_Date
+                                st.session_state.data.at[index, "PRVTHER_TARE"] = PRVTHER_Prior_TARE_Therapy
+                                st.session_state.data.at[index, "PRVTHER_TAREdate"] = PRVTHER_Prior_TARE_Date
+                                st.session_state.data.at[index, "PRVTHER_SBRT"] = PRVTHER_Prior_SBRT_Therapy
+                                st.session_state.data.at[index, "PRVTHER_SBRTdate"] = PRVTHER_Prior_SBRT_Date
+                                st.session_state.data.at[index, "PRVTHER_TACE"] = PRVTHER_Prior_TACE_Therapy
+                                st.session_state.data.at[index, "PRVTHER_TACEdate"] = PRVTHER_Prior_TACE_Date
+                                st.session_state.data.at[index, "PRVTHER_MWA"] = PRVTHER_Prior_MWA_Therapy
+                                st.session_state.data.at[index, "PRVTHER_MWAdate"] = PRVTHER_Prior_MWA_Date
+                                st.session_state.data.at[index, "PRVTHER_Resection"] = PRVTHER_Resection
+                                st.session_state.data.at[index, "PRVTHER_Resection date"] = PRVTHER_Resection_Date
+                                st.session_state.data.at[index, "PRVTHER_Prevtxsum"] = PRVTHER_Previous_Therapy_Sum
+                                st.session_state.data.at[index, "PRVTHER_NotesFT"] = PRVTHER_NotesFT
+                                st.session_state.data.at[index, "PRVTHER_Totalrecur"] = PRVTHER_Total_Recurrences_HCC
+                                st.session_state.data.at[index, "PRVTHER_Locationprevtxseg"] = PRVTHER_Location_of_Previous_Treatment_segments
+                                st.session_state.data.at[index, "PRVTHER_Location of Previous Tx Segments FT"] = PRVTHER_Location_of_Previous_Tx_segments_ft
+                                st.session_state.data.at[index, "PRVTHER_RecurLocationFT"] = PRVTHER_recurrence_location_note
+                                st.session_state.data.at[index, "PRVTHER_RecurDate"] = PRVTHER_recurrence_date
+                                st.session_state.data.at[index, "PRVTHER_Recurrence Seg"] = PRVTHER_recurrence_seg
+                                st.session_state.data.at[index, "PRVTHER_NewHCCoutsideprevsite"] = PRVTHER_New_HCC_Outside_Previous_Treatment_Site
+                                st.session_state.data.at[index, "PRVTHER_NewHCCadjacentprevsite"] = PRVTHER_New_HCC_Adjacent_to_Previous_Treatment_Site
+                                st.session_state.data.at[index, "PRVTHER_ResidualHCCnoteFT"] = PRVTHER_Residual_HCC_Note
+                                st.session_state.data.at[index, "PRVTHER_ResidualHCC"] = PRVTHER_Residual_HCC
+                                st.session_state.data.at[index, "PRVTHER_SystemictherapyFT"] = PRVTHER_Systemic_Therapy_Free_Text
+                                st.session_state.data.at[index, "PRVTHER_DateAFP"] = PRVTHER_Date_of_Labs_in_Window
                                 st.session_state.data.at[index, "PRVTHER_AFP"] = PRVTHER_AFP
-                                
                                 st.success("Previous Therapy for HCC added successfully.")
                     except:
                         st.warning("Please Fill Patient Information Page")
@@ -1438,106 +1380,79 @@ def add_new_data():
                         prey90_alkaline_phosphatase = st.number_input("PREY90_Alkaline Phosphatase", help="Enter Alkaline Phosphatase value in U/L")
                         prey90_potassium = st.number_input("PREY90_potassium", help="Enter the potassium value in mmol/L")
                         
-                        prey90_ascites = st.selectbox(
-                            "PREY90_Ascites",
-                            options=[
-                                "none", 
-                                "Asymptomatic", 
-                                "Minimal ascities/Mild abd distension, no sx", 
-                                "Symptomatic", 
-                                "moderate ascities/Symptomatic medical intervention", 
-                                "Severe symptoms, invasive intervention indicated", 
-                                "Life Threatening: Urgent operation intervention indicated"
-                            ],
-                            help="Select the appropriate ascites classification",
+                        prey90_ascites_ctcae = st.selectbox (
+                            "PREY90_Ascites CTCAE",
+                            options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
+                            format_func=lambda x: {
+                            "none": "0. none",
+                            "Asymptomatic": "1. Asymptomatic",
+                            "Minimal ascities/Mild abd distension": "1. Minimal ascities/Mild abd distension",
+                            "Symptomatic": "2. Symptomatic",
+                            "moderate ascities/Symptomatic medical intervention": " 2. moderate ascities/Symptomatic medical intervention",
+                            "Severe symptoms, invasive intervention indicated": " 3. Severe symptoms, invasive intervention indicated",
+                            "Life Threatening: Urgent operation intervention indicated" : "4. Life Threatening: Urgent operation intervention indicated",
+
+                        }[x],
+                            help="Select Metavir_score",
                             index=None,  # No default selection
                             placeholder="Choose an option",
-                        )
+                        ) 
+                        def findascitesclass(score):
+                            if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
+                                 return 2
+                            else:
+                                 return 3
                         
-                        prey90_ascites_binary = 1 if prey90_ascites != "none" else 0
-                        st.info(f"PREY90_Ascites Binary Classification: {prey90_ascites_binary}")
-                        
+                        prey90_ascites_classification = 1 if prey90_ascites_ctcae == "none" else findascitesclass(prey90_ascites_ctcae)
+
                         prey90_ascites_free_text = st.text_area(
                             "PREY90_Ascites Free Text",
-                            "Hospitalized (yes/no): \nDiuretics (yes/no): \nParacentesis (yes/no): \nAny other complications (free_text):",
-                            help="Provide details about hospitalization, diuretics, paracentesis, and other complications"
-                        )
                         
-                        prey90_he = st.selectbox(
-                            "PREY90_he", 
-                            options=["No", "Yes", "NA (not in chart)"], 
-                            help="Select hepatic encephalopathy status",
+                        )
+
+                        prey90_ascites_diruetics = st.selectbox(
+                            "PREY90_Ascites Diruetics",
+                            options = ["Yes","No"],
                             index=None,  # No default selection
                             placeholder="Choose an option",
+            
                         )
-                        
-                        prey90_ecog = st.selectbox(
-                            "PREY90_ecog",
-                            options=["0", "1", "2", "3", "4", "NA"],
-                            help="Select ECOG Performance Status",
+                        prey90_ascites_paracentesis = st.selectbox(
+                            "PREY90_Ascites Paracentesis" ,
+                            options = ["Yes","No"],
                             index=None,  # No default selection
                             placeholder="Choose an option",
+            
                         )
-                        
-                        prey90_child_pugh_class = st.selectbox(
-                            "PREY90_Child-Pugh Class Emr",
-                            options=["Class A", "Class B", "Class C", "NA"],
-                            help="Select the Child-Pugh class",
+                        prey90_ascites_hospitalization = st.selectbox(
+                            "PREY90_Ascites Hospitalization",
+                            options = ["Yes","No"],
                             index=None,  # No default selection
                             placeholder="Choose an option",
-                        )
-                        def validate_inputt(value):
-                            if value.isdigit() and 5 <= int(value) <= 15:
-                                return value  # Valid number
-                            elif value.upper() == "NA":
-                                return "NA"  # Valid 'NA'
-                            else:
-                                return "NA" 
-
-                        input_value3t = st.text_input(
-                            "PREY90_Child-Pugh Points Emr",
-                            help="Write in number in range 5-15, or NA"              
+            
                         )
 
-                        prey90_child_pugh_points = validate_inputt(input_value3t)
-
-                        prey90_bclc_stage = st.selectbox(
-                            "PREY90_BCLC Stage EMR",
-                            options=["0", "A", "B", "C", "D"],
-                            help="Select the BCLC stage",
+                        prey90_he_grade = st.selectbox(
+                            "PREY90_HE Grade",
+                            options=[1,2,3],
+                            format_func=lambda x: {
+                            1: "None",
+                            2: "Grade 1-2",
+                            3: "Grade 3-4",
+                            
+                        }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
+
                         )
+                       
+                        prey90_ecog = st.selectbox("PREY90_ECOG", options=["0", "1", "2", "3", "4", "NA"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",)
 
-                        def validate_input2t(value):
-                            if value.isdigit() and 6 <= int(value) <= 40:
-                                return value  # Valid number
-                            elif value.upper() == "NA":
-                                return "NA"  # Valid 'NA'
-                            else:
-                                return "NA" 
-
-                        input_value4t = st.text_input(
-                            "PREY90_MELD Score EMR",
-                            help="Write in number in range 6-40, or NA"                
-                        )
-
-                        prey90_meld_score = validate_input2t(input_value4t)
-
-                        input_value5t = st.text_input(
-                            "PREY90_MELD-Na Score EMR",
-                            help="Write in number in range 6-40, or NA"               
-                        )
-
-                        prey90_meld_na_score = validate_input2t(input_value5t)
-                        
-                        prey90_albi_score = st.text_input(
-                            "PREY90_ALBI Score EMR",
-                            help="Enter ALBI score"
-                        )
                         
                         # Claculation of class and points
-                        prey90_child_pugh_points_calc = calculatepoints(prey90_bilirubin,prey90_albumin,prey90_inr,prey90_ascites,prey90_he)
+                        prey90_child_pugh_points_calc = calculatepoints(prey90_bilirubin,prey90_albumin,prey90_inr,prey90_ascites_ctcae,prey90_he_grade)
                 
                         prey90_child_pugh_class_calc = calculate_class(prey90_child_pugh_points_calc)
                         # Additional Calculated Fields
@@ -1547,6 +1462,10 @@ def add_new_data():
                         prey90_meld_na_score_calc = prey90_meld_score_calc + 1.32*(137-int(prey90_sodium)) - (0.033*prey90_meld_score_calc*(137-int(prey90_sodium)))
                         
                         prey90_albi_score_calc = albi_calc(prey90_bilirubin,prey90_albumin)
+                        prey90_albi_grade = albi_class(prey90_albi_score_calc)
+
+                        prey90_bclc_calc = st.text_area("PREY90_BCLC Stage calc")
+
                     
                         st.subheader("Mapping Y90")
                         my90_date = st.date_input("MY90_date", help="Enter the date")
@@ -1557,35 +1476,34 @@ def add_new_data():
                         if submit_tab4:
                             index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
 
-                            st.session_state.data.at[index, "PREY90_symptoms"] = prey90_symptoms
-                            st.session_state.data.at[index, "PREY90_date of labs in window"] = prey90_date_of_labs.strftime("%Y-%m-%d")
+                            st.session_state.data.at[index, "PREY90_sx"] = prey90_symptoms
+                            st.session_state.data.at[index, "PREY90_Datelabs"] = prey90_date_of_labs.strftime("%Y-%m-%d")
                             st.session_state.data.at[index, "PREY90_AFP"] = prey90_afp
-                            st.session_state.data.at[index, "PRE90_AFP Prior to TARE"] = prey90_afp_prior_to_tare
+                            st.session_state.data.at[index, "PRE90_AFPbinary"] = prey90_afp_prior_to_tare
                             st.session_state.data.at[index, "PREY90_Bilirubin"] = prey90_bilirubin
                             st.session_state.data.at[index, "PREY90_Albumin"] = prey90_albumin
-                            st.session_state.data.at[index, "PREY90_inr"] = prey90_inr
-                            st.session_state.data.at[index, "PREY90_creatinine"] = prey90_creatinine
-                            st.session_state.data.at[index, "PREY90_sodium"] = prey90_sodium
+                            st.session_state.data.at[index, "PREY90_Inr"] = prey90_inr
+                            st.session_state.data.at[index, "PREY90_Ireatinine"] = prey90_creatinine
+                            st.session_state.data.at[index, "PREY90_Sodium"] = prey90_sodium
                             st.session_state.data.at[index, "PREY90_AST"] = prey90_ast
                             st.session_state.data.at[index, "PREY90_ALT"] = prey90_alt
                             st.session_state.data.at[index, "PREY90_Alkaline Phosphatase"] = prey90_alkaline_phosphatase
-                            st.session_state.data.at[index, "PREY90_potassium"] = prey90_potassium
-                            st.session_state.data.at[index, "PREY90_Ascites"] = prey90_ascites
-                            st.session_state.data.at[index, "PREY90_Ascites Binary Classification"] = prey90_ascites_binary
-                            st.session_state.data.at[index, "PREY90_Ascites Free Text"] = prey90_ascites_free_text
-                            st.session_state.data.at[index, "PREY90_he"] = prey90_he
-                            st.session_state.data.at[index, "PREY90_ecog"] = prey90_ecog
-                            st.session_state.data.at[index, "PREY90_Child-Pugh Class Emr"] = prey90_child_pugh_class
-                            st.session_state.data.at[index, "PREY90_Child-Pugh Points Emr"] = prey90_child_pugh_points
-                            st.session_state.data.at[index, "PREY90_BCLC Stage EMR"] = prey90_bclc_stage
-                            st.session_state.data.at[index, "PREY90_MELD Score EMR"] = prey90_meld_score
-                            st.session_state.data.at[index, "PREY90_MELD-Na Score EMR"] = prey90_meld_na_score
-                            st.session_state.data.at[index, "PREY90_ALBI Score EMR"] = prey90_albi_score
-                            st.session_state.data.at[index, "PREY90_Child-Pugh Class calc"] = prey90_child_pugh_class_calc
-                            st.session_state.data.at[index, "PREY90_Child-Pugh Points calc"] = prey90_child_pugh_points_calc
-                            st.session_state.data.at[index, "PREY90_MELD Score calc"] = prey90_meld_score_calc
-                            st.session_state.data.at[index, "PREY90_MELD-Na Score calc"] = prey90_meld_na_score_calc
-                            st.session_state.data.at[index, "PREY90_ALBI Score calc"] = prey90_albi_score_calc
+                            st.session_state.data.at[index, "PREY90_Potassium"] = prey90_potassium
+                            st.session_state.data.at[index, "PREY90_AscitesCTCAE"] = prey90_ascites_ctcae
+                            st.session_state.data.at[index, "PREY90_AscitesCTCAEnumb"] = prey90_ascites_classification
+                            st.session_state.data.at[index, "PREY90_AscitesFT"] = prey90_ascites_free_text
+                            st.session_state.data.at[index, "PREY90_Ascitesdiruetics"] = prey90_ascites_diruetics
+                            st.session_state.data.at[index, "PREY90_Ascitesparacentesis"] = prey90_ascites_paracentesis
+                            st.session_state.data.at[index, "PREY90_Asciteshospitalization"] = prey90_ascites_hospitalization
+                            st.session_state.data.at[index, "PREY90_HEgrade"] = prey90_he_grade
+                            st.session_state.data.at[index, "PREY90_ECOG"] = prey90_ecog
+                            st.session_state.data.at[index, "PREY90_CPclass"]= prey90_child_pugh_class_calc
+                            st.session_state.data.at[index, "PREY90_CPcalc"] = prey90_child_pugh_points_calc
+                            st.session_state.data.at[index, "PREY90_MELD"] = prey90_meld_score_calc
+                            st.session_state.data.at[index, "PREY90_MELDNa"] = prey90_meld_na_score_calc
+                            st.session_state.data.at[index, "PREY90_Albiscore"] = prey90_albi_score_calc
+                            st.session_state.data.at[index, "PREY90_Albigrade"] = prey90_albi_grade
+                            st.session_state.data.at[index, "PREY90_BCLC"] = prey90_bclc_calc
                             st.session_state.data.at[index, "MY90_date"] = my90_date
                             st.session_state.data.at[index, "MY90_Lung_shunt"] = my90_lung_shunt
 
@@ -1614,102 +1532,84 @@ def add_new_data():
                                 return "Invalid Input"
 
                         dayy90_afp_prior_to_tare = process_input(dayy90_afp)
+                        index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
 
-                        if dayy90_afp_prior_to_tare != 'NA':
-                            afp_prey90 = dayy90_afp_prior_to_tare      
-                        elif prey90_afp_prior_to_tare != 'NA':
-                            afp_prey90 = prey90_afp_prior_to_tare
-                        else:
-                            afp_prey90 = "NA"
+
+                        prey90_afp_binarydup = st.session_state.data.at[index, "PRE90_AFPbinary"]
                     
                     # Inputs for other variables
-                        dayy90_sodium = st.number_input("DAYY90_sodium (mmol/L)")
-                        dayy90_creatinine = st.number_input("DAYY90_creatinine (mg/dl)")
+                        dayy90_sodium = st.number_input("DAYY90_sodium")
+                        dayy90_creatinine = st.number_input("DAYY90_creatinine")
                         dayy90_inr = st.number_input("DAYY90_inr")
-                        dayy90_albumin = st.number_input("DAYY90_albumin (g/dl)")
-                        dayy90_bilirubin = st.number_input("DAYY90_bilirubin (mg/dl)",min_value=1)
-                        dayy90_ast = st.number_input("DAYY90_AST (U/L)")
-                        dayy90_alt = st.number_input("DAYY90_ALT (U/L)")
+                        dayy90_albumin = st.number_input("DAYY90_albumin")
+                        dayy90_bilirubin = st.number_input("DAYY90_bilirubin",min_value=1)
+                        dayy90_ast = st.number_input("DAYY90_AST")
+                        dayy90_alt = st.number_input("DAYY90_ALT")
                         dayy90_alkaline_phosphatase = st.number_input(
-                            "DAYY90_Alkaline Phosphatase (U/L)"
+                            "DAYY90_Alkaline Phosphatase"
                         )
-                        dayy90_leukocytes = st.number_input("DAYY90_leukocytes (value in x10^3/µL)")
-                        dayy90_platelets = st.number_input("DAYY90_platelets (value in x10^3/µL)")
+                        dayy90_leukocytes = st.number_input("DAYY90_leukocytes")
+                        dayy90_platelets = st.number_input("DAYY90_platelets")
+                        dayy90_potassium = st.number_input("DAY90_Potassium")
 
-                        dayy90_ascites = st.selectbox("DAYY90_ascites", options=["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5"],
+                        dayy90_ascites_ctcae = st.selectbox (
+                            "DAYY90_Ascites CTCAE",
+                            options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
+                            format_func=lambda x: {
+                            "none": "0. none",
+                            "Asymptomatic": "1. Asymptomatic",
+                            "Minimal ascities/Mild abd distension": "1. Minimal ascities/Mild abd distension",
+                            "Symptomatic": "2. Symptomatic",
+                            "moderate ascities/Symptomatic medical intervention": " 2. moderate ascities/Symptomatic medical intervention",
+                            "Severe symptoms, invasive intervention indicated": " 3. Severe symptoms, invasive intervention indicated",
+                            "Life Threatening: Urgent operation intervention indicated" : "4. Life Threatening: Urgent operation intervention indicated",
+
+                        }[x],
+                            help="Select Metavir_score",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+                        ) 
+                        def findascitesclass(score):
+                            if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
+                                 return 2
+                            else:
+                                 return 3
+                        
+                        dayy90_ascites_classification = 1 if dayy90_ascites_ctcae == "none" else findascitesclass(dayy90_ascites_ctcae)
+
+                        dayy90_he_grade = st.selectbox(
+                            "DAYY90_HE Grade",
+                            options=[1,2,3],
+                            format_func=lambda x: {
+                            1: "None",
+                            2: "Grade 1-2",
+                            3: "Grade 3-4",
+                            
+                        }[x],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+
+                        )
+                       
+                        dayy90_ecog = st.selectbox("DAYY90_ECOG", options=["0", "1", "2", "3", "4", "NA"],
                             index=None,  # No default selection
                             placeholder="Choose an option",)
-                        dayy90_hepatic_encephalopathy = st.selectbox(
-                            "DAYY90_Hepatic Encephalopathy", options=["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5"],
-                            index=None,  # No default selection
-                            placeholder="Choose an option",
-                        )
-                        dayy90_child_pugh_class_emr = st.selectbox(
-                            "DAYY90_Child-Pugh class EMR", options=["Class A", "Class B", "Class C", "NA"],
-                            index=None,  # No default selection
-                            placeholder="Choose an option",
-                        )
 
-                        def validate_input(value):
-                            if value.isdigit() and 5 <= int(value) <= 15:
-                                return value  # Valid number
-                            elif value.upper() == "NA":
-                                return "NA"  # Valid 'NA'
-                            else:
-                                return "NA" 
-
-                        input_value3 = st.text_input(
-                            "Cirrhosis_Dx_Child-Pugh Points EMR",
-                            help="Specify the Child-Pugh points if in EMR 'number 5-15 or NA"                
-                        )
-
-                        dayy90_child_pugh_points_emr = validate_input(input_value3)
+                        
+                        # Claculation of class and points
+                        dayy90_child_pugh_points_calc = calculatepoints(dayy90_bilirubin,dayy90_albumin,dayy90_inr,dayy90_ascites_ctcae,dayy90_he_grade)
                 
-                        dayy90_bclc_emr = st.selectbox("DAYY90_BCLC EMR", options=["0","A", "B", "C", "D"],
-                            index=None,  # No default selection
-                            placeholder="Choose an option",)
-
-                        def validate_input2(value):
-                            if value.isdigit() and 6 <= int(value) <= 40:
-                                return value  # Valid number
-                            elif value.upper() == "NA":
-                                return "NA"  # Valid 'NA'
-                            else:
-                                return "NA" 
-
-                        input_value4 = st.text_input(
-                            "DAYY90_MELD EMR",
-                            help="Specify MELD EMR if in EMR 'number 6-40 or NA"                
-                        )
-
-                        dayy90_meld_emr = validate_input2(input_value4)
-
-                        input_value5 = st.text_input(
-                            "DAYY90_MELD Na EMR",
-                            help="Specify DAYY90_MELD Na EMR if in EMR 'number 6-40 or NA"                
-                        )
-                        dayy90_meld_na_emr = validate_input2(input_value5)
-
-                        dayy90_albi_emr = st.number_input("DAYY90_Albi EMR")
-
-                        prey90_ecog = st.selectbox("PREY90_ECOG", options=["0", "1", "2", "3", "4", "NA"],
-                            index=None,  # No default selection
-                            placeholder="Choose an option",)
-                        dayy90_child_pugh_points_calc = calculatepoints(dayy90_bilirubin,dayy90_albumin,dayy90_inr,dayy90_ascites,dayy90_hepatic_encephalopathy)
                         dayy90_child_pugh_class_calc = calculate_class(dayy90_child_pugh_points_calc)
-                        # Formula Calculation
-                        dayy90_meld_calc = (3.78*(int(dayy90_bilirubin)))+(11.2*(int(dayy90_inr)))+(9.57*(int(dayy90_creatinine)))+6.43
-                        dayy90_meld_na_calc = dayy90_meld_calc + 1.32*(137-int(dayy90_sodium)) - (0.033*dayy90_meld_calc*(137-int(dayy90_sodium)))
+                        # Additional Calculated Fields
                         
-                        def albi_calc(a,b):
-                            a=int(a)
-                            b=int(b)
-                            t = math.log(a, 10)
-                            answer = (t * 0.66) + (b * -0.085)
-                            return answer
+                        #prey90_bclc_stage_calc = st.text_input("PREY90_BCLC Stage calc", help="Enter calculated BCLC stage")
+                        dayy90_meld_score_calc = (3.78*(int(dayy90_bilirubin)))+(11.2*(int(dayy90_inr)))+(9.57*(int(dayy90_creatinine)))+6.43
+                        dayy90_meld_na_score_calc = dayy90_meld_score_calc + 1.32*(137-int(dayy90_sodium)) - (0.033*dayy90_meld_score_calc*(137-int(dayy90_sodium)))
                         
-                        dayy90_albi_calc = albi_calc(dayy90_bilirubin,dayy90_albumin)
-                        
+                        dayy90_albi_score_calc = albi_calc(dayy90_bilirubin,dayy90_albumin)
+                        dayy90_albi_grade = albi_class(dayy90_albi_score_calc)
+
+                        dayy90_bclc_calc = st.text_area("PREY90_BCLC Stage calc")
 
                         dayy90_type_of_sphere = st.selectbox(
                             "DAYY90_Type of Sphere", options=["Therasphere-1", "SIR-2"],
@@ -1717,9 +1617,14 @@ def add_new_data():
                             placeholder="Choose an option",
                         )
 
-                        dayy90_lt_notes_ftx = st.text_area("DAYY90_LT Notes (Free Text)")
+                        dayy90_lt_notes_ftx = st.text_area("DAYY90_LT Notes Free Text")
 
-                        ken_childpughscore = st.number_input("ken_ChildPughscore")
+                        ken_childpughscore = st.selectbox(
+                            "ken_ChildPughscore",
+                            options=["A","B","C"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+                        )
                         ken_meldpretare = st.number_input("ken_MELDpreTARE")
 
 
@@ -1730,36 +1635,34 @@ def add_new_data():
                             index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
 
                             st.session_state.data.at[index, "DAYY90_AFP"] = dayy90_afp
-                            st.session_state.data.at[index, "DAYY90_AFP Prior to TARE"] = dayy90_afp_prior_to_tare
-                            st.session_state.data.at[index, "AFP_PreY90 or DAYY90"] = afp_prey90
-                            st.session_state.data.at[index, "DAYY90_sodium"] = dayy90_sodium
-                            st.session_state.data.at[index, "DAYY90_creatinine"] = dayy90_creatinine
-                            st.session_state.data.at[index, "DAYY90_inr"] = dayy90_inr
-                            st.session_state.data.at[index, "DAYY90_albumin"] = dayy90_albumin
-                            st.session_state.data.at[index, "DAYY90_bilirubin"] = dayy90_bilirubin
+                            st.session_state.data.at[index, "DAYY90_AFP Binary"] = dayy90_afp_prior_to_tare
+                            st.session_state.data.at[index, "PRE90_AFP BinaryDup"] = prey90_afp_binarydup
+                            st.session_state.data.at[index, "DAYY90_Sodium"] = dayy90_sodium
+                            st.session_state.data.at[index, "DAYY90_Creatinine"] = dayy90_creatinine
+                            st.session_state.data.at[index, "DAYY90_Inr"] = dayy90_inr
+                            st.session_state.data.at[index, "DAYY90_Albumin"] = dayy90_albumin
+                            st.session_state.data.at[index, "DAYY90_Bilirubin"] = dayy90_bilirubin
                             st.session_state.data.at[index, "DAYY90_AST"] = dayy90_ast
                             st.session_state.data.at[index, "DAYY90_ALT"] = dayy90_alt
-                            st.session_state.data.at[index, "DAYY90_Alkaline Phosphatase"] = dayy90_alkaline_phosphatase
-                            st.session_state.data.at[index, "DAYY90_leukocytes"] = dayy90_leukocytes
-                            st.session_state.data.at[index, "DAYY90_platelets"] = dayy90_platelets
-                            st.session_state.data.at[index, "DAYY90_ascities"] = dayy90_ascites
-                            st.session_state.data.at[index, "DAYY90_Hepatic Encephalopathy"] = dayy90_hepatic_encephalopathy
-                            st.session_state.data.at[index, "DAYY90_Child-Pugh class EMR"] = dayy90_child_pugh_class_emr
-                            st.session_state.data.at[index, "DAYY90_Child-Pugh points EMR"] = dayy90_child_pugh_points_emr
-                            st.session_state.data.at[index, "DAYY90_BCLC EMR"] = dayy90_bclc_emr
-                            st.session_state.data.at[index, "DAYY90_MELD EMR"] = dayy90_meld_emr
-                            st.session_state.data.at[index, "DAYY90_MELD Na EMR"] = dayy90_meld_na_emr
-                            st.session_state.data.at[index, "DAYY90_Albi EMR"] = dayy90_albi_emr
-                            st.session_state.data.at[index, "PREY90_ECOG"] = prey90_ecog
-                            st.session_state.data.at[index, "DAYY90_Child-Pugh class Calc"] = dayy90_child_pugh_class_calc
-                            st.session_state.data.at[index, "DAYY90_Child-Pugh points calc"] = dayy90_child_pugh_points_calc
-                            st.session_state.data.at[index, "DAYY90_MELD calc"] = dayy90_meld_calc
-                            st.session_state.data.at[index, "DAYY90_MELD Na calc"] = dayy90_meld_na_calc
-                            st.session_state.data.at[index, "DAYY90_Albi calc"] = dayy90_albi_calc
-                            st.session_state.data.at[index, "DAYY90_Type of Sphere"] = dayy90_type_of_sphere
-                            st.session_state.data.at[index, "DAYY90_LT_notes_ftx"] = dayy90_lt_notes_ftx
+                            st.session_state.data.at[index, "DAYY90_Alkphos"] = dayy90_alkaline_phosphatase
+                            st.session_state.data.at[index, "DAYY90_Leukocytes"] = dayy90_leukocytes
+                            st.session_state.data.at[index, "DAYY90_Platelets"] = dayy90_platelets
+                            st.session_state.data.at[index, "DAY90_Potassium"] = dayy90_potassium
+                            st.session_state.data.at[index, "Day90_AscitesCTCAE"] = dayy90_ascites_ctcae
+                            st.session_state.data.at[index, "Day90_AscitesCTCAEnumb"] = dayy90_ascites_classification
+                            st.session_state.data.at[index, "Day90_HEgrade"] = dayy90_he_grade
+                            st.session_state.data.at[index, "PREY90_ECOG"] = dayy90_ecog
+                            st.session_state.data.at[index, "DAYY90_CPclass"] = dayy90_child_pugh_class_calc
+                            st.session_state.data.at[index, "DAYY90_CPcalc"] = dayy90_child_pugh_points_calc
+                            st.session_state.data.at[index, "DAYY90_MELD"] = dayy90_meld_score_calc
+                            st.session_state.data.at[index, "DAYY90_MELD Na calc"] = dayy90_meld_na_score_calc
+                            st.session_state.data.at[index, "DAYY90_Albiscore"] = dayy90_albi_score_calc
+                            st.session_state.data.at[index, "DAYY90_Albigrade"] = dayy90_albi_grade
+                            st.session_state.data.at[index, "DAYY90_BCLC"] = dayy90_bclc_calc
+                            st.session_state.data.at[index, "DAYY90_Sphere"] = dayy90_type_of_sphere
+                            st.session_state.data.at[index, "DAYY90_LTnoteFT"] = dayy90_lt_notes_ftx
                             st.session_state.data.at[index, "ken_ChildPughscore"] = ken_childpughscore
-                            st.session_state.data.at[index, "ken_MELDpreTARE"] = ken_meldpretare
+                            st.session_state.data.at[index, "ken_MELDpreTARE (MELDpreTARE)"] = ken_meldpretare
                             
                             st.success("DAYY90 added successfully.")
                     except:
@@ -1787,17 +1690,79 @@ def add_new_data():
                         posty90_leukocytes = st.number_input("POSTY90_30DY_leukocytes", help="Enter leukocytes value in x10^3/µL")
                         posty90_platelets = st.number_input("POSTY90_30DY_platelets", help="Enter platelets value in x10^3/µL")
                         posty90_potassium = st.number_input("POSTY90_30DY_potassium", help="Enter the potassium value in mmol/L")
+                        
+                        posty90_ascites_ctcae = st.selectbox (
+                        "30DY_AE_AscitesCTCAE",
+                        options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
+                        format_func=lambda x: {
+                        "none": "0. none",
+                        "Asymptomatic": "1. Asymptomatic",
+                        "Minimal ascities/Mild abd distension": "1. Minimal ascities/Mild abd distension",
+                        "Symptomatic": "2. Symptomatic",
+                        "moderate ascities/Symptomatic medical intervention": " 2. moderate ascities/Symptomatic medical intervention",
+                        "Severe symptoms, invasive intervention indicated": " 3. Severe symptoms, invasive intervention indicated",
+                        "Life Threatening: Urgent operation intervention indicated" : "4. Life Threatening: Urgent operation intervention indicated",
 
-                        posty90_ecog = st.selectbox(
-                            "POSTY90_30DY_ECOG",
-                            options=["0", "1", "2", "3", "4", "NA"],
-                            help="Select ECOG Performance Status",
-                        index=None,  # No default selection
-                        placeholder="Choose an option",
+                        }[x],
+                            help="Select Metavir_score",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+                        ) 
+                        def findascitesclass(score):
+                            if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
+                                    return 2
+                            else:
+                                    return 3
+                        
+                        posty90_ascites_classification = 1 if posty90_ascites_ctcae == "none" else findascitesclass(posty90_ascites_ctcae)
+
+                        posty90_ascites_diruetics = st.selectbox(
+                            "30DY_AE_Ascitesdiruetics",
+                            options = ["Yes","No"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+            
+                        )
+                        posty90_ascites_paracentesis = st.selectbox(
+                            "30DY_AE_Ascitesparacentesis" ,
+                            options = ["Yes","No"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+            
+                        )
+                        posty90_ascites_hospitalization = st.selectbox(
+                            "30DY_AE_Asciteshospitalization",
+                            options = ["Yes","No"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+            
+                        )
+                        posty90_he_grade = st.selectbox(
+                            "30DY_AE_HE Grade",
+                            options=[1,2,3],
+                            format_func=lambda x: {
+                            1: "None",
+                            2: "Grade 1-2",
+                            3: "Grade 3-4",
+                            
+                        }[x],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+
                         )
 
+                        posty90_ascites_free_text = st.text_area(
+                            "30DY_AE_ascities_freetext",
+                        
+                        )
+
+                        posty90_ecog = st.selectbox("POSTY90_30DY_ECOG", options=["0", "1", "2", "3", "4", "NA"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+                            )
+                        
                         posty90_child_pugh_class = st.selectbox(
-                            "POSTY90_30DY_Child-Pugh Class EMR",
+                            "POSTY90_30DY_Child-Pugh Class calc",
                             options=["Class A", "Class B", "Class C", "NA"],
                             help="Select the Child-Pugh class",
                         index=None,  # No default selection
@@ -1805,13 +1770,13 @@ def add_new_data():
                         )
 
                         inputp90 = st.text_input(
-                            "POSTY90_30DY_Child-Pugh Points EMR",
+                            "POSTY90_30DY_Child-Pugh Points calc",
                             help="Write in number in range 5-15, or NA"
                         )
                         posty90_child_pugh_points = validate_input(inputp90)
 
-                        posty90_bclc_emr = st.selectbox(
-                            "POSTY90_30DY_BCLC EMR",
+                        posty90_bclc = st.selectbox(
+                            "POSTY90_30DY_BCLC stage",
                             options=["0", "A", "B", "C", "D"],
                             help="Select the BCLC stage",
                         index=None,  # No default selection
@@ -1822,36 +1787,22 @@ def add_new_data():
                             "POSTY90_30DY_MELD EMR",
                             help="Write in number in range 6-40, or NA"
                         )
-                        posty90_meld_emr = validate_input2(input_meld)
+                        posty90_meld = validate_input2(input_meld)
 
 
                         input_meld_na = st.text_input(
                             "POSTY90_30DY_MELD Na EMR",
                             help="Write in number in range 6-40, or NA"
                         )
-                        posty90_meld_na_emr = validate_input2(input_meld_na)
+                        posty90_meld_na = validate_input2(input_meld_na)
 
-                        posty90_albi_emr = st.number_input(
-                            "POSTY90_30DY_ALBI EMR",
+                        posty90_albi_score = st.number_input(
+                            "POSTY90_30DY_ALBI Score calc",
                             help="Enter ALBI score"
                         )
+                        posty90_albi_grade = albi_class(posty90_albi_score)
 
-                        prey90_ascites = str(st.session_state.data['PREY90_Ascites'])
-                        prey90_he = str(st.session_state.data['PREY90_he'])
-                        
-                        posty90_child_pugh_points_calc = calculatepoints(posty90_bilirubin,posty90_albumin,posty90_inr,prey90_ascites,prey90_he)
-                        
-                        posty90_child_pugh_class_calc = calculate_class(posty90_child_pugh_points_calc)
-                        #posty90_bclc_calc = st.text_input(
-                            #"POSTY90_30DY_BCLC calc",
-                            #help="Enter calculated BCLC stage"
-                        #)
-
-                        posty90_meld_calc = (3.78*(int(posty90_bilirubin)))+(11.2*(int(posty90_inr)))+(9.57*(int(posty90_creatinine)))+6.43
-                        posty90_meld_na_calc = posty90_meld_calc + 1.32*(137-int(posty90_sodium)) - (0.033*posty90_meld_calc*(137-int(posty90_sodium)))
-
-                        posty90_albi_calc = albi_calc(posty90_bilirubin,posty90_albumin)
-
+                    
                         ken_bclc_stage_post90 = st.text_input(
                             "Ken_BCLCStagepost90",
                             help="Enter BCLC Stage Post-90"
@@ -1861,68 +1812,55 @@ def add_new_data():
                             "Ken_MELD_Stagepost90",
                             help="Enter MELD Score Pre-TARE"
                         )
-
+                        ## New Part
                         st.subheader("Post_Y90_within_30_days_adverse_events")
                         DYAE_CTCAE_portal_htn = st.selectbox(
-                            "30DYAE_CTCAE_portal_htn",
+                            "30DYAE_portal_htn CTCAE",
                             options=["0","1","2","3","4","5"],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
                         DYAE_CTCAE_Vascular_comp = st.selectbox(
-                            "30DYAE_CTCAE_Vascular comp",
+                            "30DYAE_Vascular comp CTCAE",
                             options=["0","1","2","3","4","5"],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
                         DYAE_CTCAE_fatigue = st.selectbox(
-                            "30DYAE_CTCAE_fatigue",
+                            "30DYAE_fatigue CTCAE",
                             options=["0","1","2"],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
                         DYAE_CTCAE_diarrhea = st.selectbox(
-                            "30DYAE_CTCAE_diarrhea",
+                            "30DYAE_diarrhea CTCAE",
                             options=["0","1","2","3","4","5"],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
 
                         DYAE_CTCAE_hypoalbuminemia_emr = st.text_input(
-                            "30DYAE_CTCAE_hypoalbuminemia emr"
+                            "30DYAE_hypoalbuminemia CTCAE"
                         )
                         DYAE_CTCAE_hyperbilirubinemia_emr = st.text_input(
-                            "30DYAE_CTCAE_hyperbilirubinemia emr"
+                            "30DYAE_hyperbilirubinemia CTCAE"
                         )
                         DYAE_CTCAE_Increase_creatinine_emr = st.text_input(
-                            "30DYAE_CTCAE_Increase_creatinine emr"
+                            "30DYAE_Increase_creatinine CTCAE"
                         )
                         DYAE_CTCAE_abdominal_pain = st.selectbox(
-                            "30DYAE_CTCAE_abdominal pain",
+                            "30DYAE_abdominal pain CTCAE",
                             options=["0","1","2","3"],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
                         DYAE_CTCAE_sepsis = st.selectbox(
-                            "30DYAE_CTCAE_sepsis",
+                            "30DYAE_sepsis CTCAE",
                             options=["0","3","4","5"],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
-                        DYAE_CTCAE_ascites = st.selectbox(
-                        "30DYAE_CTCAE_ascites",
-                        options=["none", "Asymptomatic", "Minimal ascities/Mild abd distension, no sx",
-                                "Symptomatic", "moderate ascities/Symptomatic medical intervention",
-                                "Severe symptoms, invasive intervention indicated",
-                                "Life Threatening: Urgent operation intervention indicated"],
-                        index=None,  # No default selection
-                        placeholder="Choose an option",
-                        )
-                        DYAE_CTCAE_ascites_binary_classification = 1 if DYAE_CTCAE_ascites != "none" else 0
-                        DYAE_CTCAE_ascites_ftx = st.text_area(
-                            "30DYAE_CTCAE_ascites_ftx",
-                        )
-
+                        
                         DYAE_CTCAE_bacterial_peritonitis = st.selectbox(
                             "30DYAE_CTCAE_bacterial_peritonitis",
                             options=["0", "3", "4", "5"],
@@ -1970,18 +1908,6 @@ def add_new_data():
                             options=["0","1","2", "3", "4", "5"],
                         index=None,  # No default selection
                         placeholder="Choose an option",
-                        )
-
-                        DYAE_CTCAE_Hepatic_Encephalopathy = st.selectbox(
-                            "30DYAE_CTCAE_Hepatic Encephalopathy",
-                            options=["0","1","2", "3", "4", "5"],
-                        index=None,  # No default selection
-                        placeholder="Choose an option",
-                        )
-
-                        DYAE_CTCAE_he_ftx = st.text_area(
-                            "30DYAE_CTCAE_he_ftx",
-                            help="provide additional details of he"
                         )
 
                         DYAE_CTCAE_cholecystitis = st.selectbox(
@@ -2035,6 +1961,35 @@ def add_new_data():
                             "90DY_AE_date_of_AE",
                             help="(if AE is present after 30 days but before 90 write it here and the date)"
                         )
+                        ken_grandedtoxicity = st.text_area(
+                            "Ken_GradeandToxicity",
+
+                        )
+                        dy_ae_hospitalization_3 = st.selectbox(
+                            "90DY_AE_Hospitalization 3 months",
+                            options=["Yes","No"],
+                            index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+                        dy_ae_hospitalization_6 = st.selectbox(
+                            "90DY_AE_Hospitalization 6 months",
+                            options=["Yes","No"],
+                            index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+                        dy_ae_hosp6mo = st.selectbox(
+                            "90DY_AE_Hosp6mo",
+                            options=["Yes","No"],
+                            index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+                        dy_ae_death_due = st.selectbox(
+                            "90DY_AE_Death due to AE",
+                            options=["Yes","No"],
+                            index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
 
                         submit_tab8 = st.form_submit_button("Submit")
 
@@ -2042,63 +1997,67 @@ def add_new_data():
                                 
                                 index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
                             
-                                st.session_state.data.at[index, "POSTY90_30DY_date_labs"] = posty90_date_labs.strftime("%Y-%m-%d")
-                                st.session_state.data.at[index, "POSTY90_30DY_afp"] = posty90_afp
-                                st.session_state.data.at[index, "POSTY90_30DY_afp DATE"] = posty90_afp_date.strftime("%Y-%m-%d")
+                                st.session_state.data.at[index, "POSTY90_30DY_Datelabs"] = posty90_date_labs.strftime("%Y-%m-%d")
+                                st.session_state.data.at[index, "POSTY90_30DY_AFP"] = posty90_afp
+                                st.session_state.data.at[index, "POSTY90_30DY_AFPdate DATE"] = posty90_afp_date.strftime("%Y-%m-%d")
                                 st.session_state.data.at[index, "POSTY90_30DY_Sodium"] = posty90_sodium
-                                st.session_state.data.at[index, "POSTY90_30DY_creatinine"] = posty90_creatinine
+                                st.session_state.data.at[index, "POSTY90_30DY_Creatinine"] = posty90_creatinine
                                 st.session_state.data.at[index, "POSTY90_30DY_INR"] = posty90_inr
-                                st.session_state.data.at[index, "POSTY90_30DY_albumin"] = posty90_albumin
-                                st.session_state.data.at[index, "POSTY90_30DY_bilirubin"] = posty90_bilirubin
+                                st.session_state.data.at[index, "POSTY90_30DY_Albumin"] = posty90_albumin
+                                st.session_state.data.at[index, "POSTY90_30DY_Bilirubin"] = posty90_bilirubin
                                 st.session_state.data.at[index, "POSTY90_30DY_AST"] = posty90_ast
                                 st.session_state.data.at[index, "POSTY90_30DY_ALT"] = posty90_alt
-                                st.session_state.data.at[index, "POSTY90_30DY_Alkaline Phosphatase"] = posty90_alkaline_phosphatase
-                                st.session_state.data.at[index, "POSTY90_30DY_leukocytes"] = posty90_leukocytes
-                                st.session_state.data.at[index, "POSTY90_30DY_platelets"] = posty90_platelets
-                                st.session_state.data.at[index, "POSTY90_30DY_potassium"] = posty90_potassium
+                                st.session_state.data.at[index, "POSTY90_30DY_ALP"] = posty90_alkaline_phosphatase
+                                st.session_state.data.at[index, "POSTY90_30DY_Leukocytes"] = posty90_leukocytes
+                                st.session_state.data.at[index, "POSTY90_30DY_Platelets"] = posty90_platelets
+                                st.session_state.data.at[index, "POSTY90_30DY_Potassium"] = posty90_potassium
+                                st.session_state.data.at[index, "30DY_AE_AscitesCTCAE"] = posty90_ascites_ctcae
+                                st.session_state.data.at[index, "30DY_AE_AscitesCTCAEnumb"] = posty90_ascites_classification
+                                st.session_state.data.at[index, "30DY_AE_Ascitesdiruetics"] = posty90_ascites_diruetics
+                                st.session_state.data.at[index, "30DY_AE_Ascitesparacentesis"] = posty90_ascites_paracentesis
+                                st.session_state.data.at[index, "30DY_AE_Asciteshospitalization"] = posty90_ascites_hospitalization
+                                st.session_state.data.at[index, "30DY_AE_HEgrade"] = posty90_he_grade
+                                st.session_state.data.at[index, "30DY_AE_ascities_freetext"] = posty90_ascites_free_text
                                 st.session_state.data.at[index, "POSTY90_30DY_ECOG"] = posty90_ecog
-                                st.session_state.data.at[index, "POSTY90_30DY_Child-Pugh Class EMR"] = posty90_child_pugh_class
-                                st.session_state.data.at[index, "POSTY90_30DY_Child-Pugh Points EMR"] = posty90_child_pugh_points
-                                st.session_state.data.at[index, "POSTY90_30DY_BCLC EMR"] = posty90_bclc_emr
-                                st.session_state.data.at[index, "POSTY90_30DY_MELD EMR"] = posty90_meld_emr
-                                st.session_state.data.at[index, "POSTY90_30DY_MELD Na EMR"] = posty90_meld_na_emr
-                                st.session_state.data.at[index, "POSTY90_30DY_ALBI EMR"] = posty90_albi_emr
-                                st.session_state.data.at[index, "POSTY90_30DY_Child-Pugh Class calc"] = posty90_child_pugh_class_calc
-                                st.session_state.data.at[index, "POSTY90_30DY_Child-Pugh Points calc"] = posty90_child_pugh_points_calc
-                                st.session_state.data.at[index, "POSTY90_30DY_MELD calc"] = posty90_meld_calc
-                                st.session_state.data.at[index, "POSTY90_30DY_MELD Na calc"] = posty90_meld_na_calc
-                                st.session_state.data.at[index, "POSTY90_30DY_ALBI calc"] = posty90_albi_calc
+                                st.session_state.data.at[index, "POSTY90_30DY_CPclass"] = posty90_child_pugh_class
+                                st.session_state.data.at[index, "POSTY90_30DY_CPcalc"] = posty90_child_pugh_points
+                                st.session_state.data.at[index, "POSTY90_30DY_MELD"] = posty90_meld
+                                st.session_state.data.at[index, "POSTY90_30DY_MELDNa"] = posty90_meld_na
+                                st.session_state.data.at[index, "POSTY90_30DY_ALBIscore"] = posty90_albi_score
+                                st.session_state.data.at[index, "POSTY90_30DY_ALBIgrade"] = posty90_albi_grade
+                                st.session_state.data.at[index, "POSTY90_30DY_BCLC"] = posty90_bclc
                                 st.session_state.data.at[index, "Ken_BCLCStagepost90"] = ken_bclc_stage_post90
                                 st.session_state.data.at[index, "Ken_MELD_Stagepost90"] = ken_meld_stage_post90
-                                st.session_state.data.at[index, "30DYAE_CTCAE_portal_htn"] = DYAE_CTCAE_portal_htn
-                                st.session_state.data.at[index, "30DYAE_CTCAE_Vascular comp"] = DYAE_CTCAE_Vascular_comp
-                                st.session_state.data.at[index, "30DYAE_CTCAE_fatigue"] = DYAE_CTCAE_fatigue
-                                st.session_state.data.at[index, "30DYAE_CTCAE_diarrhea"] = DYAE_CTCAE_diarrhea
-                                st.session_state.data.at[index, "30DYAE_CTCAE_hypoalbuminemia emr"] = DYAE_CTCAE_hypoalbuminemia_emr
-                                st.session_state.data.at[index, "30DYAE_CTCAE_hyperbilirubinemia emr"] = DYAE_CTCAE_hyperbilirubinemia_emr
-                                st.session_state.data.at[index, "30DYAE_CTCAE_Increase_creatinine emr"] = DYAE_CTCAE_Increase_creatinine_emr
-                                st.session_state.data.at[index, "30DYAE_CTCAE_abdominal pain"] = DYAE_CTCAE_abdominal_pain
-                                st.session_state.data.at[index, "30DYAE_CTCAE_sepsis"] = DYAE_CTCAE_sepsis
-                                st.session_state.data.at[index, "30DYAE_CTCAE_ascites"] = DYAE_CTCAE_ascites
-                                st.session_state.data.at[index, "30DYAE_CTCAE_ascites Binary classification"] = DYAE_CTCAE_ascites_binary_classification
-                                st.session_state.data.at[index, "30DYAE_CTCAE_ascites_ftx"] = DYAE_CTCAE_ascites_ftx
-                                st.session_state.data.at[index, "30DYAE_CTCAE_bacterial_peritonitis"] = DYAE_CTCAE_bacterial_peritonitis
-                                st.session_state.data.at[index, "30DYAE_CTCAE_hemorrhage"] = DYAE_CTCAE_hemorrhage
-                                st.session_state.data.at[index, "30DYAE_CTCAE_anorexia"] = DYAE_CTCAE_anorexia
-                                st.session_state.data.at[index, "30DYAE_CTCAE_intrahepatic_fistula"] = DYAE_CTCAE_intrahepatic_fistula
-                                st.session_state.data.at[index, "30DYAE_CTCAE_constipation"] = DYAE_CTCAE_constipation
-                                st.session_state.data.at[index, "30DYAE_CTCAE_nausea"] = DYAE_CTCAE_nausea
-                                st.session_state.data.at[index, "30DYAE_CTCAE_vomiting"] = DYAE_CTCAE_vomiting
-                                st.session_state.data.at[index, "30DYAE_CTCAE_Hepatic Encephalopathy"] = DYAE_CTCAE_Hepatic_Encephalopathy
-                                st.session_state.data.at[index, "30DYAE_CTCAE_he_ftx"] = DYAE_CTCAE_he_ftx
-                                st.session_state.data.at[index, "30DYAE_CTCAE_cholecystitis"] = DYAE_CTCAE_cholecystitis
-                                st.session_state.data.at[index, "30DYAE_CTCAE_gastric_ulcers"] = DYAE_CTCAE_gastric_ulcers
-                                st.session_state.data.at[index, "30DYAE_CTCAE_hyperkalemia"] = DYAE_CTCAE_hyperkalemia
-                                st.session_state.data.at[index, "30DYAE_CTCAE_respiratory_failure"] = DYAE_CTCAE_respiratory_failure
-                                st.session_state.data.at[index, "30DYAE_CTCAE_AKI"] = DYAE_CTCAE_AKI
-                                st.session_state.data.at[index, "30DYAE_CTCAE_Radiation_pneumonitis"] = DYAE_CTCAE_Radiation_pneumonitis
-                                st.session_state.data.at[index, "30DY_AE_other"] = DYAE_AE_other
+
+                                st.session_state.data.at[index, "30DY_AE_Portalhtn"] = DYAE_CTCAE_portal_htn
+                                st.session_state.data.at[index, "30DY_AE_Vascularcomp"] = DYAE_CTCAE_Vascular_comp
+                                st.session_state.data.at[index, "30DY_AE_Fatigue"] = DYAE_CTCAE_fatigue
+                                st.session_state.data.at[index, "30DY_AE_Diarrhea"] = DYAE_CTCAE_diarrhea
+                                st.session_state.data.at[index, "30DY_AE_Hypoalbuminemia"] = DYAE_CTCAE_hypoalbuminemia_emr
+                                st.session_state.data.at[index, "30DY_AE_Hyperbilirubinemia"] = DYAE_CTCAE_hyperbilirubinemia_emr
+                                st.session_state.data.at[index, "30DY_AE_Increasecreatine"] = DYAE_CTCAE_Increase_creatinine_emr
+                                st.session_state.data.at[index, "30DY_AE_Abdominalpain"] = DYAE_CTCAE_abdominal_pain
+                                st.session_state.data.at[index, "30DY_AE_Sepsis"] = DYAE_CTCAE_sepsis
+                                st.session_state.data.at[index, "30DY_AE_BacterialPer"] = DYAE_CTCAE_bacterial_peritonitis
+                                st.session_state.data.at[index, "30DY_AE_Hemorrhage"] = DYAE_CTCAE_hemorrhage
+                                st.session_state.data.at[index, "30DY_AE_Anorexia"] = DYAE_CTCAE_anorexia
+                                st.session_state.data.at[index, "30DY_AE_Intrahepaticfistula"] = DYAE_CTCAE_intrahepatic_fistula
+                                st.session_state.data.at[index, "30DY_AE_Constipation"] = DYAE_CTCAE_constipation
+                                st.session_state.data.at[index, "30DY_AE_Nausea"] = DYAE_CTCAE_nausea
+                                st.session_state.data.at[index, "30DY_AE_Vomiting"] = DYAE_CTCAE_vomiting
+                                st.session_state.data.at[index, "30DY_AE_Cholecystitis"] = DYAE_CTCAE_cholecystitis
+                                st.session_state.data.at[index, "30DY_AE_Gastriculcer"] = DYAE_CTCAE_gastric_ulcers
+                                st.session_state.data.at[index, "30DY_AE_Hyperkalemia"] = DYAE_CTCAE_hyperkalemia
+                                st.session_state.data.at[index, "30DY_AE_Respfailure"] = DYAE_CTCAE_respiratory_failure
+                                st.session_state.data.at[index, "30DY_AE_AKI"] = DYAE_CTCAE_AKI
+                                st.session_state.data.at[index, "30DY_AE_Radiationpneumonitis"] = DYAE_CTCAE_Radiation_pneumonitis
+                                st.session_state.data.at[index, "30DY_AE_Other"] = DYAE_AE_other
                                 st.session_state.data.at[index, "90DY_AE_date_of_AE"] = DYAE_AE_date_of_AE
+                                st.session_state.data.at[index, "Additional Notes FT"] = ken_grandedtoxicity
+                                st.session_state.data.at[index, "90DY_AE_Hosp3mo"] = dy_ae_hospitalization_3
+                                st.session_state.data.at[index, "90DY_AE_Datehosp3mo"] = dy_ae_hospitalization_6
+                                st.session_state.data.at[index, "90DY_AE_Hosp6mo"] = dy_ae_hosp6mo
+                                st.session_state.data.at[index, "90DY_AE_DeathduetoAE"] = dy_ae_death_due
 
                                 st.success("DAYY90 added successfully.")
                     except:
@@ -2330,13 +2289,13 @@ def add_new_data():
 
                         FU_Imaging_Date = st.date_input("1st_FU_Imaging Date")
 
-                        st.session_state.data['TARE Tx Date'] = pd.to_datetime(st.session_state.data['TARE Tx Date'])
+                        st.session_state.data['TAREdate'] = pd.to_datetime(st.session_state.data['TAREdate'])
 
                         # Fetch the relevant date for the current MRN
                         
                         fetch_date = st.session_state.data.loc[
                                 st.session_state.data['MRN'] == st.session_state.temp_mrn, 
-                                'TARE Tx Date'
+                                'TAREdate'
                             ].values[0]
                         
                         st.write("Enter Patient Entry")
@@ -3162,58 +3121,251 @@ def add_new_data():
                     st.warning("Please complete the Patient Information tab first.")
                 else:
                     try:
-                        gtv_mean_dose = st.number_input("GTV mean dose", help="Enter GTV mean dose")
-                        tx_vol_mean_dose = st.number_input("Tx vol mean dose", help="Enter Tx vol mean dose")
-                        healthy_liver_mean_dose = st.number_input("Healthy Liver mean dose (liver - tx vol)", help="Enter Healthy Liver mean dose")
-                        gtv_vol = st.number_input("GTV Vol", help="Enter GTV Vol")
-                        tx_vol = st.number_input("Tx vol", help="Enter Tx vol")
-                        liver_vol = st.number_input("Liver vol", help="Enter Liver vol")
-                        healthy_liver_vol = st.number_input("Healthy Liver Vol", help="Enter Healthy Liver Vol")
-                        gtv_liver_percentage = st.number_input("GTV/ Liver (%)", help="Enter GTV/ Liver (%)")
-                        d98_gy = st.text_input("D98 (Gy)", help="Enter D98 (Gy)")
-                        d90_gy = st.text_input("D90 (Gy)", help="Enter D90 (Gy)")
-                        d95_gy = st.text_input("D95 (Gy)", help="Enter D95 (Gy)")
-                        d80_gy = st.text_input("D80 (Gy)", help="Enter D80 (Gy)")
-                        d70_gy = st.text_input("D70 (Gy)", help="Enter D70 (Gy)")
-                        v100_percentage = st.number_input("V100(%)", help="Enter V100(%)")
-                        v200_percentage = st.number_input("V200(%)", help="Enter V200(%)")
-                        v300_percentage = st.number_input("V300(%)", help="Enter V300(%)")
-                        v400_percentage = st.number_input("V400(%)", help="Enter V400(%)")
-                        activity_bq = st.text_input("Activity(Bq)", help="Enter Activity(Bq)")
-                        activity_ci = st.text_input("Activity(Ci)", help="Enter Activity(Ci)")
-                        tx_vol_activity_density = st.number_input("Tx vol Activity Density (Ci/cc)", help="Enter Tx vol Activity Density (Ci/cc)")
+                        input_GTV_mean_dose = st.text_input("GTV mean dose")
+                        input_Tx_vol_mean_dose = st.text_input("Tx vol mean dose")
+                        input_Liver_Vol_Mean_dose = st.text_input("Liver Vol Mean dose")
+                        input_Healthy_Liver_mean_dose = st.text_input("Healthy Liver mean dose")
+                        input_GTV_Vol = st.number_input("GTV Vol")
+                        input_Tx_vol = st.text_input("Tx vol")
+                        input_Liver_vol = st.number_input("Liver vol",min_value=1)
+                        input_Healthy_Liver_Vol = st.text_input("Healthy Liver Vol")
+                        input_GTV_Liver = (input_GTV_Vol)/(input_Liver_vol)*100
+                        input_D98 = st.text_input("D98")
+                        input_D95 = st.text_input("D95")
+                        input_D90 = st.text_input("D90")
+                        input_D80 = st.text_input("D80")
+                        input_D70 = st.text_input("D70")
+                        input_V100 = st.text_input("V100")
+                        input_V200 = st.text_input("V200")
+                        input_V300 = st.text_input("V300")
+                        input_V400 = st.text_input("V400")
+                        input_ActivityBq = st.text_input("ActivityBq")
+                        input_ActivityCi = st.text_input("ActivityCi")
+                        input_Tx_vol_Activity_Density = st.text_input("Tx vol Activity Density")
+                        input_NEW = st.text_input("NEW")
+                        input_GTV_less_D95_Vol_ml = st.text_input("GTV < D95 Vol_ml")
+                        input_GTV_less_D95_Mean_Dose = st.text_input("GTV < D95 Mean Dose")
+                        input_GTV_less_D95_Min_Dose = st.text_input("GTV < D95 Min Dose")
+                        input_GTV_less_D95_SD = st.text_input("GTV < D95 SD")
+                        input_GTV_less_D95_Vol_1 = st.text_input("GTV < D95 Vol_1")
+                        input_GTV_less_D95_Mean_Dose_1 = st.text_input("GTV < D95 Mean Dose_1")
+                        input_GTV_less_D95_Min_Dose_1 = st.text_input("GTV < D95 Min Dose_1")
+                        input_GTV_less_D95_SD_1 = st.text_input("GTV < D95 SD_1")
+                        input_GTV_less_D95_Vol_2 = st.text_input("GTV < D95 Vol_2")
+                        input_GTV_less_D95_Mean_Dose_2 = st.text_input("GTV < D95 Mean Dose_2")
+                        input_GTV_less_D95_Min_Dose_2 = st.text_input("GTV < D95 Min Dose_2")
+                        input_GTV_less_D95_SD_2 = st.text_input("GTV < D95 SD_2")
+                        input_GTV_less_100_Gy_Vol = st.text_input("GTV < 100 Gy Vol")
+                        input_GTV_less_100_Gy_Mean_Dose = st.text_input("GTV < 100 Gy Mean Dose")
+                        input_GTV_less_100_Gy_Min_Dose = st.text_input("GTV < 100 Gy Min Dose")
+                        input_GTV_less_100_Gy_SD = st.text_input("GTV < 100 Gy SD")
 
                         submit_dosimetry_data = st.form_submit_button("Submit")
 
                         if submit_dosimetry_data:
                             index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
 
-                            st.session_state.data.at[index, "GTV mean dose"] = gtv_mean_dose
-                            st.session_state.data.at[index, "Tx vol mean dose"] = tx_vol_mean_dose
-                            st.session_state.data.at[index, "Healthy Liver mean dose (liver - tx vol)"] = healthy_liver_mean_dose
-                            st.session_state.data.at[index, "GTV Vol"] = gtv_vol
-                            st.session_state.data.at[index, "Tx vol"] = tx_vol
-                            st.session_state.data.at[index, "Liver vol"] = liver_vol
-                            st.session_state.data.at[index, "Healthy Liver Vol"] = healthy_liver_vol
-                            st.session_state.data.at[index, "GTV/ Liver (%)"] = gtv_liver_percentage
-                            st.session_state.data.at[index, "D98 (Gy)"] = d98_gy
-                            st.session_state.data.at[index, "D90 (Gy)"] = d90_gy
-                            st.session_state.data.at[index, "D95 (Gy)"] = d95_gy
-                            st.session_state.data.at[index, "D80 (Gy)"] = d80_gy
-                            st.session_state.data.at[index, "D70 (Gy)"] = d70_gy
-                            st.session_state.data.at[index, "V100(%)"] = v100_percentage
-                            st.session_state.data.at[index, "V200(%)"] = v200_percentage
-                            st.session_state.data.at[index, "V300(%)"] = v300_percentage
-                            st.session_state.data.at[index, "V400(%)"] = v400_percentage
-                            st.session_state.data.at[index, "Activity(Bq)"] = activity_bq
-                            st.session_state.data.at[index, "Activity(Ci)"] = activity_ci
-                            st.session_state.data.at[index, "Tx vol Activity Density (Ci/cc)"] = tx_vol_activity_density
+                            # Assign inputs to session state
+                            st.session_state.data.at[index, "GTV mean dose"] = input_GTV_mean_dose
+                            st.session_state.data.at[index, "Tx vol mean dose"] = input_Tx_vol_mean_dose
+                            st.session_state.data.at[index, "Liver Vol Mean dose"] = input_Liver_Vol_Mean_dose
+                            st.session_state.data.at[index, "Healthy Liver mean dose"] = input_Healthy_Liver_mean_dose
+                            st.session_state.data.at[index, "GTV Vol"] = input_GTV_Vol
+                            st.session_state.data.at[index, "Tx vol"] = input_Tx_vol
+                            st.session_state.data.at[index, "Liver vol"] = input_Liver_vol
+                            st.session_state.data.at[index, "Healthy Liver Vol"] = input_Healthy_Liver_Vol
+                            st.session_state.data.at[index, "GTV/Liver"] = input_GTV_Liver
+                            st.session_state.data.at[index, "D98"] = input_D98
+                            st.session_state.data.at[index, "D95"] = input_D95
+                            st.session_state.data.at[index, "D90"] = input_D90
+                            st.session_state.data.at[index, "D80"] = input_D80
+                            st.session_state.data.at[index, "D70"] = input_D70
+                            st.session_state.data.at[index, "V100"] = input_V100
+                            st.session_state.data.at[index, "V200"] = input_V200
+                            st.session_state.data.at[index, "V300"] = input_V300
+                            st.session_state.data.at[index, "V400"] = input_V400
+                            st.session_state.data.at[index, "ActivityBq"] = input_ActivityBq
+                            st.session_state.data.at[index, "ActivityCi"] = input_ActivityCi
+                            st.session_state.data.at[index, "Tx vol Activity Density"] = input_Tx_vol_Activity_Density
+                            st.session_state.data.at[index, "NEW"] = input_NEW
+                            st.session_state.data.at[index, "GTV < D95 Vol_ml"] = input_GTV_less_D95_Vol_ml
+                            st.session_state.data.at[index, "GTV < D95 Mean Dose"] = input_GTV_less_D95_Mean_Dose
+                            st.session_state.data.at[index, "GTV < D95 Min Dose"] = input_GTV_less_D95_Min_Dose
+                            st.session_state.data.at[index, "GTV < D95 SD"] = input_GTV_less_D95_SD
+                            st.session_state.data.at[index, "GTV < D95 Vol_1"] = input_GTV_less_D95_Vol_1
+                            st.session_state.data.at[index, "GTV < D95 Mean Dose_1"] = input_GTV_less_D95_Mean_Dose_1
+                            st.session_state.data.at[index, "GTV < D95 Min Dose_1"] = input_GTV_less_D95_Min_Dose_1
+                            st.session_state.data.at[index, "GTV < D95 SD_1"] = input_GTV_less_D95_SD_1
+                            st.session_state.data.at[index, "GTV < D95 Vol_2"] = input_GTV_less_D95_Vol_2
+                            st.session_state.data.at[index, "GTV < D95 Mean Dose_2"] = input_GTV_less_D95_Mean_Dose_2
+                            st.session_state.data.at[index, "GTV < D95 Min Dose_2"] = input_GTV_less_D95_Min_Dose_2
+                            st.session_state.data.at[index, "GTV < D95 SD_2"] = input_GTV_less_D95_SD_2
+                            st.session_state.data.at[index, "GTV < 100 Gy Vol"] = input_GTV_less_100_Gy_Vol
+                            st.session_state.data.at[index, "GTV < 100 Gy Mean Dose"] = input_GTV_less_100_Gy_Mean_Dose
+                            st.session_state.data.at[index, "GTV < 100 Gy Min Dose"] = input_GTV_less_100_Gy_Min_Dose
+                            st.session_state.data.at[index, "GTV < 100 Gy SD"] = input_GTV_less_100_Gy_SD
+
 
                             st.success("Dosimetry Data added successfully.")
                     except:
                         st.warning("Please Fill Patient Information Page")
-                        
+    
+        elif st.session_state.selected_tab == "AFP":
+            st.subheader("Dosimetry Data")
+            with st.form("dosimetry_data_form"):
+                if "MRN" not in st.session_state.data:
+                    st.warning("Please complete the Patient Information tab first.")
+                else:
+                    try:
+                        input_1AFP_Date = st.text_area("1AFP Date")
+                        input_1AFP = st.text_area("1AFP")
+                        input_2AFP_Date = st.text_area("2AFP Date")
+                        input_2AFP = st.text_area("2AFP")
+                        input_3AFP_Date = st.text_area("3AFP Date")
+                        input_3AFP = st.text_area("3AFP")
+                        input_4AFP_Date = st.text_area("4AFP Date")
+                        input_4AFP = st.text_area("4AFP")
+                        input_5AFP_Date = st.text_area("5AFP Date")
+                        input_5AFP = st.text_area("5AFP")
+                        input_6AFP_Date = st.text_area("6AFP Date")
+                        input_6AFP = st.text_area("6AFP")
+                        input_7AFP_Date = st.text_area("7AFP Date")
+                        input_7AFP = st.text_area("7AFP")
+                        input_8AFP_Date = st.text_area("8AFP Date")
+                        input_8AFP = st.text_area("8AFP")
+                        input_9AFP_Date = st.text_area("9AFP Date")
+                        input_9AFP = st.text_area("9AFP")
+                        input_10AFP_Date = st.text_area("10AFP Date")
+                        input_10AFP = st.text_area("10AFP")
+                        input_11AFP_Date = st.text_area("11AFP Date")
+                        input_11AFP = st.text_area("11AFP")
+                        input_12AFP_Date = st.text_area("12AFP Date")
+                        input_12AFP = st.text_area("12AFP")
+                        input_13AFP_Date = st.text_area("13AFP Date")
+                        input_13AFP = st.text_area("13AFP")
+                        input_14AFP_Date = st.text_area("14AFP Date")
+                        input_14AFP = st.text_area("14AFP")
+                        input_15AFP_Date = st.text_area("15AFP Date")
+                        input_15AFP = st.text_area("15AFP")
+                        input_16AFP_Date = st.text_area("16AFP Date")
+                        input_16AFP = st.text_area("16AFP")
+                        input_17AFP_Date = st.text_area("17AFP Date")
+                        input_17AFP = st.text_area("17AFP")
+                        input_18AFP_DATE = st.text_area("18AFP DATE")
+                        input_18AFP = st.text_area("18AFP")
+                        input_19AFP_DATE = st.text_area("19AFP DATE")
+                        input_19AFP = st.text_area("19AFP")
+                        input_20AFP_DATE = st.text_area("20AFP DATE")
+                        input_20AFP = st.text_area("20AFP")
+                        input_21AFP_DATE = st.text_area("21AFP DATE")
+                        input_21AFP = st.text_area("21AFP")
+                        input_22AFP_DATE = st.text_area("22AFP DATE")
+                        input_22AFP = st.text_area("22AFP")
+                        input_23AFP_DATE = st.text_area("23AFP DATE")
+                        input_23AFP = st.text_area("23AFP")
+                        input_24AFP_DATE = st.text_area("24AFP DATE")
+                        input_24AFP = st.text_area("24AFP")
+                        input_25AFP_DATE = st.text_area("25AFP DATE")
+                        input_25AFP = st.text_area("25AFP")
+                        input_26AFP_DATE = st.text_area("26AFP DATE")
+                        input_26AFP = st.text_area("26AFP")
+                        input_27AFP_DATE = st.text_area("27AFP DATE")
+                        input_27AFP = st.text_area("27AFP")
+                        input_28AFP_DATE = st.text_area("28AFP DATE")
+                        input_28AFP = st.text_area("28AFP")
+                        input_29AFP_DATE = st.text_area("29AFP DATE")
+                        input_29AFP = st.text_area("29AFP")
+                        input_30AFP_DATE = st.text_area("30AFP DATE")
+                        input_30AFP = st.text_area("30AFP")
+                        input_31AFP_Date = st.text_area("31AFP Date")
+                        input_31AFP = st.text_area("31AFP")
+                        input_32AFP_DATE = st.text_area("32AFP DATE")
+                        input_32AFP = st.text_area("32AFP")
+                        input_33AFP_DATE = st.text_area("33AFP DATE")
+                        input_33AFP = st.text_area("33AFP")
+                        input_34AFP_DATE = st.text_area("34AFP DATE")
+                        input_34AFP = st.text_area("34AFP")
+
+                        submit_afp = st.form_submit_button("Submit")
+
+                        if submit_afp:
+                            index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
+                            # Assign the input values to st.session_state.data at the specified index
+                            st.session_state.data.at[index, "1AFP Date"] = input_1AFP_Date
+                            st.session_state.data.at[index, "1AFP"] = input_1AFP
+                            st.session_state.data.at[index, "2AFP Date"] = input_2AFP_Date
+                            st.session_state.data.at[index, "2AFP"] = input_2AFP
+                            st.session_state.data.at[index, "3AFP Date"] = input_3AFP_Date
+                            st.session_state.data.at[index, "3AFP"] = input_3AFP
+                            st.session_state.data.at[index, "4AFP Date"] = input_4AFP_Date
+                            st.session_state.data.at[index, "4AFP"] = input_4AFP
+                            st.session_state.data.at[index, "5AFP Date"] = input_5AFP_Date
+                            st.session_state.data.at[index, "5AFP"] = input_5AFP
+                            st.session_state.data.at[index, "6AFP Date"] = input_6AFP_Date
+                            st.session_state.data.at[index, "6AFP"] = input_6AFP
+                            st.session_state.data.at[index, "7AFP Date"] = input_7AFP_Date
+                            st.session_state.data.at[index, "7AFP"] = input_7AFP
+                            st.session_state.data.at[index, "8AFP Date"] = input_8AFP_Date
+                            st.session_state.data.at[index, "8AFP"] = input_8AFP
+                            st.session_state.data.at[index, "9AFP Date"] = input_9AFP_Date
+                            st.session_state.data.at[index, "9AFP"] = input_9AFP
+                            st.session_state.data.at[index, "10AFP Date"] = input_10AFP_Date
+                            st.session_state.data.at[index, "10AFP"] = input_10AFP
+                            st.session_state.data.at[index, "11AFP Date"] = input_11AFP_Date
+                            st.session_state.data.at[index, "11AFP"] = input_11AFP
+                            st.session_state.data.at[index, "12AFP Date"] = input_12AFP_Date
+                            st.session_state.data.at[index, "12AFP"] = input_12AFP
+                            st.session_state.data.at[index, "13AFP Date"] = input_13AFP_Date
+                            st.session_state.data.at[index, "13AFP"] = input_13AFP
+                            st.session_state.data.at[index, "14AFP Date"] = input_14AFP_Date
+                            st.session_state.data.at[index, "14AFP"] = input_14AFP
+                            st.session_state.data.at[index, "15AFP Date"] = input_15AFP_Date
+                            st.session_state.data.at[index, "15AFP"] = input_15AFP
+                            st.session_state.data.at[index, "16AFP Date"] = input_16AFP_Date
+                            st.session_state.data.at[index, "16AFP"] = input_16AFP
+                            st.session_state.data.at[index, "17AFP Date"] = input_17AFP_Date
+                            st.session_state.data.at[index, "17AFP"] = input_17AFP
+                            st.session_state.data.at[index, "18AFP DATE"] = input_18AFP_DATE
+                            st.session_state.data.at[index, "18AFP"] = input_18AFP
+                            st.session_state.data.at[index, "19AFP DATE"] = input_19AFP_DATE
+                            st.session_state.data.at[index, "19AFP"] = input_19AFP
+                            st.session_state.data.at[index, "20AFP DATE"] = input_20AFP_DATE
+                            st.session_state.data.at[index, "20AFP"] = input_20AFP
+                            st.session_state.data.at[index, "21AFP DATE"] = input_21AFP_DATE
+                            st.session_state.data.at[index, "21AFP"] = input_21AFP
+                            st.session_state.data.at[index, "22AFP DATE"] = input_22AFP_DATE
+                            st.session_state.data.at[index, "22AFP"] = input_22AFP
+                            st.session_state.data.at[index, "23AFP DATE"] = input_23AFP_DATE
+                            st.session_state.data.at[index, "23AFP"] = input_23AFP
+                            st.session_state.data.at[index, "24AFP DATE"] = input_24AFP_DATE
+                            st.session_state.data.at[index, "24AFP"] = input_24AFP
+                            st.session_state.data.at[index, "25AFP DATE"] = input_25AFP_DATE
+                            st.session_state.data.at[index, "25AFP"] = input_25AFP
+                            st.session_state.data.at[index, "26AFP DATE"] = input_26AFP_DATE
+                            st.session_state.data.at[index, "26AFP"] = input_26AFP
+                            st.session_state.data.at[index, "27AFP DATE"] = input_27AFP_DATE
+                            st.session_state.data.at[index, "27AFP"] = input_27AFP
+                            st.session_state.data.at[index, "28AFP DATE"] = input_28AFP_DATE
+                            st.session_state.data.at[index, "28AFP"] = input_28AFP
+                            st.session_state.data.at[index, "29AFP DATE"] = input_29AFP_DATE
+                            st.session_state.data.at[index, "29AFP"] = input_29AFP
+                            st.session_state.data.at[index, "30AFP DATE"] = input_30AFP_DATE
+                            st.session_state.data.at[index, "30AFP"] = input_30AFP
+                            st.session_state.data.at[index, "31AFP Date"] = input_31AFP_Date
+                            st.session_state.data.at[index, "31AFP"] = input_31AFP
+                            st.session_state.data.at[index, "32AFP DATE"] = input_32AFP_DATE
+                            st.session_state.data.at[index, "32AFP"] = input_32AFP
+                            st.session_state.data.at[index, "33AFP DATE"] = input_33AFP_DATE
+                            st.session_state.data.at[index, "33AFP"] = input_33AFP
+                            st.session_state.data.at[index, "34AFP DATE"] = input_34AFP_DATE
+                            st.session_state.data.at[index, "34AFP"] = input_34AFP
+                            st.success("Dosimetry Data added successfully.")
+                    except:
+                        st.warning("Please Fill Patient Information Page")
+    
+    st.session_state.data["TAREdate"] = st.session_state.data["TAREdate"].astype(str)               
     st.dataframe(st.session_state.data)
+
 def edit_existing_data():
 
     def calculatepoints(bilirubin, albumin, inr, ascites, encephalopathy):
@@ -3278,6 +3430,14 @@ def edit_existing_data():
                         answer = (t * 0.66) + (b * -0.085)
                         return answer
     
+    def albi_class(albi_score):
+        if albi_score <= -2.60:
+            return "Grade 1"
+        elif albi_score > -2.60 and albi_score <= -1.39:
+             return "Grade 2"
+        else:
+             return "Grade 3"
+
     def process_input(value):
                         
             # Handle the 'NA' case
@@ -3326,19 +3486,20 @@ def edit_existing_data():
             st.write(f"Editing data for MRN: {mrn}")
 
             record = st.session_state.data[st.session_state.data["MRN"] == mrn]
-            st.session_state.data['TARE Tx Date'] = pd.to_datetime(st.session_state.data['TARE Tx Date'])
+            #st.session_state.data['TAREdate'] = pd.to_datetime(st.session_state.data['TAREdate'],format="%Y-%m-%d")
 
             # Fetch the relevant date for the current MRN
             fetch_date = st.session_state.data.loc[
                 st.session_state.data['MRN'] == st.session_state.temp_mrn, 
-                'TARE Tx Date'
+                'TAREdate'
             ].values[0]
+            fetch_date = str(fetch_date)
 
             # Convert fetch_date to a datetime.date object
             fetch_date = pd.to_datetime(fetch_date).date()
             index = st.session_state.data[st.session_state.data["MRN"] == mrn].index[0]
             col1, col2 = st.columns([0.3, 0.7],gap="small")
-            tabs = ["Patient Demographics", "Cirrhosis PMH","HCC Diagnosis", "Previous Therapy for HCC", "Pre Y90", "Day_Y90", "Post Y90 Within 30 Days Labs", "Other Post Tare","Imaging Date","Dosimetry Data"]
+            tabs = ["Patient Information","Patient Demographics", "Cirrhosis PMH","HCC Diagnosis", "Previous Therapy for HCC", "Pre Y90", "Day_Y90", "Post Y90 Within 30 Days Labs", "Other Post Tare","Imaging Date","Dosimetry Data","AFP"]
             #tare_date = record.loc[index, "TARE Tx Date"]
             #tare_date = datetime.strptime(tare_date, "%Y-%m-%d").date()
             with col1:
@@ -3346,75 +3507,99 @@ def edit_existing_data():
                 st.session_state.selected_tab = st.radio("", tabs)
 
             with col2:
-                if st.session_state.selected_tab == "Patient Demographics":
-                    st.subheader("Patient Demographics")
-                    with st.form("demographics_form"):
-                        gender = st.selectbox(
-                        "Gender",
-                        options=["Male", "Female"],
-                        format_func=lambda x: f"{x} ({1 if x == 'Male' else 2})",
+                if st.session_state.selected_tab == "Patient Information":
+                    st.subheader("Patient_Info")
+                    with st.form("patient_info_form"):
+                        # Patient Info Section
+                        col1, col2 = st.columns(2)
+                        last_name = col1.text_input("Last Name")
+                        last_name = last_name.lower()
+                        first_name = col2.text_input("First Name")
+                        first_name = first_name.lower()
+                        
+                        st.write(mrn)
+                        
+                        duplicate_procedure_check = 0
+                        if mrn in st.session_state.data["MRN"].values:
+                            st.write("Are you sure this is a duplicate")
+                            duplicate_procedure_check = 1
+                        
+                        tare_date = st.date_input("TARE Tx Date", help="Select the treatment date")
+                        
+                        procedure_technique = st.selectbox(
+                        "Procedure Technique",
+                        options=["1", "2"],
+                        format_func=lambda x: {
+                                            "1": "Lobar",
+                                            "2": " Segmental",
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
+                        )
+
+                        age = st.number_input("Age at time of TARE", min_value=0, max_value=150, step=1, format="%d")
+                    
+                        submit_tab1 = st.form_submit_button("Submit")
+                        if submit_tab1:
+                            st.session_state.data.at[index, "Name"] = f"{last_name}, {first_name}"
+                            st.session_state.data.at[index, "Duplicate"] = duplicate_procedure_check
+                            st.session_state.data.at[index, "TAREdate"] = tare_date
+                            st.session_state.data.at[index, "PTech"] = procedure_technique
+                            st.session_state.data.at[index, "Tareage"] = age
+
+                elif st.session_state.selected_tab == "Patient Demographics":
+                    st.subheader("Patient Demographics")
+                    with st.form("demographics_form"):
+
+                        gender = st.selectbox(
+                            "Gender",
+                            options=["Male", "Female"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
 
                         # Ethnicity dropdown
                         ethnicity = st.selectbox(
                             "Ethnicity",
-                            options=["Black","White", "Asian", "Hispanic", "Other", "NA","0"],
-                            format_func=lambda x: {
-                                "Black": " (1) Black",
-                                "White": " (2) White ",
-                                "Asian": "(3) Asian ",
-                                "Hispanic": " (4) Hispanic ",
-                                "Other": " (5) Other",
-                                "NA": " NA (can't find it in sheet)",
-                                "0": "0 (not present)"
-                            }[x],
-                        index=None,  # No default selection
-                        placeholder="Choose an option",
+                            options=["Black","White", "Asian", "Hispanic", "Other", "NA", "0"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+                            
                         )
 
-                        # Medical History - Yes/No dropdowns
-                        st.subheader("Medical History")
-                        
                         hypertension = st.selectbox(
                             "PMHx Hypertension",
                             options=["No", "Yes"],
-                            format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                        index=None,  # No default selection
-                        placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
 
                         diabetes = st.selectbox(
                             "PMHx Diabetes (T1 or T2)",
                             options=["No", "Yes"],
-                            format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                        index=None,  # No default selection
-                        placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
 
                         hypercholesterolemia = st.selectbox(
                             "Hypercholesterolemia",
                             options=["No", "Yes"],
-                            format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                        index=None,  # No default selection
-                        placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
 
                         smoking = st.selectbox(
                             "Hx of Smoking",
                             options=["No", "Yes"],
-                            format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                        index=None,  # No default selection
-                        placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
 
                         obesity = st.selectbox(
                             "Obesity",
                             options=["No", "Yes"],
-                            format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                        index=None,  # No default selection
-                        placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
 
                         # Calculate comorbidities
@@ -3431,85 +3616,73 @@ def edit_existing_data():
                         # Display calculated fields (read-only)
                         st.info(f"Comorbidities Total Count: {total_count}")
                         st.info(f"Comorbidities Binary Value: {binary_value}")
-                        submit_tab2 = st.form_submit_button("Submit Patient Description")
+                        submit_tab2 = st.form_submit_button("Submit")
                         if submit_tab2:
-                            index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
-                            st.session_state.data.loc[index, "Gender"] = gender
-                            st.session_state.data.loc[index, "Ethnicity"] = ethnicity
-                            st.session_state.data.loc[index, "PMHx Hypertension"] = hypertension
-                            st.session_state.data.loc[index, "PMHx Diabetes (T1 or T2)"] = diabetes
-                            st.session_state.data.loc[index, "Hypercholesterolemia"] = hypercholesterolemia
-                            st.session_state.data.loc[index, "Hx of Smoking"] = smoking
-                            st.session_state.data.loc[index, "Obesity"] = obesity
-                            st.session_state.data.loc[index, "Comorbitieis Total Count"] = total_count
-                            st.session_state.data.loc[index, "Comorbitieis Binary"] = binary_value
+                            #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
+                            st.session_state.data.at[index, "Gender"] = gender
+                            st.session_state.data.at[index, "Ethnicity"] = ethnicity
+                            st.session_state.data.at[index, "PMHxHTN"] = hypertension
+                            st.session_state.data.at[index, "PMHxDM"] = diabetes
+                            st.session_state.data.at[index, "Hypercholesterolemia"] = hypercholesterolemia
+                            st.session_state.data.at[index, "PMHxSmoking"] = smoking
+                            st.session_state.data.at[index, "Obesity"] = obesity
                             st.success("Patient Description added successfully.")
-                            st.write("Updated Data:")
+                        
                     
                 elif st.session_state.selected_tab == "Cirrhosis PMH":
                     st.subheader("Cirrhosis PMH")
                     with st.form("cirrhosis_pmh_form"):
 
                         cir_pmh_hbv_status = st.selectbox(
-                            "Cir_PMH_HBV Status",
+                            "Cir PMH HBV Status",
                             options=["Yes", "No"],
-                        # format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             help="Select HBV Status",
-                        index=None,  # No default selection
-                        placeholder="Choose an option",
-                            )
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+                        )
 
                         cir_pmh_hbv_free_text = "0" if cir_pmh_hbv_status == "No" else st.text_input(
-                            "Cir_PMH_HBV Free Text",
-                            help="Provide additional details for HBV Status"
+                            "Cir PMH HBV Free Text"
                         )
                         
                         cir_pmh_hbv_art = "0" if cir_pmh_hbv_status == "No" else st.selectbox(
-                            "Cir_PMH_HBV ART",
+                            "Cir PMH HBV ART",
                             options=["Entecavir", "Tenofovir", "NA"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
 
                         cir_pmh_hcv_status = st.selectbox(
                             "Cir_PMH_HCV Status",
                             options=["Yes", "No"],
-                        # format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                            help="Select HCV Status",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
 
-                        cir_pmh_hcv_free_text = "0" if cir_pmh_hcv_status == "No" else st.text_input(
+                        cir_pmh_hcv_free_text = "No" if cir_pmh_hcv_status == "No" else st.text_input(
                             "Cir_PMH_HCV Free Text",
                             help="Provide additional details for HCV Status",
                         )
 
-                        cir_pmh_hcv_art = "0" if cir_pmh_hcv_status == "No" else st.selectbox(
-                            "Cir_PMH_HBV ART",
+                        cir_pmh_hcv_art = "No" if cir_pmh_hcv_status == "No" else st.selectbox(
+                            "Cir_PMH_HCV ART",
                             options=["sofosbuvir/velpatasvir", "ledipasvir/sofosbuvir", "NA", "Glecaprevir/pibrentasvi"],
                             help="Select ART treatment for HCV",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                     
                         )
 
                         cir_pmh_alcohol_use_disorder = st.selectbox( 
                             "Cir_PMH_Alcohol Use Disorder",
                             options=["Yes", "No"],
-                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             help="Select Alcohol Disorder",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                        )
-
-                        cir_pmh_duration_of_alcohol_use_years = "0" if cir_pmh_alcohol_use_disorder == "No" else st.number_input(
-                            "Cir_PMH_Duration of Alcohol Use Years",
-                            help="Provide Duration of Alchohol Use Years",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
 
                         cir_pmh_alcohol_free_text = "0" if cir_pmh_alcohol_use_disorder == "No" else st.text_input(
-                            "Cir_PMH_HCV Free Text",
+                            "Cir_PMH_Alcohol Free Text",
                             help="Provide additional details for Alcohol Disorder",
                         )
 
@@ -3518,44 +3691,39 @@ def edit_existing_data():
                             options=["Yes", "No"],
                             #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             help="Select IVDU Status",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                        )
-
-                        cir_pmh_duration_of_ivdu_years = "0" if cir_pmh_ivdu_status == "No" else st.number_input(
-                            "Cir_PMH_Duration of IVDU Years",
-                            help="Provide Duration of IVDU Disorder",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
 
                         cir_pmh_ivdu_free_text = "0" if cir_pmh_ivdu_status == "No" else st.text_input(
-                            "Cir_PMH_HCV Free Text",
+                            "Cir_PMH_IVDU Free Text",
                             help="Provide additional details for IVDU"
                     
                         )
 
-                        cir_pmh_other_contributing_factors = st.selectbox(
-                            "Cir_PMH_Other Contributing Factors",
+                        cir_pmh_liver_addtional_factor = st.selectbox(
+                            "Cir_PMH_Liver Additional Factors",
                             options=["NAFLD", "MAFLD", "NASH", "Autoimmune Hepatitis", "Hereditary Hemochromatosis","none"],
                             help="Select Other Contributing Factors",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
                 
                         st.subheader("Cirrhosis Dx")
-                        Cirrhosis_Dx_Diagnosis_Date = st.date_input("Cirrhosis_Dx_Diagnosis Date",help="Select Diagnosis date")
+                        Cirrhosis_Dx_Diagnosis_Date = st.date_input("Cirrhosis Dx Diagnosis Date",help="Select Diagnosis date")
 
                         Cirrhosis_Dx_Diagnosis_Method = st.selectbox(
                             "Cirrhosis_Dx_Diagnosis Method",
                             options=["Biopsy", "Imaging"],
                             help="Select Diagnosis Method",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         ) 
-                        Cirrhosis_Dx_HPI_EMR_Note_Free_Text = st.text_input(
+                        Cirrhosis_Dx_HPI_EMR_Note_Free_Text = st.text_area(
                             "Cirrhosis_Dx_HPI EMR Note Free Text",
                             help="Provide details of HPI EMR"
                         )
-                        Cirrhosis_Dx_Imaging_Findings_EMR_Note_Free_Text = st.text_input(
+                        Cirrhosis_Dx_Imaging_Findings_EMR_Note_Free_Text = st.text_area(
                             "Cirrhosis_Dx_Imaging Findings EMR Note Free Text",
                             help="Provide details of Imaging Findings"
                         )
@@ -3564,13 +3732,13 @@ def edit_existing_data():
                             "Cirrhosis_Dx_Metavir Score",
                             options=["F0/F1", "F2","F3","F4","NA"],
                             help="Select Metavir_score",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         ) 
 
                         Cirrhosis_Dx_Complications_at_Time_of_Diagnosis = st.multiselect(
                             "Cirrhosis_Dx_Complications at Time of Diagnosis",
-                            options=["ascites", " variceal hemorrhage","hepatic encephalopathy","jaundice","SBP", "Hepatorenal Syndrome", "Coagulopathy", "Portal HTN", "PVT", "PVTT", "none"],
+                            options=["ascites", " ariceal hemorrhage","Hepatic encephalopathy","jaundice","SBP", "Hepatorenal Syndrome", "Coagulopathy", "Portal HTN", "PVT", "PVTT","Portal Vein Thrombosis" "none"],
                             help="Provide details of Compilications at time of Diagnosis",
                             placeholder="Select all that apply"
                         )
@@ -3583,11 +3751,11 @@ def edit_existing_data():
                                 "0": "None",
                             }[x],
                             help="Provide details of Complications_at_Time_of_Diagnosis_Binary",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
 
-                        Cirrhosis_Dx_Complications_Free_Text =  st.text_input(
+                        Cirrhosis_Dx_Complications_Free_Text =  st.text_area(
                             "Cirrhosis_Dx_Complications Free Text",
                             help="Provide details of Complications"
                         )
@@ -3601,152 +3769,97 @@ def edit_existing_data():
                         )
 
                         Cirrhosis_Dx_AFP_L3 = st.text_input(
-                            "Cirrhosis_Dx_AFP_L3",
+                            "Cirrhosis_Dx_AFP L3",
                             help="Enter AFP_L3 value in ng/dl"
                             
                         )
+                        Cirrhosis_Dx_AFP_L3_Date_Free_Text = st.text_area("Cirrhosis_Dx_AFP L3 Date Free Text")
 
-                        Cirrhosis_Dx_Child_Pugh_class_EMR = st.selectbox(
-                            "Cirrhosis_Dx_Child-Pugh Class EMR",
-                            options=["Class A","Class B","Class C","NA"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                        Cirrhosis_Dx_Ascites_CTCAE = st.selectbox (
+                            "Cirrhosis_Dx_Ascites CTCAE",
+                            options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
+                            format_func=lambda x: {
+                            "none": "0. none",
+                            "Asymptomatic": "1. Asymptomatic",
+                            "Minimal ascities/Mild abd distension": "1. Minimal ascities/Mild abd distension",
+                            "Symptomatic": "2. Symptomatic",
+                            "moderate ascities/Symptomatic medical intervention": " 2. moderate ascities/Symptomatic medical intervention",
+                            "Severe symptoms, invasive intervention indicated": " 3. Severe symptoms, invasive intervention indicated",
+                            "Life Threatening: Urgent operation intervention indicated" : "4. Life Threatening: Urgent operation intervention indicated",
 
-                        )
-                        # Validation for Cirrhosis_Dx_Child-Pugh Points EMR
-                        def validate_input(value):
-                            if value.isdigit() and 5 <= int(value) <= 15:
-                                return value  # Valid number
-                            elif value.upper() == "NA":
-                                return "NA"  # Valid 'NA'
-                            else:
-                                return "NA" 
-
-                        input_value = st.text_input(
-                            "Cirrhosis_Dx_Child-Pugh Points EMR",
-                            help="Specify the Child-Pugh points if in EMR 'number 5-15 or NA"                
-                        )
-
-                        Cirrhosis_Dx_Child_Pugh_Points_EMR = validate_input(input_value)
-
-
-                        def validate_input_EMR(value):
-                            if value.isdigit() and 6 <= int(value) <= 40:
-                                return value  # Valid number
-                            elif value.upper() == "NA":
-                                return "NA"  # Valid 'NA'
-                            else:
-                                return "NA" 
-                        
-                        input_value1 = st.text_input(
-                            "Cirrhosis_Dx_MELD Score EMR",
-                            help="Specify the MELD Score if in EMR 'number 6-40 or NA"                
-                        )
-
-                        Cirrhosis_Dx_MELD_Score_EMR = validate_input_EMR(input_value1)
-
-                
-                        input_value2 = st.text_input(
-                            "Cirrhosis_Dx_MELD-NA_Score_EMR",
-                            help="Specify the MELD Score NA if in EMR 'number 6-40 or NA"                
-                        )
-
-                        Cirrhosis_Dx_MELD_NA_Score_EMR = validate_input_EMR(input_value2)
-
-                
-                        
-                        Cirrhosis_Dx_Ascites = st.selectbox (
-                            "Cirrhosis_Dx_Ascites",
-                            options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic"," moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
+                            }[x],
                             help="Select Metavir_score",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         ) 
-
-                        Cirrhosis_Dx_Ascites_Binary_Classification = 0 if Cirrhosis_Dx_Ascites == "none" else 1
+                        def findascitesclass(score):
+                            if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
+                                 return "Slight"
+                            elif score == "Symptomatic" or score == "moderate ascities/Symptomatic medical intervention":
+                                 return "Moderate"
+                            elif score == "Severe symptoms, invasive intervention indicated" or score == "Life Threatening: Urgent operation intervention indicated" :
+                                 return "Severe"
                         
-                        Cirrhosis_Dx_Ascites_Free_Text = "NA" if Cirrhosis_Dx_Ascites == "none" else st.text_area(
+                        Cirrhosis_Dx_Ascites_Classification = "Absent" if Cirrhosis_Dx_Ascites_CTCAE == "none" else findascitesclass(Cirrhosis_Dx_Ascites_CTCAE)
+                        
+                        Cirrhosis_Dx_Ascites_Free_Text = "NA" if Cirrhosis_Dx_Ascites_CTCAE == "none" else st.text_area(
                             "Cirrhosis_Dx_Ascites Free Text",
                             "Hospitalized (yes/no): \nDiuretics (yes/no): \nParacentesis (yes/no): \nAny other complications (free_text):",
                         
                         )
 
-                        Cirrhosis_Dx_Ascites_Labs_Free_Text = "NA" if Cirrhosis_Dx_Ascites == "none" else st.text_area(
-                            "Cirrhosis_Dx_Ascites Labs Free Text",
-                            "Bilirubin (mg/dl): \nAlbumin (g/dl): \nINR: \nCreatinine (mg/dl): \nSodium (mmol/L): \nAST (U/L): \nALT (U/L): \nAlk Phos: \nPlatelets:",
-                            
-                        )
-
-                        Cirrhosis_Dx_Hepatic_Encephalopathy = st.selectbox(
-                            "Cirrhosis_Dx_Hepatic_Encephalopathy",
-                            options=["Yes", "No"],
-                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                            help="Hepatic_Encephalopathy",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                    
-                        )
-
-
-                        submit_tab3 = st.form_submit_button("Submit Cirrhosis PMH")
+                        submit_tab3 = st.form_submit_button("Submit")
                         if submit_tab3:
 
                             #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
-                            st.session_state.data.at[index, "Cir_PMH_HBV Status"] = cir_pmh_hbv_status
-                            st.session_state.data.at[index, "Cir_PMH_HBV Free Text"] = cir_pmh_hbv_free_text
-                            st.session_state.data.at[index, "Cir_PMH_HBV ART"] = cir_pmh_hbv_art
-                            st.session_state.data.at[index, "Cir_PMH_HCV Status"] = cir_pmh_hcv_status
-                            st.session_state.data.at[index, "Cir_PMH_HCV Free Text"] = cir_pmh_hcv_free_text
-                            st.session_state.data.at[index, "Cir_PMH_HCV ART"] = cir_pmh_hcv_art
-                            st.session_state.data.at[index, "Cir_PMH_Alcohol Use Disorder"] = cir_pmh_alcohol_use_disorder
-                            st.session_state.data.at[index, "Cir_PMH_Duration of Alcohol Use Years"] = cir_pmh_duration_of_alcohol_use_years
-                            st.session_state.data.at[index, "Cir_PMH_Alcohol Free Text"] = cir_pmh_alcohol_free_text
-                            st.session_state.data.at[index, "Cir_PMH_IVDU Status"] = cir_pmh_ivdu_status
-                            st.session_state.data.at[index, "Cir_PMH_Duration of IVDU Years"] = cir_pmh_duration_of_ivdu_years
-                            st.session_state.data.at[index, "Cir_PMH_IVDU Free Text"] = cir_pmh_ivdu_free_text
-                            st.session_state.data.at[index, "Cir_PMH_Other Contributing Factors"] = cir_pmh_other_contributing_factors
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Diagnosis Date"] = Cirrhosis_Dx_Diagnosis_Date
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Diagnosis Method"] = Cirrhosis_Dx_Diagnosis_Method
-                            st.session_state.data.at[index, "Cirrhosis_Dx_HPI EMR Note Free Text"] = Cirrhosis_Dx_HPI_EMR_Note_Free_Text
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Imaging Findings EMR Note Free Text"] = Cirrhosis_Dx_Imaging_Findings_EMR_Note_Free_Text
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Metavir Score"] = Cirrhosis_Dx_Metavir_Score
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Complications at Time of Diagnosis"] = Cirrhosis_Dx_Complications_at_Time_of_Diagnosis
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Complications at Time of Diagnosis Binary"] = Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Complications Free Text"] = Cirrhosis_Dx_Complications_Free_Text
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Date of Labs in Window"] = Cirrhosis_Dx_Date_of_Labs_in_Window
-                            st.session_state.data.at[index, "Cirrhosis_Dx_AFP"] = Cirrhosis_Dx_AFP
-                            st.session_state.data.at[index, "Cirrhosis_Dx_AFP_L3"] = Cirrhosis_Dx_AFP_L3
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Child-Pugh Class EMR"] = Cirrhosis_Dx_Child_Pugh_class_EMR
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Child-Pugh Points EMR"] = Cirrhosis_Dx_Child_Pugh_Points_EMR
-                            st.session_state.data.at[index, "Cirrhosis_Dx_MELD Score EMR"] = Cirrhosis_Dx_MELD_Score_EMR
-                            st.session_state.data.at[index, "Cirrhosis_Dx_MELD-Na Score EMR"] = Cirrhosis_Dx_MELD_NA_Score_EMR
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Ascites"] = Cirrhosis_Dx_Ascites
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Ascites Binary Classification"] = Cirrhosis_Dx_Ascites_Binary_Classification
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Ascites Free Text"] = Cirrhosis_Dx_Ascites_Free_Text
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Ascites Labs Free Text"] = Cirrhosis_Dx_Ascites_Labs_Free_Text
-                            st.session_state.data.at[index, "Cirrhosis_Dx_Hepatic Encephalopathy"] = Cirrhosis_Dx_Hepatic_Encephalopathy
+                            st.session_state.data.at[index, "CirPMH_HBV"] = cir_pmh_hbv_status
+                            st.session_state.data.at[index, "CirPMH_HBVFT"] = cir_pmh_hbv_free_text
+                            st.session_state.data.at[index, "CirPMH_HBVART"] = cir_pmh_hbv_art
+                            st.session_state.data.at[index, "CirPMH_HCV"] = cir_pmh_hcv_status
+                            st.session_state.data.at[index, "CirPMH_HCVFT"] = cir_pmh_hcv_free_text
+                            st.session_state.data.at[index, "CirPMH_HCVART"] = cir_pmh_hcv_art
+                            st.session_state.data.at[index, "CirPMH_AUD"] = cir_pmh_alcohol_use_disorder
+                            st.session_state.data.at[index, "CirPMH_AUDFT"] = cir_pmh_alcohol_free_text
+                            st.session_state.data.at[index, "CirPMH_IVDU"] = cir_pmh_ivdu_status
+                            st.session_state.data.at[index, "CirPMH_IVDUFT"] = cir_pmh_ivdu_free_text
+                            st.session_state.data.at[index, "CirPMH_Liverfactors"] = cir_pmh_liver_addtional_factor
+                            st.session_state.data.at[index, "Cirdx_Dxdate"] = Cirrhosis_Dx_Diagnosis_Date
+                            st.session_state.data.at[index, "Cirdx_Dxmethod"] = Cirrhosis_Dx_Diagnosis_Method
+                            st.session_state.data.at[index, "Cirdx_HPIFT"] = Cirrhosis_Dx_HPI_EMR_Note_Free_Text
+                            st.session_state.data.at[index, "Cirdx_ImageemrFT"] = Cirrhosis_Dx_Imaging_Findings_EMR_Note_Free_Text
+                            st.session_state.data.at[index, "Cirdx_Metavir"] = Cirrhosis_Dx_Metavir_Score
+                            st.session_state.data.at[index, "Cirdx_Compatdx"] = Cirrhosis_Dx_Complications_at_Time_of_Diagnosis
+                            st.session_state.data.at[index, "Cirdx_Compatdxbinary"] = Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary
+                            st.session_state.data.at[index, "Cirdx_CompFT"] = Cirrhosis_Dx_Complications_Free_Text
+                            st.session_state.data.at[index, "Cirdx_DateLabs"] = Cirrhosis_Dx_Date_of_Labs_in_Window
+                            st.session_state.data.at[index, "Cirdx_AFP"] = Cirrhosis_Dx_AFP
+                            st.session_state.data.at[index, "Cirdx_AFP L3"] = Cirrhosis_Dx_AFP_L3
+                            st.session_state.data.at[index, "Cirdx_AFPL3DateFT"] = Cirrhosis_Dx_AFP_L3_Date_Free_Text
+                            st.session_state.data.at[index, "Cirdx_AscitesCTCAE"] = Cirrhosis_Dx_Ascites_CTCAE
+                            st.session_state.data.at[index, "Cirdx_AscitesCTCAEnumb"] = Cirrhosis_Dx_Ascites_Classification
+                            st.session_state.data.at[index, "Cirdx_AscitesFT"] = Cirrhosis_Dx_Ascites_Free_Text
                             
                             st.success("Patient Description added successfully.")
-                            st.write("Updated Data:")
 
                 elif st.session_state.selected_tab == "HCC Diagnosis":
                     st.subheader("HCC Diagnosis")
-                    with st.form("hcc_dx_form"): 
-    
+                    with st.form("hcc_dx_form"):
+
                         hcc_dx_hcc_diagnosis_date = st.date_input("HCC_Dx_HCC Diagnosis Date", help="Enter the HCC diagnosis date")
 
                         hcc_dx_method_of_diagnosis = st.selectbox(
                             "HCC_Dx_Method of Diagnosis",   
                             options=["Biopsy", "Imaging", "Unknown"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                             #format_func=lambda x: f"{x} ({1 if x == 'Biopsy' else 2 if x == 'Imaging' else 'NA'})"
                         )
 
                         hcc_dx_date_of_labs = st.date_input("HCC_Dx_Date of Labs in Window")
 
                         hcc_dx_afp = st.number_input("HCC_Dx_AFP", help="Enter AFP value in ng/dl")
-                        hcc_dx_afp_l3_date_free_text = st.text_area("HCC_Dx_AFP L3 & Date Free Text", help="Enter AFP L3 and date details")
+                        hcc_dx_afp_l3 = st.number_input("HCC_Dx_AFP L3", help="Enter AFP L3 and date details")
+                        hcc_dx_afp_l3_date_free_text = st.text_area("HCC_Dx_AFP L3 Date Free Text")
 
                         hcc_dx_bilirubin = st.number_input("HCC_Dx_Bilirubin", help="Enter the bilirubin value in mg/dl", min_value=1)
                         hcc_dx_albumin = st.number_input("HCC_Dx_Albumin", help="Enter the albumin value in g/dl")
@@ -3754,281 +3867,209 @@ def edit_existing_data():
                         hcc_dx_creatinine = st.number_input("HCC_Dx_Creatinine", help="Enter the creatinine value in mg/dl")
                         hcc_dx_sodium = st.number_input("HCC_Dx_Sodium", help="Enter the sodium value in mmol/L")
 
-                        hcc_dx_ascites = st.selectbox(
-                            "HCC_Dx_Ascites",
-                            options=["none", "Asymptomatic", "Minimal ascities/Mild abd distension, no sx",
-                                    "Symptomatic", "moderate ascities/Symptomatic medical intervention",
-                                    "Severe symptoms, invasive intervention indicated",
-                                    "Life Threatening: Urgent operation intervention indicated"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                        hcc_dx_ascites_CTCAE = st.selectbox (
+                            "HCC_Dx_Ascites CTCAE",
+                            options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
+                            format_func=lambda x: {
+                            "none": "0. none",
+                            "Asymptomatic": "1. Asymptomatic",
+                            "Minimal ascities/Mild abd distension": "1. Minimal ascities/Mild abd distension",
+                            "Symptomatic": "2. Symptomatic",
+                            "moderate ascities/Symptomatic medical intervention": " 2. moderate ascities/Symptomatic medical intervention",
+                            "Severe symptoms, invasive intervention indicated": " 3. Severe symptoms, invasive intervention indicated",
+                            "Life Threatening: Urgent operation intervention indicated" : "4. Life Threatening: Urgent operation intervention indicated",
+
+                        }[x],
+                            help="Select Metavir_score",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+                        ) 
+                        def findascitesclass(score):
+                            if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
+                                 return "Slight"
+                            elif score == "Symptomatic" or score == "moderate ascities/Symptomatic medical intervention":
+                                 return "Moderate"
+                            elif score == "Severe symptoms, invasive intervention indicated" or score == "Life Threatening: Urgent operation intervention indicated" :
+                                 return "Severe"
+                        
+                        hCC_dx_ascites_classification = "Absent" if hcc_dx_ascites_CTCAE == "none" else findascitesclass(hcc_dx_ascites_CTCAE)
+
+                        hcc_dx_ascites_diruetics = 0 if hcc_dx_ascites_CTCAE == "none" else st.selectbox(
+                            "HCC_Dx_Ascites Diruetics",
+                            options = ["Yes","No"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+            
+                        )
+                        hcc_dx_ascites_paracentesis = 0 if hcc_dx_ascites_CTCAE == "none" else st.selectbox(
+                            "HCC_Dx_Ascites Paracentesis ",
+                            options = ["Yes","No"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+            
+                        )
+                        hcc_dx_ascites_hospitalization = 0 if hcc_dx_ascites_CTCAE == "none" else st.selectbox(
+                            "HCC_Dx_Ascites Hospitalization",
+                            options = ["Yes","No"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+            
                         )
 
-                        hcc_dx_ascites_binary_classification = 1 if hcc_dx_ascites != "none" else 0
-                        #st.info(f"HCC_Dx_Ascites Binary Classification: {ascites_binary}")
-
-                        hcc_dx_ascites_free_text = "NA" if hcc_dx_ascites == 'none' else st.text_area(
-                            "HCC_Dx_Ascites Free Text",
-                            "Hospitalized (yes/no): \nDiuretics (yes/no): \nParacentesis (yes/no): \nAny other complications (free_text):",
+                        hcc_dx_he_grade = st.selectbox(
+                            "HCC_Dx_HE Grade",
+                            options=[1,2,3],
+                            format_func=lambda x: {
+                            1: "None",
+                            2: "Grade 1-2",
+                            3: "Grade 3-4",
                             
-                        )
+                        }[x],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
 
-                        hcc_dx_ascites_labs_free_text = "NA" if hcc_dx_ascites == 'none' else st.text_area(
-                            "HCC_Dx_Ascites Labs Free Text",
-                            """Bilirubin (mg/dl): \nAlbumin (g/dl): \nINR: \nCreatinine (mg/dl): \nSodium (mmol/L): 
-                            AST (U/L): \nALT (U/L): \nAlk Phos: \nPlatelets:""",
-                    
                         )
-
-                        hcc_dx_hepatic_encephalopathy = st.selectbox(
-                            "HCC_Dx_Hepatic Encephalopathy",
-                            options=["Yes", "No"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})"
-                        )
-
+                       
                         hcc_dx_ecog_performance_status = st.selectbox("HCC_Dx_ECOG Performance Status", options=["0", "1", "2", "3", "4", "NA"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",)
+                            index=None,  # No default selection
+                            placeholder="Choose an option",)
 
                         hcc_dx_lirads_score = st.selectbox(
                             "HCC_Dx_LIRADS Score",
                             options=["LR-1", "LR-2", "LR-3", "LR-4", "LR-5", "LR-5V", "LR-M"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
 
-                        hcc_dx_child_pugh_class_emr = st.selectbox(
-                            "HCC_Dx_Child-Pugh Class EMR",
-                            options=["Class A", "Class B", "Class C", "NA"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                        )
-
-                        # Validation of hcc_dx_child_pugh_points_emr
-
-                        def validate_input(value):
-                            if value.isdigit() and 5 <= int(value) <= 15:
-                                return value  # Valid number
-                            elif value.upper() == "NA":
-                                return "NA"  # Valid 'NA'
-                            else:
-                                return "NA" 
-
-                        input_value3 = st.text_input(
-                            "HCC_Dx_Child-Pugh Points EMR",
-                            help="Specify the Child-Pugh points if in EMR number 5-15 or NA"                
-                        )
-
-                        hcc_dx_child_pugh_points_emr = validate_input(input_value3)
-
-
-                        hcc_dx_bclc_stage_emr = st.selectbox(
-                            "HCC_Dx_BCLC Stage EMR",
-                            options=["0", "A", "B", "C", "D"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                        )
-
-                        # Validating hcc_dx_meld/na score
-                        def validate_input2(value):
-                            if value.isdigit() and 6 <= int(value) <= 40:
-                                return value  # Valid number
-                            elif value.upper() == "NA":
-                                return "NA"  # Valid 'NA'
-                            else:
-                                return "NA" 
-
-                
-                        input_value4 = st.text_input(
-                            "HCC_Dx_MELD Score EMR",
-                            help="Write in number in range 6-40, or NA"
-                        )
-
-
-                        hcc_dx_meld_score_emr = validate_input2(input_value4)
-
-                        input_value5 = st.text_input(
-                            "HCC_Dx_MELD-Na Score EMR",
-                            help="Write in number in range 6-40, or NA"
-                        )
-
-                        hcc_dx_meld_na_score_emr = validate_input2(input_value5)
-
-
-                        hcc_dx_albi_score_emr = st.number_input("HCC_Dx_ALBI Score EMR")
-
-                        #  calculation of child_pugh_points_clac
-
-                        def calculatepoints(bilirubin, albumin, inr, ascites, encephalopathy):
-                            if bilirubin < 2:
-                                bilirubin_points = 1
-                            elif 2 <= bilirubin <= 3:
-                                bilirubin_points = 2
-                            else:
-                                bilirubin_points = 3
-
-                            if albumin > 3.5:
-                                albumin_points = 1
-                            elif 2.8 <= albumin <= 3.5:
-                                albumin_points = 2
-                            else:
-                                albumin_points = 3
-
-                # Points for INR
-                            if inr < 1.7:
-                                inr_points = 1
-                            elif 1.7 <= inr <= 2.3:
-                                inr_points = 2
-                            else:
-                                inr_points = 3
-
-                # Points for Ascites
-                            if ascites == 'none':
-                                ascites_points = 1
-                            elif ascites == 'Asymptomatic' or ascites == 'Minimal ascities/Mild abd distension, no sx' or ascites == "Symptomatic" :
-                                ascites_points = 2
-                            else:  # 'moderate/severe'
-                                ascites_points = 3
-
-                # Points for Hepatic Encephalopathy
-                            if encephalopathy == 'No':
-                                encephalopathy_points = 1
-                            elif encephalopathy == 'Yes':
-                                encephalopathy_points = 2
-                            else:  # 'grade iii-iv'
-                                encephalopathy_points = 3
-
-                # Total Child-Pugh score
-                            total_score = (
-                                bilirubin_points + albumin_points + inr_points + ascites_points + encephalopathy_points
-                            )
-
-                            return total_score
-
-
-                        hcc_dx_child_pugh_points_calc = calculatepoints(hcc_dx_bilirubin,hcc_dx_albumin,hcc_dx_inr,hcc_dx_ascites,hcc_dx_hepatic_encephalopathy)
-
-                        # Calculations for classses
-
-                        def calculate_class(poin):
-                            if 5 <= poin <= 6:
-                                return 'A'
-                            elif 7 <= poin <= 9:
-                                return 'B'
-                            elif 10 <= poin <= 15:
-                                return 'C'
-                            else:
-                                return "Invalid points: must be between 5 and 15."
-                
+                        hcc_dx_child_pugh_points_calc = calculatepoints(hcc_dx_bilirubin,hcc_dx_albumin,hcc_dx_inr,hcc_dx_ascites_CTCAE,hcc_dx_he_grade)
                         hcc_dx_child_pugh_class_calc = calculate_class(hcc_dx_child_pugh_points_calc)
                     
                         #bclc_stage_calc = st.text_input("HCC_Dx_BCLC Stage calc")
                         hcc_dx_meld_score_calc = (3.78*(int(hcc_dx_bilirubin)))+(11.2*(int(hcc_dx_inr)))+(9.57*(int(hcc_dx_creatinine)))+6.43
                         hcc_dx_meld_na_score_calc = hcc_dx_meld_score_calc + 1.32*(137-int(hcc_dx_sodium)) - (0.033*hcc_dx_meld_score_calc*(137-int(hcc_dx_sodium)))
                         def albi_calc(a,b):
-                            a=int(a)
+                            a=int(a)*17.1
                             b=int(b)
                             t = math.log(a, 10)
-                            answer = (t * 0.66) + (b * -0.085)
+                            answer = round((t * 0.66) + (b * -0.085))
                             return answer
                         
                         hcc_dx_albi_score_calc = albi_calc(hcc_dx_bilirubin, hcc_dx_albumin)
+                        hcc_dx_albi_grade = albi_class(hcc_dx_albi_score_calc)
+
+                        hcc_dx_bclc_calc = st.text_area("HCC_Dx_BCLC Stage calc")
                     
 
-                        submit_tab4 = st.form_submit_button("Save HCC Diagnosis")
+                        submit_tab4 = st.form_submit_button("Submit")
                         if submit_tab4:
                                 #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
-                                st.session_state.data.at[index, "HCC_Dx_HCC Diagnosis Date"] = hcc_dx_hcc_diagnosis_date.strftime("%Y-%m-%d")
-                                st.session_state.data.at[index, "HCC_Dx_Method of Diagnosis"] = hcc_dx_method_of_diagnosis
-                                st.session_state.data.at[index, "HCC_Dx_Date of Labs in Window"] = hcc_dx_date_of_labs.strftime("%Y-%m-%d")
-                                st.session_state.data.at[index, "HCC_Dx_AFP"] = hcc_dx_afp
-                                st.session_state.data.at[index, "HCC_Dx_AFP L3 & Date Free Text"] = hcc_dx_afp_l3_date_free_text
-                                st.session_state.data.at[index, "HCC_Dx_Bilirubin"] = hcc_dx_bilirubin
-                                st.session_state.data.at[index, "HCC_Dx_Albumin"] = hcc_dx_albumin
-                                st.session_state.data.at[index, "HCC_Dx_INR"] = hcc_dx_inr
-                                st.session_state.data.at[index, "HCC_Dx_Creatinine"] = hcc_dx_creatinine
-                                st.session_state.data.at[index, "HCC_Dx_Sodium"] = hcc_dx_sodium
-                                st.session_state.data.at[index, "HCC_Dx_Ascites"] = hcc_dx_ascites
-                                st.session_state.data.at[index, "HCC_Dx_Ascites Binary Classification"] = hcc_dx_ascites_binary_classification
-                                st.session_state.data.at[index, "HCC_Dx_Ascites Free Text"] = hcc_dx_ascites_free_text
-                                st.session_state.data.at[index, "HCC_Dx_Ascites Labs Free Text"] = hcc_dx_ascites_labs_free_text
-                                st.session_state.data.at[index, "HCC_Dx_Hepatic Encephalopathy"] = hcc_dx_hepatic_encephalopathy
-                                st.session_state.data.at[index, "HCC_Dx_ECOG Performance Status"] = hcc_dx_ecog_performance_status
-                                st.session_state.data.at[index, "HCC_Dx_LIRADS Score"] = hcc_dx_lirads_score
-                                st.session_state.data.at[index, "HCC_Dx_Child-Pugh Class EMR"] = hcc_dx_child_pugh_class_emr
-                                st.session_state.data.at[index, "HCC_Dx_Child-Pugh Points EMR"] = hcc_dx_child_pugh_points_emr
-                                st.session_state.data.at[index, "HCC_Dx_BCLC Stage EMR"] = hcc_dx_bclc_stage_emr
-                                st.session_state.data.at[index, "HCC_Dx_MELD Score EMR"] = hcc_dx_meld_score_emr
-                                st.session_state.data.at[index, "HCC_Dx_MELD-Na Score EMR"] = hcc_dx_meld_na_score_emr
-                                st.session_state.data.at[index, "HCC_Dx_ALBI Score EMR"] = hcc_dx_albi_score_emr
-                                st.session_state.data.at[index, "HCC_Dx_Child-Pugh Class calc"] = hcc_dx_child_pugh_class_calc
-                                st.session_state.data.at[index, "HCC_Dx_Child-Pugh Points calc"] = hcc_dx_child_pugh_points_calc
-                                st.session_state.data.at[index, "HCC_Dx_MELD Score calc"] = hcc_dx_meld_score_calc
-                                st.session_state.data.at[index, "HCC_Dx_MELD-Na Score calc"] = hcc_dx_meld_na_score_calc
-                                st.session_state.data.at[index, "HCC_Dx_ALBI Score calc"] = hcc_dx_albi_score_calc
-
+                                st.session_state.data.at[index, "HCCdx_HCCdxdate"] = hcc_dx_hcc_diagnosis_date.strftime("%Y-%m-%d")
+                                st.session_state.data.at[index, "HCCdx_Methoddx"] = hcc_dx_method_of_diagnosis
+                                st.session_state.data.at[index, "HCCdx_Datelabs"] = hcc_dx_date_of_labs.strftime("%Y-%m-%d")
+                                st.session_state.data.at[index, "HCCdx_AFP"] = hcc_dx_afp
+                                st.session_state.data.at[index, "HCCdx_AFP L3"] = hcc_dx_afp_l3
+                                st.session_state.data.at[index, "HCCdx_AFPL3dateFT"] = hcc_dx_afp_l3_date_free_text
+                                st.session_state.data.at[index, "HCCdx_Bilirubin"] = hcc_dx_bilirubin
+                                st.session_state.data.at[index, "HCCdx_Albumin"] = hcc_dx_albumin
+                                st.session_state.data.at[index, "HCCdx_INR"] = hcc_dx_inr
+                                st.session_state.data.at[index, "HCCdx_Creatinine"] = hcc_dx_creatinine
+                                st.session_state.data.at[index, "HCCdx_Sodium"] = hcc_dx_sodium
+                                st.session_state.data.at[index, "HCCdx_AscitesCTCAE"] = hcc_dx_ascites_CTCAE
+                                st.session_state.data.at[index, "HCCdx_AscitesCTCAEnumb"] = hCC_dx_ascites_classification
+                                st.session_state.data.at[index, "HCCdx_Ascitesdiruetics"] = hcc_dx_ascites_diruetics
+                                st.session_state.data.at[index, "HCCdx_Ascitesparacentesis"] = hcc_dx_ascites_paracentesis
+                                st.session_state.data.at[index, "HCCdx_Asciteshospitalization"] = hcc_dx_ascites_hospitalization
+                                st.session_state.data.at[index, "HCCdx_HEgrade"] = hcc_dx_he_grade
+                                st.session_state.data.at[index, "HCCdx_ECOG"] = hcc_dx_ecog_performance_status
+                                st.session_state.data.at[index, "HCCdx_LIRADS"] = hcc_dx_lirads_score
+                                st.session_state.data.at[index, "HCCdx_CPcalc"] = hcc_dx_child_pugh_points_calc
+                                st.session_state.data.at[index, "HCCdx_CPclass"] = hcc_dx_child_pugh_class_calc
+                                st.session_state.data.at[index, "HCCdx_MELD"] = hcc_dx_meld_score_calc
+                                st.session_state.data.at[index, "HCCdx_MELDNa"] = hcc_dx_meld_na_score_calc
+                                st.session_state.data.at[index, "HCCdx_Albiscore"] = hcc_dx_albi_score_calc
+                                st.session_state.data.at[index, "HCCdx_Albigrade"] = hcc_dx_albi_grade
+                                st.session_state.data.at[index, "HCCdx_BCLC"] = hcc_dx_bclc_calc
                                 st.success("HCC Dx added successfully.")
-                                st.write("Updated Data:")
         
                 elif st.session_state.selected_tab == "Previous Therapy for HCC":
                     st.subheader("Previous Therapy for HCC")
                     with st.form("previous_therapy_form"):
-                         
+
                         PRVTHER_Prior_LDT_Therapy = st.selectbox(
-                            "PRVTHER_Prior_LDT_Therapy",
-                            options=["Yes", "No","NA"],
-                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                            help="Prior LDT Therapy",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                        "PRVTHER_Prior_LDT_Therapy",
+                        options=["Yes", "No","NA"],
+                        #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
+                        help="Prior LDT Therapy",
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
                         )
                         PRVTHER_Prior_RFA_Therapy = st.selectbox(
                             "PRVTHER_Prior RFA Therapy",
                             options=["Yes", "No", "NA"],
                             #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             help="Prior RFA Therapy",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
+                        PRVTHER_Prior_RFA_Date = 0 if PRVTHER_Prior_RFA_Therapy == 'No' else st.date_input("PRVTHER_Prior RFA Date")
+
                     
                         PRVTHER_Prior_TARE_Therapy = st.selectbox(
                             "PRVTHER_Prior TARE Therapy",
                             options=["Yes", "No","NA"],
                             #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             help="Prior TARE Therapy",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
+                        PRVTHER_Prior_TARE_Date = 0 if PRVTHER_Prior_TARE_Therapy == 'No' else st.date_input("PRVTHER_Prior TARE Date")
                     
                         PRVTHER_Prior_SBRT_Therapy = st.selectbox(
                             "PRVTHER_Prior SBRT Therapy",
                             options=["Yes", "No","NA"],
                             #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             help="Prior SBRT Therapy",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
+                        
+                        PRVTHER_Prior_SBRT_Date = 0 if PRVTHER_Prior_SBRT_Therapy == 'No' else st.date_input("PRVTHER_Prior SBRT Date")
+
+
                     
                         PRVTHER_Prior_TACE_Therapy = st.selectbox(
                             "PRVTHER_Prior TACE Therapy",
                             options=["Yes", "No","NA"],
                             #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             help="Prior TACE Therapy",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
+                        
+                        PRVTHER_Prior_TACE_Date = 0 if PRVTHER_Prior_TACE_Therapy == 'No' else st.date_input("PRVTHER_Prior TACE Date")
+
                         PRVTHER_Prior_MWA_Therapy = st.selectbox(
                             "PRVTHER_Prior MWA Therapy",
                             options=["Yes", "No","NA"],
                             #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             help="Prior MWA Therapy",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
+                        PRVTHER_Prior_MWA_Date = 0 if PRVTHER_Prior_MWA_Therapy == 'No' else st.date_input("PRVTHER_Prior MWA Date")
 
-                        list1=[PRVTHER_Prior_LDT_Therapy, PRVTHER_Prior_RFA_Therapy, PRVTHER_Prior_TARE_Therapy, PRVTHER_Prior_SBRT_Therapy, PRVTHER_Prior_TACE_Therapy, PRVTHER_Prior_MWA_Therapy]
+                        PRVTHER_Resection = st.selectbox(
+                            "PRVTHER_Resection",
+                            options=["Yes", "No","NA"],
+                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
+                            help="Prior MWA Therapy",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+                        )
+                        PRVTHER_Resection_Date = 0 if PRVTHER_Resection == 'No' else st.date_input("PRVTHER_Resection Date")
+
+
+                        list1=[PRVTHER_Prior_LDT_Therapy, PRVTHER_Prior_RFA_Therapy, PRVTHER_Prior_TARE_Therapy, PRVTHER_Prior_SBRT_Therapy, PRVTHER_Prior_TACE_Therapy, PRVTHER_Prior_MWA_Therapy, PRVTHER_Resection ]
                         sum=0
                         for item in list1:
                             if item == "Yes" :
@@ -4038,107 +4079,135 @@ def edit_existing_data():
                         
                         PRVTHER_Previous_Therapy_Sum = sum
 
-                    
                     # PRVTHER_Previous_Therapy_Sum = PRVTHER_Prior_LDT_Therapy + PRVTHER_Prior_RFA_Therapy + PRVTHER_Prior_TARE_Therapy + PRVTHER_Prior_SBRT_Therapy + PRVTHER_Prior_TACE_Therapy + PRVTHER_Prior_MWA_Therapy
 
-                        PRVTHER_Previous_Therapy_Dates = st.text_area(
-                        "PRVTHER_Previous Therapy Date(s) ",
-                        help=" Enter previous therapy date or NA"
-                        )
-
-                        PRVTHER_Total_Recurrences_HCC = st.selectbox(
-                            "PRVTHER_Total Recurrences HCC",
-                            options=["0","1","2","3","4","NA"],
-                            help="select total recurrences of HCC",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                        )
+                        PRVTHER_NotesFT = st.text_area(
+                        "PRVTHER_NotesFT",
                     
-                        PRVTHER_Binary_for_ANY_Recurrences_HCC_Binary = 1 if PRVTHER_Previous_Therapy_Sum == "YES" or PRVTHER_Prior_LDT_Therapy == "Yes" or PRVTHER_Prior_RFA_Therapy == "Yes" or PRVTHER_Prior_TARE_Therapy == "Yes" or PRVTHER_Prior_SBRT_Therapy == "Yes" or PRVTHER_Prior_TACE_Therapy == "Yes" or PRVTHER_Prior_MWA_Therapy == "Yes" else 0
-
-                        PRVTHER_Location_of_Previous_Treatment_HCC = st.text_input(
-                            "PRVTHER_Location of Previous Treatment HCC",
-                            help="Provide Location of Previous HCC treatment"
                         )
 
-                        PRVTHER_Recurrence_Date_Location_Free_Text = st.text_input(
-                            "PRVTHER_Recurrence Date/Location Free Text",
-                            help="Provide Date and Location on Recurrence"
-                        )   
-                        PRVTHER_New_HCC_Outside_Previous_Treatment_Site = st.text_input(
+                        PRVTHER_Total_Recurrences_HCC = st.text_area(
+                            "PRVTHER_Total Recurrences HCC",
+                        )
+                        PRVTHER_Location_of_Previous_Treatment_segments = st.selectbox(
+                            "PRVTHER_Location of Previous Treatment Segments",
+                            options=["1","2","3","4a","4b","5","6","7","8","NA"],
+                            index=None,
+                            placeholder="Choose an option"
+                        )
+                        PRVTHER_Location_of_Previous_Tx_segments_ft = st.text_area(
+                            "PRVTHER_Location of Previous Tx Segments FT",
+                          
+                        )
+                        PRVTHER_recurrence_location_note = st.selectbox(
+                            "PRVTHER_Recurrence Location Note",
+                            options=["1","2","3","4a","4b","5","6","7","8","NA"],
+                            index=None,
+                            placeholder="Choose an option"
+                        )
+                        PRVTHER_recurrence_date = st.text_area(
+                            "PRVTHER_Recurrence Date",
+                          
+                        )
+                        PRVTHER_recurrence_seg =  st.text_input(
+                             "PRVTHER_Recurrence Seg"
+                        )
+                        PRVTHER_New_HCC_Outside_Previous_Treatment_Site = st.selectbox(
                             "PRVTHER_New HCC Outside Previous Treatment Site",
-                            help="new HCC occurrence that has developed in a diff location in the liver, separate from the area that was previously tx"
+                            options = ["Yes","No","NA"],
+                            help="new HCC occurrence that has developed in a diff location in the liver, separate from the area that was previously tx",
+                            index=None,
+                            placeholder="Choose an option"
                         )   
-                        PRVTHER_New_HCC_Adjacent_to_Previous_Treatment_Site = st.text_input(
+                        PRVTHER_New_HCC_Adjacent_to_Previous_Treatment_Site = st.selectbox(
                             "PRVTHER_New HCC Adjacent to Previous Treatment Site",
-                            help=" new HCC occurrence that has developed close to, but not directly in, the area that was previously treated"
+                            options = ["Yes","No","NA"],
+                            help=" new HCC occurrence that has developed close to, but not directly in, the area that was previously treated",
+                            index=None,
+                            placeholder="Choose an option"
                         )   
-                        PRVTHER_Residual_HCC = st.text_input(
-                            "PRVTHER_Residual HCC",
+                        PRVTHER_Residual_HCC_Note = st.text_area(
+                            "PRVTHER_Residual HCC Note",
                             help="Provide information of Residual HCC"
                         ) 
+                        PRVTHER_Residual_HCC = st.selectbox(
+                            "PRVTHER_Residual HCC",
+                            options = ["Yes","No","NA"],
+                            help="new HCC occurrence that has developed in a diff location in the liver, separate from the area that was previously tx",
+                            index=None,
+                            placeholder="Choose an option"
+                        )   
 
                         PRVTHER_Systemic_Therapy_Free_Text = st.selectbox(
                             "PRVTHER_Systemic Therapy Free Text",
                             options=["Yes", "No","NA"],
                             #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             help="Prior TACE Therapy",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
 
                         PRVTHER_Date_of_Labs_in_Window = st.date_input(
-                            "PRVTHER_Date of Labs in Window",
+                            "PRVTHER_Date of Labs for AFP",
                             help="select date of labs in window"
                         )
 
-                        PRVTHER_AFP = st.text_input(
+                        PRVTHER_AFP = st.number_input(
                             "PRVTHER_AFP",
                             help="Enter AFP value in ng/dl or NA"
                         )
 
-                        submit_tab5 = st.form_submit_button("Submit Previous Therapy Form")
+                        submit_tab5 = st.form_submit_button("Submit")
 
                         if submit_tab5:
                                 #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
-                                st.session_state.data.at[index, "PRVTHER_Prior LDT Therapy"] = PRVTHER_Prior_LDT_Therapy
-                                st.session_state.data.at[index, "PRVTHER_Prior RFA Therapy"] = PRVTHER_Prior_RFA_Therapy
-                                st.session_state.data.at[index, "PRVTHER_Prior TARE Therapy"] = PRVTHER_Prior_TARE_Therapy
-                                st.session_state.data.at[index, "PRVTHER_Prior SBRT Therapy"] = PRVTHER_Prior_SBRT_Therapy
-                                st.session_state.data.at[index, "PRVTHER_Prior TACE Therapy"] = PRVTHER_Prior_TACE_Therapy
-                                st.session_state.data.at[index, "PRVTHER_Prior MWA Therapy"] = PRVTHER_Prior_MWA_Therapy
-                                st.session_state.data.at[index, "PRVTHER_Previous Therapy Sum"] = PRVTHER_Previous_Therapy_Sum
-                                st.session_state.data.at[index, "PRVTHER_Previous Therapy Date(s)"] = PRVTHER_Previous_Therapy_Dates
-                                st.session_state.data.at[index, "PRVTHER_Total Recurrences HCC"] = PRVTHER_Total_Recurrences_HCC
-                                st.session_state.data.at[index, "PRVTHER_Binary for ANY Recurrences HCC Binary"] = PRVTHER_Binary_for_ANY_Recurrences_HCC_Binary
-                                st.session_state.data.at[index, "PRVTHER_Location of Previous Treatment HCC"] = PRVTHER_Location_of_Previous_Treatment_HCC
-                                st.session_state.data.at[index, "PRVTHER_Recurrence Date/Location Free Text"] = PRVTHER_Recurrence_Date_Location_Free_Text
-                                st.session_state.data.at[index, "PRVTHER_New HCC Outside Previous Treatment Site"] = PRVTHER_New_HCC_Outside_Previous_Treatment_Site
-                                st.session_state.data.at[index, "PRVTHER_New HCC Adjacent to Previous Treatment Site"] = PRVTHER_New_HCC_Adjacent_to_Previous_Treatment_Site
-                                st.session_state.data.at[index, "PRVTHER_Residual HCC"] = PRVTHER_Residual_HCC
-                                st.session_state.data.at[index, "PRVTHER_Systemic Therapy Free Text"] = PRVTHER_Systemic_Therapy_Free_Text
-                                st.session_state.data.at[index, "PRVTHER_Date of Labs in Window"] = PRVTHER_Date_of_Labs_in_Window
+
+                                st.session_state.data.at[index, "PRVTHER_LDT"] = PRVTHER_Prior_LDT_Therapy
+                                st.session_state.data.at[index, "PRVTHER_RFA"] = PRVTHER_Prior_RFA_Therapy
+                                st.session_state.data.at[index, "PRVTHER_RFAdate"] = PRVTHER_Prior_RFA_Date
+                                st.session_state.data.at[index, "PRVTHER_TARE"] = PRVTHER_Prior_TARE_Therapy
+                                st.session_state.data.at[index, "PRVTHER_TAREdate"] = PRVTHER_Prior_TARE_Date
+                                st.session_state.data.at[index, "PRVTHER_SBRT"] = PRVTHER_Prior_SBRT_Therapy
+                                st.session_state.data.at[index, "PRVTHER_SBRTdate"] = PRVTHER_Prior_SBRT_Date
+                                st.session_state.data.at[index, "PRVTHER_TACE"] = PRVTHER_Prior_TACE_Therapy
+                                st.session_state.data.at[index, "PRVTHER_TACEdate"] = PRVTHER_Prior_TACE_Date
+                                st.session_state.data.at[index, "PRVTHER_MWA"] = PRVTHER_Prior_MWA_Therapy
+                                st.session_state.data.at[index, "PRVTHER_MWAdate"] = PRVTHER_Prior_MWA_Date
+                                st.session_state.data.at[index, "PRVTHER_Resection"] = PRVTHER_Resection
+                                st.session_state.data.at[index, "PRVTHER_Resection date"] = PRVTHER_Resection_Date
+                                st.session_state.data.at[index, "PRVTHER_Prevtxsum"] = PRVTHER_Previous_Therapy_Sum
+                                st.session_state.data.at[index, "PRVTHER_NotesFT"] = PRVTHER_NotesFT
+                                st.session_state.data.at[index, "PRVTHER_Totalrecur"] = PRVTHER_Total_Recurrences_HCC
+                                st.session_state.data.at[index, "PRVTHER_Locationprevtxseg"] = PRVTHER_Location_of_Previous_Treatment_segments
+                                st.session_state.data.at[index, "PRVTHER_Location of Previous Tx Segments FT"] = PRVTHER_Location_of_Previous_Tx_segments_ft
+                                st.session_state.data.at[index, "PRVTHER_RecurLocationFT"] = PRVTHER_recurrence_location_note
+                                st.session_state.data.at[index, "PRVTHER_RecurDate"] = PRVTHER_recurrence_date
+                                st.session_state.data.at[index, "PRVTHER_Recurrence Seg"] = PRVTHER_recurrence_seg
+                                st.session_state.data.at[index, "PRVTHER_NewHCCoutsideprevsite"] = PRVTHER_New_HCC_Outside_Previous_Treatment_Site
+                                st.session_state.data.at[index, "PRVTHER_NewHCCadjacentprevsite"] = PRVTHER_New_HCC_Adjacent_to_Previous_Treatment_Site
+                                st.session_state.data.at[index, "PRVTHER_ResidualHCCnoteFT"] = PRVTHER_Residual_HCC_Note
+                                st.session_state.data.at[index, "PRVTHER_ResidualHCC"] = PRVTHER_Residual_HCC
+                                st.session_state.data.at[index, "PRVTHER_SystemictherapyFT"] = PRVTHER_Systemic_Therapy_Free_Text
+                                st.session_state.data.at[index, "PRVTHER_DateAFP"] = PRVTHER_Date_of_Labs_in_Window
                                 st.session_state.data.at[index, "PRVTHER_AFP"] = PRVTHER_AFP
-                                
                                 st.success("Previous Therapy for HCC added successfully.")
-                                st.write("Updated Data:")
             
                 elif st.session_state.selected_tab == "Pre Y90":
                     st.subheader("Pre Y90")
                     with st.form("pre_y90_form"):
-            
+
                         prey90_symptoms = st.multiselect(
-                            "PREY90_symptoms",
-                            options=[
-                                "portal vein HTN", 
-                                "GI bleeding", 
-                                "Limb edema", 
-                                "Ischemic liver injury", 
-                                "Variceal Bleeding", 
-                                "Biliary Obstruction", 
-                                "Infection"
-                            ],
-                            help="Select all that apply",
+                        "PREY90_symptoms",
+                        options=[
+                            "portal vein HTN", 
+                            "GI bleeding", 
+                            "Limb edema", 
+                            "Ischemic liver injury", 
+                            "Variceal Bleeding", 
+                            "Biliary Obstruction", 
+                            "Infection"
+                        ],
+                        help="Select all that apply",
                             placeholder="Select all that apply"
                         )
                         
@@ -4160,6 +4229,8 @@ def edit_existing_data():
                         
                     
                         prey90_afp_prior_to_tare = process_input(prey90_afp)
+                        
+                        
                         prey90_bilirubin = st.number_input("PREY90_Bilirubin", help="Enter the bilirubin value in mg/dl",min_value=1)
                         prey90_albumin = st.number_input("PREY90_Albumin", help="Enter the albumin value in g/dl")
                         prey90_inr = st.number_input("PREY90_inr", help="Enter the INR value")
@@ -4170,105 +4241,79 @@ def edit_existing_data():
                         prey90_alkaline_phosphatase = st.number_input("PREY90_Alkaline Phosphatase", help="Enter Alkaline Phosphatase value in U/L")
                         prey90_potassium = st.number_input("PREY90_potassium", help="Enter the potassium value in mmol/L")
                         
-                        prey90_ascites = st.selectbox(
-                            "PREY90_Ascites",
-                            options=[
-                                "none", 
-                                "Asymptomatic", 
-                                "Minimal ascities/Mild abd distension, no sx", 
-                                "Symptomatic", 
-                                "moderate ascities/Symptomatic medical intervention", 
-                                "Severe symptoms, invasive intervention indicated", 
-                                "Life Threatening: Urgent operation intervention indicated"
-                            ],
-                            help="Select the appropriate ascites classification",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                        )
+                        prey90_ascites_ctcae = st.selectbox (
+                            "PREY90_Ascites CTCAE",
+                            options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
+                            format_func=lambda x: {
+                            "none": "0. none",
+                            "Asymptomatic": "1. Asymptomatic",
+                            "Minimal ascities/Mild abd distension": "1. Minimal ascities/Mild abd distension",
+                            "Symptomatic": "2. Symptomatic",
+                            "moderate ascities/Symptomatic medical intervention": " 2. moderate ascities/Symptomatic medical intervention",
+                            "Severe symptoms, invasive intervention indicated": " 3. Severe symptoms, invasive intervention indicated",
+                            "Life Threatening: Urgent operation intervention indicated" : "4. Life Threatening: Urgent operation intervention indicated",
+
+                        }[x],
+                            help="Select Metavir_score",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+                        ) 
+                        def findascitesclass(score):
+                            if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
+                                 return 2
+                            else:
+                                 return 3
                         
-                        prey90_ascites_binary = 1 if prey90_ascites != "none" else 0
-                        st.info(f"PREY90_Ascites Binary Classification: {prey90_ascites_binary}")
-                        
+                        prey90_ascites_classification = 1 if prey90_ascites_ctcae == "none" else findascitesclass(prey90_ascites_ctcae)
+
                         prey90_ascites_free_text = st.text_area(
                             "PREY90_Ascites Free Text",
-                            "Hospitalized (yes/no): \nDiuretics (yes/no): \nParacentesis (yes/no): \nAny other complications (free_text):",
-                            help="Provide details about hospitalization, diuretics, paracentesis, and other complications"
-                        )
                         
-                        prey90_he = st.selectbox(
-                            "PREY90_he", 
-                            options=["No", "Yes", "NA (not in chart)"], 
-                            help="Select hepatic encephalopathy status",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                        )
-                        
-                        prey90_ecog = st.selectbox(
-                            "PREY90_ecog",
-                            options=["0", "1", "2", "3", "4", "NA"],
-                            help="Select ECOG Performance Status",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                        )
-                        
-                        prey90_child_pugh_class = st.selectbox(
-                            "PREY90_Child-Pugh Class Emr",
-                            options=["Class A", "Class B", "Class C", "NA"],
-                            help="Select the Child-Pugh class",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                        )
-                        def validate_inputt(value):
-                            if value.isdigit() and 5 <= int(value) <= 15:
-                                return value  # Valid number
-                            elif value.upper() == "NA":
-                                return "NA"  # Valid 'NA'
-                            else:
-                                return "NA" 
-
-                        input_value3t = st.text_input(
-                            "PREY90_Child-Pugh Points Emr",
-                            help="Write in number in range 5-15, or NA"              
                         )
 
-                        prey90_child_pugh_points = validate_inputt(input_value3t)
-                        prey90_bclc_stage = st.selectbox(
-                            "PREY90_BCLC Stage EMR",
-                            options=["0", "A", "B", "C", "D"],
-                            help="Select the BCLC stage",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                        prey90_ascites_diruetics = st.selectbox(
+                            "PREY90_Ascites Diruetics",
+                            options = ["Yes","No"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+            
+                        )
+                        prey90_ascites_paracentesis = st.selectbox(
+                            "PREY90_Ascites Paracentesis" ,
+                            options = ["Yes","No"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+            
+                        )
+                        prey90_ascites_hospitalization = st.selectbox(
+                            "PREY90_Ascites Hospitalization",
+                            options = ["Yes","No"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+            
                         )
 
-                        def validate_input2t(value):
-                            if value.isdigit() and 6 <= int(value) <= 40:
-                                return value  # Valid number
-                            elif value.upper() == "NA":
-                                return "NA"  # Valid 'NA'
-                            else:
-                                return "NA" 
+                        prey90_he_grade = st.selectbox(
+                            "PREY90_HE Grade",
+                            options=[1,2,3],
+                            format_func=lambda x: {
+                            1: "None",
+                            2: "Grade 1-2",
+                            3: "Grade 3-4",
+                            
+                        }[x],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
 
-                        input_value4t = st.text_input(
-                            "PREY90_MELD Score EMR",
-                            help="Write in number in range 6-40, or NA"                
                         )
+                       
+                        prey90_ecog = st.selectbox("PREY90_ECOG", options=["0", "1", "2", "3", "4", "NA"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",)
 
-                        prey90_meld_score = validate_input2t(input_value4t)
-
-                        input_value5t = st.text_input(
-                            "PREY90_MELD-Na Score EMR",
-                            help="Write in number in range 6-40, or NA"               
-                        )
-
-                        prey90_meld_na_score = validate_input2t(input_value5t)
-                        
-                        prey90_albi_score = st.text_input(
-                            "PREY90_ALBI Score EMR",
-                            help="Enter ALBI score"
-                        )
                         
                         # Claculation of class and points
-                        prey90_child_pugh_points_calc = calculatepoints(prey90_bilirubin,prey90_albumin,prey90_inr,prey90_ascites,prey90_he)
+                        prey90_child_pugh_points_calc = calculatepoints(prey90_bilirubin,prey90_albumin,prey90_inr,prey90_ascites_ctcae,prey90_he_grade)
                 
                         prey90_child_pugh_class_calc = calculate_class(prey90_child_pugh_points_calc)
                         # Additional Calculated Fields
@@ -4278,56 +4323,57 @@ def edit_existing_data():
                         prey90_meld_na_score_calc = prey90_meld_score_calc + 1.32*(137-int(prey90_sodium)) - (0.033*prey90_meld_score_calc*(137-int(prey90_sodium)))
                         
                         prey90_albi_score_calc = albi_calc(prey90_bilirubin,prey90_albumin)
+                        prey90_albi_grade = albi_class(prey90_albi_score_calc)
+
+                        prey90_bclc_calc = st.text_area("PREY90_BCLC Stage calc")
+
                     
                         st.subheader("Mapping Y90")
                         my90_date = st.date_input("MY90_date", help="Enter the date")
                         my90_lung_shunt = st.number_input("MY90_Lung_shunt", min_value=0, step=1, help="Enter the lung shunt value")
 
-
-                        submit_tab4 = st.form_submit_button("Save Pre Y90")
+                        submit_tab4 = st.form_submit_button("Submit")
 
                         if submit_tab4:
                             #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
 
-                            st.session_state.data.at[index, "PREY90_symptoms"] = prey90_symptoms
-                            st.session_state.data.at[index, "PREY90_date of labs in window"] = prey90_date_of_labs.strftime("%Y-%m-%d")
+                            st.session_state.data.at[index, "PREY90_sx"] = prey90_symptoms
+                            st.session_state.data.at[index, "PREY90_Datelabs"] = prey90_date_of_labs.strftime("%Y-%m-%d")
                             st.session_state.data.at[index, "PREY90_AFP"] = prey90_afp
-                            st.session_state.data.at[index, "PRE90_AFP Prior to TARE"] = prey90_afp_prior_to_tare
+                            st.session_state.data.at[index, "PRE90_AFPbinary"] = prey90_afp_prior_to_tare
                             st.session_state.data.at[index, "PREY90_Bilirubin"] = prey90_bilirubin
                             st.session_state.data.at[index, "PREY90_Albumin"] = prey90_albumin
-                            st.session_state.data.at[index, "PREY90_inr"] = prey90_inr
-                            st.session_state.data.at[index, "PREY90_creatinine"] = prey90_creatinine
-                            st.session_state.data.at[index, "PREY90_sodium"] = prey90_sodium
+                            st.session_state.data.at[index, "PREY90_Inr"] = prey90_inr
+                            st.session_state.data.at[index, "PREY90_Ireatinine"] = prey90_creatinine
+                            st.session_state.data.at[index, "PREY90_Sodium"] = prey90_sodium
                             st.session_state.data.at[index, "PREY90_AST"] = prey90_ast
                             st.session_state.data.at[index, "PREY90_ALT"] = prey90_alt
                             st.session_state.data.at[index, "PREY90_Alkaline Phosphatase"] = prey90_alkaline_phosphatase
-                            st.session_state.data.at[index, "PREY90_potassium"] = prey90_potassium
-                            st.session_state.data.at[index, "PREY90_Ascites"] = prey90_ascites
-                            st.session_state.data.at[index, "PREY90_Ascites Binary Classification"] = prey90_ascites_binary
-                            st.session_state.data.at[index, "PREY90_Ascites Free Text"] = prey90_ascites_free_text
-                            st.session_state.data.at[index, "PREY90_he"] = prey90_he
-                            st.session_state.data.at[index, "PREY90_ecog"] = prey90_ecog
-                            st.session_state.data.at[index, "PREY90_Child-Pugh Class Emr"] = prey90_child_pugh_class
-                            st.session_state.data.at[index, "PREY90_Child-Pugh Points Emr"] = prey90_child_pugh_points
-                            st.session_state.data.at[index, "PREY90_BCLC Stage EMR"] = prey90_bclc_stage
-                            st.session_state.data.at[index, "PREY90_MELD Score EMR"] = prey90_meld_score
-                            st.session_state.data.at[index, "PREY90_MELD-Na Score EMR"] = prey90_meld_na_score
-                            st.session_state.data.at[index, "PREY90_ALBI Score EMR"] = prey90_albi_score
-                            st.session_state.data.at[index, "PREY90_Child-Pugh Class calc"] = prey90_child_pugh_class_calc
-                            st.session_state.data.at[index, "PREY90_Child-Pugh Points calc"] = prey90_child_pugh_points_calc
-                            st.session_state.data.at[index, "PREY90_MELD Score calc"] = prey90_meld_score_calc
-                            st.session_state.data.at[index, "PREY90_MELD-Na Score calc"] = prey90_meld_na_score_calc
-                            st.session_state.data.at[index, "PREY90_ALBI Score calc"] = prey90_albi_score_calc
+                            st.session_state.data.at[index, "PREY90_Potassium"] = prey90_potassium
+                            st.session_state.data.at[index, "PREY90_AscitesCTCAE"] = prey90_ascites_ctcae
+                            st.session_state.data.at[index, "PREY90_AscitesCTCAEnumb"] = prey90_ascites_classification
+                            st.session_state.data.at[index, "PREY90_AscitesFT"] = prey90_ascites_free_text
+                            st.session_state.data.at[index, "PREY90_Ascitesdiruetics"] = prey90_ascites_diruetics
+                            st.session_state.data.at[index, "PREY90_Ascitesparacentesis"] = prey90_ascites_paracentesis
+                            st.session_state.data.at[index, "PREY90_Asciteshospitalization"] = prey90_ascites_hospitalization
+                            st.session_state.data.at[index, "PREY90_HEgrade"] = prey90_he_grade
+                            st.session_state.data.at[index, "PREY90_ECOG"] = prey90_ecog
+                            st.session_state.data.at[index, "PREY90_CPclass"]= prey90_child_pugh_class_calc
+                            st.session_state.data.at[index, "PREY90_CPcalc"] = prey90_child_pugh_points_calc
+                            st.session_state.data.at[index, "PREY90_MELD"] = prey90_meld_score_calc
+                            st.session_state.data.at[index, "PREY90_MELDNa"] = prey90_meld_na_score_calc
+                            st.session_state.data.at[index, "PREY90_Albiscore"] = prey90_albi_score_calc
+                            st.session_state.data.at[index, "PREY90_Albigrade"] = prey90_albi_grade
+                            st.session_state.data.at[index, "PREY90_BCLC"] = prey90_bclc_calc
                             st.session_state.data.at[index, "MY90_date"] = my90_date
                             st.session_state.data.at[index, "MY90_Lung_shunt"] = my90_lung_shunt
 
                             st.success("Pre Y90 added successfully.")
-                            st.write("Updated Data:")
             
                 elif st.session_state.selected_tab == "Day_Y90":
                     st.subheader("Day_Y90")
                     with st.form("day_y90_form"):
-            
+
                         dayy90_afp = st.text_input("DAYY90_AFP")
                         def process_input(value):
                             
@@ -4341,114 +4387,98 @@ def edit_existing_data():
                             else:
                                 return "Invalid Input"
 
-            # Process the input
                         dayy90_afp_prior_to_tare = process_input(dayy90_afp)
 
-                        if dayy90_afp_prior_to_tare != 'NA':
-                            afp_prey90 = dayy90_afp_prior_to_tare      
-                        elif prey90_afp_prior_to_tare != 'NA':
-                            afp_prey90 = prey90_afp_prior_to_tare
-                        else:
-                            afp_prey90 = "NA"
+                        prey90_afp_binarydup = st.session_state.data.at[index, "PRE90_AFPbinary"]
                     
-        
-                        dayy90_sodium = st.number_input("DAYY90_sodium (mmol/L)")
-                        dayy90_creatinine = st.number_input("DAYY90_creatinine (mg/dl)")
+                    # Inputs for other variables
+                        dayy90_sodium = st.number_input("DAYY90_sodium")
+                        dayy90_creatinine = st.number_input("DAYY90_creatinine")
                         dayy90_inr = st.number_input("DAYY90_inr")
-                        dayy90_albumin = st.number_input("DAYY90_albumin (g/dl)")
-                        dayy90_bilirubin = st.number_input("DAYY90_bilirubin (mg/dl)",min_value=1)
-                        dayy90_ast = st.number_input("DAYY90_AST (U/L)")
-                        dayy90_alt = st.number_input("DAYY90_ALT (U/L)")
+                        dayy90_albumin = st.number_input("DAYY90_albumin")
+                        dayy90_bilirubin = st.number_input("DAYY90_bilirubin",min_value=1)
+                        dayy90_ast = st.number_input("DAYY90_AST")
+                        dayy90_alt = st.number_input("DAYY90_ALT")
                         dayy90_alkaline_phosphatase = st.number_input(
-                            "DAYY90_Alkaline Phosphatase (U/L)"
+                            "DAYY90_Alkaline Phosphatase"
                         )
-                        dayy90_leukocytes = st.number_input("DAYY90_leukocytes (value in x10^3/µL)")
-                        dayy90_platelets = st.number_input("DAYY90_platelets (value in x10^3/µL)")
+                        dayy90_leukocytes = st.number_input("DAYY90_leukocytes")
+                        dayy90_platelets = st.number_input("DAYY90_platelets")
+                        dayy90_potassium = st.number_input("DAY90_Potassium")
 
-                        dayy90_ascites = st.selectbox("DAYY90_ascites", options=["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",)
-                        dayy90_hepatic_encephalopathy = st.selectbox(
-                            "DAYY90_Hepatic Encephalopathy", options=["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                        )
-                        dayy90_child_pugh_class_emr = st.selectbox(
-                            "DAYY90_Child-Pugh class EMR", options=["Class A", "Class B", "Class C", "NA"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                        )
+                        dayy90_ascites_ctcae = st.selectbox (
+                            "DAYY90_Ascites CTCAE",
+                            options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
+                            format_func=lambda x: {
+                            "none": "0. none",
+                            "Asymptomatic": "1. Asymptomatic",
+                            "Minimal ascities/Mild abd distension": "1. Minimal ascities/Mild abd distension",
+                            "Symptomatic": "2. Symptomatic",
+                            "moderate ascities/Symptomatic medical intervention": " 2. moderate ascities/Symptomatic medical intervention",
+                            "Severe symptoms, invasive intervention indicated": " 3. Severe symptoms, invasive intervention indicated",
+                            "Life Threatening: Urgent operation intervention indicated" : "4. Life Threatening: Urgent operation intervention indicated",
 
-                        def validate_input(value):
-                            if value.isdigit() and 5 <= int(value) <= 15:
-                                return value  # Valid number
-                            elif value.upper() == "NA":
-                                return "NA"  # Valid 'NA'
+                        }[x],
+                            help="Select Metavir_score",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+                        ) 
+                        def findascitesclass(score):
+                            if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
+                                 return 2
                             else:
-                                return "NA" 
+                                 return 3
+                        
+                        dayy90_ascites_classification = 1 if dayy90_ascites_ctcae == "none" else findascitesclass(dayy90_ascites_ctcae)
 
-                        input_value3 = st.text_input(
-                            "Cirrhosis_Dx_Child-Pugh Points EMR",
-                            help="Specify the Child-Pugh points if in EMR 'number 5-15 or NA"                
+                        dayy90_he_grade = st.selectbox(
+                            "DAYY90_HE Grade",
+                            options=[1,2,3],
+                            format_func=lambda x: {
+                            1: "None",
+                            2: "Grade 1-2",
+                            3: "Grade 3-4",
+                            
+                        }[x],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+
                         )
+                       
+                        dayy90_ecog = st.selectbox("DAYY90_ECOG", options=["0", "1", "2", "3", "4", "NA"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",)
 
-                        dayy90_child_pugh_points_emr = validate_input(input_value3)
-
-                        dayy90_bclc_emr = st.selectbox("DAYY90_BCLC EMR", options=["0","A", "B", "C", "D"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",)
-
-                        def validate_input2(value):
-                            if value.isdigit() and 6 <= int(value) <= 40:
-                                return value  # Valid number
-                            elif value.upper() == "NA":
-                                return "NA"  # Valid 'NA'
-                            else:
-                                return "NA" 
-
-                        input_value4 = st.text_input(
-                            "DAYY90_MELD EMR",
-                            help="Specify MELD EMR if in EMR 'number 6-40 or NA"                
-                        )
-
-                        dayy90_meld_emr = validate_input2(input_value4)
-
-                        input_value5 = st.text_input(
-                            "DAYY90_MELD Na EMR",
-                            help="Specify DAYY90_MELD Na EMR if in EMR 'number 6-40 or NA"                
-                        )
-                        dayy90_meld_na_emr = validate_input2(input_value5)
-
-                        dayy90_albi_emr = st.number_input("DAYY90_Albi EMR")
-
-                        prey90_ecog = st.selectbox("PREY90_ECOG", options=["0", "1", "2", "3", "4", "NA"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",)
-                        dayy90_child_pugh_points_calc = calculatepoints(dayy90_bilirubin,dayy90_albumin,dayy90_inr,dayy90_ascites,dayy90_hepatic_encephalopathy)
+                        
+                        # Claculation of class and points
+                        dayy90_child_pugh_points_calc = calculatepoints(dayy90_bilirubin,dayy90_albumin,dayy90_inr,dayy90_ascites_ctcae,dayy90_he_grade)
+                
                         dayy90_child_pugh_class_calc = calculate_class(dayy90_child_pugh_points_calc)
-                        # Formula Calculation
-                        dayy90_meld_calc = (3.78*(int(dayy90_bilirubin)))+(11.2*(int(dayy90_inr)))+(9.57*(int(dayy90_creatinine)))+6.43
-                        dayy90_meld_na_calc = dayy90_meld_calc + 1.32*(137-int(dayy90_sodium)) - (0.033*dayy90_meld_calc*(137-int(dayy90_sodium)))
+                        # Additional Calculated Fields
                         
+                        #prey90_bclc_stage_calc = st.text_input("PREY90_BCLC Stage calc", help="Enter calculated BCLC stage")
+                        dayy90_meld_score_calc = (3.78*(int(dayy90_bilirubin)))+(11.2*(int(dayy90_inr)))+(9.57*(int(dayy90_creatinine)))+6.43
+                        dayy90_meld_na_score_calc = dayy90_meld_score_calc + 1.32*(137-int(dayy90_sodium)) - (0.033*dayy90_meld_score_calc*(137-int(dayy90_sodium)))
+                        
+                        dayy90_albi_score_calc = albi_calc(dayy90_bilirubin,dayy90_albumin)
+                        dayy90_albi_grade = albi_class(dayy90_albi_score_calc)
 
-                        def albi_calc(a,b):
-                            a=int(a)
-                            b=int(b)
-                            t = math.log(a, 10)
-                            answer = (t * 0.66) + (b * -0.085)
-                            return answer
-                        
-                        dayy90_albi_calc = albi_calc(dayy90_bilirubin,dayy90_albumin)
-                    
+                        dayy90_bclc_calc = st.text_area("PREY90_BCLC Stage calc")
+
                         dayy90_type_of_sphere = st.selectbox(
                             "DAYY90_Type of Sphere", options=["Therasphere-1", "SIR-2"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
                         )
 
-                        dayy90_lt_notes_ftx = st.text_area("DAYY90_LT Notes (Free Text)")
+                        dayy90_lt_notes_ftx = st.text_area("DAYY90_LT Notes Free Text")
 
-                        ken_childpughscore = st.number_input("ken_ChildPughscore")
+                        ken_childpughscore = st.selectbox(
+                            "ken_ChildPughscore",
+                            options=["A","B","C"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+                        )
                         ken_meldpretare = st.number_input("ken_MELDpreTARE")
 
 
@@ -4459,371 +4489,428 @@ def edit_existing_data():
                             #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
 
                             st.session_state.data.at[index, "DAYY90_AFP"] = dayy90_afp
-                            st.session_state.data.at[index, "DAYY90_AFP Prior to TARE"] = dayy90_afp_prior_to_tare
-                            st.session_state.data.at[index, "AFP_PreY90 or DAYY90"] = afp_prey90
-                            st.session_state.data.at[index, "DAYY90_sodium"] = dayy90_sodium
-                            st.session_state.data.at[index, "DAYY90_creatinine"] = dayy90_creatinine
-                            st.session_state.data.at[index, "DAYY90_inr"] = dayy90_inr
-                            st.session_state.data.at[index, "DAYY90_albumin"] = dayy90_albumin
-                            st.session_state.data.at[index, "DAYY90_bilirubin"] = dayy90_bilirubin
+                            st.session_state.data.at[index, "DAYY90_AFP Binary"] = dayy90_afp_prior_to_tare
+                            st.session_state.data.at[index, "PRE90_AFP BinaryDup"] = prey90_afp_binarydup
+                            st.session_state.data.at[index, "DAYY90_Sodium"] = dayy90_sodium
+                            st.session_state.data.at[index, "DAYY90_Creatinine"] = dayy90_creatinine
+                            st.session_state.data.at[index, "DAYY90_Inr"] = dayy90_inr
+                            st.session_state.data.at[index, "DAYY90_Albumin"] = dayy90_albumin
+                            st.session_state.data.at[index, "DAYY90_Bilirubin"] = dayy90_bilirubin
                             st.session_state.data.at[index, "DAYY90_AST"] = dayy90_ast
                             st.session_state.data.at[index, "DAYY90_ALT"] = dayy90_alt
-                            st.session_state.data.at[index, "DAYY90_Alkaline Phosphatase"] = dayy90_alkaline_phosphatase
-                            st.session_state.data.at[index, "DAYY90_leukocytes"] = dayy90_leukocytes
-                            st.session_state.data.at[index, "DAYY90_platelets"] = dayy90_platelets
-                            st.session_state.data.at[index, "DAYY90_ascities"] = dayy90_ascites
-                            st.session_state.data.at[index, "DAYY90_Hepatic Encephalopathy"] = dayy90_hepatic_encephalopathy
-                            st.session_state.data.at[index, "DAYY90_Child-Pugh class EMR"] = dayy90_child_pugh_class_emr
-                            st.session_state.data.at[index, "DAYY90_Child-Pugh points EMR"] = dayy90_child_pugh_points_emr
-                            st.session_state.data.at[index, "DAYY90_BCLC EMR"] = dayy90_bclc_emr
-                            st.session_state.data.at[index, "DAYY90_MELD EMR"] = dayy90_meld_emr
-                            st.session_state.data.at[index, "DAYY90_MELD Na EMR"] = dayy90_meld_na_emr
-                            st.session_state.data.at[index, "DAYY90_Albi EMR"] = dayy90_albi_emr
-                            st.session_state.data.at[index, "PREY90_ECOG"] = prey90_ecog
-                            st.session_state.data.at[index, "DAYY90_Child-Pugh class Calc"] = dayy90_child_pugh_class_calc
-                            st.session_state.data.at[index, "DAYY90_Child-Pugh points calc"] = dayy90_child_pugh_points_calc
-                            st.session_state.data.at[index, "DAYY90_MELD calc"] = dayy90_meld_calc
-                            st.session_state.data.at[index, "DAYY90_MELD Na calc"] = dayy90_meld_na_calc
-                            st.session_state.data.at[index, "DAYY90_Albi calc"] = dayy90_albi_calc
-                            st.session_state.data.at[index, "DAYY90_Type of Sphere"] = dayy90_type_of_sphere
-                            st.session_state.data.at[index, "DAYY90_LT_notes_ftx"] = dayy90_lt_notes_ftx
+                            st.session_state.data.at[index, "DAYY90_Alkphos"] = dayy90_alkaline_phosphatase
+                            st.session_state.data.at[index, "DAYY90_Leukocytes"] = dayy90_leukocytes
+                            st.session_state.data.at[index, "DAYY90_Platelets"] = dayy90_platelets
+                            st.session_state.data.at[index, "DAY90_Potassium"] = dayy90_potassium
+                            st.session_state.data.at[index, "Day90_AscitesCTCAE"] = dayy90_ascites_ctcae
+                            st.session_state.data.at[index, "Day90_AscitesCTCAEnumb"] = dayy90_ascites_classification
+                            st.session_state.data.at[index, "Day90_HEgrade"] = dayy90_he_grade
+                            st.session_state.data.at[index, "PREY90_ECOG"] = dayy90_ecog
+                            st.session_state.data.at[index, "DAYY90_CPclass"] = dayy90_child_pugh_class_calc
+                            st.session_state.data.at[index, "DAYY90_CPcalc"] = dayy90_child_pugh_points_calc
+                            st.session_state.data.at[index, "DAYY90_MELD"] = dayy90_meld_score_calc
+                            st.session_state.data.at[index, "DAYY90_MELD Na calc"] = dayy90_meld_na_score_calc
+                            st.session_state.data.at[index, "DAYY90_Albiscore"] = dayy90_albi_score_calc
+                            st.session_state.data.at[index, "DAYY90_Albigrade"] = dayy90_albi_grade
+                            st.session_state.data.at[index, "DAYY90_BCLC"] = dayy90_bclc_calc
+                            st.session_state.data.at[index, "DAYY90_Sphere"] = dayy90_type_of_sphere
+                            st.session_state.data.at[index, "DAYY90_LTnoteFT"] = dayy90_lt_notes_ftx
                             st.session_state.data.at[index, "ken_ChildPughscore"] = ken_childpughscore
-                            st.session_state.data.at[index, "ken_MELDpreTARE"] = ken_meldpretare
+                            st.session_state.data.at[index, "ken_MELDpreTARE (MELDpreTARE)"] = ken_meldpretare
                             
                             st.success("DAYY90 added successfully.")
-                            st.write("Updated Data:")
             
                 elif st.session_state.selected_tab == "Post Y90 Within 30 Days Labs":
                     st.subheader("Post Y90 Within 30 Days Labs")
-                    with st.form("post_y90_form"):                             
-                              
-                            posty90_date_labs = st.date_input("POSTY90_30DY_date_labs", help="Enter the date of lab tests")
-                            input90 = st.text_input("POSTY90_30DY_afp", help="Enter AFP value in ng/dl or NA")
-                            posty90_afp = process_input(input90)
-                            posty90_afp_date = st.date_input("POSTY90_30DY_afp DATE", help="Enter the date for AFP")
-                            posty90_sodium = st.number_input("POSTY90_30DY_Sodium", help="Enter the sodium value in mmol/L")
-                            posty90_creatinine = st.number_input("POSTY90_30DY_creatinine", help="Enter the creatinine value in mg/dl")
-                            posty90_inr = st.number_input("POSTY90_30DY_INR", help="Enter the INR value")
-                            posty90_albumin = st.number_input("POSTY90_30DY_albumin", help="Enter the albumin value in g/dl")
-                            posty90_bilirubin = st.number_input("POSTY90_30DY_bilirubin", help="Enter the bilirubin value in mg/dl",min_value=1)
-                            posty90_ast = st.number_input("POSTY90_30DY_AST", help="Enter AST value in U/L")
-                            posty90_alt = st.number_input("POSTY90_30DY_ALT", help="Enter ALT value in U/L")
-                            posty90_alkaline_phosphatase = st.number_input("POSTY90_30DY_Alkaline Phosphatase", help="Enter Alkaline Phosphatase value in U/L")
-                            posty90_leukocytes = st.number_input("POSTY90_30DY_leukocytes", help="Enter leukocytes value in x10^3/µL")
-                            posty90_platelets = st.number_input("POSTY90_30DY_platelets", help="Enter platelets value in x10^3/µL")
-                            posty90_potassium = st.number_input("POSTY90_30DY_potassium", help="Enter the potassium value in mmol/L")
+                    with st.form("post_y90_form"):
 
-                            posty90_ecog = st.selectbox(
-                                "POSTY90_30DY_ECOG",
-                                options=["0", "1", "2", "3", "4", "NA"],
-                                help="Select ECOG Performance Status",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            posty90_child_pugh_class = st.selectbox(
-                                "POSTY90_30DY_Child-Pugh Class EMR",
-                                options=["Class A", "Class B", "Class C", "NA"],
-                                help="Select the Child-Pugh class",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            inputp90 = st.text_input(
-                                "POSTY90_30DY_Child-Pugh Points EMR",
-                                help="Write in number in range 5-15, or NA"
-                            )
-                            posty90_child_pugh_points = validate_input(inputp90)
-
-                            posty90_bclc_emr = st.selectbox(
-                                "POSTY90_30DY_BCLC EMR",
-                                options=["0", "A", "B", "C", "D"],
-                                help="Select the BCLC stage",
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            input_meld = st.text_input(
-                                "POSTY90_30DY_MELD EMR",
-                                help="Write in number in range 6-40, or NA"
-                            )
-                            posty90_meld_emr = validate_input2(input_meld)
-
-
-                            input_meld_na = st.text_input(
-                                "POSTY90_30DY_MELD Na EMR",
-                                help="Write in number in range 6-40, or NA"
-                            )
-                            posty90_meld_na_emr = validate_input2(input_meld_na)
-
-                            posty90_albi_emr = st.number_input(
-                                "POSTY90_30DY_ALBI EMR",
-                                help="Enter ALBI score"
-                            )
-                            prey90_ascites = str(st.session_state.data['PREY90_Ascites'])
-                            prey90_he = str(st.session_state.data['PREY90_he'])
-
-                            posty90_child_pugh_points_calc = calculatepoints(posty90_bilirubin,posty90_albumin,posty90_inr,prey90_ascites,prey90_he)
-                            posty90_child_pugh_class_calc = calculate_class(posty90_child_pugh_points_calc)
+                        posty90_date_labs = st.date_input("POSTY90_30DY_date_labs", help="Enter the date of lab tests")
+                        input90 = st.text_input("POSTY90_30DY_afp", help="Enter AFP value in ng/dl or NA")
+                        posty90_afp = process_input(input90)
+                        posty90_afp_date = st.date_input("POSTY90_30DY_afp DATE", help="Enter the date for AFP")
+                        posty90_sodium = st.number_input("POSTY90_30DY_Sodium", help="Enter the sodium value in mmol/L")
+                        posty90_creatinine = st.number_input("POSTY90_30DY_creatinine", help="Enter the creatinine value in mg/dl")
+                        posty90_inr = st.number_input("POSTY90_30DY_INR", help="Enter the INR value")
+                        posty90_albumin = st.number_input("POSTY90_30DY_albumin", help="Enter the albumin value in g/dl")
+                        posty90_bilirubin = st.number_input("POSTY90_30DY_bilirubin", help="Enter the bilirubin value in mg/dl",min_value=1)
+                        posty90_ast = st.number_input("POSTY90_30DY_AST", help="Enter AST value in U/L")
+                        posty90_alt = st.number_input("POSTY90_30DY_ALT", help="Enter ALT value in U/L")
+                        posty90_alkaline_phosphatase = st.number_input("POSTY90_30DY_Alkaline Phosphatase", help="Enter Alkaline Phosphatase value in U/L")
+                        posty90_leukocytes = st.number_input("POSTY90_30DY_leukocytes", help="Enter leukocytes value in x10^3/µL")
+                        posty90_platelets = st.number_input("POSTY90_30DY_platelets", help="Enter platelets value in x10^3/µL")
+                        posty90_potassium = st.number_input("POSTY90_30DY_potassium", help="Enter the potassium value in mmol/L")
                         
-                            posty90_meld_calc = (3.78*(int(posty90_bilirubin)))+(11.2*(int(posty90_inr)))+(9.57*(int(posty90_creatinine)))+6.43
-                            posty90_meld_na_calc = posty90_meld_calc + 1.32*(137-int(posty90_sodium)) - (0.033*posty90_meld_calc*(137-int(posty90_sodium)))
+                        posty90_ascites_ctcae = st.selectbox (
+                        "30DY_AE_AscitesCTCAE",
+                        options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
+                        format_func=lambda x: {
+                        "none": "0. none",
+                        "Asymptomatic": "1. Asymptomatic",
+                        "Minimal ascities/Mild abd distension": "1. Minimal ascities/Mild abd distension",
+                        "Symptomatic": "2. Symptomatic",
+                        "moderate ascities/Symptomatic medical intervention": " 2. moderate ascities/Symptomatic medical intervention",
+                        "Severe symptoms, invasive intervention indicated": " 3. Severe symptoms, invasive intervention indicated",
+                        "Life Threatening: Urgent operation intervention indicated" : "4. Life Threatening: Urgent operation intervention indicated",
 
+                        }[x],
+                            help="Select Metavir_score",
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+                        ) 
+                        def findascitesclass(score):
+                            if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
+                                    return 2
+                            else:
+                                    return 3
+                        
+                        posty90_ascites_classification = 1 if posty90_ascites_ctcae == "none" else findascitesclass(posty90_ascites_ctcae)
 
-                            posty90_albi_calc = albi_calc(posty90_bilirubin,posty90_albumin)
-
-                            ken_bclc_stage_post90 = st.text_input(
-                                "Ken_BCLCStagepost90",
-                                help="Enter BCLC Stage Post-90"
-                            )
-
-                            ken_meld_stage_post90 = st.text_input(
-                                "Ken_MELD_Stagepost90",
-                                help="Enter MELD Score Pre-TARE"
-                            )
-
-                            st.subheader("Post_Y90_within_30_days_adverse_events")
-                            DYAE_CTCAE_portal_htn = st.selectbox(
-                                "30DYAE_CTCAE_portal_htn",
-                                options=["0","1","2","3","4","5"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-                            DYAE_CTCAE_Vascular_comp = st.selectbox(
-                                "30DYAE_CTCAE_Vascular comp",
-                                options=["0","1","2","3","4","5"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-                            DYAE_CTCAE_fatigue = st.selectbox(
-                                "30DYAE_CTCAE_fatigue",
-                                options=["0","1","2"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-                            DYAE_CTCAE_diarrhea = st.selectbox(
-                                "30DYAE_CTCAE_diarrhea",
-                                options=["0","1","2","3","4","5"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            DYAE_CTCAE_hypoalbuminemia_emr = st.text_input(
-                                "30DYAE_CTCAE_hypoalbuminemia emr"
-                            )
-                            DYAE_CTCAE_hyperbilirubinemia_emr = st.text_input(
-                                "30DYAE_CTCAE_hyperbilirubinemia emr"
-                            )
-                            DYAE_CTCAE_Increase_creatinine_emr = st.text_input(
-                                "30DYAE_CTCAE_Increase_creatinine emr"
-                            )
-                            DYAE_CTCAE_abdominal_pain = st.selectbox(
-                                "30DYAE_CTCAE_abdominal pain",
-                                options=["0","1","2","3"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-                            DYAE_CTCAE_sepsis = st.selectbox(
-                                "30DYAE_CTCAE_sepsis",
-                                options=["0","3","4","5"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-                            DYAE_CTCAE_ascites = st.selectbox(
-                            "30DYAE_CTCAE_ascites",
-                            options=["none", "Asymptomatic", "Minimal ascities/Mild abd distension, no sx",
-                                    "Symptomatic", "moderate ascities/Symptomatic medical intervention",
-                                    "Severe symptoms, invasive intervention indicated",
-                                    "Life Threatening: Urgent operation intervention indicated"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-                            DYAE_CTCAE_ascites_binary_classification = 1 if DYAE_CTCAE_ascites != "none" else 0
-                            DYAE_CTCAE_ascites_ftx = st.text_area(
-                                "30DYAE_CTCAE_ascites_ftx",
-                            )
-
-                            DYAE_CTCAE_bacterial_peritonitis = st.selectbox(
-                                "30DYAE_CTCAE_bacterial_peritonitis",
-                                options=["0", "3", "4", "5"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            DYAE_CTCAE_hemorrhage = st.selectbox(
-                            "30DYAE_CTCAE_hemorrhage",
-                            options=["0", "3", "4", "5"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            DYAE_CTCAE_anorexia = st.selectbox(
-                                "30DYAE_CTCAE_anorexia",
-                                options=["0", "1", "2", "3"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            DYAE_CTCAE_intrahepatic_fistula = st.selectbox(
-                                "30DYAE_CTCAE_intrahepatic_fistula",
-                                options=["0","2", "3", "4", "5"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            DYAE_CTCAE_constipation = st.selectbox(
-                                "30DYAE_CTCAE_constipation",
-                                options=["0", "1", "2", "3"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            DYAE_CTCAE_nausea = st.selectbox(
-                                "30DYAE_CTCAE_nausea",
-                                options=["0", "1", "2", "3"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            DYAE_CTCAE_vomiting = st.selectbox(
-                                "30DYAE_CTCAE_vomiting",
-                                options=["0","1","2", "3", "4", "5"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            DYAE_CTCAE_Hepatic_Encephalopathy = st.selectbox(
-                                "30DYAE_CTCAE_Hepatic Encephalopathy",
-                                options=["0","1","2", "3", "4", "5"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            DYAE_CTCAE_he_ftx = st.text_area(
-                                "30DYAE_CTCAE_he_ftx",
-                                help="provide additional details of he"
-                            )
-
-                            DYAE_CTCAE_cholecystitis = st.selectbox(
-                                "30DYAE_CTCAE_cholecystitis",
-                                options=["0", "2","3", "4", "5"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            DYAE_CTCAE_gastric_ulcers = st.selectbox(
-                                "30DYAE_CTCAE_gastric_ulcers",
-                                options=["0","1","2", "3", "4", "5"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            DYAE_CTCAE_hyperkalemia = st.selectbox(
-                                "30DYAE_CTCAE_hyperkalemia",
-                                options=["NA"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            DYAE_CTCAE_respiratory_failure = st.selectbox(
-                                "30DYAE_CTCAE_respiratory_failure",
-                                options=["0", "4", "5"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            DYAE_CTCAE_AKI = st.selectbox(
-                                "30DYAE_CTCAE_AKI",
-                                options=["0", "3", "4", "5"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            DYAE_CTCAE_Radiation_pneumonitis = st.selectbox(
-                                "30DYAE_CTCAE_Radiation_pneumonitis",
-                                options=["0","1","2", "3", "4", "5"],
-                    index=None,  # No default selection
-                    placeholder="Choose an option",
-                            )
-
-                            DYAE_AE_other = st.text_area(
-                                "30DY_AE_other",
-                                help="Other Adverse Events (Free Text)"
-                            )
-
-                            DYAE_AE_date_of_AE = st.text_input(
-                                "90DY_AE_date_of_AE",
-                                help="(if AE is present after 30 days but before 90 write it here and the date)"
-                            )
+                        posty90_ascites_diruetics = st.selectbox(
+                            "30DY_AE_Ascitesdiruetics",
+                            options = ["Yes","No"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+            
+                        )
+                        posty90_ascites_paracentesis = st.selectbox(
+                            "30DY_AE_Ascitesparacentesis" ,
+                            options = ["Yes","No"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+            
+                        )
+                        posty90_ascites_hospitalization = st.selectbox(
+                            "30DY_AE_Asciteshospitalization",
+                            options = ["Yes","No"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+            
+                        )
+                        posty90_he_grade = st.selectbox(
+                            "30DY_AE_HE Grade",
+                            options=[1,2,3],
+                            format_func=lambda x: {
+                            1: "None",
+                            2: "Grade 1-2",
+                            3: "Grade 3-4",
                             
+                        }[x],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+
+                        )
+
+                        posty90_ascites_free_text = st.text_area(
+                            "30DY_AE_ascities_freetext",
+                        
+                        )
+
+                        posty90_ecog = st.selectbox("POSTY90_30DY_ECOG", options=["0", "1", "2", "3", "4", "NA"],
+                            index=None,  # No default selection
+                            placeholder="Choose an option",
+                            )
+                        
+                        posty90_child_pugh_class = st.selectbox(
+                            "POSTY90_30DY_Child-Pugh Class calc",
+                            options=["Class A", "Class B", "Class C", "NA"],
+                            help="Select the Child-Pugh class",
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+                        inputp90 = st.text_input(
+                            "POSTY90_30DY_Child-Pugh Points calc",
+                            help="Write in number in range 5-15, or NA"
+                        )
+                        posty90_child_pugh_points = validate_input(inputp90)
+
+                        posty90_bclc = st.selectbox(
+                            "POSTY90_30DY_BCLC stage",
+                            options=["0", "A", "B", "C", "D"],
+                            help="Select the BCLC stage",
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+                        input_meld = st.text_input(
+                            "POSTY90_30DY_MELD EMR",
+                            help="Write in number in range 6-40, or NA"
+                        )
+                        posty90_meld = validate_input2(input_meld)
 
 
-                            submit_tab8 = st.form_submit_button("Save Post POST90 Labs")
+                        input_meld_na = st.text_input(
+                            "POSTY90_30DY_MELD Na EMR",
+                            help="Write in number in range 6-40, or NA"
+                        )
+                        posty90_meld_na = validate_input2(input_meld_na)
 
-                            if submit_tab8:
-                                    
-                                    #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
+                        posty90_albi_score = st.number_input(
+                            "POSTY90_30DY_ALBI Score calc",
+                            help="Enter ALBI score"
+                        )
+                        posty90_albi_grade = albi_class(posty90_albi_score)
+
+                    
+                        ken_bclc_stage_post90 = st.text_input(
+                            "Ken_BCLCStagepost90",
+                            help="Enter BCLC Stage Post-90"
+                        )
+
+                        ken_meld_stage_post90 = st.text_input(
+                            "Ken_MELD_Stagepost90",
+                            help="Enter MELD Score Pre-TARE"
+                        )
+                        ## New Part
+                        st.subheader("Post_Y90_within_30_days_adverse_events")
+                        DYAE_CTCAE_portal_htn = st.selectbox(
+                            "30DYAE_portal_htn CTCAE",
+                            options=["0","1","2","3","4","5"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+                        DYAE_CTCAE_Vascular_comp = st.selectbox(
+                            "30DYAE_Vascular comp CTCAE",
+                            options=["0","1","2","3","4","5"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+                        DYAE_CTCAE_fatigue = st.selectbox(
+                            "30DYAE_fatigue CTCAE",
+                            options=["0","1","2"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+                        DYAE_CTCAE_diarrhea = st.selectbox(
+                            "30DYAE_diarrhea CTCAE",
+                            options=["0","1","2","3","4","5"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+                        DYAE_CTCAE_hypoalbuminemia_emr = st.text_input(
+                            "30DYAE_hypoalbuminemia CTCAE"
+                        )
+                        DYAE_CTCAE_hyperbilirubinemia_emr = st.text_input(
+                            "30DYAE_hyperbilirubinemia CTCAE"
+                        )
+                        DYAE_CTCAE_Increase_creatinine_emr = st.text_input(
+                            "30DYAE_Increase_creatinine CTCAE"
+                        )
+                        DYAE_CTCAE_abdominal_pain = st.selectbox(
+                            "30DYAE_abdominal pain CTCAE",
+                            options=["0","1","2","3"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+                        DYAE_CTCAE_sepsis = st.selectbox(
+                            "30DYAE_sepsis CTCAE",
+                            options=["0","3","4","5"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+                        
+                        DYAE_CTCAE_bacterial_peritonitis = st.selectbox(
+                            "30DYAE_CTCAE_bacterial_peritonitis",
+                            options=["0", "3", "4", "5"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+                        DYAE_CTCAE_hemorrhage = st.selectbox(
+                        "30DYAE_CTCAE_hemorrhage",
+                        options=["0", "3", "4", "5"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+                        DYAE_CTCAE_anorexia = st.selectbox(
+                            "30DYAE_CTCAE_anorexia",
+                            options=["0", "1", "2", "3"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+                        DYAE_CTCAE_intrahepatic_fistula = st.selectbox(
+                            "30DYAE_CTCAE_intrahepatic_fistula",
+                            options=["0","2", "3", "4", "5"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+                        DYAE_CTCAE_constipation = st.selectbox(
+                            "30DYAE_CTCAE_constipation",
+                            options=["0", "1", "2", "3"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+                        DYAE_CTCAE_nausea = st.selectbox(
+                            "30DYAE_CTCAE_nausea",
+                            options=["0", "1", "2", "3"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+                        DYAE_CTCAE_vomiting = st.selectbox(
+                            "30DYAE_CTCAE_vomiting",
+                            options=["0","1","2", "3", "4", "5"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+                        DYAE_CTCAE_cholecystitis = st.selectbox(
+                            "30DYAE_CTCAE_cholecystitis",
+                            options=["0", "2","3", "4", "5"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+                        DYAE_CTCAE_gastric_ulcers = st.selectbox(
+                            "30DYAE_CTCAE_gastric_ulcers",
+                            options=["0","1","2", "3", "4", "5"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+                        DYAE_CTCAE_hyperkalemia = st.selectbox(
+                            "30DYAE_CTCAE_hyperkalemia",
+                            options=["NA"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+                        DYAE_CTCAE_respiratory_failure = st.selectbox(
+                            "30DYAE_CTCAE_respiratory_failure",
+                            options=["0", "4", "5"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+                        DYAE_CTCAE_AKI = st.selectbox(
+                            "30DYAE_CTCAE_AKI",
+                            options=["0", "3", "4", "5"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+                        DYAE_CTCAE_Radiation_pneumonitis = st.selectbox(
+                            "30DYAE_CTCAE_Radiation_pneumonitis",
+                            options=["0","1","2", "3", "4", "5"],
+                        index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+                        DYAE_AE_other = st.text_area(
+                            "30DY_AE_other",
+                            help="Other Adverse Events (Free Text)"
+                        )
+
+                        DYAE_AE_date_of_AE = st.text_input(
+                            "90DY_AE_date_of_AE",
+                            help="(if AE is present after 30 days but before 90 write it here and the date)"
+                        )
+                        ken_grandedtoxicity = st.text_area(
+                            "Ken_GradeandToxicity",
+
+                        )
+                        dy_ae_hospitalization_3 = st.selectbox(
+                            "90DY_AE_Hospitalization 3 months",
+                            options=["Yes","No"],
+                            index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+                        dy_ae_hospitalization_6 = st.selectbox(
+                            "90DY_AE_Hospitalization 6 months",
+                            options=["Yes","No"],
+                            index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+                        dy_ae_hosp6mo = st.selectbox(
+                            "90DY_AE_Hosp6mo",
+                            options=["Yes","No"],
+                            index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+                        dy_ae_death_due = st.selectbox(
+                            "90DY_AE_Death due to AE",
+                            options=["Yes","No"],
+                            index=None,  # No default selection
+                        placeholder="Choose an option",
+                        )
+
+
+                        submit_tab8 = st.form_submit_button("Submit")
+
+                        if submit_tab8:
                                 
-                                    st.session_state.data.at[index, "POSTY90_30DY_date_labs"] = posty90_date_labs.strftime("%Y-%m-%d")
-                                    st.session_state.data.at[index, "POSTY90_30DY_afp"] = posty90_afp
-                                    st.session_state.data.at[index, "POSTY90_30DY_afp DATE"] = posty90_afp_date.strftime("%Y-%m-%d")
-                                    st.session_state.data.at[index, "POSTY90_30DY_Sodium"] = posty90_sodium
-                                    st.session_state.data.at[index, "POSTY90_30DY_creatinine"] = posty90_creatinine
-                                    st.session_state.data.at[index, "POSTY90_30DY_INR"] = posty90_inr
-                                    st.session_state.data.at[index, "POSTY90_30DY_albumin"] = posty90_albumin
-                                    st.session_state.data.at[index, "POSTY90_30DY_bilirubin"] = posty90_bilirubin
-                                    st.session_state.data.at[index, "POSTY90_30DY_AST"] = posty90_ast
-                                    st.session_state.data.at[index, "POSTY90_30DY_ALT"] = posty90_alt
-                                    st.session_state.data.at[index, "POSTY90_30DY_Alkaline Phosphatase"] = posty90_alkaline_phosphatase
-                                    st.session_state.data.at[index, "POSTY90_30DY_leukocytes"] = posty90_leukocytes
-                                    st.session_state.data.at[index, "POSTY90_30DY_platelets"] = posty90_platelets
-                                    st.session_state.data.at[index, "POSTY90_30DY_potassium"] = posty90_potassium
-                                    st.session_state.data.at[index, "POSTY90_30DY_ECOG"] = posty90_ecog
-                                    st.session_state.data.at[index, "POSTY90_30DY_Child-Pugh Class EMR"] = posty90_child_pugh_class
-                                    st.session_state.data.at[index, "POSTY90_30DY_Child-Pugh Points EMR"] = posty90_child_pugh_points
-                                    st.session_state.data.at[index, "POSTY90_30DY_BCLC EMR"] = posty90_bclc_emr
-                                    st.session_state.data.at[index, "POSTY90_30DY_MELD EMR"] = posty90_meld_emr
-                                    st.session_state.data.at[index, "POSTY90_30DY_MELD Na EMR"] = posty90_meld_na_emr
-                                    st.session_state.data.at[index, "POSTY90_30DY_ALBI EMR"] = posty90_albi_emr
-                                    st.session_state.data.at[index, "POSTY90_30DY_Child-Pugh Class calc"] = posty90_child_pugh_class_calc
-                                    st.session_state.data.at[index, "POSTY90_30DY_Child-Pugh Points calc"] = posty90_child_pugh_points_calc
-                                    st.session_state.data.at[index, "POSTY90_30DY_MELD calc"] = posty90_meld_calc
-                                    st.session_state.data.at[index, "POSTY90_30DY_MELD Na calc"] = posty90_meld_na_calc
-                                    st.session_state.data.at[index, "POSTY90_30DY_ALBI calc"] = posty90_albi_calc
-                                    st.session_state.data.at[index, "Ken_BCLCStagepost90"] = ken_bclc_stage_post90
-                                    st.session_state.data.at[index, "Ken_MELD_Stagepost90"] = ken_meld_stage_post90
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_portal_htn"] = DYAE_CTCAE_portal_htn
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_Vascular comp"] = DYAE_CTCAE_Vascular_comp
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_fatigue"] = DYAE_CTCAE_fatigue
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_diarrhea"] = DYAE_CTCAE_diarrhea
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_hypoalbuminemia emr"] = DYAE_CTCAE_hypoalbuminemia_emr
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_hyperbilirubinemia emr"] = DYAE_CTCAE_hyperbilirubinemia_emr
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_Increase_creatinine emr"] = DYAE_CTCAE_Increase_creatinine_emr
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_abdominal pain"] = DYAE_CTCAE_abdominal_pain
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_sepsis"] = DYAE_CTCAE_sepsis
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_ascites"] = DYAE_CTCAE_ascites
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_ascites Binary classification"] = DYAE_CTCAE_ascites_binary_classification
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_ascites_ftx"] = DYAE_CTCAE_ascites_ftx
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_bacterial_peritonitis"] = DYAE_CTCAE_bacterial_peritonitis
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_hemorrhage"] = DYAE_CTCAE_hemorrhage
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_anorexia"] = DYAE_CTCAE_anorexia
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_intrahepatic_fistula"] = DYAE_CTCAE_intrahepatic_fistula
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_constipation"] = DYAE_CTCAE_constipation
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_nausea"] = DYAE_CTCAE_nausea
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_vomiting"] = DYAE_CTCAE_vomiting
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_Hepatic Encephalopathy"] = DYAE_CTCAE_Hepatic_Encephalopathy
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_he_ftx"] = DYAE_CTCAE_he_ftx
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_cholecystitis"] = DYAE_CTCAE_cholecystitis
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_gastric_ulcers"] = DYAE_CTCAE_gastric_ulcers
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_hyperkalemia"] = DYAE_CTCAE_hyperkalemia
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_respiratory_failure"] = DYAE_CTCAE_respiratory_failure
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_AKI"] = DYAE_CTCAE_AKI
-                                    st.session_state.data.at[index, "30DYAE_CTCAE_Radiation_pneumonitis"] = DYAE_CTCAE_Radiation_pneumonitis
-                                    st.session_state.data.at[index, "30DY_AE_other"] = DYAE_AE_other
-                                    st.session_state.data.at[index, "90DY_AE_date_of_AE"] = DYAE_AE_date_of_AE
+                                #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
+                            
+                                st.session_state.data.at[index, "POSTY90_30DY_Datelabs"] = posty90_date_labs.strftime("%Y-%m-%d")
+                                st.session_state.data.at[index, "POSTY90_30DY_AFP"] = posty90_afp
+                                st.session_state.data.at[index, "POSTY90_30DY_AFPdate DATE"] = posty90_afp_date.strftime("%Y-%m-%d")
+                                st.session_state.data.at[index, "POSTY90_30DY_Sodium"] = posty90_sodium
+                                st.session_state.data.at[index, "POSTY90_30DY_Creatinine"] = posty90_creatinine
+                                st.session_state.data.at[index, "POSTY90_30DY_INR"] = posty90_inr
+                                st.session_state.data.at[index, "POSTY90_30DY_Albumin"] = posty90_albumin
+                                st.session_state.data.at[index, "POSTY90_30DY_Bilirubin"] = posty90_bilirubin
+                                st.session_state.data.at[index, "POSTY90_30DY_AST"] = posty90_ast
+                                st.session_state.data.at[index, "POSTY90_30DY_ALT"] = posty90_alt
+                                st.session_state.data.at[index, "POSTY90_30DY_ALP"] = posty90_alkaline_phosphatase
+                                st.session_state.data.at[index, "POSTY90_30DY_Leukocytes"] = posty90_leukocytes
+                                st.session_state.data.at[index, "POSTY90_30DY_Platelets"] = posty90_platelets
+                                st.session_state.data.at[index, "POSTY90_30DY_Potassium"] = posty90_potassium
+                                st.session_state.data.at[index, "30DY_AE_AscitesCTCAE"] = posty90_ascites_ctcae
+                                st.session_state.data.at[index, "30DY_AE_AscitesCTCAEnumb"] = posty90_ascites_classification
+                                st.session_state.data.at[index, "30DY_AE_Ascitesdiruetics"] = posty90_ascites_diruetics
+                                st.session_state.data.at[index, "30DY_AE_Ascitesparacentesis"] = posty90_ascites_paracentesis
+                                st.session_state.data.at[index, "30DY_AE_Asciteshospitalization"] = posty90_ascites_hospitalization
+                                st.session_state.data.at[index, "30DY_AE_HEgrade"] = posty90_he_grade
+                                st.session_state.data.at[index, "30DY_AE_ascities_freetext"] = posty90_ascites_free_text
+                                st.session_state.data.at[index, "POSTY90_30DY_ECOG"] = posty90_ecog
+                                st.session_state.data.at[index, "POSTY90_30DY_CPclass"] = posty90_child_pugh_class
+                                st.session_state.data.at[index, "POSTY90_30DY_CPcalc"] = posty90_child_pugh_points
+                                st.session_state.data.at[index, "POSTY90_30DY_MELD"] = posty90_meld
+                                st.session_state.data.at[index, "POSTY90_30DY_MELDNa"] = posty90_meld_na
+                                st.session_state.data.at[index, "POSTY90_30DY_ALBIscore"] = posty90_albi_score
+                                st.session_state.data.at[index, "POSTY90_30DY_ALBIgrade"] = posty90_albi_grade
+                                st.session_state.data.at[index, "POSTY90_30DY_BCLC"] = posty90_bclc
+                                st.session_state.data.at[index, "Ken_BCLCStagepost90"] = ken_bclc_stage_post90
+                                st.session_state.data.at[index, "Ken_MELD_Stagepost90"] = ken_meld_stage_post90
 
-                                    st.success("DAYY90 added successfully.")
-                                    st.write("Updated Data:")
+                                st.session_state.data.at[index, "30DY_AE_Portalhtn"] = DYAE_CTCAE_portal_htn
+                                st.session_state.data.at[index, "30DY_AE_Vascularcomp"] = DYAE_CTCAE_Vascular_comp
+                                st.session_state.data.at[index, "30DY_AE_Fatigue"] = DYAE_CTCAE_fatigue
+                                st.session_state.data.at[index, "30DY_AE_Diarrhea"] = DYAE_CTCAE_diarrhea
+                                st.session_state.data.at[index, "30DY_AE_Hypoalbuminemia"] = DYAE_CTCAE_hypoalbuminemia_emr
+                                st.session_state.data.at[index, "30DY_AE_Hyperbilirubinemia"] = DYAE_CTCAE_hyperbilirubinemia_emr
+                                st.session_state.data.at[index, "30DY_AE_Increasecreatine"] = DYAE_CTCAE_Increase_creatinine_emr
+                                st.session_state.data.at[index, "30DY_AE_Abdominalpain"] = DYAE_CTCAE_abdominal_pain
+                                st.session_state.data.at[index, "30DY_AE_Sepsis"] = DYAE_CTCAE_sepsis
+                                st.session_state.data.at[index, "30DY_AE_BacterialPer"] = DYAE_CTCAE_bacterial_peritonitis
+                                st.session_state.data.at[index, "30DY_AE_Hemorrhage"] = DYAE_CTCAE_hemorrhage
+                                st.session_state.data.at[index, "30DY_AE_Anorexia"] = DYAE_CTCAE_anorexia
+                                st.session_state.data.at[index, "30DY_AE_Intrahepaticfistula"] = DYAE_CTCAE_intrahepatic_fistula
+                                st.session_state.data.at[index, "30DY_AE_Constipation"] = DYAE_CTCAE_constipation
+                                st.session_state.data.at[index, "30DY_AE_Nausea"] = DYAE_CTCAE_nausea
+                                st.session_state.data.at[index, "30DY_AE_Vomiting"] = DYAE_CTCAE_vomiting
+                                st.session_state.data.at[index, "30DY_AE_Cholecystitis"] = DYAE_CTCAE_cholecystitis
+                                st.session_state.data.at[index, "30DY_AE_Gastriculcer"] = DYAE_CTCAE_gastric_ulcers
+                                st.session_state.data.at[index, "30DY_AE_Hyperkalemia"] = DYAE_CTCAE_hyperkalemia
+                                st.session_state.data.at[index, "30DY_AE_Respfailure"] = DYAE_CTCAE_respiratory_failure
+                                st.session_state.data.at[index, "30DY_AE_AKI"] = DYAE_CTCAE_AKI
+                                st.session_state.data.at[index, "30DY_AE_Radiationpneumonitis"] = DYAE_CTCAE_Radiation_pneumonitis
+                                st.session_state.data.at[index, "30DY_AE_Other"] = DYAE_AE_other
+                                st.session_state.data.at[index, "90DY_AE_date_of_AE"] = DYAE_AE_date_of_AE
+                                st.session_state.data.at[index, "Additional Notes FT"] = ken_grandedtoxicity
+                                st.session_state.data.at[index, "90DY_AE_Hosp3mo"] = dy_ae_hospitalization_3
+                                st.session_state.data.at[index, "90DY_AE_Datehosp3mo"] = dy_ae_hospitalization_6
+                                st.session_state.data.at[index, "90DY_AE_Hosp6mo"] = dy_ae_hosp6mo
+                                st.session_state.data.at[index, "90DY_AE_DeathduetoAE"] = dy_ae_death_due
+
+                                st.success("DAYY90 added successfully.")                             
+                              
+
                                              
                 elif st.session_state.selected_tab == "Other Post Tare":
                     st.subheader("Other_post_TARE")
@@ -4855,8 +4942,8 @@ def edit_existing_data():
                                 else:
                                     return "Grade 3"
 
-                            prey90_bilirubin_verify = st.session_state.data["PREY90_Bilirubin"].isnull()
-                            prey90_albumin_verify = st.session_state.data["PREY90_Albumin"].isnull()
+                            #prey90_bilirubin_verify = st.session_state.data["PREY90_Bilirubin"].isnull()
+                            #prey90_albumin_verify = st.session_state.data["PREY90_Albumin"].isnull()
                             #if prey90_bilirubin_verify.bool() == True or prey90_albumin_verify.bool() == True :
                              #   st.write("Fill value PREY90_Bilirubin and PREY90_Albumin")
                             #else:
@@ -4865,8 +4952,8 @@ def edit_existing_data():
                               #  k_ken_albipretareraw = albi_calc(prey90_bilirubin,prey90_albumin)
                                # k_ken_albipretaregrade = albigrade(k_ken_albipretareraw)
                        
-                            posty90_albumin_verify = st.session_state.data["POSTY90_30DY_albumin"].isnull()
-                            posty90_bilirubin_verify = st.session_state.data["POSTY90_30DY_bilirubin"].isnull()
+                            #posty90_albumin_verify = st.session_state.data["POSTY90_30DY_albumin"].isnull()
+                            #posty90_bilirubin_verify = st.session_state.data["POSTY90_30DY_bilirubin"].isnull()
                             #if posty90_albumin_verify.bool() == True or posty90_bilirubin_verify.bool() == True :
                              #   st.write("Fill value POSTY90_30DY_albumin and POSTY90_30DY_bilirubin")
                             #else:
@@ -5836,62 +5923,244 @@ def edit_existing_data():
                                 
                             
                                 st.success("Imagine Data dubmitted")
-                                st.write("Updated Data:")
                                           
                 elif st.session_state.selected_tab == "Dosimetry Data":
                     st.subheader("Dosimetry Data")
                     with st.form("dosimetry_data_form"):
             
-                            gtv_mean_dose = st.number_input("GTV mean dose", help="Enter GTV mean dose")
-                            tx_vol_mean_dose = st.number_input("Tx vol mean dose", help="Enter Tx vol mean dose")
-                            healthy_liver_mean_dose = st.number_input("Healthy Liver mean dose (liver - tx vol)", help="Enter Healthy Liver mean dose")
-                            gtv_vol = st.number_input("GTV Vol", help="Enter GTV Vol")
-                            tx_vol = st.number_input("Tx vol", help="Enter Tx vol")
-                            liver_vol = st.number_input("Liver vol", help="Enter Liver vol")
-                            healthy_liver_vol = st.number_input("Healthy Liver Vol", help="Enter Healthy Liver Vol")
-                            gtv_liver_percentage = st.number_input("GTV/ Liver (%)", help="Enter GTV/ Liver (%)")
-                            d98_gy = st.text_input("D98 (Gy)", help="Enter D98 (Gy)")
-                            d90_gy = st.text_input("D90 (Gy)", help="Enter D90 (Gy)")
-                            d95_gy = st.text_input("D95 (Gy)", help="Enter D95 (Gy)")
-                            d80_gy = st.text_input("D80 (Gy)", help="Enter D80 (Gy)")
-                            d70_gy = st.text_input("D70 (Gy)", help="Enter D70 (Gy)")
-                            v100_percentage = st.number_input("V100(%)", help="Enter V100(%)")
-                            v200_percentage = st.number_input("V200(%)", help="Enter V200(%)")
-                            v300_percentage = st.number_input("V300(%)", help="Enter V300(%)")
-                            v400_percentage = st.number_input("V400(%)", help="Enter V400(%)")
-                            activity_bq = st.text_input("Activity(Bq)", help="Enter Activity(Bq)")
-                            activity_ci = st.text_input("Activity(Ci)", help="Enter Activity(Ci)")
-                            tx_vol_activity_density = st.number_input("Tx vol Activity Density (Ci/cc)", help="Enter Tx vol Activity Density (Ci/cc)")
+                        input_GTV_mean_dose = st.text_input("GTV mean dose")
+                        input_Tx_vol_mean_dose = st.text_input("Tx vol mean dose")
+                        input_Liver_Vol_Mean_dose = st.text_input("Liver Vol Mean dose")
+                        input_Healthy_Liver_mean_dose = st.text_input("Healthy Liver mean dose")
+                        input_GTV_Vol = st.number_input("GTV Vol")
+                        input_Tx_vol = st.text_input("Tx vol")
+                        input_Liver_vol = st.number_input("Liver vol", min_value=1)
+                        input_Healthy_Liver_Vol = st.text_input("Healthy Liver Vol")
+                        input_GTV_Liver = (input_GTV_Vol)/(input_Liver_vol)*100
+                        input_D98 = st.text_input("D98")
+                        input_D95 = st.text_input("D95")
+                        input_D90 = st.text_input("D90")
+                        input_D80 = st.text_input("D80")
+                        input_D70 = st.text_input("D70")
+                        input_V100 = st.text_input("V100")
+                        input_V200 = st.text_input("V200")
+                        input_V300 = st.text_input("V300")
+                        input_V400 = st.text_input("V400")
+                        input_ActivityBq = st.text_input("ActivityBq")
+                        input_ActivityCi = st.text_input("ActivityCi")
+                        input_Tx_vol_Activity_Density = st.text_input("Tx vol Activity Density")
+                        input_NEW = st.text_input("NEW")
+                        input_GTV_less_D95_Vol_ml = st.text_input("GTV < D95 Vol_ml")
+                        input_GTV_less_D95_Mean_Dose = st.text_input("GTV < D95 Mean Dose")
+                        input_GTV_less_D95_Min_Dose = st.text_input("GTV < D95 Min Dose")
+                        input_GTV_less_D95_SD = st.text_input("GTV < D95 SD")
+                        input_GTV_less_D95_Vol_1 = st.text_input("GTV < D95 Vol_1")
+                        input_GTV_less_D95_Mean_Dose_1 = st.text_input("GTV < D95 Mean Dose_1")
+                        input_GTV_less_D95_Min_Dose_1 = st.text_input("GTV < D95 Min Dose_1")
+                        input_GTV_less_D95_SD_1 = st.text_input("GTV < D95 SD_1")
+                        input_GTV_less_D95_Vol_2 = st.text_input("GTV < D95 Vol_2")
+                        input_GTV_less_D95_Mean_Dose_2 = st.text_input("GTV < D95 Mean Dose_2")
+                        input_GTV_less_D95_Min_Dose_2 = st.text_input("GTV < D95 Min Dose_2")
+                        input_GTV_less_D95_SD_2 = st.text_input("GTV < D95 SD_2")
+                        input_GTV_less_100_Gy_Vol = st.text_input("GTV < 100 Gy Vol")
+                        input_GTV_less_100_Gy_Mean_Dose = st.text_input("GTV < 100 Gy Mean Dose")
+                        input_GTV_less_100_Gy_Min_Dose = st.text_input("GTV < 100 Gy Min Dose")
+                        input_GTV_less_100_Gy_SD = st.text_input("GTV < 100 Gy SD")
 
-                            submit_dosimetry_data = st.form_submit_button("Submit")
+                        submit_dosimetry_data = st.form_submit_button("Submit")
 
-                            if submit_dosimetry_data:
-                                #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
+                        if submit_dosimetry_data:
+                            index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
 
-                                st.session_state.data.at[index, "GTV mean dose"] = gtv_mean_dose
-                                st.session_state.data.at[index, "Tx vol mean dose"] = tx_vol_mean_dose
-                                st.session_state.data.at[index, "Healthy Liver mean dose (liver - tx vol)"] = healthy_liver_mean_dose
-                                st.session_state.data.at[index, "GTV Vol"] = gtv_vol
-                                st.session_state.data.at[index, "Tx vol"] = tx_vol
-                                st.session_state.data.at[index, "Liver vol"] = liver_vol
-                                st.session_state.data.at[index, "Healthy Liver Vol"] = healthy_liver_vol
-                                st.session_state.data.at[index, "GTV/ Liver (%)"] = gtv_liver_percentage
-                                st.session_state.data.at[index, "D98 (Gy)"] = d98_gy
-                                st.session_state.data.at[index, "D90 (Gy)"] = d90_gy
-                                st.session_state.data.at[index, "D95 (Gy)"] = d95_gy
-                                st.session_state.data.at[index, "D80 (Gy)"] = d80_gy
-                                st.session_state.data.at[index, "D70 (Gy)"] = d70_gy
-                                st.session_state.data.at[index, "V100(%)"] = v100_percentage
-                                st.session_state.data.at[index, "V200(%)"] = v200_percentage
-                                st.session_state.data.at[index, "V300(%)"] = v300_percentage
-                                st.session_state.data.at[index, "V400(%)"] = v400_percentage
-                                st.session_state.data.at[index, "Activity(Bq)"] = activity_bq
-                                st.session_state.data.at[index, "Activity(Ci)"] = activity_ci
-                                st.session_state.data.at[index, "Tx vol Activity Density (Ci/cc)"] = tx_vol_activity_density
+                            # Assign inputs to session state
+                            st.session_state.data.at[index, "GTV mean dose"] = input_GTV_mean_dose
+                            st.session_state.data.at[index, "Tx vol mean dose"] = input_Tx_vol_mean_dose
+                            st.session_state.data.at[index, "Liver Vol Mean dose"] = input_Liver_Vol_Mean_dose
+                            st.session_state.data.at[index, "Healthy Liver mean dose"] = input_Healthy_Liver_mean_dose
+                            st.session_state.data.at[index, "GTV Vol"] = input_GTV_Vol
+                            st.session_state.data.at[index, "Tx vol"] = input_Tx_vol
+                            st.session_state.data.at[index, "Liver vol"] = input_Liver_vol
+                            st.session_state.data.at[index, "Healthy Liver Vol"] = input_Healthy_Liver_Vol
+                            st.session_state.data.at[index, "GTV/Liver"] = input_GTV_Liver
+                            st.session_state.data.at[index, "D98"] = input_D98
+                            st.session_state.data.at[index, "D95"] = input_D95
+                            st.session_state.data.at[index, "D90"] = input_D90
+                            st.session_state.data.at[index, "D80"] = input_D80
+                            st.session_state.data.at[index, "D70"] = input_D70
+                            st.session_state.data.at[index, "V100"] = input_V100
+                            st.session_state.data.at[index, "V200"] = input_V200
+                            st.session_state.data.at[index, "V300"] = input_V300
+                            st.session_state.data.at[index, "V400"] = input_V400
+                            st.session_state.data.at[index, "ActivityBq"] = input_ActivityBq
+                            st.session_state.data.at[index, "ActivityCi"] = input_ActivityCi
+                            st.session_state.data.at[index, "Tx vol Activity Density"] = input_Tx_vol_Activity_Density
+                            st.session_state.data.at[index, "NEW"] = input_NEW
+                            st.session_state.data.at[index, "GTV < D95 Vol_ml"] = input_GTV_less_D95_Vol_ml
+                            st.session_state.data.at[index, "GTV < D95 Mean Dose"] = input_GTV_less_D95_Mean_Dose
+                            st.session_state.data.at[index, "GTV < D95 Min Dose"] = input_GTV_less_D95_Min_Dose
+                            st.session_state.data.at[index, "GTV < D95 SD"] = input_GTV_less_D95_SD
+                            st.session_state.data.at[index, "GTV < D95 Vol_1"] = input_GTV_less_D95_Vol_1
+                            st.session_state.data.at[index, "GTV < D95 Mean Dose_1"] = input_GTV_less_D95_Mean_Dose_1
+                            st.session_state.data.at[index, "GTV < D95 Min Dose_1"] = input_GTV_less_D95_Min_Dose_1
+                            st.session_state.data.at[index, "GTV < D95 SD_1"] = input_GTV_less_D95_SD_1
+                            st.session_state.data.at[index, "GTV < D95 Vol_2"] = input_GTV_less_D95_Vol_2
+                            st.session_state.data.at[index, "GTV < D95 Mean Dose_2"] = input_GTV_less_D95_Mean_Dose_2
+                            st.session_state.data.at[index, "GTV < D95 Min Dose_2"] = input_GTV_less_D95_Min_Dose_2
+                            st.session_state.data.at[index, "GTV < D95 SD_2"] = input_GTV_less_D95_SD_2
+                            st.session_state.data.at[index, "GTV < 100 Gy Vol"] = input_GTV_less_100_Gy_Vol
+                            st.session_state.data.at[index, "GTV < 100 Gy Mean Dose"] = input_GTV_less_100_Gy_Mean_Dose
+                            st.session_state.data.at[index, "GTV < 100 Gy Min Dose"] = input_GTV_less_100_Gy_Min_Dose
+                            st.session_state.data.at[index, "GTV < 100 Gy SD"] = input_GTV_less_100_Gy_SD
+                            st.success("Dosimetry Data added successfully.")
 
-                                st.success("Dosimetry Data added successfully.")
-                                st.write("Updated Data:")
-                                
+                elif st.session_state.selected_tab == "AFP":
+                    st.subheader("Dosimetry Data")
+                    with st.form("dosimetry_data_form"):
+                        
+                            input_1AFP_Date = st.text_area("1AFP Date")
+                            input_1AFP = st.text_area("1AFP")
+                            input_2AFP_Date = st.text_area("2AFP Date")
+                            input_2AFP = st.text_area("2AFP")
+                            input_3AFP_Date = st.text_area("3AFP Date")
+                            input_3AFP = st.text_area("3AFP")
+                            input_4AFP_Date = st.text_area("4AFP Date")
+                            input_4AFP = st.text_area("4AFP")
+                            input_5AFP_Date = st.text_area("5AFP Date")
+                            input_5AFP = st.text_area("5AFP")
+                            input_6AFP_Date = st.text_area("6AFP Date")
+                            input_6AFP = st.text_area("6AFP")
+                            input_7AFP_Date = st.text_area("7AFP Date")
+                            input_7AFP = st.text_area("7AFP")
+                            input_8AFP_Date = st.text_area("8AFP Date")
+                            input_8AFP = st.text_area("8AFP")
+                            input_9AFP_Date = st.text_area("9AFP Date")
+                            input_9AFP = st.text_area("9AFP")
+                            input_10AFP_Date = st.text_area("10AFP Date")
+                            input_10AFP = st.text_area("10AFP")
+                            input_11AFP_Date = st.text_area("11AFP Date")
+                            input_11AFP = st.text_area("11AFP")
+                            input_12AFP_Date = st.text_area("12AFP Date")
+                            input_12AFP = st.text_area("12AFP")
+                            input_13AFP_Date = st.text_area("13AFP Date")
+                            input_13AFP = st.text_area("13AFP")
+                            input_14AFP_Date = st.text_area("14AFP Date")
+                            input_14AFP = st.text_area("14AFP")
+                            input_15AFP_Date = st.text_area("15AFP Date")
+                            input_15AFP = st.text_area("15AFP")
+                            input_16AFP_Date = st.text_area("16AFP Date")
+                            input_16AFP = st.text_area("16AFP")
+                            input_17AFP_Date = st.text_area("17AFP Date")
+                            input_17AFP = st.text_area("17AFP")
+                            input_18AFP_DATE = st.text_area("18AFP DATE")
+                            input_18AFP = st.text_area("18AFP")
+                            input_19AFP_DATE = st.text_area("19AFP DATE")
+                            input_19AFP = st.text_area("19AFP")
+                            input_20AFP_DATE = st.text_area("20AFP DATE")
+                            input_20AFP = st.text_area("20AFP")
+                            input_21AFP_DATE = st.text_area("21AFP DATE")
+                            input_21AFP = st.text_area("21AFP")
+                            input_22AFP_DATE = st.text_area("22AFP DATE")
+                            input_22AFP = st.text_area("22AFP")
+                            input_23AFP_DATE = st.text_area("23AFP DATE")
+                            input_23AFP = st.text_area("23AFP")
+                            input_24AFP_DATE = st.text_area("24AFP DATE")
+                            input_24AFP = st.text_area("24AFP")
+                            input_25AFP_DATE = st.text_area("25AFP DATE")
+                            input_25AFP = st.text_area("25AFP")
+                            input_26AFP_DATE = st.text_area("26AFP DATE")
+                            input_26AFP = st.text_area("26AFP")
+                            input_27AFP_DATE = st.text_area("27AFP DATE")
+                            input_27AFP = st.text_area("27AFP")
+                            input_28AFP_DATE = st.text_area("28AFP DATE")
+                            input_28AFP = st.text_area("28AFP")
+                            input_29AFP_DATE = st.text_area("29AFP DATE")
+                            input_29AFP = st.text_area("29AFP")
+                            input_30AFP_DATE = st.text_area("30AFP DATE")
+                            input_30AFP = st.text_area("30AFP")
+                            input_31AFP_Date = st.text_area("31AFP Date")
+                            input_31AFP = st.text_area("31AFP")
+                            input_32AFP_DATE = st.text_area("32AFP DATE")
+                            input_32AFP = st.text_area("32AFP")
+                            input_33AFP_DATE = st.text_area("33AFP DATE")
+                            input_33AFP = st.text_area("33AFP")
+                            input_34AFP_DATE = st.text_area("34AFP DATE")
+                            input_34AFP = st.text_area("34AFP")
+
+                            submit_afp = st.form_submit_button("Submit")
+
+                            if submit_afp:
+                                index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
+                                # Assign the input values to st.session_state.data at the specified index
+                                st.session_state.data.at[index, "1AFP Date"] = input_1AFP_Date
+                                st.session_state.data.at[index, "1AFP"] = input_1AFP
+                                st.session_state.data.at[index, "2AFP Date"] = input_2AFP_Date
+                                st.session_state.data.at[index, "2AFP"] = input_2AFP
+                                st.session_state.data.at[index, "3AFP Date"] = input_3AFP_Date
+                                st.session_state.data.at[index, "3AFP"] = input_3AFP
+                                st.session_state.data.at[index, "4AFP Date"] = input_4AFP_Date
+                                st.session_state.data.at[index, "4AFP"] = input_4AFP
+                                st.session_state.data.at[index, "5AFP Date"] = input_5AFP_Date
+                                st.session_state.data.at[index, "5AFP"] = input_5AFP
+                                st.session_state.data.at[index, "6AFP Date"] = input_6AFP_Date
+                                st.session_state.data.at[index, "6AFP"] = input_6AFP
+                                st.session_state.data.at[index, "7AFP Date"] = input_7AFP_Date
+                                st.session_state.data.at[index, "7AFP"] = input_7AFP
+                                st.session_state.data.at[index, "8AFP Date"] = input_8AFP_Date
+                                st.session_state.data.at[index, "8AFP"] = input_8AFP
+                                st.session_state.data.at[index, "9AFP Date"] = input_9AFP_Date
+                                st.session_state.data.at[index, "9AFP"] = input_9AFP
+                                st.session_state.data.at[index, "10AFP Date"] = input_10AFP_Date
+                                st.session_state.data.at[index, "10AFP"] = input_10AFP
+                                st.session_state.data.at[index, "11AFP Date"] = input_11AFP_Date
+                                st.session_state.data.at[index, "11AFP"] = input_11AFP
+                                st.session_state.data.at[index, "12AFP Date"] = input_12AFP_Date
+                                st.session_state.data.at[index, "12AFP"] = input_12AFP
+                                st.session_state.data.at[index, "13AFP Date"] = input_13AFP_Date
+                                st.session_state.data.at[index, "13AFP"] = input_13AFP
+                                st.session_state.data.at[index, "14AFP Date"] = input_14AFP_Date
+                                st.session_state.data.at[index, "14AFP"] = input_14AFP
+                                st.session_state.data.at[index, "15AFP Date"] = input_15AFP_Date
+                                st.session_state.data.at[index, "15AFP"] = input_15AFP
+                                st.session_state.data.at[index, "16AFP Date"] = input_16AFP_Date
+                                st.session_state.data.at[index, "16AFP"] = input_16AFP
+                                st.session_state.data.at[index, "17AFP Date"] = input_17AFP_Date
+                                st.session_state.data.at[index, "17AFP"] = input_17AFP
+                                st.session_state.data.at[index, "18AFP DATE"] = input_18AFP_DATE
+                                st.session_state.data.at[index, "18AFP"] = input_18AFP
+                                st.session_state.data.at[index, "19AFP DATE"] = input_19AFP_DATE
+                                st.session_state.data.at[index, "19AFP"] = input_19AFP
+                                st.session_state.data.at[index, "20AFP DATE"] = input_20AFP_DATE
+                                st.session_state.data.at[index, "20AFP"] = input_20AFP
+                                st.session_state.data.at[index, "21AFP DATE"] = input_21AFP_DATE
+                                st.session_state.data.at[index, "21AFP"] = input_21AFP
+                                st.session_state.data.at[index, "22AFP DATE"] = input_22AFP_DATE
+                                st.session_state.data.at[index, "22AFP"] = input_22AFP
+                                st.session_state.data.at[index, "23AFP DATE"] = input_23AFP_DATE
+                                st.session_state.data.at[index, "23AFP"] = input_23AFP
+                                st.session_state.data.at[index, "24AFP DATE"] = input_24AFP_DATE
+                                st.session_state.data.at[index, "24AFP"] = input_24AFP
+                                st.session_state.data.at[index, "25AFP DATE"] = input_25AFP_DATE
+                                st.session_state.data.at[index, "25AFP"] = input_25AFP
+                                st.session_state.data.at[index, "26AFP DATE"] = input_26AFP_DATE
+                                st.session_state.data.at[index, "26AFP"] = input_26AFP
+                                st.session_state.data.at[index, "27AFP DATE"] = input_27AFP_DATE
+                                st.session_state.data.at[index, "27AFP"] = input_27AFP
+                                st.session_state.data.at[index, "28AFP DATE"] = input_28AFP_DATE
+                                st.session_state.data.at[index, "28AFP"] = input_28AFP
+                                st.session_state.data.at[index, "29AFP DATE"] = input_29AFP_DATE
+                                st.session_state.data.at[index, "29AFP"] = input_29AFP
+                                st.session_state.data.at[index, "30AFP DATE"] = input_30AFP_DATE
+                                st.session_state.data.at[index, "30AFP"] = input_30AFP
+                                st.session_state.data.at[index, "31AFP Date"] = input_31AFP_Date
+                                st.session_state.data.at[index, "31AFP"] = input_31AFP
+                                st.session_state.data.at[index, "32AFP DATE"] = input_32AFP_DATE
+                                st.session_state.data.at[index, "32AFP"] = input_32AFP
+                                st.session_state.data.at[index, "33AFP DATE"] = input_33AFP_DATE
+                                st.session_state.data.at[index, "33AFP"] = input_33AFP
+                                st.session_state.data.at[index, "34AFP DATE"] = input_34AFP_DATE
+                                st.session_state.data.at[index, "34AFP"] = input_34AFP
+                                st.success("AFP Data added successfully.")
+                                   
         st.dataframe(st.session_state.data, use_container_width=True)
 if st.session_state.logged_in:
     # Navigation options
@@ -5907,3 +6176,4 @@ if st.session_state.logged_in:
         st.rerun()
 else:
     login_page()        
+
