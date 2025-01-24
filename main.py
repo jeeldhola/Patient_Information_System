@@ -609,6 +609,7 @@ def add_new_data():
 
     col1, col2 = st.columns([0.3, 0.7],gap="small")
 
+
     # Left column for vertical tabs
     with col1:
         st.header("Patient Deatils")
@@ -667,6 +668,7 @@ def add_new_data():
                         st.session_state.temp_mrn = mrn
                         st.success("Patient Information saved. Proceed to Patient Description tab.")
             
+              
         elif st.session_state.selected_tab == "Patient Demographics":
             st.subheader("Patient_Demographics")
             with st.form("demographics_form"):
@@ -1095,6 +1097,8 @@ def add_new_data():
                         hcc_dx_albi_grade = albi_class(hcc_dx_albi_score_calc)
 
                         hcc_dx_bclc_calc = st.text_area("HCC_Dx_BCLC Stage calc")
+                    
+
                         submit_tab4 = st.form_submit_button("Submit")
                         if submit_tab4:
                                 index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
@@ -1153,6 +1157,7 @@ def add_new_data():
                         )
                         PRVTHER_Prior_RFA_Date = 0 if PRVTHER_Prior_RFA_Therapy == 'No' else st.date_input("PRVTHER_Prior RFA Date")
 
+                    
                         PRVTHER_Prior_TARE_Therapy = st.selectbox(
                             "PRVTHER_Prior TARE Therapy",
                             options=["Yes", "No","NA"],
@@ -1173,6 +1178,8 @@ def add_new_data():
                         )
                         
                         PRVTHER_Prior_SBRT_Date = 0 if PRVTHER_Prior_SBRT_Therapy == 'No' else st.date_input("PRVTHER_Prior SBRT Date")
+
+
                     
                         PRVTHER_Prior_TACE_Therapy = st.selectbox(
                             "PRVTHER_Prior TACE Therapy",
@@ -1205,6 +1212,7 @@ def add_new_data():
                         )
                         PRVTHER_Resection_Date = 0 if PRVTHER_Resection == 'No' else st.date_input("PRVTHER_Resection Date")
 
+
                         list1=[PRVTHER_Prior_LDT_Therapy, PRVTHER_Prior_RFA_Therapy, PRVTHER_Prior_TARE_Therapy, PRVTHER_Prior_SBRT_Therapy, PRVTHER_Prior_TACE_Therapy, PRVTHER_Prior_MWA_Therapy, PRVTHER_Resection ]
                         sum=0
                         for item in list1:
@@ -1219,6 +1227,7 @@ def add_new_data():
 
                         PRVTHER_NotesFT = st.text_area(
                         "PRVTHER_NotesFT",
+                    
                         )
 
                         PRVTHER_Total_Recurrences_HCC = st.text_area(
@@ -1293,6 +1302,7 @@ def add_new_data():
                         )
 
                         submit_tab5 = st.form_submit_button("Submit")
+
                         if submit_tab5:
                                 index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
 
@@ -5970,7 +5980,7 @@ def edit_existing_data():
                         submit_dosimetry_data = st.form_submit_button("Submit")
 
                         if submit_dosimetry_data:
-                            index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
+                            #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
 
                             # Assign inputs to session state
                             st.session_state.data.at[index, "GTV mean dose"] = input_GTV_mean_dose
@@ -6089,7 +6099,7 @@ def edit_existing_data():
                             submit_afp = st.form_submit_button("Submit")
 
                             if submit_afp:
-                                index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
+                                #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
                                 # Assign the input values to st.session_state.data at the specified index
                                 st.session_state.data.at[index, "1AFP Date"] = input_1AFP_Date
                                 st.session_state.data.at[index, "1AFP"] = input_1AFP
