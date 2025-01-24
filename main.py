@@ -3491,7 +3491,7 @@ def edit_existing_data():
         if mrn not in st.session_state.data["MRN"].values:
             st.error(f"No data found for MRN {mrn}.")
         else:
-            st.subheader("Cahnge_Data")
+            st.subheader("Change_Data")
             
             st.write(f"Editing data for MRN: {mrn}")
 
@@ -6186,4 +6186,3 @@ if st.session_state.logged_in:
         st.rerun()
 else:
     login_page()        
-
