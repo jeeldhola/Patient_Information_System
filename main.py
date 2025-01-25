@@ -6369,7 +6369,7 @@ def edit_existing_data():
                                     update_dataframe(df,mrn)                                    
                                     st.success("AFP Data added successfully.")
 if st.session_state.logged_in:
-    # Navigation options
+  
     st.sidebar.title("Navigation")
     options = st.sidebar.radio("Select an option", ["Add New Data", "Edit Existing Data", "Logout"])
     
