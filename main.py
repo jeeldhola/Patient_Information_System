@@ -759,7 +759,12 @@ def add_new_data():
                     if fetch_all_mrn(mrn):
                         st.error(f"MRN {mrn} already exists. Please enter a unique MRN.")
                     else:
-                        st.session_state.data = st.session_state.data[st.session_state.data["MRN"] != st.session_state.temp_mrn]
+                        if hasattr(st.session_state, 'temp_mrn'):
+                            # If temp_mrn exists, remove the old entry with the previous MRN
+                            st.session_state.data = st.session_state.data[st.session_state.data["MRN"] != st.session_state.temp_mrn]
+                            # Reset temp_mrn after clearing the previous entry
+                            del st.session_state.temp_mrn
+                        #st.session_state.data = st.session_state.data[st.session_state.data["MRN"] != st.session_state.temp_mrn]
                         st.session_state.data = pd.concat(
                         [st.session_state.data, pd.DataFrame([{
                             "Name": f"{last_name}, {first_name}",
