@@ -3,16 +3,16 @@ import pandas as pd
 import math
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+import json
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 # Google Sheets API setup
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = 'streemlit-ed54095f0814.json'  # Update this path
-
+#SERVICE_ACCOUNT_FILE = 'streemlit-ed54095f0814.json'  # Update this path
+json_key = json.loads(st.secrets["gcp_service_account"]["json_key"])
+credentials = service_account.Credentials.from_service_account_info(json_key)
 # Authenticate and create the service
-credentials = service_account.Credentials.from_service_account_file(
-    SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 service = build('sheets', 'v4', credentials=credentials)
 
 # The ID and range of the spreadsheet
