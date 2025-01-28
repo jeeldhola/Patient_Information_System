@@ -145,8 +145,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
-
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 username = "user"
@@ -1290,8 +1288,6 @@ def add_new_data():
                             placeholder="Choose an option",
                         )
                         PRVTHER_Prior_RFA_Date = 0 if PRVTHER_Prior_RFA_Therapy == 'No' else st.date_input("PRVTHER_Prior RFA Date")
-
-                    
                         PRVTHER_Prior_TARE_Therapy = st.selectbox(
                             "PRVTHER_Prior TARE Therapy",
                             options=["Yes", "No","NA"],
@@ -1301,7 +1297,6 @@ def add_new_data():
                             placeholder="Choose an option",
                         )
                         PRVTHER_Prior_TARE_Date = 0 if PRVTHER_Prior_TARE_Therapy == 'No' else st.date_input("PRVTHER_Prior TARE Date")
-                    
                         PRVTHER_Prior_SBRT_Therapy = st.selectbox(
                             "PRVTHER_Prior SBRT Therapy",
                             options=["Yes", "No","NA"],
@@ -1310,11 +1305,7 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        
                         PRVTHER_Prior_SBRT_Date = 0 if PRVTHER_Prior_SBRT_Therapy == 'No' else st.date_input("PRVTHER_Prior SBRT Date")
-
-
-                    
                         PRVTHER_Prior_TACE_Therapy = st.selectbox(
                             "PRVTHER_Prior TACE Therapy",
                             options=["Yes", "No","NA"],
@@ -1323,9 +1314,7 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        
                         PRVTHER_Prior_TACE_Date = 0 if PRVTHER_Prior_TACE_Therapy == 'No' else st.date_input("PRVTHER_Prior TACE Date")
-
                         PRVTHER_Prior_MWA_Therapy = st.selectbox(
                             "PRVTHER_Prior MWA Therapy",
                             options=["Yes", "No","NA"],
@@ -1335,7 +1324,6 @@ def add_new_data():
                             placeholder="Choose an option",
                         )
                         PRVTHER_Prior_MWA_Date = 0 if PRVTHER_Prior_MWA_Therapy == 'No' else st.date_input("PRVTHER_Prior MWA Date")
-
                         PRVTHER_Resection = st.selectbox(
                             "PRVTHER_Resection",
                             options=["Yes", "No","NA"],
