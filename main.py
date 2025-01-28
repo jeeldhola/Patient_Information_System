@@ -5696,7 +5696,6 @@ def edit_existing_data():
                                     "3rd_FU_Non-Target Lesion 1 CCD Art Enhanc",
                                     step=0.1,value = float(df.iloc[0]["3rd_FU_Non-Target Lesion 1 CCD Art Enhanc"]) if pd.notnull(df.iloc[0]["3rd_FU_Non-Target Lesion 1 CCD Art Enhanc"]) and df.iloc[0]["3rd_FU_Non-Target Lesion 1 CCD Art Enhanc"] !="" else 0.0
                                 )
-
                                 FU3_Non_targeted_Lesion_Dia_Sum = max(FU3_Non_Target_Lesion_1_LAD_Art_Enhanc, FU3_Non_Target_Lesion_1_PAD_Art_Enhanc, FU3_Non_Target_Lesion_1_CCD_Art_Enhanc)
                                 st.write("3rd_FU_Non-targeted Lesion Dia Sum",FU3_Non_targeted_Lesion_Dia_Sum)
                                 FU3_Lesion_Necrosis = st.selectbox(
@@ -5705,34 +5704,29 @@ def edit_existing_data():
                         index=["No", "Yes", "NA"].index(df.iloc[0]["3rd_FU_Lesion Necrosis"]) if df.iloc[0]["3rd_FU_Lesion Necrosis"] else None,
                         placeholder="Choose an option",
                                 )
-
                                 FU3_Reviewers_Initials = st.text_input(
                                     "3rd_FU_Reviewers Initials",
                                     help="Free-text input for reviewer name",
                                     value = df.iloc[0]["3rd_FU_Reviewers Initials"]
                                 )
-
                                 FU3_Non_target_lesion_response = st.selectbox(
                                     "3rd_FU_Non target lesion response",
                                     options=["No", "Yes", "NA"],
                         index=["No", "Yes", "NA"].index(df.iloc[0]["3rd_FU_Non target lesion response"]) if df.iloc[0]["3rd_FU_Non target lesion response"] else None,
                         placeholder="Choose an option",
                                 )
-
                                 FU3_New_Lesions = st.selectbox(
                                     "3rd_FU_New Lesions",
                                     options=["No", "Yes", "NA"],
                         index=["No", "Yes", "NA"].index(df.iloc[0]["3rd_FU_New Lesions"]) if df.iloc[0]["3rd_FU_New Lesions"] else None,
                         placeholder="Choose an option",
                                 )
-
                                 FU3_NEW_Extrahepatic_Disease = st.selectbox(
                                     "3rd_FU_NEW Extrahepatic Disease",
                                     options=["No", "Yes", "NA"],
                         index=["No", "Yes", "NA"].index(df.iloc[0]["3rd_FU_Extrahepatic Disease"]) if df.iloc[0]["3rd_FU_Extrahepatic Disease"] else None,
                         placeholder="Choose an option",
                                 )
-
                                 FU3_NEW_Extrahepatic_Dz_Location = st.text_input(
                                     "3rd_FU_NEW Extrahepatic Dz Location",
                                     help="Free text",
@@ -5864,7 +5858,6 @@ def edit_existing_data():
                                 )
 
                                 FU4_NEW_Extrahepatic_Dz_Date = st.date_input("4th_FU_NEW Extrahepatic Dz Date",value = datetime.strptime(df.iloc[0]["4th_FU_NEW Extrahepatic Dz Date"], "%Y-%m-%d").date() if df.iloc[0]["4th_FU_NEW Extrahepatic Dz Date"] else None)
-
                                 FU4_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU4_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
                                 st.write("4th_FU_% change non target lesion",FU4_change_non_target_lesion)
                                 FU4_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU4_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
@@ -5876,7 +5869,6 @@ def edit_existing_data():
                                     "4th_FU_Free Text",
                                     help="Free text", value = df.iloc[0]["4th_FU_Free Text"]
                                 )
-
                                 # 5th Imaging Follow-up
                                 st.subheader("Imaging_5th_Followup")
 
@@ -5935,7 +5927,6 @@ def edit_existing_data():
                                     help="Free text",
                                     value = df.iloc[0]["5th_FU_NEW Extrahepatic Dz Location"]
                                 )
-
                                 FU5_NEW_Extrahepatic_Dz_Date = st.date_input("5th_FU_NEW Extrahepatic Dz Date",value = datetime.strptime(df.iloc[0]["5th_FU_NEW Extrahepatic Dz Date"], "%Y-%m-%d").date() if df.iloc[0]["5th_FU_NEW Extrahepatic Dz Date"] else None)
 
                                 FU5_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU5_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
@@ -6080,7 +6071,6 @@ def edit_existing_data():
                                 if Date_of_Death != None and Date_of_Death != "NA" :
                                     Date_of_Death = Date_of_Death.strftime("%Y-%m-%d")
                                 submit_tab10 = st.form_submit_button("Submit")
-
                                 if submit_tab10:
                                     
                                     data10={
@@ -6304,7 +6294,6 @@ def edit_existing_data():
                             input_GTV_less_100_Gy_Mean_Dose = st.text_input("GTV < 100 Gy Mean Dose",value = df.iloc[0]["GTV < 100 Gy Mean Dose"])
                             input_GTV_less_100_Gy_Min_Dose = st.text_input("GTV < 100 Gy Min Dose",value = df.iloc[0]["GTV < 100 Gy Min Dose"])
                             input_GTV_less_100_Gy_SD = st.text_input("GTV < 100 Gy SD",value = df.iloc[0]["GTV < 100 Gy SD"])
-
                             submit_dosimetry_data = st.form_submit_button("Submit")
 
                             if submit_dosimetry_data:
@@ -6422,7 +6411,6 @@ def edit_existing_data():
                                 input_33AFP = st.text_area("33AFP",value = df.iloc[0]["33AFP"])
                                 input_34AFP_DATE = st.text_area("34AFP DATE",value = df.iloc[0]["34AFP DATE"])
                                 input_34AFP = st.text_area("34AFP",value = df.iloc[0]["34AFP"])
-
                                 submit_afp = st.form_submit_button("Submit")
 
                                 if submit_afp:
