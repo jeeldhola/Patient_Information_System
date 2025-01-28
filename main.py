@@ -10,8 +10,9 @@ from googleapiclient.discovery import build
 # Google Sheets API setup
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 #SERVICE_ACCOUNT_FILE = 'streemlit-ed54095f0814.json'  # Update this path
-json_key = json.loads(st.secrets["gcp_service_account"]["json_key"])
-credentials = service_account.Credentials.from_service_account_info(json_key)
+credentials_info = json.loads(st.secrets["gcp_service_account"])
+credentials = service_account.Credentials.from_service_account_info(credentials_info)
+
 # Authenticate and create the service
 service = build('sheets', 'v4', credentials=credentials)
 
