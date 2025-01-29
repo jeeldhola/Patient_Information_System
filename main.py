@@ -4515,7 +4515,7 @@ def edit_existing_data():
                                 index=["0", "1", "NA"].index(df.iloc[0]["PTHER_RESECTION"]) if df.iloc[0]["PTHER_RESECTION"] else None, 
                                 placeholder="Choose an option",
                             )
-                            PRVTHER_Resection_Date = 0 if PRVTHER_Resection == '0' else st.date_input("PRVTHER_Resection Date",value=datetime.strptime(df.iloc[0]["PTHER_RESECTIONDATE"].values[0], "%Y-%m-%d").date() if df.iloc[0]["PTHER_RESECTIONDATE"] else None)
+                            PRVTHER_Resection_Date = 0 if PRVTHER_Resection == "0" else st.date_input("PRVTHER_Resection Date",value=datetime.strptime(df.iloc[0]["PTHER_RESECTIONDATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_RESECTIONDATE"] else None)
 
 
                             list1=[PRVTHER_Prior_LDT_Therapy, PRVTHER_Prior_RFA_Therapy, PRVTHER_Prior_TARE_Therapy, PRVTHER_Prior_SBRT_Therapy, PRVTHER_Prior_TACE_Therapy, PRVTHER_Prior_MWA_Therapy, PRVTHER_Resection ]
@@ -4623,49 +4623,49 @@ def edit_existing_data():
                                 help="Enter AFP value in ng/dl or NA",step=0.1,
                                 value=float(df.iloc[0]["PTHER_AFP"]) if pd.notnull(df.iloc[0]["PTHER_AFP"]) and str(df.iloc[0]["PTHER_AFP"]).isdigit() else 0.0
                             )
-                            if PRVTHER_Prior_RFA_Date == "0":
+                            if PRVTHER_Prior_RFA_Date == 0:
                                 PRVTHER_Prior_RFA_Date = 0
                             elif PRVTHER_Prior_RFA_Date == None :
                                 PRVTHER_Prior_RFA_Date = None
                             else:
                                 PRVTHER_Prior_RFA_Date=PRVTHER_Prior_RFA_Date.strftime("%Y-%m-%d") 
                             
-                            if PRVTHER_Prior_TARE_Date == "0":
+                            if PRVTHER_Prior_TARE_Date == 0:
                                 PRVTHER_Prior_TARE_Date = 0
                             elif PRVTHER_Prior_TARE_Date == None :
                                 PRVTHER_Prior_TARE_Date = None
                             else:
                                 PRVTHER_Prior_TARE_Date=PRVTHER_Prior_TARE_Date.strftime("%Y-%m-%d")
 
-                            if PRVTHER_Prior_SBRT_Date == "0":
+                            if PRVTHER_Prior_SBRT_Date == 0:
                                 PRVTHER_Prior_SBRT_Date = 0
                             elif PRVTHER_Prior_SBRT_Date == None :
                                 PRVTHER_Prior_SBRT_Date = None
                             else:
                                 PRVTHER_Prior_SBRT_Date=PRVTHER_Prior_SBRT_Date.strftime("%Y-%m-%d")
 
-                            if PRVTHER_Prior_TACE_Date == "0":
+                            if PRVTHER_Prior_TACE_Date == 0:
                                 PRVTHER_Prior_TACE_Date = 0
                             elif PRVTHER_Prior_TACE_Date == None :
                                 PRVTHER_Prior_TACE_Date = None
                             else:
                                 PRVTHER_Prior_TACE_Date=PRVTHER_Prior_TACE_Date.strftime("%Y-%m-%d")
 
-                            if PRVTHER_Prior_MWA_Date == "0":
+                            if PRVTHER_Prior_MWA_Date == 0:
                                 PRVTHER_Prior_MWA_Date = 0
                             elif PRVTHER_Prior_MWA_Date == None :
                                 PRVTHER_Prior_MWA_Date = None
                             else:
                                 PRVTHER_Prior_MWA_Date=PRVTHER_Prior_MWA_Date.strftime("%Y-%m-%d")   
 
-                            if PRVTHER_Resection_Date == "0":
+                            if PRVTHER_Resection_Date == 0:
                                 PRVTHER_Resection_Date = 0
                             elif PRVTHER_Resection_Date == None :
                                 PRVTHER_Resection_Date = None
                             else:
                                 PRVTHER_Resection_Date=PRVTHER_Resection_Date.strftime("%Y-%m-%d")
 
-                            if PRVTHER_Date_of_Labs_in_Window == "0":
+                            if PRVTHER_Date_of_Labs_in_Window == 0:
                                 PRVTHER_Date_of_Labs_in_Window = 0
                             elif PRVTHER_Date_of_Labs_in_Window == None :
                                 PRVTHER_Date_of_Labs_in_Window = None
