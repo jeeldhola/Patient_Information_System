@@ -10,14 +10,17 @@ from googleapiclient.discovery import build
 
 credentials_info = st.secrets["connections"]
 credentials = service_account.Credentials.from_service_account_info(credentials_info)
+
 # Google Sheets API setup
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-
+#SERVICE_ACCOUNT_FILE = 'streemlit-ed54095f0814.json'  # Update this path
 # Authenticate and create the service
+
 service = build('sheets', 'v4', credentials=credentials)
+
 # The ID and range of the spreadsheet
-SPREADSHEET_ID = '1Eb3pnP1MYlDaBCzz0pTc3h1yNBpslxfGI4QiAQEDAiw'  
-RANGE_NAME = 'Sheet1'  
+SPREADSHEET_ID = '1Eb3pnP1MYlDaBCzz0pTc3h1yNBpslxfGI4QiAQEDAiw'  # Update this with your spreadsheet ID
+RANGE_NAME = 'Sheet1'  # Update this with your target range
 
 def append_to_google_sheet(data):
     try:
@@ -38,7 +41,6 @@ def append_to_google_sheet(data):
 
 def fetch_data_from_google_sheet():
     try:
-        
         result = service.spreadsheets().values().get(
             spreadsheetId=SPREADSHEET_ID,
             range=RANGE_NAME
@@ -48,12 +50,28 @@ def fetch_data_from_google_sheet():
 
         if not values:
             st.warning("No data found in the specified range.")
-            return pd.DataFrame()  # or return None if preferred
+            return pd.DataFrame()
 
-        # Handle header and rows
-        headers = values[0]  # Assume the first row is the header
-        data_rows = [row + [""] * (len(headers) - len(row)) for row in values[1:]]  # Pad rows if needed
+        # Extract headers (First row)
+        headers = values[0]
+        
+        if len(values) < 2:  # No data rows available
+            st.warning("Only headers found, no data available.")
+            return pd.DataFrame(columns=headers)
+
+        # Process data rows safely, padding if needed
+        data_rows = [row + [""] * (len(headers) - len(row)) for row in values[1:]]
+
+        # Create DataFrame
         df = pd.DataFrame(data_rows, columns=headers)
+
+        # Ensure MRN or any required column exists
+        required_columns = ["MRN"]  # Add more required columns if needed
+        for col in required_columns:
+            if col not in df.columns:
+                st.error(f"Column '{col}' not found in Google Sheets.")
+                return pd.DataFrame()
+
         return df
 
     except Exception as e:
@@ -69,6 +87,9 @@ def update_google_sheet(data, mrn):
         if 'MRN' not in df.columns:
             st.error(f"MRN column not found in Google Sheets.")
             return False
+        df['MRN'] = df['MRN'].astype(str)
+        mrn = str(mrn)
+
         index = df[df['MRN'] == mrn].index[0]
         for key, value in data.items():
             if key in df.columns:
@@ -157,20 +178,15 @@ def fetch_data_for_mrn(mrn):
     if 'MRN' not in df.columns:
         st.error(f"MRN column not found in the Google Sheet.")
         return None
-    if mrn not in df['MRN'].values:
+    if str(mrn) not in df['MRN'].values:
         st.error(f"No data found for MRN {mrn}.")
         return None
-    data = df[df['MRN'] == mrn]
+    data = df[df['MRN'] == str(mrn)]
     return data
 
 if "data" not in st.session_state:
     st.session_state.data = pd.DataFrame(
-        columns=["Name",
-    "MRN",
-    "Duplicate",
-    "TAREdate",
-    "PTech",
-    "Tareage",
+        columns=["FIRST", "LAST", "MRN","ID","Duplicate","TAREdate","PT","Tareage",
     "Gender",
     "Ethnicity",
     "PMHxHTN",
@@ -611,7 +627,6 @@ def login_page():
             st.error("Invalid username or password.")
 
 def add_new_data():
- 
     
     df=fetch_data_from_google_sheet()
     st.dataframe(df)
@@ -726,38 +741,51 @@ def add_new_data():
         st.session_state.selected_tab = st.radio("", tabs)
 
     with col2:
-        
         if st.session_state.selected_tab == "Patient Info":
-            
             st.subheader("Patient_Info")
             with st.form("patient_info_form"):
                 # Patient Info Section
                 col1, col2 = st.columns(2)
-                last_name = col1.text_input("Last Name")
-                last_name = last_name.lower()
-                first_name = col2.text_input("First Name")
-                first_name = first_name.lower()
+                first_name = col1.text_input("First Name")
+                first_name = first_name.capitalize()
+                last_name = col2.text_input("Last Name")
+                last_name = last_name.capitalize()
                 
-                mrn = st.text_input("MRN",help="Enter patient's Medical Record Number")
+                mrn = st.number_input("MRN",step=1)
+                id=""
                 
-                duplicate_procedure_check = 0
+                if first_name and last_name:
+                    base_id = first_name[0] + last_name[0]
+                    if not df.empty:
+                        existing_ids = df['ID'].tolist()
+                        count = sum(1 for id in existing_ids if id.startswith(base_id))
+                        id = f"{base_id}{count + 1}"
+                    else:
+                        id = f"{base_id}1"
+                else:
+                    id = ""
+                
+                duplicate_procedure_check = ""
+                if id.endswith("1"):
+                     duplicate_procedure_check = ""
+                else:
+                     duplicate_procedure_check = "Duplicate"
+                
                 tare_date = st.date_input("TARE Tx Date", help="Select the treatment date")
                 procedure_technique = st.selectbox(
-                "Procedure Technique",
+                "Procedure Technique    [Excel : PROTYPE]\n\nLobar (1), Segmental (2)",
                 options=["1", "2"],
                 format_func=lambda x: {
                                     "1": "Lobar",
-                                    "2": " Segmental",
+                                    "2": "Segmental",
                                 }[x],
                 index=None,  # No default selection
                 placeholder="Choose an option",
                 )
-
                 age = st.number_input("Age at time of TARE", min_value=0, max_value=150, step=1)
-            
                 submit_tab1 = st.form_submit_button("Submit")
                 if submit_tab1:
-                        df = fetch_data_from_google_sheet()
+                        #df = fetch_data_from_google_sheet()
                         if not df.empty and mrn in df['MRN'].values:
                             st.error(f"MRN {mrn} already exists. Please enter a unique MRN.")
                         else:
@@ -766,15 +794,16 @@ def add_new_data():
                                 st.session_state.data = st.session_state.data[st.session_state.data["MRN"] != st.session_state.temp_mrn]
                                 # Reset temp_mrn after clearing the previous entry
                                 del st.session_state.temp_mrn
-                            
-                    
+                            st.write("ID :",id)
                             data = {
-                                "Name": f"{last_name}, {first_name}",
+                                "FIRST": first_name,
+                                "LAST": last_name,
                                 "MRN": mrn,
-                                "Duplicate" : duplicate_procedure_check,
-                                "TAREdate": tare_date.strftime("%Y-%m-%d"),
-                                "PTech": procedure_technique,
-                                "Tareage": age
+                                "ID" : id,
+                                "DUP" : duplicate_procedure_check,
+                                "TAREDATE": tare_date.strftime("%Y-%m-%d"),
+                                "PROTYPE": procedure_technique,
+                                "TAREAGE": age
                                 } 
                             st.session_state.temp_mrn = mrn
                             # Store the data in session state
@@ -791,86 +820,105 @@ def add_new_data():
                 else:
                     #try:
                         gender = st.selectbox(
-                            "Gender",
-                            options=["Male", "Female"],
+                            "Gender     [Excel : GENDER]\n\nMale (1) , Female (2)",
+                            options=["1", "2"],
+                            format_func=lambda x: {
+                                                    "1": "Male",
+                                                    "2": "Female",
+                                                }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
 
                         # Ethnicity dropdown
                         ethnicity = st.selectbox(
-                            "Ethnicity",
-                            options=["Black","White", "Asian", "Hispanic", "Other", "NA", "0"],
+                            "Ethnicity      [Excel : ETHNICITY]\n\n(1) Black, (2) White, (3) Asian, (4) Hispanic, (5) Other, NA (cant find it in sheet), 0 (not present)",
+                            options=["1","2", "3", "4", "5", "NA", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Black",
+                                                    "2": "White",
+                                                    "3": "Asian",
+                                                    "4": "Hispanic",
+                                                    "5": "Other",
+                                                    "NA": "NA (cant find it in sheet)",
+                                                    "0" : "0 (not present)",
+                                                }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                             
                         )
 
                         hypertension = st.selectbox(
-                            "PMHx Hypertension",
-                            options=["No", "Yes"],
+                            "PMHx Hypertension      [Excel : PMHHTN]\n\nYes(1), No(0)",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes",
+                                                    "0": "No",
+                                                }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
 
                         diabetes = st.selectbox(
-                            "PMHx Diabetes (T1 or T2)",
-                            options=["No", "Yes"],
+                            "PMHx Diabetes (T1 or T2)     [Excel : PMHDM]\n\nYes(1), No(0)",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes",
+                                                    "0": "No",
+                                                }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
 
                         hypercholesterolemia = st.selectbox(
-                            "Hypercholesterolemia",
-                            options=["No", "Yes"],
+                            "Hypercholesterolemia      [Excel : HYPERCHOL]\n\nYes(1), No(0)",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes",
+                                                    "0": "No",
+                                                }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
 
                         smoking = st.selectbox(
-                            "Hx of Smoking",
-                            options=["No", "Yes"],
+                            "Hx of Smoking      [Excel : PMHSMOKE]\n\nYes(1), No(0)",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes",
+                                                    "0": "No",
+                                                }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
 
                         obesity = st.selectbox(
-                            "Obesity",
-                            options=["No", "Yes"],
+                            "Obesity        [Excel : OBESITY]\n\nYes(1), No(0)",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes",
+                                                    "0": "No",
+                                                }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-
-                        # Calculate comorbidities
-                        total_count = calculate_comorbidities_total(
-                            int(hypertension == "Yes"),
-                            int(diabetes == "Yes"),
-                            int(hypercholesterolemia == "Yes"),
-                            int(smoking == "Yes"),
-                            int(obesity == "Yes")
-                        )
-                        
-                        binary_value = calculate_comorbidities_binary(total_count)
-
-                        # Display calculated fields (read-only)
-                        st.info(f"Comorbidities Total Count: {total_count}")
-                        st.info(f"Comorbidities Binary Value: {binary_value}")
+                       
                         submit_tab2 = st.form_submit_button("Submit")
                         if submit_tab2:
                             #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
                             data1={
-                                "Gender": gender,
-                                "Ethnicity":ethnicity,
-                                "PMHxHTN": hypertension,
-                                "PMHxDM":diabetes,
-                                "Hypercholesterolemia" : hypercholesterolemia,
-                                "PMHxSmoking" : smoking,
-                                "Obesity" : obesity,
+                                "GENDER": gender,
+                                "ETHNICITY":ethnicity,
+                                "PMHHTN": hypertension,
+                                "PMHDM":diabetes,
+                                "HYPERCHOL" : hypercholesterolemia,
+                                "PMHSMOKE" : smoking,
+                                "OBESITY" : obesity,
                             }
                             if "patient_info" in st.session_state and st.session_state.patient_info["MRN"] == st.session_state.temp_mrn:
                                 st.session_state.patient_info.update(data1)
                                 # Update the data in Google Sheets
-                                update_google_sheet(st.session_state.patient_info, st.session_state.temp_mrn)
+                                update_google_sheet(data1, int(st.session_state.temp_mrn))
                             else:
                                 st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
                        
@@ -885,8 +933,12 @@ def add_new_data():
                     
                 # Cirrhosis PMH Fields
                         cir_pmh_hbv_status = st.selectbox(
-                            "Cir PMH HBV Status",
-                            options=["Yes", "No"],
+                            "Cir PMH HBV Status [ Excel : CIRPMH_HBV ]\n\nYes(1), No(0)  ",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes ",
+                                                    "0": "No  ",
+                                                }[x],
                             help="Select HBV Status",
                             index=None,  # No default selection
                             placeholder="Choose an option",
@@ -897,15 +949,24 @@ def add_new_data():
                         )
                         
                         cir_pmh_hbv_art = "0" if cir_pmh_hbv_status == "No" else st.selectbox(
-                            "Cir PMH HBV ART",
-                            options=["Entecavir", "Tenofovir", "NA"],
+                            "Cir PMH HBV ART [ Excel : CIRPMH_HBVART ]\n\n(1) Entecavir, (2) Tenofovir, (3) NA  ",
+                            options=["1", "2", "3"],
+                            format_func=lambda x: {
+                                                    "1": "Entecavir ",
+                                                    "2": "Tenofovir ",
+                                                    "3": "NA "
+                                                }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
 
                         cir_pmh_hcv_status = st.selectbox(
-                            "Cir_PMH_HCV Status",
-                            options=["Yes", "No"],
+                            "Cir_PMH_HCV Status [ Excel : CIRPMH_HCV ]\n\nYes(1), No(0)  ",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes ",
+                                                    "0": "No  ",
+                                                }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
@@ -916,8 +977,14 @@ def add_new_data():
                         )
 
                         cir_pmh_hcv_art = "No" if cir_pmh_hcv_status == "No" else st.selectbox(
-                            "Cir_PMH_HCV ART",
-                            options=["sofosbuvir/velpatasvir", "ledipasvir/sofosbuvir", "NA", "Glecaprevir/pibrentasvi"],
+                            "Cir_PMH_HCV ART [ Excel : CIRPMH_HCVART ]\n\n(1) sofosbuvir/velpatasvir , (2) ledipasvir/sofosbuvir, (3) NA (if u can't find a med or if they arent on it), (4) Glecaprevir/pibrentasvir",
+                            options=["1", "2", "3", "4"],
+                            format_func=lambda x: {
+                                                    "1": " sofosbuvir/velpatasvir",
+                                                    "2": " ledipasvir/sofosbuvir",
+                                                    "3": " NA (if you can't find a med or if they aren't on it)",
+                                                    "4": " Glecaprevir/pibrentasvir"
+                                                }[x],
                             help="Select ART treatment for HCV",
                             index=None,  # No default selection
                             placeholder="Choose an option",
@@ -925,8 +992,12 @@ def add_new_data():
                         )
 
                         cir_pmh_alcohol_use_disorder = st.selectbox( 
-                            "Cir_PMH_Alcohol Use Disorder",
-                            options=["Yes", "No"],
+                            "Cir_PMH_Alcohol Use Disorder [ Excel : CIRPMH_AUD ]\n\nYes(1), No(0)  ",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes ",
+                                                    "0": "No  ",
+                                                }[x],
                             help="Select Alcohol Disorder",
                             index=None,  # No default selection
                             placeholder="Choose an option",
@@ -938,8 +1009,12 @@ def add_new_data():
                         )
 
                         cir_pmh_ivdu_status = st.selectbox(
-                            "Cir_PMH_IVDU Status",
-                            options=["Yes", "No"],
+                            "Cir_PMH_IVDU Status [ Excel : CIRPMH_IVDU ]\n\nYes(1), No(0)  ",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes",
+                                                    "0": "No  ",
+                                                }[x],
                             #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
                             help="Select IVDU Status",
                             index=None,  # No default selection
@@ -953,8 +1028,16 @@ def add_new_data():
                         )
 
                         cir_pmh_liver_addtional_factor = st.selectbox(
-                            "Cir_PMH_Liver Additional Factors",
-                            options=["NAFLD", "MAFLD", "NASH", "Autoimmune Hepatitis", "Hereditary Hemochromatosis","none"],
+                            "Cir_PMH_Liver Additional Factors [ Excel : CIRPMH_LIVERFAC ]\n\n (1) NAFLD, (2) MAFLD, (3) NASH, (4) Autoimmune Hepatitis, (5) Hereditary Hemochromatosis, (6) none  ",
+                            options=["1", "2", "3", "4", "5", "6"],
+                            format_func=lambda x: {
+                                                    "1": "NAFLD ",
+                                                        "2": "MAFLD ",
+                                                        "3": "NASH ",
+                                                        "4": "Autoimmune Hepatitis ",
+                                                        "5": "Hereditary Hemochromatosis ",
+                                                        "6": "None "
+                                                }[x], 
                             help="Select Other Contributing Factors",
                             index=None,  # No default selection
                             placeholder="Choose an option",
@@ -964,9 +1047,12 @@ def add_new_data():
                         Cirrhosis_Dx_Diagnosis_Date = st.date_input("Cirrhosis Dx Diagnosis Date",help="Select Diagnosis date")
 
                         Cirrhosis_Dx_Diagnosis_Method = st.selectbox(
-                            "Cirrhosis_Dx_Diagnosis Method",
-                            options=["Biopsy", "Imaging"],
-                            help="Select Diagnosis Method",
+                            "Cirrhosis_Dx_Diagnosis Method [ Excel : CIRDX_METHOD ]\n\n(1) Biopsy, (2) Imaging  ",
+                            options=["1", "2"],
+                            format_func=lambda x: {
+                                                    "1": "Biopsy",
+                                                    "2": "maging",
+                                                }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         ) 
@@ -980,7 +1066,7 @@ def add_new_data():
                         )
 
                         Cirrhosis_Dx_Metavir_Score = st.selectbox (
-                            "Cirrhosis_Dx_Metavir Score",
+                            "Cirrhosis_Dx_Metavir Score [ Excel : CIRDX_METAVIR ]  ",
                             options=["F0/F1", "F2","F3","F4","NA"],
                             help="Select Metavir_score",
                             index=None,  # No default selection
@@ -988,7 +1074,7 @@ def add_new_data():
                         ) 
 
                         Cirrhosis_Dx_Complications_at_Time_of_Diagnosis = st.multiselect(
-                            "Cirrhosis_Dx_Complications at Time of Diagnosis",
+                            "Cirrhosis_Dx_Complications at Time of Diagnosis [ Excel : CIRDX_COMPLDX ] ",
                             options=["ascites", " ariceal hemorrhage","Hepatic encephalopathy","jaundice","SBP", "Hepatorenal Syndrome", "Coagulopathy", "Portal HTN", "PVT", "PVTT","Portal Vein Thrombosis" "none"],
                             help="Provide details of Compilications at time of Diagnosis",
                             placeholder="Select all that apply"
@@ -996,7 +1082,7 @@ def add_new_data():
                         Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_String = ", ".join(Cirrhosis_Dx_Complications_at_Time_of_Diagnosis)
 
                         Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary = st.selectbox(
-                            "Cirrhosis_Dx_Complications at Time of Diagnosis Binary",
+                            "Cirrhosis_Dx_Complications at Time of Diagnosis Binary [ Excel : CIRDX_COMPLDXBIN ]  ",
                             options=["0","1"],
                             format_func=lambda x: {
                                 "1": " >1 ",
@@ -1017,7 +1103,6 @@ def add_new_data():
                         Cirrhosis_Dx_AFP = st.text_input(
                             "Cirrhosis_Dx_AFP",
                             help="Enter AFP value in ng/dl"
-                            
                         )
 
                         Cirrhosis_Dx_AFP_L3 = st.text_input(
@@ -1028,7 +1113,7 @@ def add_new_data():
                         Cirrhosis_Dx_AFP_L3_Date_Free_Text = st.text_area("Cirrhosis_Dx_AFP L3 Date Free Text")
 
                         Cirrhosis_Dx_Ascites_CTCAE = st.selectbox (
-                            "Cirrhosis_Dx_Ascites CTCAE",
+                            "Cirrhosis_Dx_Ascites CTCAE [ Excel : CIRDX_ASCITCTCAE ] ",
                             options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
                             format_func=lambda x: {
                             "none": "0. none",
@@ -1064,32 +1149,32 @@ def add_new_data():
                         if submit_tab3:
 
                             data2={
-                            "CirPMH_HBV" : cir_pmh_hbv_status,
-                            "CirPMH_HBVFT" : cir_pmh_hbv_free_text,
-                            "CirPMH_HBVART" : cir_pmh_hbv_art,
-                            "CirPMH_HCV" : cir_pmh_hcv_status,
-                            "CirPMH_HCVFT" : cir_pmh_hcv_free_text,
-                            "CirPMH_HCVART" : cir_pmh_hcv_art,
-                            "CirPMH_AUD" : cir_pmh_alcohol_use_disorder,
-                            "CirPMH_AUDFT" : cir_pmh_alcohol_free_text,
-                            "CirPMH_IVDU" : cir_pmh_ivdu_status,
-                            "CirPMH_IVDUFT" : cir_pmh_ivdu_free_text,
-                            "CirPMH_Liverfactors" : cir_pmh_liver_addtional_factor,
-                            "Cirdx_Dxdate" : Cirrhosis_Dx_Diagnosis_Date.strftime("%Y-%m-%d"),
-                            "Cirdx_Dxmethod" : Cirrhosis_Dx_Diagnosis_Method,
-                            "Cirdx_HPIFT" : Cirrhosis_Dx_HPI_EMR_Note_Free_Text,
-                            "Cirdx_ImageemrFT" : Cirrhosis_Dx_Imaging_Findings_EMR_Note_Free_Text,
-                            "Cirdx_Metavir" : Cirrhosis_Dx_Metavir_Score,
-                            "Cirdx_Compatdx" : Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_String,
-                            "Cirdx_Compatdxbinary" : Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary,
-                            "Cirdx_CompFT" : Cirrhosis_Dx_Complications_Free_Text,
-                            "Cirdx_DateLabs" : Cirrhosis_Dx_Date_of_Labs_in_Window.strftime("%Y-%m-%d"),
-                            "Cirdx_AFP" : Cirrhosis_Dx_AFP,
-                            "Cirdx_AFP L3" : Cirrhosis_Dx_AFP_L3,
-                            "Cirdx_AFPL3DateFT" : Cirrhosis_Dx_AFP_L3_Date_Free_Text,
-                            "Cirdx_AscitesCTCAE" : Cirrhosis_Dx_Ascites_CTCAE,
-                            "Cirdx_AscitesCTCAEnumb" : Cirrhosis_Dx_Ascites_Classification,
-                            "Cirdx_AscitesFT" : Cirrhosis_Dx_Ascites_Free_Text,
+                            "CIRPMH_HBV" : cir_pmh_hbv_status,
+                            "CIRPMH_HBVFT" : cir_pmh_hbv_free_text,
+                            "CIRPMH_HBVART" : cir_pmh_hbv_art,
+                            "CIRPMH_HCV" : cir_pmh_hcv_status,
+                            "CIRPMH_HCVFT" : cir_pmh_hcv_free_text,
+                            "CIRPMH_HCVART" : cir_pmh_hcv_art,
+                            "CIRPMH_AUD" : cir_pmh_alcohol_use_disorder,
+                            "CIRPMH_AUDFT" : cir_pmh_alcohol_free_text,
+                            "CIRPMH_IVDU" : cir_pmh_ivdu_status,
+                            "CIRPMH_IVDUFT" : cir_pmh_ivdu_free_text,
+                            "CIRPMH_LIVERFAC" : cir_pmh_liver_addtional_factor,
+                            "CIRDX_DATE" : Cirrhosis_Dx_Diagnosis_Date.strftime("%Y-%m-%d"),
+                            "CIRDX_METHOD" : Cirrhosis_Dx_Diagnosis_Method,
+                            "CIRDX_HPIFT" : Cirrhosis_Dx_HPI_EMR_Note_Free_Text,
+                            "CIRDX_IMAGEFT" : Cirrhosis_Dx_Imaging_Findings_EMR_Note_Free_Text,
+                            "CIRDX_METAVIR" : Cirrhosis_Dx_Metavir_Score,
+                            "CIRDX_COMPLDX" : Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_String,
+                            "CIRDX_COMPLDXBIN" : Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary,
+                            "CIRDX_COMPLFT" : Cirrhosis_Dx_Complications_Free_Text,
+                            "CIRDX_DATELABS" : Cirrhosis_Dx_Date_of_Labs_in_Window.strftime("%Y-%m-%d"),
+                            "CIRDX_AFP" : Cirrhosis_Dx_AFP,
+                            "CIRDX_AFPL3" : Cirrhosis_Dx_AFP_L3,
+                            "CIRDX_AFPL3DATEFT" : Cirrhosis_Dx_AFP_L3_Date_Free_Text,
+                            "CIRDX_ASCITCTCAE" : Cirrhosis_Dx_Ascites_CTCAE,
+                            "CIRDX_ASCITNUMB" : Cirrhosis_Dx_Ascites_Classification,
+                            "CIRDX_ASCITFT" : Cirrhosis_Dx_Ascites_Free_Text,
                                  
                             }
                             if "patient_info" in st.session_state and st.session_state.patient_info["MRN"] == st.session_state.temp_mrn:
@@ -1111,11 +1196,16 @@ def add_new_data():
                         hcc_dx_hcc_diagnosis_date = st.date_input("HCC_Dx_HCC Diagnosis Date", help="Enter the HCC diagnosis date")
 
                         hcc_dx_method_of_diagnosis = st.selectbox(
-                            "HCC_Dx_Method of Diagnosis",   
-                            options=["Biopsy", "Imaging", "Unknown"],
+                            "HCC_Dx_Method of Diagnosis [ Excel : HCCDX_METHODDX ]\n\n(1) Biopsy, (2) Imaging, (NA) Unknown  ",   
+                             options=["1", "2", "NA"],
+                                format_func=lambda x: {
+                                    "1": "Biopsy ",
+                                    "2": "Imaging ",
+                                    "NA": "Unknown ",
+                                }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
-                            #format_func=lambda x: f"{x} ({1 if x == 'Biopsy' else 2 if x == 'Imaging' else 'NA'})"
+                            
                         )
 
                         hcc_dx_date_of_labs = st.date_input("HCC_Dx_Date of Labs in Window")
@@ -1131,7 +1221,7 @@ def add_new_data():
                         hcc_dx_sodium = st.number_input("HCC_Dx_Sodium", help="Enter the sodium value in mmol/L",step=0.1)
 
                         hcc_dx_ascites_CTCAE = st.selectbox (
-                            "HCC_Dx_Ascites CTCAE",
+                            "HCC_Dx_Ascites CTCAE [ Excel : HCCDX_ASCITCTCAE ] ",
                             options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
                             format_func=lambda x: {
                             "none": "0. none",
@@ -1143,7 +1233,6 @@ def add_new_data():
                             "Life Threatening: Urgent operation intervention indicated" : "4. Life Threatening: Urgent operation intervention indicated",
 
                         }[x],
-                            help="Select Metavir_score",
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         ) 
@@ -1158,29 +1247,41 @@ def add_new_data():
                         hCC_dx_ascites_classification = "Absent" if hcc_dx_ascites_CTCAE == "none" else findascitesclass(hcc_dx_ascites_CTCAE)
 
                         hcc_dx_ascites_diruetics = 0 if hcc_dx_ascites_CTCAE == "none" else st.selectbox(
-                            "HCC_Dx_Ascites Diruetics",
-                            options = ["Yes","No"],
+                            "HCC_Dx_Ascites Diruetics [ Excel : HCCDX_ASCITDIUR ]\n\nYes(1), No(0)  ",
+                             options=["1", "0"],
+                            format_func=lambda x: {
+                                "1": "Yes ",
+                                "0": "No ",
+                            }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
             
                         )
                         hcc_dx_ascites_paracentesis = 0 if hcc_dx_ascites_CTCAE == "none" else st.selectbox(
-                            "HCC_Dx_Ascites Paracentesis ",
-                            options = ["Yes","No"],
+                            "HCC_Dx_Ascites Paracentesis  [ Excel : HCCDX_ASCITPARA ]\n\nYes(1), No(0)  ",
+                             options=["1", "0"],
+                            format_func=lambda x: {
+                                "1": "Yes ",
+                                "0": "No ",
+                            }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
             
                         )
                         hcc_dx_ascites_hospitalization = 0 if hcc_dx_ascites_CTCAE == "none" else st.selectbox(
-                            "HCC_Dx_Ascites Hospitalization",
-                            options = ["Yes","No"],
+                            "HCC_Dx_Ascites Hospitalization [ Excel : HCCDX_ASCITHOSP ]\n\nYes(1), No(0) ",
+                             options=["1", "0"],
+                            format_func=lambda x: {
+                                "1": "Yes ",
+                                "0": "No ",
+                            }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
             
                         )
 
                         hcc_dx_he_grade = st.selectbox(
-                            "HCC_Dx_HE Grade",
+                            "HCC_Dx_HE Grade [ Excel : HCCDX_HEGRADE ]\n\n(1) None, (2) Grade 1-2, (3) Grade 3-4    ",
                             options=["1","2","3"],
                             format_func=lambda x: {
                             "1": "None",
@@ -1193,12 +1294,12 @@ def add_new_data():
 
                         )
                        
-                        hcc_dx_ecog_performance_status = st.selectbox("HCC_Dx_ECOG Performance Status", options=["0", "1", "2", "3", "4", "NA"],
+                        hcc_dx_ecog_performance_status = st.selectbox("HCC_Dx_ECOG Performance Status [ Excel : HCCDX_ECOG ]  ", options=["0", "1", "2", "3", "4", "NA"],
                             index=None,  # No default selection
                             placeholder="Choose an option",)
 
                         hcc_dx_lirads_score = st.selectbox(
-                            "HCC_Dx_LIRADS Score",
+                            "HCC_Dx_LIRADS Score  [ Excel : HCCDX_LIRADS ]",
                             options=["LR-1", "LR-2", "LR-3", "LR-4", "LR-5", "LR-5V", "LR-M"],
                             index=None,  # No default selection
                             placeholder="Choose an option",
@@ -1222,43 +1323,54 @@ def add_new_data():
                         hcc_dx_albi_grade = albi_class(hcc_dx_albi_score_calc)
                         st.write("HCC_Dx_ALBI Score calc : ",hcc_dx_albi_score_calc)
                         st.write("HCC_Dx_ALBI Grade : ", hcc_dx_albi_grade)
-                        hcc_dx_bclc_calc = st.text_area("HCC_Dx_BCLC Stage calc")
-                    
-
+                        hcc_dx_bclc_calc = st.selectbox("HCC_Dx_BCLC Stage calc [ Excel : HCCDX_BCLC ]\n\n(NA) Not in chart, (0) Stage 0, (1) Stage A, (2) Stage B, (3) Stage C, (4) Stage D   ",
+                                options=["NA", "0", "1", "2", "3", "4"],
+                                format_func=lambda x: {
+                                    "NA": "(NA) Not in chart",
+                                    "0": " Stage 0: Very early stage, with a single nodule smaller than 2 cm in diameter",
+                                    "1": " Stage A: Early stage, with one nodule smaller than 5 cm or up to three nodules smaller than 3 cm",
+                                    "2": " Stage B: Intermediate stage, with multiple tumors in the liver",
+                                    "3": " Stage C: Advanced stage, with cancer that has spread to other organs or blood vessels",
+                                    "4": " Stage D: End-stage disease, with severe liver damage or the patient is very unwell",
+                                }[x],
+                                index=None,  # No default selection
+                                placeholder="Choose an option",
+                            )
                         submit_tab4 = st.form_submit_button("Submit")
                         if submit_tab4:
                                 data4 = {
-                                    "HCCdx_HCCdxdate": hcc_dx_hcc_diagnosis_date.strftime("%Y-%m-%d"),
-                                    "HCCdx_Methoddx": hcc_dx_method_of_diagnosis,
-                                    "HCCdx_Datelabs": hcc_dx_date_of_labs.strftime("%Y-%m-%d"),
-                                    "HCCdx_AFP": hcc_dx_afp,
-                                    "HCCdx_AFP L3": hcc_dx_afp_l3,
-                                    "HCCdx_AFPL3dateFT": hcc_dx_afp_l3_date_free_text,
-                                    "HCCdx_Bilirubin": hcc_dx_bilirubin,
-                                    "HCCdx_Albumin": hcc_dx_albumin,
-                                    "HCCdx_INR": hcc_dx_inr,
-                                    "HCCdx_Creatinine": hcc_dx_creatinine,
-                                    "HCCdx_Sodium": hcc_dx_sodium,
-                                    "HCCdx_AscitesCTCAE": hcc_dx_ascites_CTCAE,
-                                    "HCCdx_AscitesCTCAEnumb": hCC_dx_ascites_classification,
-                                    "HCCdx_Ascitesdiruetics": hcc_dx_ascites_diruetics,
-                                    "HCCdx_Ascitesparacentesis": hcc_dx_ascites_paracentesis,
-                                    "HCCdx_Asciteshospitalization": hcc_dx_ascites_hospitalization,
-                                    "HCCdx_HEgrade": hcc_dx_he_grade,
-                                    "HCCdx_ECOG": hcc_dx_ecog_performance_status,
-                                    "HCCdx_LIRADS": hcc_dx_lirads_score,
-                                    "HCCdx_CPcalc": hcc_dx_child_pugh_points_calc,
-                                    "HCCdx_CPclass": hcc_dx_child_pugh_class_calc,
-                                    "HCCdx_MELD": hcc_dx_meld_score_calc,
-                                    "HCCdx_MELDNa": hcc_dx_meld_na_score_calc,
-                                    "HCCdx_Albiscore": hcc_dx_albi_score_calc,
-                                    "HCCdx_Albigrade": hcc_dx_albi_grade,
-                                    "HCCdx_BCLC": hcc_dx_bclc_calc,
+                                    "HCCDX_DATEDX": hcc_dx_hcc_diagnosis_date.strftime("%Y-%m-%d"),
+                                    "HCCDX_METHODDX": hcc_dx_method_of_diagnosis,
+                                    "HCCDX_LABSDATE": hcc_dx_date_of_labs.strftime("%Y-%m-%d"),
+                                    "HCCDX_AFP": hcc_dx_afp,
+                                    "HCCDX_AFPL3": hcc_dx_afp_l3,
+                                    "HCCDX_AFPL3dateFT": hcc_dx_afp_l3_date_free_text,
+                                    "HCCDX_BILI": hcc_dx_bilirubin,
+                                    "HCCDX_ALBUMIN": hcc_dx_albumin,
+                                    "HCCDX_INR": hcc_dx_inr,
+                                    "HCCDX_CREATININE": hcc_dx_creatinine,
+                                    "HCCDX_SODIUM": hcc_dx_sodium,
+                                    "HCCDX_ASCITCTCAE": hcc_dx_ascites_CTCAE,
+                                    "HCCDX_ASCITNUMB": hCC_dx_ascites_classification,
+                                    "HCCDX_ASCITDIUR": hcc_dx_ascites_diruetics,
+                                    "HCCDX_ASCITPARA": hcc_dx_ascites_paracentesis,
+                                    "HCCDX_ASCITHOSP": hcc_dx_ascites_hospitalization,
+                                    "HCCDX_HEGRADE": hcc_dx_he_grade,
+                                    "HCCDX_ECOG": hcc_dx_ecog_performance_status,
+                                    "HCCDX_LIRADS": hcc_dx_lirads_score,
+                                    "HCCDX_CPCALC": hcc_dx_child_pugh_points_calc,
+                                    "HCCDX_CPCLASS": hcc_dx_child_pugh_class_calc,
+                                    "HCCDX_MELD": hcc_dx_meld_score_calc,
+                                    "HCCDX_MELDNA": hcc_dx_meld_na_score_calc,
+                                    "HCCDX_ALBISCORE": hcc_dx_albi_score_calc,
+                                    "HCCDX_ALBIGRADE": hcc_dx_albi_grade,
+                                    "HCCDX_BCLC": hcc_dx_bclc_calc,
                                 }
                                 if "patient_info" in st.session_state and st.session_state.patient_info["MRN"] == st.session_state.temp_mrn:
                                     st.session_state.patient_info.update(data4)
                                     # Update the data in Google Sheets
-                                    update_google_sheet(st.session_state.patient_info, st.session_state.temp_mrn)
+                                    update_google_sheet(data4, st.session_state.temp_mrn)
+                                    df=fetch_data_from_google_sheet()
                                 else:
                                     st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
                     #except:
@@ -1272,91 +1384,123 @@ def add_new_data():
                 else:
                     try:
                         PRVTHER_Prior_LDT_Therapy = st.selectbox(
-                        "PRVTHER_Prior_LDT_Therapy",
-                        options=["Yes", "No","NA"],
-                        #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
+                        "PRVTHER_Prior_LDT_Therapy [ Excel : PTHER_LDT ]\n\nNo (0), Yes (1), NA",
+                        options=["0", "1", "NA"], 
+                        format_func=lambda x: {
+                            "0": "No",
+                            "1": "Yes",
+                            "NA": "NA (not in chart)"
+                        }[x],
                         help="Prior LDT Therapy",
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
                         PRVTHER_Prior_RFA_Therapy = st.selectbox(
-                            "PRVTHER_Prior RFA Therapy",
-                            options=["Yes", "No", "NA"],
-                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
+                            "PRVTHER_Prior RFA Therapy [ Excel : PTHER_RFA ]\n\nNo (0), Yes (1), NA  ",
+                           options=["0", "1", "NA"], 
+                        format_func=lambda x: {
+                            "0": "No",
+                            "1": "Yes",
+                            "NA": "NA (not in chart)"
+                        }[x],
                             help="Prior RFA Therapy",
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        PRVTHER_Prior_RFA_Date = 0 if PRVTHER_Prior_RFA_Therapy == 'No' else st.date_input("PRVTHER_Prior RFA Date")
+                        PRVTHER_Prior_RFA_Date = 0 if PRVTHER_Prior_RFA_Therapy == '0' else st.date_input("PRVTHER_Prior RFA Date")
+
+                    
                         PRVTHER_Prior_TARE_Therapy = st.selectbox(
-                            "PRVTHER_Prior TARE Therapy",
-                            options=["Yes", "No","NA"],
-                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
+                            "PRVTHER_Prior TARE Therapy [ Excel : PTHER_TARE ]\n\nNo (0), Yes (1), NA ",
+                            options=["0", "1", "NA"], 
+                        format_func=lambda x: {
+                            "0": "No ",
+                            "1": "Yes ",
+                            "NA": "NA (not in chart)"
+                        }[x],
                             help="Prior TARE Therapy",
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        PRVTHER_Prior_TARE_Date = 0 if PRVTHER_Prior_TARE_Therapy == 'No' else st.date_input("PRVTHER_Prior TARE Date")
+                        PRVTHER_Prior_TARE_Date = 0 if PRVTHER_Prior_TARE_Therapy == '0' else st.date_input("PRVTHER_Prior TARE Date")
+                    
                         PRVTHER_Prior_SBRT_Therapy = st.selectbox(
-                            "PRVTHER_Prior SBRT Therapy",
-                            options=["Yes", "No","NA"],
-                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
+                            "PRVTHER_Prior SBRT Therapy [ Excel : PTHER_SBRT ]\n\nNo (0), Yes (1), NA",
+                            options=["0", "1", "NA"], 
+                        format_func=lambda x: {
+                            "0": "No ",
+                            "1": "Yes",
+                            "NA": "NA (not in chart)"
+                        }[x],
                             help="Prior SBRT Therapy",
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        PRVTHER_Prior_SBRT_Date = 0 if PRVTHER_Prior_SBRT_Therapy == 'No' else st.date_input("PRVTHER_Prior SBRT Date")
+                        
+                        PRVTHER_Prior_SBRT_Date = 0 if PRVTHER_Prior_SBRT_Therapy == '0' else st.date_input("PRVTHER_Prior SBRT Date")
                         PRVTHER_Prior_TACE_Therapy = st.selectbox(
-                            "PRVTHER_Prior TACE Therapy",
-                            options=["Yes", "No","NA"],
-                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
+                            "PRVTHER_Prior TACE Therapy [ Excel : PTHER_TACE ]\n\nNo (0), Yes (1), NA ",
+                            options=["0", "1", "NA"], 
+                        format_func=lambda x: {
+                            "0": "No ",
+                            "1": "Yes ",
+                            "NA": "NA (not in chart)"
+                        }[x],
                             help="Prior TACE Therapy",
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        PRVTHER_Prior_TACE_Date = 0 if PRVTHER_Prior_TACE_Therapy == 'No' else st.date_input("PRVTHER_Prior TACE Date")
+                        PRVTHER_Prior_TACE_Date = 0 if PRVTHER_Prior_TACE_Therapy == '0' else st.date_input("PRVTHER_Prior TACE Date")
+
                         PRVTHER_Prior_MWA_Therapy = st.selectbox(
-                            "PRVTHER_Prior MWA Therapy",
-                            options=["Yes", "No","NA"],
-                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
+                            "PRVTHER_Prior MWA Therapy [ Excel : PTHER_MWA ]\n\nNo (0), Yes (1), NA",
+                            options=["0", "1", "NA"], 
+                        format_func=lambda x: {
+                            "0": "No ",
+                            "1": "Yes ",
+                            "NA": "NA (not in chart)"
+                        }[x],
                             help="Prior MWA Therapy",
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        PRVTHER_Prior_MWA_Date = 0 if PRVTHER_Prior_MWA_Therapy == 'No' else st.date_input("PRVTHER_Prior MWA Date")
+                        PRVTHER_Prior_MWA_Date = 0 if PRVTHER_Prior_MWA_Therapy == '0' else st.date_input("PRVTHER_Prior MWA Date")
+
                         PRVTHER_Resection = st.selectbox(
-                            "PRVTHER_Resection",
-                            options=["Yes", "No","NA"],
-                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
+                            "PRVTHER_Resection [ Excel : PTHER_RESECTION ]\n\nNo (0), Yes (1), NA ",
+                            options=["0", "1", "NA"], 
+                        format_func=lambda x: {
+                            "0": "No ",
+                            "1": "Yes ",
+                            "NA": "NA (not in chart)"
+                        }[x],
                             help="Prior MWA Therapy",
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        PRVTHER_Resection_Date = 0 if PRVTHER_Resection == 'No' else st.date_input("PRVTHER_Resection Date")
+                        PRVTHER_Resection_Date = 0 if PRVTHER_Resection == '0' else st.date_input("PRVTHER_Resection Date")
 
 
                         list1=[PRVTHER_Prior_LDT_Therapy, PRVTHER_Prior_RFA_Therapy, PRVTHER_Prior_TARE_Therapy, PRVTHER_Prior_SBRT_Therapy, PRVTHER_Prior_TACE_Therapy, PRVTHER_Prior_MWA_Therapy, PRVTHER_Resection ]
-                        sum=0
+                        total_sum=0
                         for item in list1:
                             if item == "Yes" :
-                                sum+=1
+                                total_sum+=1
                             else:
                                 continue
                         
-                        PRVTHER_Previous_Therapy_Sum = sum
+                        PRVTHER_Previous_Therapy_Sum = total_sum
                         st.write("PRVTHER_Prevtxsum ",PRVTHER_Previous_Therapy_Sum)
-                    # PRVTHER_Previous_Therapy_Sum = PRVTHER_Prior_LDT_Therapy + PRVTHER_Prior_RFA_Therapy + PRVTHER_Prior_TARE_Therapy + PRVTHER_Prior_SBRT_Therapy + PRVTHER_Prior_TACE_Therapy + PRVTHER_Prior_MWA_Therapy
-
+                   
                         PRVTHER_NotesFT = st.text_area(
                         "PRVTHER_NotesFT",
-                    
                         )
 
                         PRVTHER_Total_Recurrences_HCC = st.text_area(
                             "PRVTHER_Total Recurrences HCC",
                         )
                         PRVTHER_Location_of_Previous_Treatment_segments = st.selectbox(
-                            "PRVTHER_Location of Previous Treatment Segments",
+                            "PRVTHER_Location of Previous Treatment Segments [ Excel : PTHER_PREVSEGMENT ]",
                             options=["1","2","3","4a","4b","5","6","7","8","NA"],
                             index=None,
                             placeholder="Choose an option"
@@ -1366,7 +1510,7 @@ def add_new_data():
                           
                         )
                         PRVTHER_recurrence_location_note = st.selectbox(
-                            "PRVTHER_Recurrence Location Note",
+                            "PRVTHER_Recurrence Location Note [ Excel : PTHER_RECURSEGMENTFT ]",
                             options=["1","2","3","4a","4b","5","6","7","8","NA"],
                             index=None,
                             placeholder="Choose an option"
@@ -1379,16 +1523,24 @@ def add_new_data():
                              "PRVTHER_Recurrence Seg"
                         )
                         PRVTHER_New_HCC_Outside_Previous_Treatment_Site = st.selectbox(
-                            "PRVTHER_New HCC Outside Previous Treatment Site",
-                            options = ["Yes","No","NA"],
-                            help="new HCC occurrence that has developed in a diff location in the liver, separate from the area that was previously tx",
+                            "PRVTHER_New HCC Outside Previous Treatment Site [ Excel : PTHER_NEWHCCOUT ]\n\nNo (0), Yes (1), NA",
+                            options=["0", "1", "NA"], 
+                        format_func=lambda x: {
+                            "0": "No ",
+                            "1": "Yes ",
+                            "NA": "NA (not in chart)"
+                        }[x],
                             index=None,
                             placeholder="Choose an option"
                         )   
                         PRVTHER_New_HCC_Adjacent_to_Previous_Treatment_Site = st.selectbox(
-                            "PRVTHER_New HCC Adjacent to Previous Treatment Site",
-                            options = ["Yes","No","NA"],
-                            help=" new HCC occurrence that has developed close to, but not directly in, the area that was previously treated",
+                            "PRVTHER_New HCC Adjacent to Previous Treatment Site [ Excel : PTHER_NEWHCCADJ ]\n\nNo (0), Yes (1), NA ",
+                            options=["0", "1", "NA"], 
+                        format_func=lambda x: {
+                            "0": "No ",
+                            "1": "Yes ",
+                            "NA": "NA (not in chart)"
+                        }[x],
                             index=None,
                             placeholder="Choose an option"
                         )   
@@ -1397,18 +1549,25 @@ def add_new_data():
                             help="Provide information of Residual HCC"
                         ) 
                         PRVTHER_Residual_HCC = st.selectbox(
-                            "PRVTHER_Residual HCC",
-                            options = ["Yes","No","NA"],
-                            help="new HCC occurrence that has developed in a diff location in the liver, separate from the area that was previously tx",
+                            "PRVTHER_Residual HCC [ Excel : PTHER_RESIDUALHCC ]\n\nNo (0), Yes (1), NA ",
+                            options=["0", "1", "NA"], 
+                        format_func=lambda x: {
+                            "0": "No ",
+                            "1": "Yes ",
+                            "NA": "NA (not in chart)"
+                        }[x],
                             index=None,
                             placeholder="Choose an option"
                         )   
 
                         PRVTHER_Systemic_Therapy_Free_Text = st.selectbox(
-                            "PRVTHER_Systemic Therapy Free Text",
-                            options=["Yes", "No","NA"],
-                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                            help="Prior TACE Therapy",
+                            "PRVTHER_Systemic Therapy Free Text [ Excel : PTHER_SYSTHER ]\n\nNo (0), Yes (1), NA ",
+                            options=["0", "1", "NA"], 
+                        format_func=lambda x: {
+                            "0": "No ",
+                            "1": "Yes ",
+                            "NA": "NA (not in chart)"
+                        }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
@@ -1428,34 +1587,34 @@ def add_new_data():
                         if submit_tab5:
                                 
                             data5 = {
-                            "PRVTHER_LDT": PRVTHER_Prior_LDT_Therapy,
-                            "PRVTHER_RFA": PRVTHER_Prior_RFA_Therapy,
-                            "PRVTHER_RFAdate": PRVTHER_Prior_RFA_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_RFA_Date != 0 else PRVTHER_Prior_RFA_Date,
-                            "PRVTHER_TARE": PRVTHER_Prior_TARE_Therapy,
-                            "PRVTHER_TAREdate": PRVTHER_Prior_TARE_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_TARE_Date != 0 else PRVTHER_Prior_TARE_Date,
-                            "PRVTHER_SBRT": PRVTHER_Prior_SBRT_Therapy,
-                            "PRVTHER_SBRTdate": PRVTHER_Prior_SBRT_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_SBRT_Date != 0 else PRVTHER_Prior_SBRT_Date,
-                            "PRVTHER_TACE": PRVTHER_Prior_TACE_Therapy,
-                            "PRVTHER_TACEdate": PRVTHER_Prior_TACE_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_TACE_Date != 0 else PRVTHER_Prior_TACE_Date,
-                            "PRVTHER_MWA": PRVTHER_Prior_MWA_Therapy,
-                            "PRVTHER_MWAdate": PRVTHER_Prior_MWA_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_MWA_Date != 0 else PRVTHER_Prior_MWA_Date,
-                            "PRVTHER_Resection": PRVTHER_Resection,
-                            "PRVTHER_Resection date": PRVTHER_Resection_Date.strftime("%Y-%m-%d") if PRVTHER_Resection_Date != 0 else PRVTHER_Resection_Date,
-                            "PRVTHER_Prevtxsum": PRVTHER_Previous_Therapy_Sum,
-                            "PRVTHER_NotesFT": PRVTHER_NotesFT,
-                            "PRVTHER_Totalrecur": PRVTHER_Total_Recurrences_HCC,
-                            "PRVTHER_Locationprevtxseg": PRVTHER_Location_of_Previous_Treatment_segments,
-                            "PRVTHER_Location of Previous Tx Segments FT": PRVTHER_Location_of_Previous_Tx_segments_ft,
-                            "PRVTHER_RecurLocationFT": PRVTHER_recurrence_location_note,
-                            "PRVTHER_RecurDate": PRVTHER_recurrence_date,
-                            "PRVTHER_Recurrence Seg": PRVTHER_recurrence_seg,
-                            "PRVTHER_NewHCCoutsideprevsite": PRVTHER_New_HCC_Outside_Previous_Treatment_Site,
-                            "PRVTHER_NewHCCadjacentprevsite": PRVTHER_New_HCC_Adjacent_to_Previous_Treatment_Site,
-                            "PRVTHER_ResidualHCCnoteFT": PRVTHER_Residual_HCC_Note,
-                            "PRVTHER_ResidualHCC": PRVTHER_Residual_HCC,
-                            "PRVTHER_SystemictherapyFT": PRVTHER_Systemic_Therapy_Free_Text,
-                            "PRVTHER_DateAFP": PRVTHER_Date_of_Labs_in_Window.strftime("%Y-%m-%d"),
-                            "PRVTHER_AFP": PRVTHER_AFP,
+                            "PTHER_LDT": PRVTHER_Prior_LDT_Therapy,
+                            "PTHER_RFA": PRVTHER_Prior_RFA_Therapy,
+                            "PTHER_RFADATE": PRVTHER_Prior_RFA_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_RFA_Date != 0 else PRVTHER_Prior_RFA_Date,
+                            "PTHER_TARE": PRVTHER_Prior_TARE_Therapy,
+                            "PTHER_TAREDATE": PRVTHER_Prior_TARE_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_TARE_Date != 0 else PRVTHER_Prior_TARE_Date,
+                            "PTHER_SBRT": PRVTHER_Prior_SBRT_Therapy,
+                            "PTHER_SBRTDATE": PRVTHER_Prior_SBRT_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_SBRT_Date != 0 else PRVTHER_Prior_SBRT_Date,
+                            "PTHER_TACE": PRVTHER_Prior_TACE_Therapy,
+                            "PTHER_TACEDATE": PRVTHER_Prior_TACE_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_TACE_Date != 0 else PRVTHER_Prior_TACE_Date,
+                            "PTHER_MWA": PRVTHER_Prior_MWA_Therapy,
+                            "PTHER_MWADATE": PRVTHER_Prior_MWA_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_MWA_Date != 0 else PRVTHER_Prior_MWA_Date,
+                            "PTHER_RESECTION": PRVTHER_Resection,
+                            "PTHER_RESECTIONDATE": PRVTHER_Resection_Date.strftime("%Y-%m-%d") if PRVTHER_Resection_Date != 0 else PRVTHER_Resection_Date,
+                            "PTHER_PREVSUM": PRVTHER_Previous_Therapy_Sum,
+                            "PTHER_NOTESFT": PRVTHER_NotesFT,
+                            "PTHER_TOTRECUR": PRVTHER_Total_Recurrences_HCC,
+                            "PTHER_PREVSEGMENT": PRVTHER_Location_of_Previous_Treatment_segments,
+                            "PTHER_PREVSEGMENTFT": PRVTHER_Location_of_Previous_Tx_segments_ft,
+                            "PTHER_RECURSEGMENTFT": PRVTHER_recurrence_location_note,
+                            "PTHER_RECURDATE": PRVTHER_recurrence_date,
+                            "PTHER_RECURSEGMENT": PRVTHER_recurrence_seg,
+                            "PTHER_NEWHCCOUT": PRVTHER_New_HCC_Outside_Previous_Treatment_Site,
+                            "PTHER_NEWHCCADJ": PRVTHER_New_HCC_Adjacent_to_Previous_Treatment_Site,
+                            "PTHER_RESIDUALHCCFT": PRVTHER_Residual_HCC_Note,
+                            "PTHER_RESIDUALHCC": PRVTHER_Residual_HCC,
+                            "PTHER_SYSTHER": PRVTHER_Systemic_Therapy_Free_Text,
+                            "PTHER_AFPDATE": PRVTHER_Date_of_Labs_in_Window.strftime("%Y-%m-%d"),
+                            "PTHER_AFP": PRVTHER_AFP,
                             }
                             if "patient_info" in st.session_state and st.session_state.patient_info["MRN"] == st.session_state.temp_mrn:
                                 st.session_state.patient_info.update(data5)
@@ -1616,36 +1775,36 @@ def add_new_data():
                         if submit_tab6:
 
                             data6 = {
-                            "PREY90_sx": prey90_symptoms,
-                            "PREY90_Datelabs": prey90_date_of_labs.strftime("%Y-%m-%d"),
-                            "PREY90_AFP": prey90_afp,
-                            "PRE90_AFPbinary": prey90_afp_prior_to_tare,
-                            "PREY90_Bilirubin": prey90_bilirubin,
-                            "PREY90_Albumin": prey90_albumin,
-                            "PREY90_INR": prey90_inr,
-                            "PREY90_Creatinine": prey90_creatinine,
-                            "PREY90_Sodium": prey90_sodium,
-                            "PREY90_AST": prey90_ast,
-                            "PREY90_ALT": prey90_alt,
-                            "PREY90_Alkaline Phosphatase": prey90_alkaline_phosphatase,
-                            "PREY90_Potassium": prey90_potassium,
-                            "PREY90_AscitesCTCAE": prey90_ascites_ctcae,
-                            "PREY90_AscitesCTCAEnumb": prey90_ascites_classification,
-                            "PREY90_AscitesFT": prey90_ascites_free_text,
-                            "PREY90_Ascitesdiruetics": prey90_ascites_diruetics,
-                            "PREY90_Ascitesparacentesis": prey90_ascites_paracentesis,
-                            "PREY90_Asciteshospitalization": prey90_ascites_hospitalization,
-                            "PREY90_HEgrade": prey90_he_grade,
-                            "PREY90_ECOG": prey90_ecog,
-                            "PREY90_CPclass": prey90_child_pugh_class_calc,
-                            "PREY90_CPcalc": prey90_child_pugh_points_calc,
-                            "PREY90_MELD": prey90_meld_score_calc,
-                            "PREY90_MELDNa": prey90_meld_na_score_calc,
-                            "PREY90_Albiscore": prey90_albi_score_calc,
-                            "PREY90_Albigrade": prey90_albi_grade,
-                            "PREY90_BCLC": prey90_bclc_calc,
-                            "MY90_date": my90_date.strftime("%Y-%m-%d"),
-                            "MY90_Lung_shunt": my90_lung_shunt,
+                            "PREY_SX": prey90_symptoms,
+                            "PREY_DATELABS": prey90_date_of_labs.strftime("%Y-%m-%d"),
+                            "PREY_AFP": prey90_afp,
+                            "PREY_AFPBINARY": prey90_afp_prior_to_tare,
+                            "PREY_BILI": prey90_bilirubin,
+                            "PREY_ALBUMIN": prey90_albumin,
+                            "PREY_INR": prey90_inr,
+                            "PREY_CREATININE": prey90_creatinine,
+                            "PREY_SODIUM": prey90_sodium,
+                            "PREY_AST": prey90_ast,
+                            "PREY_ALT": prey90_alt,
+                            "PREY_ALP": prey90_alkaline_phosphatase,
+                            "PREY_POTAS": prey90_potassium,
+                            "PREY_ASCITCTCAE": prey90_ascites_ctcae,
+                            "PREY_ASCITNUMB": prey90_ascites_classification,
+                            "PREY_ASCITFT": prey90_ascites_free_text,
+                            "PREY_ASCITDIUR": prey90_ascites_diruetics,
+                            "PREY_ASCITPARA": prey90_ascites_paracentesis,
+                            "PREY_ASCITHOSP": prey90_ascites_hospitalization,
+                            "PREY_HEGRADE": prey90_he_grade,
+                            "PREY_ECOG": prey90_ecog,
+                            "PREY_CPCALC": prey90_child_pugh_points_calc,
+                            "PREY_CLASS": prey90_child_pugh_class_calc,
+                            "PREY_MELD": prey90_meld_score_calc,
+                            "PREY_MELDNA": prey90_meld_na_score_calc,
+                            "PREY_ALBISCORE": prey90_albi_score_calc,
+                            "PREY_ALBIGRADE": prey90_albi_grade,
+                            "PREY_BCLC": prey90_bclc_calc,
+                            "MY_DATE": my90_date.strftime("%Y-%m-%d"),
+                            "MY_LUNGSHU": my90_lung_shunt,
                             }
                             
                             if "patient_info" in st.session_state and st.session_state.patient_info["MRN"] == st.session_state.temp_mrn:
@@ -3594,10 +3753,8 @@ def edit_existing_data():
         df1=fetch_data_from_google_sheet()
         st.dataframe(df1)
         
-        mrn = st.text_input("Enter MRN to edit and Press Enter")
-        #mrn=int(mrn)
-        #load_button = st.button("Edit Data")
-        #if load_button:
+        mrn = st.number_input("Enter MRN to edit and Press Enter",step=1)
+       
         if mrn:
             if df1.empty and mrn not in df1['MRN'].values:
                 st.error(f"MRN {mrn} not exists. Please enter a unique MRN.")
@@ -3605,11 +3762,15 @@ def edit_existing_data():
                 st.subheader("Change_Data")
                 st.write(f"Editing data for MRN: {mrn}")
                 df = fetch_data_for_mrn(mrn)
-                st.write(df)
-                fetch_date = pd.to_datetime(df.loc[df['MRN'] == mrn, 'TAREdate'].values[0]).date()
-                # Convert fetch_date to a datetime.date object
-                fetch_date = pd.to_datetime(fetch_date).date()
-                index = (df["MRN"] == mrn)
+                try:
+                    st.write(df)
+                    mrn=str(mrn)
+                    fetch_date = pd.to_datetime(df.loc[df['MRN'] == mrn, 'TAREDATE'].values[0]).date()
+                    # Convert fetch_date to a datetime.date object
+                    fetch_date = pd.to_datetime(fetch_date).date()
+                    index = (df["MRN"] == mrn)
+                except:
+                     st.write("please write valid mrn")
                 col1, col2 = st.columns([0.3, 0.7],gap="small")
                 tabs = ["Patient Information","Patient Demographics", "Cirrhosis PMH","HCC Diagnosis", "Previous Therapy for HCC", "Pre Y90", "Day_Y90", "Post Y90 Within 30 Days Labs", "Other Post Tare","Imaging Date","Dosimetry Data","AFP"]
                 
@@ -3621,119 +3782,160 @@ def edit_existing_data():
                     if st.session_state.selected_tab == "Patient Information":
                         st.subheader("Patient_Info")
                         with st.form("patient_info_form"):
-                            try:
+                            #try:
                             # Patient Info Section
                                 col1, col2 = st.columns(2)
-                                name=df.iloc[0]["Name"]
-                                last_name = col1.text_input("Last Name",value=name.split(",")[0])
-                                last_name = last_name.lower()
-                                first_name = col2.text_input("First Name",value=name.split(",")[1])
-                                first_name = first_name.lower()
-                                
+                                first_name = col1.text_input("First Name",value=df.iloc[0]["FIRST"])
+                                first_name = first_name.capitalize()
+                                last_name = col2.text_input("Last Name",value=df.iloc[0]["LAST"])
+                                last_name = last_name.capitalize()
                                 st.write(mrn)
+                                id=df.iloc[0]["ID"]
+                
+                                if first_name and last_name:
+                                    base_id = first_name[0] + last_name[0]
+                                    if not df.empty:
+                                        existing_ids = df['ID'].tolist()
+                                        count = sum(1 for id in existing_ids if id.startswith(base_id))
+                                        id = f"{base_id}{count + 1}"
+                                    else:
+                                        id = f"{base_id}1"
+                                else:
+                                    id = ""
                                 
-                                duplicate_procedure_check = 0
-                                if mrn in st.session_state.data["MRN"].values:
-                                    st.write("Are you sure this is a duplicate")
-                                    duplicate_procedure_check = 1
+                                duplicate_procedure_check = df.iloc[0]["DUP"]
+                                if id.endswith("1"):
+                                    duplicate_procedure_check = ""
+                                else:
+                                    duplicate_procedure_check = "Duplicate"
                                 
-                                tare_date = st.date_input("TARE Tx Date", help="Select the treatment date",value=datetime.strptime(df.iloc[0]["TAREdate"], "%Y-%m-%d").date())
+                                tare_date = st.date_input("TARE Tx Date", help="Select the treatment date",value=datetime.strptime(df.iloc[0]["TAREDATE"], "%Y-%m-%d").date())
                                 
                                 procedure_technique = st.selectbox(
-                                "Procedure Technique",
+                                "Procedure Technique    [Excel : PROTYPE]\n\nLobar (1), Segmental (2)",
                                 options=["1", "2"],
                                 format_func=lambda x: {
-                                                    "1": "Lobar",
-                                                    "2": " Segmental",
-                                                }[x],
-                                index=["1", "2"].index(df.iloc[0]["PTech"]) if df.iloc[0]["PTech"]  else 0,
+                                    "1": "Lobar",
+                                    "2": "Segmental",
+                                }[x],
+                                index=["1", "2"].index(df.iloc[0]["PROTYPE"]) if df.iloc[0]["PROTYPE"]  else 0,
                                 # No default selection
                                 placeholder="Choose an option",
                                 )
 
-                                age = st.number_input("Age at time of TARE", value=int(df.iloc[0]["Tareage"]) ,min_value=0, max_value=150, step=1, format="%d")
+                                age = st.number_input("Age at time of TARE", value=int(df.iloc[0]["TAREAGE"]) ,min_value=0, max_value=150, step=1, format="%d")
                             
                                 submit_tab1 = st.form_submit_button("Submit")
                                 if submit_tab1:
+                                    st.write("ID :",id)
                                     data = {
-                                        "Name": f"{last_name}, {first_name}",
+                                        "FIRST": first_name,
+                                        "LAST": last_name,
                                         "MRN": mrn,
-                                        "Duplicate" : duplicate_procedure_check,
-                                        "TAREdate": tare_date.strftime("%Y-%m-%d"),
-                                        "PTech": procedure_technique,
-                                        "Tareage": age
+                                        "ID" : id,
+                                        "DUP" : duplicate_procedure_check,
+                                        "TAREDATE": tare_date.strftime("%Y-%m-%d"),
+                                        "PROTYPE": procedure_technique,
+                                        "TAREAGE": age
                                         } 
-                                    
                                     update_google_sheet(data, mrn)
-                            except:
-                                pass
+                            #except:
+                             #   pass
 
                     elif st.session_state.selected_tab == "Patient Demographics":
                         st.subheader("Patient Demographics")
                         with st.form("demographics_form"):
 
                             gender = st.selectbox(
-                                "Gender",
-                                options=["Male", "Female"],
-                                index=["Male", "Female"].index(df.iloc[0]["Gender"]) if df.iloc[0]["Gender"] else None,
+                                "Gender     [Excel : GENDER]\n\nMale (1) , Female (2)",
+                                options=["1", "2"],
+                                format_func=lambda x: {
+                                                    "1": "Male",
+                                                    "2": "Female",
+                                                }[x],
+                                index=["1", "2"].index(df.iloc[0]["GENDER"]) if df.iloc[0]["GENDER"] else None,
                                 placeholder="Choose an option",
                             )
-
                             # Ethnicity dropdown
                             ethnicity = st.selectbox(
-                                "Ethnicity",
-                                options=["Black","White", "Asian", "Hispanic", "Other", "NA", "0"],
-                                index=["Black","White", "Asian", "Hispanic", "Other", "NA", "0"].index(df.iloc[0]["Ethnicity"]) if df.iloc[0]["Ethnicity"] else None,  # No default selection
+                                "Ethnicity      [Excel : ETHNICITY]\n\n(1) Black, (2) White, (3) Asian, (4) Hispanic, (5) Other, NA (cant find it in sheet), 0 (not present)",
+                                options=["1","2", "3", "4", "5", "NA", "0"],
+                                format_func=lambda x: {
+                                                    "1": "Black",
+                                                    "2": "White",
+                                                    "3": "Asian",
+                                                    "4": "Hispanic",
+                                                    "5": "Other",
+                                                    "NA": "NA (cant find it in sheet)",
+                                                    "0" : "0 (not present)",
+                                                }[x],
+                                index=["1","2", "3", "4", "5", "NA", "0"].index(df.iloc[0]["ETHNICITY"]) if df.iloc[0]["ETHNICITY"] else None,  # No default selection
                                 placeholder="Choose an option",
                             )
 
                             hypertension = st.selectbox(
-                                "PMHx Hypertension",
-                                options=["No", "Yes"],
-                                index=["No", "Yes"].index(df.iloc[0]["PMHxHTN"]) if df.iloc[0]["PMHxHTN"] else None,  # No default selection
+                                "PMHx Hypertension      [Excel : PMHHTN]\n\nYes(1), No(0)",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes",
+                                                    "0": "No",
+                                                }[x],
+                                index=["1", "0"].index(df.iloc[0]["PMHHTN"]) if df.iloc[0]["PMHHTN"] else None,  # No default selection
                                 placeholder="Choose an option",
                             )
 
                             diabetes = st.selectbox(
-                                "PMHx Diabetes (T1 or T2)",
-                                options=["No", "Yes"],
-                                index=["No", "Yes"].index(df.iloc[0]["PMHxDM"]) if df.iloc[0]["PMHxDM"] else None,  # No default selection
+                                "PMHx Diabetes (T1 or T2)  [Excel : PMHDM]\n\nYes(1), No(0)",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes",
+                                                    "0": "No",
+                                                }[x],
+                                index=["1", "0"].index(df.iloc[0]["PMHDM"]) if df.iloc[0]["PMHDM"] else None,  # No default selection
                                 placeholder="Choose an option",
                             )
 
                             hypercholesterolemia = st.selectbox(
-                                "Hypercholesterolemia",
-                                options=["No", "Yes"],
-                                index=["No", "Yes"].index(df.iloc[0]["Hypercholesterolemia"]) if df.iloc[0]["Hypercholesterolemia"] else None,  # No default selection
+                                "Hypercholesterolemia      [Excel : HYPERCHOL]\n\nYes(1), No(0)",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes ",
+                                                    "0": "No  ",
+                                                }[x],
+                                index=["1", "0"].index(df.iloc[0]["HYPERCHOL"]) if df.iloc[0]["HYPERCHOL"] else None,  # No default selection
                                 placeholder="Choose an option",
                             )
 
                             smoking = st.selectbox(
-                                "Hx of Smoking",
-                                options=["No", "Yes"],
-                                index=["No", "Yes"].index(df.iloc[0]["PMHxSmoking"]) if df.iloc[0]["PMHxSmoking"] else None,  
+                                "Hx of Smoking      [Excel : PMHSMOKE]\n\nYes(1), No(0)",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes ",
+                                                    "0": "No  ",
+                                                }[x],
+                                index=["1", "0"].index(df.iloc[0]["PMHSMOKE"]) if df.iloc[0]["PMHSMOKE"] else None,  
                                 placeholder="Choose an option",
                             )
-
                             obesity = st.selectbox(
-                                "Obesity",
-                                options=["No", "Yes"],
-                                index=["No", "Yes"].index(df.iloc[0]["Obesity"]) if df.iloc[0]["Obesity"] else None,  
+                                "Obesity        [Excel : OBESITY]\n\nYes(1), No(0)",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes ",
+                                                    "0": "No  ",
+                                                }[x],
+                                index=["1", "0"].index(df.iloc[0]["OBESITY"]) if df.iloc[0]["OBESITY"] else None,  
                                 placeholder="Choose an option",
                             )
-
-                            
-                           
                             submit_tab2 = st.form_submit_button("Submit")
                             if submit_tab2:
                                 data1={
-                                "Gender": gender,
-                                "Ethnicity":ethnicity,
-                                "PMHxHTN": hypertension,
-                                "PMHxDM":diabetes,
-                                "Hypercholesterolemia" : hypercholesterolemia,
-                                "PMHxSmoking" : smoking,
-                                "Obesity" : obesity,
+                                "GENDER": gender,
+                                "ETHNICITY":ethnicity,
+                                "PMHHTN": hypertension,
+                                "PMHDM":diabetes,
+                                "HYPERCHOL" : hypercholesterolemia,
+                                "PMHSMOKE" : smoking,
+                                "OBESITY" : obesity,
                                 }
                                 update_google_sheet(data1,mrn)
                         
@@ -3742,118 +3944,156 @@ def edit_existing_data():
                         with st.form("cirrhosis_pmh_form"):
 
                             cir_pmh_hbv_status = st.selectbox(
-                                "Cir PMH HBV Status",
-                                options=["Yes", "No"],
+                                "Cir PMH HBV Status [ Excel : CIRPMH_HBV ]\n\nYes(1), No(0)  ",
+                                options=["1", "0"],
+                                format_func=lambda x: {
+                                                    "1": "Yes ",
+                                                    "0": "No  ",
+                                                }[x],
                                 help="Select HBV Status",
-                                index=["Yes", "No"].index(df.iloc[0]["CirPMH_HBV"]) if df.iloc[0]["CirPMH_HBV"] else None,
+                                index=["1", "0"].index(df.iloc[0]["CIRPMH_HBV"]) if df.iloc[0]["CIRPMH_HBV"] else None,
                                 placeholder="Choose an option",
                             )
 
                             cir_pmh_hbv_free_text = "0" if cir_pmh_hbv_status == "No" else st.text_input(
                                 "Cir PMH HBV Free Text",
-                                value = df.iloc[0]["CirPMH_HBVFT"],
+                                value = df.iloc[0]["CIRPMH_HBVFT"],
                             )
                             
                             cir_pmh_hbv_art = "0" if cir_pmh_hbv_status == "No" else st.selectbox(
-                                "Cir PMH HBV ART",
-                                options=["Entecavir", "Tenofovir", "NA"],
-                                index=["Entecavir", "Tenofovir", "NA"].index(df.iloc[0]["CirPMH_HBVART"]) if df.iloc[0]["CirPMH_HBVART"] else None,  # No default selection
+                                "Cir PMH HBV ART [ Excel : CIRPMH_HBVART ]\n\n(1) Entecavir, (2) Tenofovir, (3) NA ",
+                            options=["1", "2", "3"],
+                            format_func=lambda x: {
+                                                    "1": "Entecavir ",
+                                                    "2": "Tenofovir ",
+                                                    "3": "NA "
+                                                }[x],
+                                index=["1", "2", "3"].index(df.iloc[0]["CIRPMH_HBVART"]) if df.iloc[0]["CIRPMH_HBVART"] else None,  # No default selection
                                 placeholder="Choose an option",
                             )
 
-                            cir_pmh_hcv_status = st.selectbox(
-                                "Cir_PMH_HCV Status",
-                                options=["Yes", "No"],
-                                index=["Yes", "No"].index(df.iloc[0]["CirPMH_HCV"]) if df.iloc[0]["CirPMH_HCV"] else None,  # No default selection
+                            cir_pmh_hcv_status = st.selectbox("Cir_PMH_HCV Status [ Excel : CIRPMH_HCV ]\n\nYes(1), No(0)  ",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes ",
+                                                    "0": "No  ",
+                                                }[x],
+                               
+                                index=["1", "0"].index(df.iloc[0]["CIRPMH_HCV"]) if df.iloc[0]["CIRPMH_HCV"] else None,  # No default selection
                                 placeholder="Choose an option",
                             )
 
                             cir_pmh_hcv_free_text = "No" if cir_pmh_hcv_status == "No" else st.text_input(
                                 "Cir_PMH_HCV Free Text",
-                                value = df.iloc[0]["CirPMH_HCVFT"],
+                                value = df.iloc[0]["CIRPMH_HCVFT"],
                                 help="Provide additional details for HCV Status",
                             )
 
                             cir_pmh_hcv_art = "No" if cir_pmh_hcv_status == "No" else st.selectbox(
-                                "Cir_PMH_HCV ART",
-                                options=["sofosbuvir/velpatasvir", "ledipasvir/sofosbuvir", "NA", "Glecaprevir/pibrentasvi"],
+                                "Cir_PMH_HCV ART [ Excel : CIRPMH_HCVART ]\n\n(1) sofosbuvir/velpatasvir , (2) ledipasvir/sofosbuvir, (3) NA (if u can't find a med or if they arent on it), (4) Glecaprevir/pibrentasvir",
+                            options=["1", "2", "3", "4"],
+                            format_func=lambda x: {
+                                                    "1": " sofosbuvir/velpatasvir",
+                                                    "2": " ledipasvir/sofosbuvir",
+                                                    "3": " NA (if you can't find a med or if they aren't on it)",
+                                                    "4": " Glecaprevir/pibrentasvir"
+                                                }[x],
                                 help="Select ART treatment for HCV",
-                                index=["sofosbuvir/velpatasvir", "ledipasvir/sofosbuvir", "NA", "Glecaprevir/pibrentasvi"].index(df.iloc[0]["CirPMH_HCVART"]) if df.iloc[0]["CirPMH_HCVART"] else None, 
+                                index=["1", "2", "3", "4"].index(df.iloc[0]["CIRPMH_HCVART"]) if df.iloc[0]["CIRPMH_HCVART"] else None, 
                                 placeholder="Choose an option",
                         
                             )
 
                             cir_pmh_alcohol_use_disorder = st.selectbox( 
-                                "Cir_PMH_Alcohol Use Disorder",
-                                options=["Yes", "No"],
+                                "Cir_PMH_Alcohol Use Disorder [ Excel : CIRPMH_AUD ]\n\nYes(1), No(0)  ",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes",
+                                                    "0": "No ",
+                                                }[x],
                                 help="Select Alcohol Disorder",
-                                index=["Yes", "No"].index(df.iloc[0]["CirPMH_AUD"]) if df.iloc[0]["CirPMH_AUD"] else None,  
+                                index=["1", "0"].index(df.iloc[0]["CIRPMH_AUD"]) if df.iloc[0]["CIRPMH_AUD"] else None,  
                                 placeholder="Choose an option",
                             )
 
                             cir_pmh_alcohol_free_text = "0" if cir_pmh_alcohol_use_disorder == "No" else st.text_input(
                                 "Cir_PMH_Alcohol Free Text",
-                                value = df.iloc[0]["CirPMH_AUDFT"],
+                                value = df.iloc[0]["CIRPMH_AUDFT"],
                                 help="Provide additional details for Alcohol Disorder",
                             )
 
                             cir_pmh_ivdu_status = st.selectbox(
-                                "Cir_PMH_IVDU Status",
-                                options=["Yes", "No"],
-                                #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
+                              "Cir_PMH_IVDU Status [ Excel : CIRPMH_IVDU ]\n\nYes(1), No(0)  ",
+                            options=["1", "0"],
+                            format_func=lambda x: {
+                                                    "1": "Yes ",
+                                                    "0": "No  ",
+                                                }[x],
                                 help="Select IVDU Status",
-                                index=["Yes", "No"].index(df.iloc[0]["CirPMH_IVDU"]) if df.iloc[0]["CirPMH_IVDU"] else None, 
+                                index=["1", "0"].index(df.iloc[0]["CIRPMH_IVDU"]) if df.iloc[0]["CIRPMH_IVDU"] else None, 
                                 placeholder="Choose an option",
                             )
 
                             cir_pmh_ivdu_free_text = "0" if cir_pmh_ivdu_status == "No" else st.text_input(
                                 "Cir_PMH_IVDU Free Text",
-                                value = df.iloc[0]["CirPMH_IVDUFT"],
+                                value = df.iloc[0]["CIRPMH_IVDUFT"],
                                 help="Provide additional details for IVDU"
                         
                             )
 
                             cir_pmh_liver_addtional_factor = st.selectbox(
-                                "Cir_PMH_Liver Additional Factors",
-                                options=["NAFLD", "MAFLD", "NASH", "Autoimmune Hepatitis", "Hereditary Hemochromatosis","none"],
+                                "Cir_PMH_Liver Additional Factors [ Excel : CIRPMH_LIVERFAC ]\n\n (1) NAFLD, (2) MAFLD, (3) NASH, (4) Autoimmune Hepatitis, (5) Hereditary Hemochromatosis, (6) none",
+                            options=["1", "2", "3", "4", "5", "6"],
+                            format_func=lambda x: {
+                                                    "1": "NAFLD ",
+                                                        "2": "MAFLD ",
+                                                        "3": "NASH ",
+                                                        "4": "Autoimmune Hepatitis ",
+                                                        "5": "Hereditary Hemochromatosis",
+                                                        "6": "None "
+                                                }[x], 
                                 help="Select Other Contributing Factors",
-                                index=["NAFLD", "MAFLD", "NASH", "Autoimmune Hepatitis", "Hereditary Hemochromatosis","none"].index(df.iloc[0]["CirPMH_Liverfactors"]) if df.iloc[0]["CirPMH_Liverfactors"] else None,
+                                index=["1", "2", "3", "4", "4 ","6"].index(df.iloc[0]["CIRPMH_LIVERFAC"]) if df.iloc[0]["CIRPMH_LIVERFAC"] else None,
                                 placeholder="Choose an option",
                             )
                     
                             st.subheader("Cirrhosis Dx")
-                            if df.iloc[0]["Cirdx_DateLabs"]:
-                                Cirdx_Value = datetime.strptime(df.iloc[0]["Cirdx_DateLabs"], "%Y-%m-%d").date()
+                            if df.iloc[0]["CIRDX_DATE"]:
+                                Cirdx_Value = datetime.strptime(df.iloc[0]["CIRDX_DATE"], "%Y-%m-%d").date()
                             else:
                                 Cirdx_Value = None
                             Cirrhosis_Dx_Diagnosis_Date = st.date_input("Cirrhosis Dx Diagnosis Date", value = Cirdx_Value)
 
                             Cirrhosis_Dx_Diagnosis_Method = st.selectbox(
-                                "Cirrhosis_Dx_Diagnosis Method",
-                                options=["Biopsy", "Imaging"],
+                                "Cirrhosis_Dx_Diagnosis Method [ Excel : CIRDX_METHOD ]\n\n(1) Biopsy, (2) Imaging  ",
+                                options=["1", "2"],
+                                format_func=lambda x: {
+                                                        "1": " Biopsy",
+                                                        "2": " Imaging",
+                                                    }[x],
                                 help="Select Diagnosis Method",
-                                index=["Biopsy", "Imaging"].index(df.iloc[0]["Cirdx_Dxmethod"]) if df.iloc[0]["Cirdx_Dxmethod"] else None,  # No default selection
+                                index=["1", "2"].index(df.iloc[0]["CIRDX_METHOD"]) if df.iloc[0]["CIRDX_METHOD"] else None,  # No default selection
                                 placeholder="Choose an option",
                             ) 
                             Cirrhosis_Dx_HPI_EMR_Note_Free_Text = st.text_area(
                                 "Cirrhosis_Dx_HPI EMR Note Free Text",
-                                value = df.iloc[0]["Cirdx_HPIFT"],
+                                value = df.iloc[0]["CIRDX_HPIFT"],
                                 help="Provide details of HPI EMR"
                             )
                             Cirrhosis_Dx_Imaging_Findings_EMR_Note_Free_Text = st.text_area(
                                 "Cirrhosis_Dx_Imaging Findings EMR Note Free Text",
-                                value = df.iloc[0]["Cirdx_ImageemrFT"],
+                                value = df.iloc[0]["CIRDX_IMAGEFT"],
                                 help="Provide details of Imaging Findings"
                             )
 
                             Cirrhosis_Dx_Metavir_Score = st.selectbox (
-                                "Cirrhosis_Dx_Metavir Score",
+                                "Cirrhosis_Dx_Metavir Score [ Excel : CIRDX_METAVIR ]  ",
                                 options=["F0/F1", "F2","F3","F4","NA"],
                                 help="Select Metavir_score",
-                                index=["F0/F1", "F2","F3","F4","NA"].index(df.iloc[0]["Cirdx_Metavir"]) if df.iloc[0]["Cirdx_Metavir"] else None,  # No default selection
+                                index=["F0/F1", "F2","F3","F4","NA"].index(df.iloc[0]["CIRDX_METAVIR"]) if df.iloc[0]["CIRDX_METAVIR"] else None,  # No default selection
                                 placeholder="Choose an option",
                             ) 
-                            complications = df.loc[df["MRN"] == mrn, "Cirdx_Compatdx"].values[0]
+                            complications = df.loc[df["MRN"] == mrn, "CIRDX_COMPLDX"].values[0]
                             if complications:
                                 # If complications is a string, split it into a list and strip spaces
                                 complications_list = [comp.strip() for comp in complications.split(',')] if isinstance(complications, str) else complications
@@ -3866,7 +4106,7 @@ def edit_existing_data():
                             # Filter out any items that are not part of the valid complications list
                             complications_list = [comp for comp in complications_list if comp in valid_complications]
                             Cirrhosis_Dx_Complications_at_Time_of_Diagnosis = st.multiselect(
-                                "Cirrhosis_Dx_Complications at Time of Diagnosis",
+                            "Cirrhosis_Dx_Complications at Time of Diagnosis [ Excel : CIRDX_COMPLDX ] ",
                                 options=["ascites", "ariceal hemorrhage", "Hepatic encephalopathy", "jaundice", "SBP", "Hepatorenal Syndrome", "Coagulopathy", "Portal HTN", "PVT", "PVTT", "Portal Vein Thrombosis", "none"],
                                 help="Provide details of Compilications at time of Diagnosis",
                                 default=complications_list,
@@ -3875,24 +4115,24 @@ def edit_existing_data():
                             Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_String = ", ".join(Cirrhosis_Dx_Complications_at_Time_of_Diagnosis)
 
                             Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary = st.selectbox(
-                                "Cirrhosis_Dx_Complications at Time of Diagnosis Binary",
+                                "Cirrhosis_Dx_Complications at Time of Diagnosis Binary [ Excel : CIRDX_COMPLDXBIN ] ",
                                 options=["0","1"],
                                 format_func=lambda x: {
                                     "1": " >1 ",
                                     "0": "None",
                                 }[x],
                                 help="Provide details of Complications_at_Time_of_Diagnosis_Binary",
-                                index=["0","1"].index(df.iloc[0]["Cirdx_Compatdxbinary"]) if df.iloc[0]["Cirdx_Compatdxbinary"] else None, 
+                                index=["0","1"].index(df.iloc[0]["CIRDX_COMPLDXBIN"]) if df.iloc[0]["CIRDX_COMPLDXBIN"] else None, 
                                 placeholder="Choose an option",
                             )
 
                             Cirrhosis_Dx_Complications_Free_Text =  st.text_area(
                                 "Cirrhosis_Dx_Complications Free Text",
-                                value = df.iloc[0]["Cirdx_CompFT"],
+                                value = df.iloc[0]["CIRDX_COMPLFT"],
                                 help="Provide details of Complications"
                             )
-                            if df.iloc[0]["Cirdx_Dxdate"]:
-                                Cirdx_Dxdate_value = datetime.strptime(df.iloc[0]["Cirdx_Dxdate"], "%Y-%m-%d").date()
+                            if df.iloc[0]["CIRDX_DATELABS"]:
+                                Cirdx_Dxdate_value = datetime.strptime(df.iloc[0]["CIRDX_DATELABS"], "%Y-%m-%d").date()
                             else:
                                 Cirdx_Dxdate_value = None 
 
@@ -3900,21 +4140,21 @@ def edit_existing_data():
 
                             Cirrhosis_Dx_AFP = st.text_input(
                                 "Cirrhosis_Dx_AFP",
-                                value = df.iloc[0]["Cirdx_AFP"],
+                                value = df.iloc[0]["CIRDX_AFP"],
                                 help="Enter AFP value in ng/dl"
                                 
                             )
 
                             Cirrhosis_Dx_AFP_L3 = st.text_input(
                                 "Cirrhosis_Dx_AFP L3",
-                                value = df.iloc[0]["Cirdx_AFP L3"],
+                                value = df.iloc[0]["CIRDX_AFPL3"],
                                 help="Enter AFP_L3 value in ng/dl"
                                 
                             )
-                            Cirrhosis_Dx_AFP_L3_Date_Free_Text = st.text_area("Cirrhosis_Dx_AFP L3 Date Free Text",value = df.iloc[0]["Cirdx_AFPL3DateFT"])
+                            Cirrhosis_Dx_AFP_L3_Date_Free_Text = st.text_area("Cirrhosis_Dx_AFP L3 Date Free Text",value = df.iloc[0]["CIRDX_AFPL3DATEFT"])
 
                             Cirrhosis_Dx_Ascites_CTCAE = st.selectbox (
-                                "Cirrhosis_Dx_Ascites CTCAE",
+                                "Cirrhosis_Dx_Ascites CTCAE [ Excel : CIRDX_ASCITCTCAE ]",
                                 options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
                                 format_func=lambda x: {
                                 "none": "0. none",
@@ -3927,7 +4167,7 @@ def edit_existing_data():
 
                                 }[x],
                                 help="Select Metavir_score",
-                                index=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"].index(df.iloc[0]["Cirdx_AscitesCTCAE"]) if df.iloc[0]["Cirdx_AscitesCTCAE"] else None,  # No default selection
+                                index=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"].index(df.iloc[0]["CIRDX_ASCITCTCAE"]) if df.iloc[0]["CIRDX_ASCITCTCAE"] else None,  # No default selection
                                 placeholder="Choose an option",
                             ) 
                             def findascitesclass(score):
@@ -3942,7 +4182,7 @@ def edit_existing_data():
                             st.write("Cirdx_AscitesCTCAEnumb ",Cirrhosis_Dx_Ascites_Classification)
                             Cirrhosis_Dx_Ascites_Free_Text = "NA" if Cirrhosis_Dx_Ascites_CTCAE == "none" else st.text_area(
                                 "Cirrhosis_Dx_Ascites Free Text",
-                                value = df.iloc[0]["Cirdx_AscitesFT"]
+                                value = df.iloc[0]["CIRDX_ASCITFT"]
                             
                             )
                             Cirrhosis_Dx_Diagnosis_Date = (
@@ -3959,33 +4199,32 @@ def edit_existing_data():
                             submit_tab3 = st.form_submit_button("Submit")
                             if submit_tab3:
                                 data2={
-                                    "CirPMH_HBV" : cir_pmh_hbv_status,
-                                    "CirPMH_HBVFT" : cir_pmh_hbv_free_text,
-                                    "CirPMH_HBVART" : cir_pmh_hbv_art,
-                                    "CirPMH_HCV" : cir_pmh_hcv_status,
-                                    "CirPMH_HCVFT" : cir_pmh_hcv_free_text,
-                                    "CirPMH_HCVART" : cir_pmh_hcv_art,
-                                    "CirPMH_AUD" : cir_pmh_alcohol_use_disorder,
-                                    "CirPMH_AUDFT" : cir_pmh_alcohol_free_text,
-                                    "CirPMH_IVDU" : cir_pmh_ivdu_status,
-                                    "CirPMH_IVDUFT" : cir_pmh_ivdu_free_text,
-                                    "CirPMH_Liverfactors" : cir_pmh_liver_addtional_factor,
-                                    "Cirdx_Dxdate" : Cirrhosis_Dx_Diagnosis_Date,
-                                    "Cirdx_Dxmethod" : Cirrhosis_Dx_Diagnosis_Method,
-                                    "Cirdx_HPIFT" : Cirrhosis_Dx_HPI_EMR_Note_Free_Text,
-                                    "Cirdx_ImageemrFT" : Cirrhosis_Dx_Imaging_Findings_EMR_Note_Free_Text,
-                                    "Cirdx_Metavir" : Cirrhosis_Dx_Metavir_Score,
-                                    "Cirdx_Compatdx" : Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_String,
-                                    "Cirdx_Compatdxbinary" : Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary,
-                                    "Cirdx_CompFT" : Cirrhosis_Dx_Complications_Free_Text,
-                                    "Cirdx_DateLabs" : Cirrhosis_Dx_Date_of_Labs_in_Window,
-                                    "Cirdx_AFP" : Cirrhosis_Dx_AFP,
-                                    "Cirdx_AFP L3" : Cirrhosis_Dx_AFP_L3,
-                                    "Cirdx_AFPL3DateFT" : Cirrhosis_Dx_AFP_L3_Date_Free_Text,
-                                    "Cirdx_AscitesCTCAE" : Cirrhosis_Dx_Ascites_CTCAE,
-                                    "Cirdx_AscitesCTCAEnumb" : Cirrhosis_Dx_Ascites_Classification,
-                                    "Cirdx_AscitesFT" : Cirrhosis_Dx_Ascites_Free_Text,
-                                        
+                                    "CIRPMH_HBV" : cir_pmh_hbv_status,
+                                    "CIRPMH_HBVFT" : cir_pmh_hbv_free_text,
+                                    "CIRPMH_HBVART" : cir_pmh_hbv_art,
+                                    "CIRPMH_HCV" : cir_pmh_hcv_status,
+                                    "CIRPMH_HCVFT" : cir_pmh_hcv_free_text,
+                                    "CIRPMH_HCVART" : cir_pmh_hcv_art,
+                                    "CIRPMH_AUD" : cir_pmh_alcohol_use_disorder,
+                                    "CIRPMH_AUDFT" : cir_pmh_alcohol_free_text,
+                                    "CIRPMH_IVDU" : cir_pmh_ivdu_status,
+                                    "CIRPMH_IVDUFT" : cir_pmh_ivdu_free_text,
+                                    "CIRPMH_LIVERFAC" : cir_pmh_liver_addtional_factor,
+                                    "CIRDX_DATE" : Cirrhosis_Dx_Diagnosis_Date,
+                                    "CIRDX_METHOD" : Cirrhosis_Dx_Diagnosis_Method,
+                                    "CIRDX_HPIFT" : Cirrhosis_Dx_HPI_EMR_Note_Free_Text,
+                                    "CIRDX_IMAGEFT" : Cirrhosis_Dx_Imaging_Findings_EMR_Note_Free_Text,
+                                    "CIRDX_METAVIR" : Cirrhosis_Dx_Metavir_Score,
+                                    "CIRDX_COMPLDX" : Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_String,
+                                    "CIRDX_COMPLDXBIN" : Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary,
+                                    "CIRDX_COMPLFT" : Cirrhosis_Dx_Complications_Free_Text,
+                                    "CIRDX_DATELABS" : Cirrhosis_Dx_Date_of_Labs_in_Window,
+                                    "CIRDX_AFP" : Cirrhosis_Dx_AFP,
+                                    "CIRDX_AFPL3" : Cirrhosis_Dx_AFP_L3,
+                                    "CIRDX_AFPL3DATEFT" : Cirrhosis_Dx_AFP_L3_Date_Free_Text,
+                                    "CIRDX_ASCITCTCAE" : Cirrhosis_Dx_Ascites_CTCAE,
+                                    "CIRDX_ASCITNUMB" : Cirrhosis_Dx_Ascites_Classification,
+                                    "CIRDX_ASCITFT" : Cirrhosis_Dx_Ascites_Free_Text,
                                     }
                                     
                                 update_google_sheet(data2, mrn)
@@ -3994,31 +4233,36 @@ def edit_existing_data():
                         st.subheader("HCC Diagnosis")
                         with st.form("hcc_dx_form"):
 
-                            hcc_dx_hcc_diagnosis_date = st.date_input("HCC_Dx_HCC Diagnosis Date", help="Enter the HCC diagnosis date",value = datetime.strptime(df.iloc[0]["HCCdx_HCCdxdate"], "%Y-%m-%d").date() if df.iloc[0]["HCCdx_HCCdxdate"] else None)
+                            hcc_dx_hcc_diagnosis_date = st.date_input("HCC_Dx_HCC Diagnosis Date", help="Enter the HCC diagnosis date",value = datetime.strptime(df.iloc[0]["HCCDX_DATEDX"], "%Y-%m-%d").date() if df.iloc[0]["HCCDX_DATEDX"] else None)
 
                             hcc_dx_method_of_diagnosis = st.selectbox(
-                                "HCC_Dx_Method of Diagnosis",   
-                                options=["Biopsy", "Imaging", "Unknown"],
-                                index=["Biopsy", "Imaging", "Unknown"].index(df.iloc[0]["HCCdx_Methoddx"]) if df.iloc[0]["HCCdx_Methoddx"] else None, 
+                                 "HCC_Dx_Method of Diagnosis [ Excel : HCCDX_METHODDX ]\n\n(1) Biopsy, (2) Imaging, (NA) Unknown",   
+                             options=["1", "2", "NA"],
+                                format_func=lambda x: {
+                                    "1": "Biopsy ",
+                                    "2": "Imaging ",
+                                    "NA": "Unknown ",
+                                }[x],
+                                index=["1", "2", "NA"].index(df.iloc[0]["HCCDX_METHODDX"]) if df.iloc[0]["HCCDX_METHODDX"] else None, 
                                 placeholder="Choose an option",
-                                #format_func=lambda x: f"{x} ({1 if x == 'Biopsy' else 2 if x == 'Imaging' else 'NA'})"
+                                
                             )
 
-                            hcc_dx_date_of_labs = st.date_input("HCC_Dx_Date of Labs in Window",value=datetime.strptime(df.iloc[0]["HCCdx_Datelabs"], "%Y-%m-%d").date() if df.iloc[0]["HCCdx_Datelabs"] else None)
+                            hcc_dx_date_of_labs = st.date_input("HCC_Dx_Date of Labs in Window",value=datetime.strptime(df.iloc[0]["HCCDX_LABSDATE"], "%Y-%m-%d").date() if df.iloc[0]["HCCDX_LABSDATE"] else None)
 
-                            hcc_dx_afp = st.number_input("HCC_Dx_AFP",step=0.1, help="Enter AFP value in ng/dl",value = float(df.iloc[0]["HCCdx_AFP"]) if pd.notnull(df.iloc[0]["HCCdx_AFP"]) and str(df.iloc[0]["HCCdx_AFP"]).isdigit() else 0.0 )
+                            hcc_dx_afp = st.number_input("HCC_Dx_AFP",step=0.1, help="Enter AFP value in ng/dl",value = float(df.iloc[0]["HCCDX_AFP"]) if pd.notnull(df.iloc[0]["HCCDX_AFP"]) and str(df.iloc[0]["HCCDX_AFP"]).isdigit() else 0.0 )
 
-                            hcc_dx_afp_l3 = st.number_input("HCC_Dx_AFP L3",step=0.1, help="Enter AFP L3 and date details",value = float(df.iloc[0]["HCCdx_AFP L3"]) if pd.notnull(df.iloc[0]["HCCdx_AFP L3"]) and str(df.iloc[0]["HCCdx_AFP L3"]).isdigit() else 0.0)
-                            hcc_dx_afp_l3_date_free_text = st.text_area("HCC_Dx_AFP L3 Date Free Text",value = df.iloc[0]["HCCdx_AFPL3dateFT"])
+                            hcc_dx_afp_l3 = st.number_input("HCC_Dx_AFP L3",step=0.1, help="Enter AFP L3 and date details",value = float(df.iloc[0]["HCCDX_AFPL3"]) if pd.notnull(df.iloc[0]["HCCDX_AFPL3"]) and str(df.iloc[0]["HCCDX_AFPL3"]).isdigit() else 0.0)
+                            hcc_dx_afp_l3_date_free_text = st.text_area("HCC_Dx_AFP L3 Date Free Text",value = df.iloc[0]["HCCDX_AFPL3dateFT"])
 
-                            hcc_dx_bilirubin = st.number_input("HCC_Dx_Bilirubin",step=0.1, help="Enter the bilirubin value in mg/dl", min_value=1.0,value = float(df.iloc[0]["HCCdx_Bilirubin"]) if pd.notnull(df.iloc[0]["HCCdx_Bilirubin"]) and str(df.iloc[0]["HCCdx_Bilirubin"]).isdigit() else 1.0)
-                            hcc_dx_albumin = st.number_input("HCC_Dx_Albumin",step=0.1, help="Enter the albumin value in g/dl",value = float(df.iloc[0]["HCCdx_Albumin"]) if pd.notnull(df.iloc[0]["HCCdx_Albumin"]) and str(df.iloc[0]["HCCdx_Albumin"]).isdigit() else 0.0)
-                            hcc_dx_inr = st.number_input("HCC_Dx_INR",step=0.1, help="Enter the INR value", value = float(df.iloc[0]["HCCdx_INR"]) if pd.notnull(df.iloc[0]["HCCdx_INR"]) and str(df.iloc[0]["HCCdx_INR"]).isdigit() else 0.0)
-                            hcc_dx_creatinine = st.number_input("HCC_Dx_Creatinine",step=0.1, help="Enter the creatinine value in mg/dl", value = float(df.iloc[0]["HCCdx_Creatinine"]) if pd.notnull(df.iloc[0]["HCCdx_Creatinine"]) and str(df.iloc[0]["HCCdx_Creatinine"]).isdigit() else 0.0)
-                            hcc_dx_sodium = st.number_input("HCC_Dx_Sodium",step=0.1, help="Enter the sodium value in mmol/L", value = float(df.iloc[0]["HCCdx_Sodium"]) if pd.notnull(df.iloc[0]["HCCdx_Sodium"]) and str(df.iloc[0]["HCCdx_Sodium"]).isdigit() else 0.0)
+                            hcc_dx_bilirubin = st.number_input("HCC_Dx_Bilirubin",step=0.1, help="Enter the bilirubin value in mg/dl", min_value=1.0,value = float(df.iloc[0]["HCCDX_BILI"]) if pd.notnull(df.iloc[0]["HCCDX_BILI"]) and str(df.iloc[0]["HCCDX_BILI"]).isdigit() else 1.0)
+                            hcc_dx_albumin = st.number_input("HCC_Dx_Albumin",step=0.1, help="Enter the albumin value in g/dl",value = float(df.iloc[0]["HCCDX_ALBUMIN"]) if pd.notnull(df.iloc[0]["HCCDX_ALBUMIN"]) and str(df.iloc[0]["HCCDX_ALBUMIN"]).isdigit() else 0.0)
+                            hcc_dx_inr = st.number_input("HCC_Dx_INR",step=0.1, help="Enter the INR value", value = float(df.iloc[0]["HCCDX_INR"]) if pd.notnull(df.iloc[0]["HCCDX_INR"]) and str(df.iloc[0]["HCCDX_INR"]).isdigit() else 0.0)
+                            hcc_dx_creatinine = st.number_input("HCC_Dx_Creatinine",step=0.1, help="Enter the creatinine value in mg/dl", value = float(df.iloc[0]["HCCDX_CREATININE"]) if pd.notnull(df.iloc[0]["HCCDX_CREATININE"]) and str(df.iloc[0]["HCCDX_CREATININE"]).isdigit() else 0.0)
+                            hcc_dx_sodium = st.number_input("HCC_Dx_Sodium",step=0.1, help="Enter the sodium value in mmol/L", value = float(df.iloc[0]["HCCDX_SODIUM"]) if pd.notnull(df.iloc[0]["HCCDX_SODIUM"]) and str(df.iloc[0]["HCCDX_SODIUM"]).isdigit() else 0.0)
 
                             hcc_dx_ascites_CTCAE = st.selectbox (
-                                "HCC_Dx_Ascites CTCAE",
+                                "HCC_Dx_Ascites CTCAE [ Excel : HCCDX_ASCITCTCAE ] ",
                                 options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
                                 format_func=lambda x: {
                                 "none": "0. none",
@@ -4031,7 +4275,7 @@ def edit_existing_data():
 
                             }[x],
                                 help="Select Metavir_score",
-                                index=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"].index(df.iloc[0]["HCCdx_AscitesCTCAE"]) if df.iloc[0]["HCCdx_AscitesCTCAE"] else None,
+                                index=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"].index(df.iloc[0]["HCCDX_ASCITCTCAE"]) if df.iloc[0]["HCCDX_ASCITCTCAE"] else None,
                                 placeholder="Choose an option",
                             ) 
                             def findascitesclass(score):
@@ -4046,29 +4290,40 @@ def edit_existing_data():
                             st.write("HCCdx_AscitesCTCAEnumb : ",hCC_dx_ascites_classification)
 
                             hcc_dx_ascites_diruetics = 0 if hcc_dx_ascites_CTCAE == "none" else st.selectbox(
-                                "HCC_Dx_Ascites Diruetics",
-                                options = ["Yes","No"],
-                                index=["Yes","No"].index(df.iloc[0]["HCCdx_Ascitesdiruetics"]) if df.iloc[0]["HCCdx_Ascitesdiruetics"] else None,  # No default selection
+                                "HCC_Dx_Ascites Diruetics [ Excel : HCCDX_ASCITDIUR ]\n\nYes(1), No(0)",
+                             options=["1", "0"],
+                            format_func=lambda x: {
+                                "1": "Yes ",
+                                "0": "No ",
+                            }[x],
+                                index=["1","0"].index(df.iloc[0]["HCCDX_ASCITDIUR"]) if df.iloc[0]["HCCDX_ASCITDIUR"] else None,  # No default selection
                                 placeholder="Choose an option",
                 
                             )
                             hcc_dx_ascites_paracentesis = 0 if hcc_dx_ascites_CTCAE == "none" else st.selectbox(
-                                "HCC_Dx_Ascites Paracentesis ",
-                                options = ["Yes","No"],
-                                index= ["Yes","No"].index(df.iloc[0]["HCCdx_Ascitesparacentesis"]) if df.iloc[0]["HCCdx_Ascitesparacentesis"] else None,
+                                "HCC_Dx_Ascites Paracentesis  [ Excel : HCCDX_ASCITPARA ]\n\nYes(1), No(0)  ",
+                             options=["1", "0"],
+                            format_func=lambda x: {
+                                "1": "Yes ",
+                                "0": "No ",
+                            }[x],
+                                index= ["1","0"].index(df.iloc[0]["HCCDX_ASCITPARA"]) if df.iloc[0]["HCCDX_ASCITPARA"] else None,
                                 placeholder="Choose an option",
                 
                             )
                             hcc_dx_ascites_hospitalization = 0 if hcc_dx_ascites_CTCAE == "none" else st.selectbox(
-                                "HCC_Dx_Ascites Hospitalization",
-                                options = ["Yes","No"],
-                                index=["Yes","No"].index(df.iloc[0]["HCCdx_Asciteshospitalization"]) if df.iloc[0]["HCCdx_Asciteshospitalization"] else None,
+                                "HCC_Dx_Ascites Hospitalization [ Excel : HCCDX_ASCITHOSP ]\n\nYes(1), No(0)",
+                             options=["1", "0"],
+                            format_func=lambda x: {
+                                "1": "Yes ",
+                                "0": "No ",
+                            }[x],
+                                index=["1","0"].index(df.iloc[0]["HCCDX_ASCITHOSP"]) if df.iloc[0]["HCCDX_ASCITHOSP"] else None,
                                 placeholder="Choose an option",
                 
                             )
-
                             hcc_dx_he_grade = st.selectbox(
-                                "HCC_Dx_HE Grade",
+                                "HCC_Dx_HE Grade [ Excel : HCCDX_HEGRADE ]\n\n(1) None, (2) Grade 1-2, (3) Grade 3-4   ",
                                 options=[1,2,3],
                                 format_func=lambda x: {
                                 1: "None",
@@ -4076,28 +4331,24 @@ def edit_existing_data():
                                 3: "Grade 3-4",
                                 
                             }[x],
-                                index=[1,2,3].index(int(df.iloc[0]["HCCdx_HEgrade"])) if df.iloc[0]["HCCdx_HEgrade"] else None,  
+                                index=[1,2,3].index(int(df.iloc[0]["HCCDX_HEGRADE"])) if df.iloc[0]["HCCDX_HEGRADE"] else None,  
                                 placeholder="Choose an option",
 
                             )
-                        
-                            hcc_dx_ecog_performance_status = st.selectbox("HCC_Dx_ECOG Performance Status", options=["0", "1", "2", "3", "4", "NA"],
-                                index=["0", "1", "2", "3", "4", "NA"].index(df.iloc[0]["HCCdx_ECOG"]) if df.iloc[0]["HCCdx_ECOG"] else None,  
+                            hcc_dx_ecog_performance_status = st.selectbox("HCC_Dx_ECOG Performance Status [ Excel : HCCDX_ECOG ]  ", options=["0", "1", "2", "3", "4", "NA"],
+                                index=["0", "1", "2", "3", "4", "NA"].index(df.iloc[0]["HCCDX_ECOG"]) if df.iloc[0]["HCCDX_ECOG"] else None,  
                                 placeholder="Choose an option",)
 
                             hcc_dx_lirads_score = st.selectbox(
-                                "HCC_Dx_LIRADS Score",
+                                "HCC_Dx_LIRADS Score  [ Excel : HCCDX_LIRADS ]",
                                 options=["LR-1", "LR-2", "LR-3", "LR-4", "LR-5", "LR-5V", "LR-M"],
-                                index=["LR-1", "LR-2", "LR-3", "LR-4", "LR-5", "LR-5V", "LR-M"].index(df.iloc[0]["HCCdx_LIRADS"]) if df.iloc[0]["HCCdx_LIRADS"] else None, 
+                                index=["LR-1", "LR-2", "LR-3", "LR-4", "LR-5", "LR-5V", "LR-M"].index(df.iloc[0]["HCCDX_LIRADS"]) if df.iloc[0]["HCCDX_LIRADS"] else None, 
                                 placeholder="Choose an option",
                             )
-
                             hcc_dx_child_pugh_points_calc = calculatepoints(hcc_dx_bilirubin,hcc_dx_albumin,hcc_dx_inr,hcc_dx_ascites_CTCAE,hcc_dx_he_grade)
                             st.write("HCCdx_CPcalc ",hcc_dx_child_pugh_points_calc)
                             hcc_dx_child_pugh_class_calc = calculate_class(hcc_dx_child_pugh_points_calc)
                             st.write("HCCdx_CPclass ",hcc_dx_child_pugh_class_calc)
-                        
-                            #bclc_stage_calc = st.text_input("HCC_Dx_BCLC Stage calc")
                             hcc_dx_meld_score_calc = (3.78*(int(hcc_dx_bilirubin)))+(11.2*(int(hcc_dx_inr)))+(9.57*(int(hcc_dx_creatinine)))+6.43
                             st.write("HCCdx_MELD ",hcc_dx_meld_score_calc)
                             hcc_dx_meld_na_score_calc = hcc_dx_meld_score_calc + 1.32*(137-int(hcc_dx_sodium)) - (0.033*hcc_dx_meld_score_calc*(137-int(hcc_dx_sodium)))
@@ -4114,7 +4365,18 @@ def edit_existing_data():
                             hcc_dx_albi_grade = albi_class(hcc_dx_albi_score_calc)
                             st.write("HCCdx_Albigrade ",hcc_dx_albi_grade)
 
-                            hcc_dx_bclc_calc = st.text_area("HCC_Dx_BCLC Stage calc",value = df.iloc[0]["HCCdx_BCLC"])
+                            hcc_dx_bclc_calc = st.selectbox("HCC_Dx_BCLC Stage calc [ Excel : HCCDX_BCLC ]\n\n(NA) Not in chart, (0) Stage 0, (1) Stage A, (2) Stage B, (3) Stage C, (4) Stage D  ",
+                                    options=["NA", "0", "1", "2", "3", "4"],
+                                format_func=lambda x: {
+                                    "NA": " Not in chart",
+                                    "0": " Stage 0: Very early stage, with a single nodule smaller than 2 cm in diameter",
+                                    "1": " Stage A: Early stage, with one nodule smaller than 5 cm or up to three nodules smaller than 3 cm",
+                                    "2": " Stage B: Intermediate stage, with multiple tumors in the liver",
+                                    "3": " Stage C: Advanced stage, with cancer that has spread to other organs or blood vessels",
+                                    "4": " Stage D: End-stage disease, with severe liver damage or the patient is very unwell",
+                                }[x],index=["NA", "0", "1", "2", "3", "4"].index(df.iloc[0]["HCCDX_BCLC"]) if df.iloc[0]["HCCDX_BCLC"] else None, 
+                                placeholder="Choose an option",)
+                            
                             hcc_dx_hcc_diagnosis_date_formatted = (
                             hcc_dx_hcc_diagnosis_date.strftime("%Y-%m-%d") 
                             if hcc_dx_hcc_diagnosis_date is not None 
@@ -4125,38 +4387,36 @@ def edit_existing_data():
                             if hcc_dx_date_of_labs is not None
                             else None
                             )
-
-
                             submit_tab4 = st.form_submit_button("Submit")
                             if submit_tab4:
                                     
                                 data4 = {
-                                    "HCCdx_HCCdxdate": hcc_dx_hcc_diagnosis_date_formatted,
-                                    "HCCdx_Methoddx": hcc_dx_method_of_diagnosis,
-                                    "HCCdx_Datelabs": hcc_dx_date_of_labs_date_formattes,
-                                    "HCCdx_AFP": hcc_dx_afp,
-                                    "HCCdx_AFP L3": hcc_dx_afp_l3,
-                                    "HCCdx_AFPL3dateFT": hcc_dx_afp_l3_date_free_text,
-                                    "HCCdx_Bilirubin": hcc_dx_bilirubin,
-                                    "HCCdx_Albumin": hcc_dx_albumin,
-                                    "HCCdx_INR": hcc_dx_inr,
-                                    "HCCdx_Creatinine": hcc_dx_creatinine,
-                                    "HCCdx_Sodium": hcc_dx_sodium,
-                                    "HCCdx_AscitesCTCAE": hcc_dx_ascites_CTCAE,
-                                    "HCCdx_AscitesCTCAEnumb": hCC_dx_ascites_classification,
-                                    "HCCdx_Ascitesdiruetics": hcc_dx_ascites_diruetics,
-                                    "HCCdx_Ascitesparacentesis": hcc_dx_ascites_paracentesis,
-                                    "HCCdx_Asciteshospitalization": hcc_dx_ascites_hospitalization,
-                                    "HCCdx_HEgrade": hcc_dx_he_grade,
-                                    "HCCdx_ECOG": hcc_dx_ecog_performance_status,
-                                    "HCCdx_LIRADS": hcc_dx_lirads_score,
-                                    "HCCdx_CPcalc": hcc_dx_child_pugh_points_calc,
-                                    "HCCdx_CPclass": hcc_dx_child_pugh_class_calc,
-                                    "HCCdx_MELD": hcc_dx_meld_score_calc,
-                                    "HCCdx_MELDNa": hcc_dx_meld_na_score_calc,
-                                    "HCCdx_Albiscore": hcc_dx_albi_score_calc,
-                                    "HCCdx_Albigrade": hcc_dx_albi_grade,
-                                    "HCCdx_BCLC": hcc_dx_bclc_calc,
+                                    "HCCDX_DATEDX": hcc_dx_hcc_diagnosis_date_formatted,
+                                    "HCCDX_METHODDX": hcc_dx_method_of_diagnosis,
+                                    "HCCDX_LABSDATE": hcc_dx_date_of_labs_date_formattes,
+                                    "HCCDX_AFP": hcc_dx_afp,
+                                    "HCCDX_AFPL3": hcc_dx_afp_l3,
+                                    "HCCDX_AFPL3dateFT": hcc_dx_afp_l3_date_free_text,
+                                    "HCCDX_BILI": hcc_dx_bilirubin,
+                                    "HCCDX_ALBUMIN": hcc_dx_albumin,
+                                    "HCCDX_INR": hcc_dx_inr,
+                                    "HCCDX_CREATININE": hcc_dx_creatinine,
+                                    "HCCDX_SODIUM": hcc_dx_sodium,
+                                    "HCCDX_ASCITCTCAE": hcc_dx_ascites_CTCAE,
+                                    "HCCDX_ASCITNUMB": hCC_dx_ascites_classification,
+                                    "HCCDX_ASCITDIUR": hcc_dx_ascites_diruetics,
+                                    "HCCDX_ASCITPARA": hcc_dx_ascites_paracentesis,
+                                    "HCCDX_ASCITHOSP": hcc_dx_ascites_hospitalization,
+                                    "HCCDX_HEGRADE": hcc_dx_he_grade,
+                                    "HCCDX_ECOG": hcc_dx_ecog_performance_status,
+                                    "HCCDX_LIRADS": hcc_dx_lirads_score,
+                                    "HCCDX_CPCALC": hcc_dx_child_pugh_points_calc,
+                                    "HCCDX_CPCLASS": hcc_dx_child_pugh_class_calc,
+                                    "HCCDX_MELD": hcc_dx_meld_score_calc,
+                                    "HCCDX_MELDNA": hcc_dx_meld_na_score_calc,
+                                    "HCCDX_ALBISCORE": hcc_dx_albi_score_calc,
+                                    "HCCDX_ALBIGRADE": hcc_dx_albi_grade,
+                                    "HCCDX_BCLC": hcc_dx_bclc_calc,
                                 }
                                 
                                 update_google_sheet(data4, mrn)
@@ -4164,170 +4424,204 @@ def edit_existing_data():
                     elif st.session_state.selected_tab == "Previous Therapy for HCC":
                         st.subheader("Previous Therapy for HCC")
                         with st.form("previous_therapy_form"):
-
+                            
                             PRVTHER_Prior_LDT_Therapy = st.selectbox(
-                            "PRVTHER_Prior_LDT_Therapy",
-                            options=["Yes", "No","NA"],
-                            #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                            help="Prior LDT Therapy",
-                            index=["Yes", "No","NA"].index(df.iloc[0]["PRVTHER_LDT"]) if df.iloc[0]["PRVTHER_LDT"] else None,  
+                                "PRVTHER_Prior_LDT_Therapy [ Excel : PTHER_LDT ]\n\nNo (0), Yes (1), NA ",
+                                options=["0", "1", "NA"], 
+                                format_func=lambda x: {
+                                    "0": "No",
+                                    "1": "Yes",
+                                    "NA": "NA (not in chart)"
+                                }[x],
+                            index=["0", "1", "NA"].index(df.iloc[0]["PTHER_LDT"]) if df.iloc[0]["PTHER_LDT"] else None,  
                             placeholder="Choose an option",
                             )
+                            
                             PRVTHER_Prior_RFA_Therapy = st.selectbox(
-                                "PRVTHER_Prior RFA Therapy",
-                                options=["Yes", "No", "NA"],
-                                #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                                help="Prior RFA Therapy",
-                                index=["Yes", "No", "NA"].index(df.iloc[0]["PRVTHER_RFA"]) if df.iloc[0]["PRVTHER_RFA"] else None,
+                                "PRVTHER_Prior RFA Therapy [ Excel : PTHER_RFA ]\n\nNo (0), Yes (1), NA ",
+                                options=["0", "1", "NA"], 
+                                format_func=lambda x: {
+                                    "0": "No",
+                                    "1": "Yes",
+                                    "NA": "NA"
+                                }[x],
+                                index=["0", "1", "NA"].index(df.iloc[0]["PTHER_RFA"]) if df.iloc[0]["PTHER_RFA"] else None,
                                 placeholder="Choose an option",
                             )
-                            PRVTHER_Prior_RFA_Date = 0 if PRVTHER_Prior_RFA_Therapy == 'No' else st.date_input("PRVTHER_Prior RFA Date",value=datetime.strptime(df.iloc[0]["PRVTHER_RFAdate"], "%Y-%m-%d").date() if df.iloc[0]["PRVTHER_RFAdate"] else None)
-
+                            PRVTHER_Prior_RFA_Date = 0 if PRVTHER_Prior_RFA_Therapy == '0' else st.date_input("PRVTHER_Prior RFA Date",value=datetime.strptime(df.iloc[0]["PTHER_RFADATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_RFADATE"] else None)
                         
                             PRVTHER_Prior_TARE_Therapy = st.selectbox(
-                                "PRVTHER_Prior TARE Therapy",
-                                options=["Yes", "No","NA"],
-                                #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                                help="Prior TARE Therapy",
-                                index=["Yes", "No","NA"].index(df.iloc[0]["PRVTHER_TARE"]) if df.iloc[0]["PRVTHER_TARE"] else None, 
+                                "PRVTHER_Prior TARE Therapy [ Excel : PTHER_TARE ]\n\nNo (0), Yes (1), NA ",
+                                    options=["0", "1", "NA"], 
+                                format_func=lambda x: {
+                                    "0": "No",
+                                    "1": "Yes",
+                                    "NA": "NA (not in chart)"
+                                }[x],
+                                index=["0", "1", "NA"].index(df.iloc[0]["PTHER_TARE"]) if df.iloc[0]["PTHER_TARE"] else None, 
                                 placeholder="Choose an option",
                             )
-                            PRVTHER_Prior_TARE_Date = 0 if PRVTHER_Prior_TARE_Therapy == 'No' else st.date_input("PRVTHER_Prior TARE Date",value=datetime.strptime(df.iloc[0]["PRVTHER_TAREdate"], "%Y-%m-%d").date() if df.iloc[0]["PRVTHER_TAREdate"] else None)
+                            PRVTHER_Prior_TARE_Date = 0 if PRVTHER_Prior_TARE_Therapy == '0' else st.date_input("PRVTHER_Prior TARE Date",value=datetime.strptime(df.iloc[0]["PTHER_TAREDATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_TAREDATE"] else None)
                         
                             PRVTHER_Prior_SBRT_Therapy = st.selectbox(
-                                "PRVTHER_Prior SBRT Therapy",
-                                options=["Yes", "No","NA"],
-                                #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                                help="Prior SBRT Therapy",
-                                index=["Yes", "No","NA"].index(df.iloc[0]["PRVTHER_SBRT"]) if df.iloc[0]["PRVTHER_SBRT"] else None,  
+                                "PRVTHER_Prior SBRT Therapy [ Excel : PTHER_SBRT ]\n\nNo (0), Yes (1), NA ",
+                                    options=["0", "1", "NA"], 
+                                format_func=lambda x: {
+                                    "0": "No",
+                                    "1": "Yes",
+                                    "NA": "NA (not in chart)"
+                                }[x],
+                                index=["0", "1", "NA"].index(df.iloc[0]["PTHER_SBRT"]) if df.iloc[0]["PTHER_SBRT"] else None,  
                                 placeholder="Choose an option",
                             )
                             
-                            PRVTHER_Prior_SBRT_Date = 0 if PRVTHER_Prior_SBRT_Therapy == 'No' else st.date_input("PRVTHER_Prior SBRT Date",value=datetime.strptime(df.iloc[0]["PRVTHER_SBRTdate"], "%Y-%m-%d").date() if df.iloc[0]["PRVTHER_SBRTdate"] else None)
-
-
+                            PRVTHER_Prior_SBRT_Date = 0 if PRVTHER_Prior_SBRT_Therapy == '0' else st.date_input("PRVTHER_Prior SBRT Date",value=datetime.strptime(df.iloc[0]["PTHER_SBRTDATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_SBRTDATE"] else None)
                         
                             PRVTHER_Prior_TACE_Therapy = st.selectbox(
-                                "PRVTHER_Prior TACE Therapy",
-                                options=["Yes", "No","NA"],
-                                #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                                help="Prior TACE Therapy",
-                                index=["Yes", "No","NA"].index(df.iloc[0]["PRVTHER_TACE"]) if df.iloc[0]["PRVTHER_TACE"] else None,
+                               "PRVTHER_Prior TACE Therapy [ Excel : PTHER_TACE ]\n\nNo (0), Yes (1), NA ",
+                                    options=["0", "1", "NA"], 
+                                format_func=lambda x: {
+                                    "0": "No",
+                                    "1": "Yes",
+                                    "NA": "NA (not in chart)"
+                                }[x],
+                                index=["0", "1", "NA"].index(df.iloc[0]["PTHER_TACE"]) if df.iloc[0]["PTHER_TACE"] else None,
                                 placeholder="Choose an option",
                             )
                             
-                            PRVTHER_Prior_TACE_Date = 0 if PRVTHER_Prior_TACE_Therapy == 'No' else st.date_input("PRVTHER_Prior TACE Date",value=datetime.strptime(df.iloc[0]["PRVTHER_TACEdate"], "%Y-%m-%d").date() if df.iloc[0]["PRVTHER_TACEdate"] else None)
+                            PRVTHER_Prior_TACE_Date = 0 if PRVTHER_Prior_TACE_Therapy == '0' else st.date_input("PRVTHER_Prior TACE Date",value=datetime.strptime(df.iloc[0]["PTHER_TACEDATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_TACEDATE"] else None)
 
                             PRVTHER_Prior_MWA_Therapy = st.selectbox(
-                                "PRVTHER_Prior MWA Therapy",
-                                options=["Yes", "No","NA"],
-                                #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                                help="Prior MWA Therapy",
-                                index=["Yes", "No","NA"].index(df.iloc[0]["PRVTHER_MWA"]) if df.iloc[0]["PRVTHER_MWA"] else None, 
+                               "PRVTHER_Prior MWA Therapy [ Excel : PTHER_MWA ]\n\nNo (0), Yes (1), NA ",
+                                    options=["0", "1", "NA"], 
+                                format_func=lambda x: {
+                                    "0": "No",
+                                    "1": "Yes",
+                                    "NA": "NA (not in chart)"
+                                }[x],
+                                index=["0", "1", "NA"].index(df.iloc[0]["PTHER_MWA"]) if df.iloc[0]["PTHER_MWA"] else None, 
                                 placeholder="Choose an option",
                             )
-                            PRVTHER_Prior_MWA_Date = 0 if PRVTHER_Prior_MWA_Therapy == 'No' else st.date_input("PRVTHER_Prior MWA Date",value=datetime.strptime(df.iloc[0]["PRVTHER_MWAdate"], "%Y-%m-%d").date() if df.iloc[0]["PRVTHER_MWAdate"] else None)
+                            PRVTHER_Prior_MWA_Date = 0 if PRVTHER_Prior_MWA_Therapy == '0' else st.date_input("PRVTHER_Prior MWA Date",value=datetime.strptime(df.iloc[0]["PTHER_MWADATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_MWADATE"] else None)
 
                             PRVTHER_Resection = st.selectbox(
-                                "PRVTHER_Resection",
-                                options=["Yes", "No","NA"],
-                                #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                                help="Prior MWA Therapy",
-                                index=["Yes", "No","NA"].index(df.iloc[0]["PRVTHER_Resection"]) if df.iloc[0]["PRVTHER_Resection"] else None, 
+                               "PRVTHER_Resection [ Excel : PTHER_RESECTION ]\n\nNo (0), Yes (1), NA ",
+                                    options=["0", "1", "NA"], 
+                                format_func=lambda x: {
+                                    "0": "No",
+                                    "1": "Yes",
+                                    "NA": "NA (not in chart)"
+                                }[x],
+                                index=["0", "1", "NA"].index(df.iloc[0]["PTHER_RESECTION"]) if df.iloc[0]["PTHER_RESECTION"] else None, 
                                 placeholder="Choose an option",
                             )
-                            PRVTHER_Resection_Date = 0 if PRVTHER_Resection == 'No' else st.date_input("PRVTHER_Resection Date",value=datetime.strptime(df.iloc[0]["PRVTHER_Resection date"].values[0], "%Y-%m-%d").date() if df.iloc[0]["PRVTHER_Resection date"] else None)
+                            PRVTHER_Resection_Date = 0 if PRVTHER_Resection == '0' else st.date_input("PRVTHER_Resection Date",value=datetime.strptime(df.iloc[0]["PTHER_RESECTIONDATE"].values[0], "%Y-%m-%d").date() if df.iloc[0]["PTHER_RESECTIONDATE"] else None)
 
 
                             list1=[PRVTHER_Prior_LDT_Therapy, PRVTHER_Prior_RFA_Therapy, PRVTHER_Prior_TARE_Therapy, PRVTHER_Prior_SBRT_Therapy, PRVTHER_Prior_TACE_Therapy, PRVTHER_Prior_MWA_Therapy, PRVTHER_Resection ]
-                            sum=0
+                            total_sum=0
                             for item in list1:
                                 if item == "Yes" :
-                                    sum+=1
+                                    total_sum+=1
                                 else:
                                     continue
                             
-                            PRVTHER_Previous_Therapy_Sum = sum
+                            PRVTHER_Previous_Therapy_Sum = total_sum
                             st.write("PRVTHER_Prevtxsum ",PRVTHER_Previous_Therapy_Sum)
                         # PRVTHER_Previous_Therapy_Sum = PRVTHER_Prior_LDT_Therapy + PRVTHER_Prior_RFA_Therapy + PRVTHER_Prior_TARE_Therapy + PRVTHER_Prior_SBRT_Therapy + PRVTHER_Prior_TACE_Therapy + PRVTHER_Prior_MWA_Therapy
 
                             PRVTHER_NotesFT = st.text_area(
-                            "PRVTHER_NotesFT",  value=df.iloc[0]["PRVTHER_NotesFT"]
+                            "PRVTHER_NotesFT",  value=df.iloc[0]["PTHER_NOTESFT"]
                         
                             )
 
                             PRVTHER_Total_Recurrences_HCC = st.text_area(
-                                "PRVTHER_Total Recurrences HCC", value=df.iloc[0]["PRVTHER_Totalrecur"]
+                                "PRVTHER_Total Recurrences HCC", value=df.iloc[0]["PTHER_TOTRECUR"]
                             )
                             PRVTHER_Location_of_Previous_Treatment_segments = st.selectbox(
-                                "PRVTHER_Location of Previous Treatment Segments",
+                                "PRVTHER_Location of Previous Treatment Segments [Excel : PTHER_PREVSEGMENT]",
                                 options=["1","2","3","4a","4b","5","6","7","8","NA"],
-                                index=["1","2","3","4a","4b","5","6","7","8","NA"].index(df.iloc[0]["PRVTHER_Locationprevtxseg"]) if df.iloc[0]["PRVTHER_Locationprevtxseg"] else None,
+                                index=["1","2","3","4a","4b","5","6","7","8","NA"].index(df.iloc[0]["PTHER_PREVSEGMENT"]) if df.iloc[0]["PTHER_PREVSEGMENT"] else None,
                                 placeholder="Choose an option"
                             )
                             PRVTHER_Location_of_Previous_Tx_segments_ft = st.text_area(
-                                "PRVTHER_Location of Previous Tx Segments FT",  value=df.iloc[0]["PRVTHER_Location of Previous Tx Segments FT"]
+                                "PRVTHER_Location of Previous Tx Segments FT",  value=df.iloc[0]["PTHER_PREVSEGMENTFT"]
                             
                             )
                             PRVTHER_recurrence_location_note = st.selectbox(
-                                "PRVTHER_Recurrence Location Note",
+                                "PRVTHER_Recurrence Location Note [Excel : PTHER_RECURSEGMENTFT]",
                                 options=["1","2","3","4a","4b","5","6","7","8","NA"],
-                                index=["1","2","3","4a","4b","5","6","7","8","NA"].index(df.iloc[0]["PRVTHER_RecurLocationFT"]) if df.iloc[0]["PRVTHER_RecurLocationFT"] else None,
+                                index=["1","2","3","4a","4b","5","6","7","8","NA"].index(df.iloc[0]["PTHER_RECURSEGMENTFT"]) if df.iloc[0]["PTHER_RECURSEGMENTFT"] else None,
                                 placeholder="Choose an option"
                             )
                             PRVTHER_recurrence_date = st.text_area(
-                                "PRVTHER_Recurrence Date", value=df.iloc[0]["PRVTHER_RecurDate"],
+                                "PRVTHER_Recurrence Date", value=df.iloc[0]["PTHER_RECURDATE"],
                             
                             )
                             PRVTHER_recurrence_seg =  st.text_input(
-                                "PRVTHER_Recurrence Seg" , value=df.iloc[0]["PRVTHER_Recurrence Seg"]
+                                "PRVTHER_Recurrence Seg" , value=df.iloc[0]["PTHER_RECURSEGMENT"]
                             )
                             PRVTHER_New_HCC_Outside_Previous_Treatment_Site = st.selectbox(
-                                "PRVTHER_New HCC Outside Previous Treatment Site",
-                                options = ["Yes","No","NA"],
-                                help="new HCC occurrence that has developed in a diff location in the liver, separate from the area that was previously tx",
-                                index=["Yes","No","NA"].index(df.iloc[0]["PRVTHER_NewHCCoutsideprevsite"]) if df.iloc[0]["PRVTHER_NewHCCoutsideprevsite"] else None,
+                                "PRVTHER_New HCC Outside Previous Treatment Site [ Excel : PTHER_NEWHCCOUT ]\n\nNo (0), Yes (1), NA",
+                                    options=["0", "1", "NA"], 
+                                format_func=lambda x: {
+                                    "0": "No ",
+                                    "1": "Yes ",
+                                    "NA": "NA (not in chart)"
+                                }[x],
+                                index=["0", "1", "NA"].index(df.iloc[0]["PTHER_NEWHCCOUT"]) if df.iloc[0]["PTHER_NEWHCCOUT"] else None,
                                 placeholder="Choose an option"
                             )   
                             PRVTHER_New_HCC_Adjacent_to_Previous_Treatment_Site = st.selectbox(
-                                "PRVTHER_New HCC Adjacent to Previous Treatment Site",
-                                options = ["Yes","No","NA"],
-                                help=" new HCC occurrence that has developed close to, but not directly in, the area that was previously treated",
-                                index=["Yes","No","NA"].index(df.iloc[0]["PRVTHER_NewHCCadjacentprevsite"]) if df.iloc[0]["PRVTHER_NewHCCadjacentprevsite"] else None,
+                                "PRVTHER_New HCC Adjacent to Previous Treatment Site [ Excel : PTHER_NEWHCCADJ ]\n\nNo (0), Yes (1), NA ",
+                                    options=["0", "1", "NA"], 
+                                format_func=lambda x: {
+                                    "0": "No ",
+                                    "1": "Yes ",
+                                    "NA": "NA (not in chart)"
+                                }[x],
+                                index=["0", "1", "NA"].index(df.iloc[0]["PTHER_NEWHCCADJ"]) if df.iloc[0]["PTHER_NEWHCCADJ"] else None,
                                 placeholder="Choose an option"
                             )   
                             PRVTHER_Residual_HCC_Note = st.text_area(
                                 "PRVTHER_Residual HCC Note",
                                 help="Provide information of Residual HCC",
-                                value = df.iloc[0]["PRVTHER_ResidualHCCnoteFT"]
+                                value = df.iloc[0]["PTHER_RESIDUALHCCFT"]
                             ) 
                             PRVTHER_Residual_HCC = st.selectbox(
-                                "PRVTHER_Residual HCC",
-                                options = ["Yes","No","NA"],
-                                help="new HCC occurrence that has developed in a diff location in the liver, separate from the area that was previously tx",
-                                index=["Yes","No","NA"].index(df.iloc[0]["PRVTHER_ResidualHCC"]) if df.iloc[0]["PRVTHER_ResidualHCC"] else None,
+                                "PRVTHER_Residual HCC [ Excel : PTHER_RESIDUALHCC ]\n\nNo (0), Yes (1), NA ",
+                                    options=["0", "1", "NA"], 
+                                format_func=lambda x: {
+                                    "0": "No ",
+                                    "1": "Yes ",
+                                    "NA": "NA (not in chart)"
+                                }[x],
+                                index=["0", "1", "NA"].index(df.iloc[0]["PTHER_RESIDUALHCC"]) if df.iloc[0]["PTHER_RESIDUALHCC"] else None,
                                 placeholder="Choose an option"
                             )   
 
                             PRVTHER_Systemic_Therapy_Free_Text = st.selectbox(
-                                "PRVTHER_Systemic Therapy Free Text",
-                                options=["Yes", "No","NA"],
-                                #format_func=lambda x: f"{x} ({1 if x == 'Yes' else 0})",
-                                help="Prior TACE Therapy",
-                                index=["Yes", "No","NA"].index(df.iloc[0]["PRVTHER_SystemictherapyFT"]) if df.iloc[0]["PRVTHER_SystemictherapyFT"] else None, 
+                                "PRVTHER_Systemic Therapy Free Text [ Excel : PTHER_SYSTHER ]\n\nNo (0), Yes (1), NA",
+                                options=["0", "1", "NA"], 
+                                format_func=lambda x: {
+                                    "0": "No ",
+                                    "1": "Yes ",
+                                    "NA": "NA (not in chart)"
+                                }[x],
+                                index=["0", "1", "NA"].index(df.iloc[0]["PTHER_SYSTHER"]) if df.iloc[0]["PTHER_SYSTHER"] else None, 
                                 placeholder="Choose an option",
                             )
 
                             PRVTHER_Date_of_Labs_in_Window = st.date_input(
                                 "PRVTHER_Date of Labs for AFP",
                                 help="select date of labs in window",
-                                value=datetime.strptime(df.iloc[0]["PRVTHER_DateAFP"], "%Y-%m-%d").date() if df.iloc[0]["PRVTHER_DateAFP"] else None
+                                value=datetime.strptime(df.iloc[0]["PTHER_AFPDATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_AFPDATE"] else None
                             )
 
                             PRVTHER_AFP = st.number_input(
                                 "PRVTHER_AFP",
                                 help="Enter AFP value in ng/dl or NA",step=0.1,
-                                value=float(df.iloc[0]["PRVTHER_AFP"]) if pd.notnull(df.iloc[0]["PRVTHER_AFP"]) and str(df.iloc[0]["PRVTHER_AFP"]).isdigit() else 0.0
+                                value=float(df.iloc[0]["PTHER_AFP"]) if pd.notnull(df.iloc[0]["PTHER_AFP"]) and str(df.iloc[0]["PTHER_AFP"]).isdigit() else 0.0
                             )
                             if PRVTHER_Prior_RFA_Date == 0:
                                 PRVTHER_Prior_RFA_Date = 0
@@ -4382,36 +4676,35 @@ def edit_existing_data():
 
                             if submit_tab5:
                                 data5 = {
-                                "PRVTHER_LDT": PRVTHER_Prior_LDT_Therapy,
-                                "PRVTHER_RFA": PRVTHER_Prior_RFA_Therapy,
-                                "PRVTHER_RFAdate": PRVTHER_Prior_RFA_Date,
-                                "PRVTHER_TARE": PRVTHER_Prior_TARE_Therapy,
-                                "PRVTHER_TAREdate": PRVTHER_Prior_TARE_Date ,
-                                "PRVTHER_SBRT": PRVTHER_Prior_SBRT_Therapy,
-                                "PRVTHER_SBRTdate": PRVTHER_Prior_SBRT_Date ,
-                                "PRVTHER_TACE": PRVTHER_Prior_TACE_Therapy,
-                                "PRVTHER_TACEdate": PRVTHER_Prior_TACE_Date ,
-                                "PRVTHER_MWA": PRVTHER_Prior_MWA_Therapy,
-                                "PRVTHER_MWAdate": PRVTHER_Prior_MWA_Date ,
-                                "PRVTHER_Resection": PRVTHER_Resection,
-                                "PRVTHER_Resection date": PRVTHER_Resection_Date ,
-                                "PRVTHER_Prevtxsum": PRVTHER_Previous_Therapy_Sum,
-                                "PRVTHER_NotesFT": PRVTHER_NotesFT,
-                                "PRVTHER_Totalrecur": PRVTHER_Total_Recurrences_HCC,
-                                "PRVTHER_Locationprevtxseg": PRVTHER_Location_of_Previous_Treatment_segments,
-                                "PRVTHER_Location of Previous Tx Segments FT": PRVTHER_Location_of_Previous_Tx_segments_ft,
-                                "PRVTHER_RecurLocationFT": PRVTHER_recurrence_location_note,
-                                "PRVTHER_RecurDate": PRVTHER_recurrence_date,
-                                "PRVTHER_Recurrence Seg": PRVTHER_recurrence_seg,
-                                "PRVTHER_NewHCCoutsideprevsite": PRVTHER_New_HCC_Outside_Previous_Treatment_Site,
-                                "PRVTHER_NewHCCadjacentprevsite": PRVTHER_New_HCC_Adjacent_to_Previous_Treatment_Site,
-                                "PRVTHER_ResidualHCCnoteFT": PRVTHER_Residual_HCC_Note,
-                                "PRVTHER_ResidualHCC": PRVTHER_Residual_HCC,
-                                "PRVTHER_SystemictherapyFT": PRVTHER_Systemic_Therapy_Free_Text,
-                                "PRVTHER_DateAFP": PRVTHER_Date_of_Labs_in_Window,
-                                "PRVTHER_AFP": PRVTHER_AFP,
+                                "PTHER_LDT": PRVTHER_Prior_LDT_Therapy,
+                                "PTHER_RFA": PRVTHER_Prior_RFA_Therapy,
+                                "PTHER_RFADATE": PRVTHER_Prior_RFA_Date,
+                                "PTHER_TARE": PRVTHER_Prior_TARE_Therapy,
+                                "PTHER_TAREDATE": PRVTHER_Prior_TARE_Date,
+                                "PTHER_SBRT": PRVTHER_Prior_SBRT_Therapy,
+                                "PTHER_SBRTDATE": PRVTHER_Prior_SBRT_Date,
+                                "PTHER_TACE": PRVTHER_Prior_TACE_Therapy,
+                                "PTHER_TACEDATE": PRVTHER_Prior_TACE_Date,
+                                "PTHER_MWA": PRVTHER_Prior_MWA_Therapy,
+                                "PTHER_MWADATE": PRVTHER_Prior_MWA_Date,
+                                "PTHER_RESECTION": PRVTHER_Resection,
+                                "PTHER_RESECTIONDATE": PRVTHER_Resection_Date,
+                                "PTHER_PREVSUM": PRVTHER_Previous_Therapy_Sum,
+                                "PTHER_NOTESFT": PRVTHER_NotesFT,
+                                "PTHER_TOTRECUR": PRVTHER_Total_Recurrences_HCC,
+                                "PTHER_PREVSEGMENT": PRVTHER_Location_of_Previous_Treatment_segments,
+                                "PTHER_PREVSEGMENTFT": PRVTHER_Location_of_Previous_Tx_segments_ft,
+                                "PTHER_RECURSEGMENTFT": PRVTHER_recurrence_location_note,
+                                "PTHER_RECURDATE": PRVTHER_recurrence_date,
+                                "PTHER_RECURSEGMENT": PRVTHER_recurrence_seg,
+                                "PTHER_NEWHCCOUT": PRVTHER_New_HCC_Outside_Previous_Treatment_Site,
+                                "PTHER_NEWHCCADJ": PRVTHER_New_HCC_Adjacent_to_Previous_Treatment_Site,
+                                "PTHER_RESIDUALHCCFT": PRVTHER_Residual_HCC_Note,
+                                "PTHER_RESIDUALHCC": PRVTHER_Residual_HCC,
+                                "PTHER_SYSTHER": PRVTHER_Systemic_Therapy_Free_Text,
+                                "PTHER_AFPDATE": PRVTHER_Date_of_Labs_in_Window,
+                                "PTHER_AFP": PRVTHER_AFP,
                                 }
-                            
                                 update_google_sheet(data5, mrn)
                 
                     elif st.session_state.selected_tab == "Pre Y90":
@@ -5684,6 +5977,7 @@ def edit_existing_data():
                                     "3rd_FU_Non-Target Lesion 1 CCD Art Enhanc",
                                     step=0.1,value = float(df.iloc[0]["3rd_FU_Non-Target Lesion 1 CCD Art Enhanc"]) if pd.notnull(df.iloc[0]["3rd_FU_Non-Target Lesion 1 CCD Art Enhanc"]) and df.iloc[0]["3rd_FU_Non-Target Lesion 1 CCD Art Enhanc"] !="" else 0.0
                                 )
+
                                 FU3_Non_targeted_Lesion_Dia_Sum = max(FU3_Non_Target_Lesion_1_LAD_Art_Enhanc, FU3_Non_Target_Lesion_1_PAD_Art_Enhanc, FU3_Non_Target_Lesion_1_CCD_Art_Enhanc)
                                 st.write("3rd_FU_Non-targeted Lesion Dia Sum",FU3_Non_targeted_Lesion_Dia_Sum)
                                 FU3_Lesion_Necrosis = st.selectbox(
@@ -5692,29 +5986,34 @@ def edit_existing_data():
                         index=["No", "Yes", "NA"].index(df.iloc[0]["3rd_FU_Lesion Necrosis"]) if df.iloc[0]["3rd_FU_Lesion Necrosis"] else None,
                         placeholder="Choose an option",
                                 )
+
                                 FU3_Reviewers_Initials = st.text_input(
                                     "3rd_FU_Reviewers Initials",
                                     help="Free-text input for reviewer name",
                                     value = df.iloc[0]["3rd_FU_Reviewers Initials"]
                                 )
+
                                 FU3_Non_target_lesion_response = st.selectbox(
                                     "3rd_FU_Non target lesion response",
                                     options=["No", "Yes", "NA"],
                         index=["No", "Yes", "NA"].index(df.iloc[0]["3rd_FU_Non target lesion response"]) if df.iloc[0]["3rd_FU_Non target lesion response"] else None,
                         placeholder="Choose an option",
                                 )
+
                                 FU3_New_Lesions = st.selectbox(
                                     "3rd_FU_New Lesions",
                                     options=["No", "Yes", "NA"],
                         index=["No", "Yes", "NA"].index(df.iloc[0]["3rd_FU_New Lesions"]) if df.iloc[0]["3rd_FU_New Lesions"] else None,
                         placeholder="Choose an option",
                                 )
+
                                 FU3_NEW_Extrahepatic_Disease = st.selectbox(
                                     "3rd_FU_NEW Extrahepatic Disease",
                                     options=["No", "Yes", "NA"],
                         index=["No", "Yes", "NA"].index(df.iloc[0]["3rd_FU_Extrahepatic Disease"]) if df.iloc[0]["3rd_FU_Extrahepatic Disease"] else None,
                         placeholder="Choose an option",
                                 )
+
                                 FU3_NEW_Extrahepatic_Dz_Location = st.text_input(
                                     "3rd_FU_NEW Extrahepatic Dz Location",
                                     help="Free text",
@@ -5846,6 +6145,7 @@ def edit_existing_data():
                                 )
 
                                 FU4_NEW_Extrahepatic_Dz_Date = st.date_input("4th_FU_NEW Extrahepatic Dz Date",value = datetime.strptime(df.iloc[0]["4th_FU_NEW Extrahepatic Dz Date"], "%Y-%m-%d").date() if df.iloc[0]["4th_FU_NEW Extrahepatic Dz Date"] else None)
+
                                 FU4_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU4_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
                                 st.write("4th_FU_% change non target lesion",FU4_change_non_target_lesion)
                                 FU4_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU4_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
@@ -5857,6 +6157,7 @@ def edit_existing_data():
                                     "4th_FU_Free Text",
                                     help="Free text", value = df.iloc[0]["4th_FU_Free Text"]
                                 )
+
                                 # 5th Imaging Follow-up
                                 st.subheader("Imaging_5th_Followup")
 
@@ -5915,6 +6216,7 @@ def edit_existing_data():
                                     help="Free text",
                                     value = df.iloc[0]["5th_FU_NEW Extrahepatic Dz Location"]
                                 )
+
                                 FU5_NEW_Extrahepatic_Dz_Date = st.date_input("5th_FU_NEW Extrahepatic Dz Date",value = datetime.strptime(df.iloc[0]["5th_FU_NEW Extrahepatic Dz Date"], "%Y-%m-%d").date() if df.iloc[0]["5th_FU_NEW Extrahepatic Dz Date"] else None)
 
                                 FU5_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU5_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
@@ -6059,6 +6361,7 @@ def edit_existing_data():
                                 if Date_of_Death != None and Date_of_Death != "NA" :
                                     Date_of_Death = Date_of_Death.strftime("%Y-%m-%d")
                                 submit_tab10 = st.form_submit_button("Submit")
+
                                 if submit_tab10:
                                     
                                     data10={
@@ -6282,6 +6585,7 @@ def edit_existing_data():
                             input_GTV_less_100_Gy_Mean_Dose = st.text_input("GTV < 100 Gy Mean Dose",value = df.iloc[0]["GTV < 100 Gy Mean Dose"])
                             input_GTV_less_100_Gy_Min_Dose = st.text_input("GTV < 100 Gy Min Dose",value = df.iloc[0]["GTV < 100 Gy Min Dose"])
                             input_GTV_less_100_Gy_SD = st.text_input("GTV < 100 Gy SD",value = df.iloc[0]["GTV < 100 Gy SD"])
+
                             submit_dosimetry_data = st.form_submit_button("Submit")
 
                             if submit_dosimetry_data:
@@ -6399,6 +6703,7 @@ def edit_existing_data():
                                 input_33AFP = st.text_area("33AFP",value = df.iloc[0]["33AFP"])
                                 input_34AFP_DATE = st.text_area("34AFP DATE",value = df.iloc[0]["34AFP DATE"])
                                 input_34AFP = st.text_area("34AFP",value = df.iloc[0]["34AFP"])
+
                                 submit_afp = st.form_submit_button("Submit")
 
                                 if submit_afp:
@@ -6453,3 +6758,7 @@ if st.session_state.logged_in:
         st.rerun()
 else:
     login_page()        
+
+
+
+
