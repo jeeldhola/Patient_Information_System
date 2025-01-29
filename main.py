@@ -604,6 +604,7 @@ def calculate_comorbidities_binary(total_count):
     return 1 if total_count >= 1 else 0
 def get_variable_value(mrn, column_name):
     df = fetch_data_from_google_sheet()
+    mrn = str(mrn)
     if df.empty:
         st.error(f"No data found in the Google Sheet.")
         return None
@@ -1633,7 +1634,7 @@ def add_new_data():
                 else:
                     try:
                         prey90_symptoms = st.multiselect(
-                        "PREY90_symptoms",
+                        "PREY90_symptoms [Excel : PREY_SX]",
                         options=[
                             "portal vein HTN", 
                             "GI bleeding", 
@@ -1678,7 +1679,7 @@ def add_new_data():
                         prey90_potassium = st.number_input("PREY90_potassium", help="Enter the potassium value in mmol/L",step=0.1)
                         
                         prey90_ascites_ctcae = st.selectbox (
-                            "PREY90_Ascites CTCAE",
+                            "PREY90_Ascites CTCAE [Excel : PREY_ASCITCTCAE]",
                             options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
                             format_func=lambda x: {
                             "none": "0. none",
@@ -1708,29 +1709,44 @@ def add_new_data():
                         )
 
                         prey90_ascites_diruetics = st.selectbox(
-                            "PREY90_Ascites Diruetics",
-                            options = ["Yes","No"],
+                            "PREY90_Ascites Diruetics [ Excel : PREY_ASCITDIUR ]\n\nYes(1), No(0), NA  ",
+                            options=["1", "0","NA"],
+                            format_func=lambda x: {
+                                "1": "Yes ",
+                                "0": "No ",
+                                "NA" : "NA (not in chart)"
+                            }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
             
                         )
                         prey90_ascites_paracentesis = st.selectbox(
-                            "PREY90_Ascites Paracentesis" ,
-                            options = ["Yes","No"],
+                            "PREY90_Ascites Paracentesis [Excel :PREY_ASCITPARA]\n\nYes(1), No(0), NA" ,
+                            options=["1", "0","NA"],
+                            format_func=lambda x: {
+                                "1": "Yes ",
+                                "0": "No ",
+                                "NA" : "NA (not in chart)"
+                            }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
             
                         )
                         prey90_ascites_hospitalization = st.selectbox(
-                            "PREY90_Ascites Hospitalization",
-                            options = ["Yes","No"],
+                            "PREY90_Ascites Hospitalization [Excel : PREY_ASCITHOSP]\n\nYes(1), No(0), NA",
+                            options=["1", "0","NA"],
+                            format_func=lambda x: {
+                                "1": "Yes ",
+                                "0": "No ",
+                                "NA" : "NA (not in chart)"
+                            }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
             
                         )
 
                         prey90_he_grade = st.selectbox(
-                            "PREY90_HE Grade",
+                            "PREY90_HE Grade [ Excel : PREY_HEGRADE ]\n\n(1) None, (2) Grade 1-2, (3) Grade 3-4 ",
                             options=[1,2,3],
                             format_func=lambda x: {
                             1: "None",
@@ -1743,7 +1759,7 @@ def add_new_data():
 
                         )
                        
-                        prey90_ecog = st.selectbox("PREY90_ECOG", options=["0", "1", "2", "3", "4", "NA"],
+                        prey90_ecog = st.selectbox("PREY90_ECOG [Excel : PREY_ECOG]", options=["0", "1", "2", "3", "4", "NA"],
                             index=None,  # No default selection
                             placeholder="Choose an option",)
 
@@ -1762,9 +1778,19 @@ def add_new_data():
                         st.write("PREY90_Albiscore",prey90_albi_score_calc)
                         prey90_albi_grade = albi_class(prey90_albi_score_calc)
                         st.write("PREY90_Albigrade",prey90_albi_grade)
-
-                        prey90_bclc_calc = st.text_area("PREY90_BCLC Stage calc")
-
+                        prey90_bclc_calc = st.selectbox("PREY90_BCLC Stage calc [ Excel : PREY_BCLC ]\n\n(NA) Not in chart, (0) Stage 0, (1) Stage A, (2) Stage B, (3) Stage C, (4) Stage D   ",
+                                options=["NA", "0", "1", "2", "3", "4"],
+                                format_func=lambda x: {
+                                    "NA": "(NA) Not in chart",
+                                    "0": " Stage 0: Very early stage, with a single nodule smaller than 2 cm in diameter",
+                                    "1": " Stage A: Early stage, with one nodule smaller than 5 cm or up to three nodules smaller than 3 cm",
+                                    "2": " Stage B: Intermediate stage, with multiple tumors in the liver",
+                                    "3": " Stage C: Advanced stage, with cancer that has spread to other organs or blood vessels",
+                                    "4": " Stage D: End-stage disease, with severe liver damage or the patient is very unwell",
+                                }[x],
+                                index=None,  # No default selection
+                                placeholder="Choose an option",
+                            )
                     
                         st.subheader("Mapping Y90")
                         my90_date = st.date_input("MY90_date", help="Enter the date")
@@ -1835,11 +1861,11 @@ def add_new_data():
                                 return 1 if numeric_value < 200 else 2
                             else:
                                 return "Invalid Input"
-
+                        #df.loc[df["MRN"] == mrn, "PREY_AFPBINARY"].values[0]
                         dayy90_afp_prior_to_tare = process_input(dayy90_afp)
                         st.write("DAYY90_AFP Binary",dayy90_afp_prior_to_tare)
                         if hasattr(st.session_state, 'temp_mrn'):
-                            prey90_afp_binarydup = get_variable_value(st.session_state.temp_mrn,"PRE90_AFPbinary")
+                            prey90_afp_binarydup = get_variable_value(st.session_state.temp_mrn,"PREY_AFPBINARY")
                             st.write("PRE90_AFP BinaryDup",prey90_afp_binarydup)
                         dayy90_sodium = st.number_input("DAYY90_sodium",step=0.1)
                         dayy90_creatinine = st.number_input("DAYY90_creatinine",step=0.1)
@@ -1951,7 +1977,7 @@ def add_new_data():
                                 "Day90_AscitesCTCAE": dayy90_ascites_ctcae,
                                 "Day90_AscitesCTCAEnumb": dayy90_ascites_classification,
                                 "Day90_HEgrade": dayy90_he_grade,
-                                "PREY90_ECOG": dayy90_ecog,
+                                "Day90_ECOG": dayy90_ecog,
                                 "DAYY90_CPclass": dayy90_child_pugh_class_calc,
                                 "DAYY90_CPcalc": dayy90_child_pugh_points_calc,
                                 "DAYY90_MELD": dayy90_meld_score_calc,
@@ -2400,8 +2426,8 @@ def add_new_data():
                             else:
                                 return "Grade 3"
                         try : 
-                            prey90_bilirubin = get_variable_value(st.session_state.temp_mrn,"PREY90_Bilirubin")
-                            prey90_albumin = get_variable_value(st.session_state.temp_mrn,"PREY90_Albumin")
+                            prey90_bilirubin = get_variable_value(st.session_state.temp_mrn,"PREY_BILI")
+                            prey90_albumin = get_variable_value(st.session_state.temp_mrn,"PREY_ALBUMIN")
                                     
                             k_ken_albipretareraw = albi_calc(prey90_bilirubin,prey90_albumin)
                             st.write("K_ken_AlbiPreTARERaw : ", k_ken_albipretareraw)
@@ -2585,7 +2611,7 @@ def add_new_data():
                         FU_Imaging_Date = st.date_input("1st_FU_Imaging Date")
                         fetch_date = None
                         try:
-                            fetch_date =  datetime.strptime(get_variable_value(st.session_state.temp_mrn,"TAREdate"),"%Y-%m-%d")
+                            fetch_date =  datetime.strptime(get_variable_value(st.session_state.temp_mrn,"TAREDATE"),"%Y-%m-%d")
                         except:
                             st.write("Fill Patient Info form")
                        
@@ -3754,11 +3780,15 @@ def edit_existing_data():
         st.dataframe(df1)
         
         mrn = st.number_input("Enter MRN to edit and Press Enter",step=1)
-       
+        
         if mrn:
-            if df1.empty and mrn not in df1['MRN'].values:
+            mrn_str = str(int(mrn))
+            if df1.empty or mrn not in df1['MRN'].astype(int).values:
                 st.error(f"MRN {mrn} not exists. Please enter a unique MRN.")
+                if 'mrn' in st.session_state:
+                    del st.session_state.mrn
             else:
+                st.session_state.mrn = mrn_str
                 st.subheader("Change_Data")
                 st.write(f"Editing data for MRN: {mrn}")
                 df = fetch_data_for_mrn(mrn)
@@ -4710,7 +4740,8 @@ def edit_existing_data():
                     elif st.session_state.selected_tab == "Pre Y90":
                         st.subheader("Pre Y90")
                         with st.form("pre_y90_form"):
-                            prey90_sx = df.loc[df["MRN"] == mrn, "PREY90_sx"].values[0]
+                            #mrn = int(mrn)
+                            prey90_sx = df.loc[df["MRN"] == mrn, "PREY_SX"].values[0]
                             if prey90_sx:
                                 # If complications is a string, split it into a list and strip spaces
                                 prey90_sx_list = [comp.strip() for comp in prey90_sx.split(',')] if isinstance(prey90_sx, str) else prey90_sx
@@ -4731,7 +4762,7 @@ def edit_existing_data():
                             prey90_sx_list = [comp for comp in prey90_sx_list if comp in valid_prey90_sx]
 
                             prey90_symptoms = st.multiselect(
-                            "PREY90_symptoms",
+                            "PREY90_symptoms [Excel : PREY_SX]",
                             options=[
                                 "portal vein HTN", 
                                 "GI bleeding", 
@@ -4746,8 +4777,8 @@ def edit_existing_data():
                             placeholder="Select all that apply"
                             )
                             prey90_symptoms = ", ".join(prey90_symptoms)
-                            prey90_date_of_labs = st.date_input("PREY90_date of labs in window", help="Enter the date of lab tests",value = datetime.strptime(df.iloc[0]["PREY90_Datelabs"], "%Y-%m-%d").date() if df.iloc[0]["PREY90_Datelabs"] else None)
-                            prey90_afp = st.text_input("PREY90_AFP", help="Enter AFP value in ng/dl or NA",value = df.iloc[0]["PREY90_AFP"])
+                            prey90_date_of_labs = st.date_input("PREY90_date of labs in window", help="Enter the date of lab tests",value = datetime.strptime(df.iloc[0]["PREY_DATELABS"], "%Y-%m-%d").date() if df.iloc[0]["PREY_DATELABS"] else None)
+                            prey90_afp = st.text_input("PREY90_AFP", help="Enter AFP value in ng/dl or NA",value = df.iloc[0]["PREY_AFP"])
                             
                             def process_input(value):
                                 
@@ -4764,18 +4795,18 @@ def edit_existing_data():
                             prey90_afp_prior_to_tare = process_input(prey90_afp)
                             st.write("PRE90_AFPbinary ",prey90_afp_prior_to_tare)
                             
-                            prey90_bilirubin = st.number_input("PREY90_Bilirubin",step=0.1,min_value=1.0,value = float(df.iloc[0]["PREY90_Bilirubin"]) if pd.notnull(df.iloc[0]["PREY90_Bilirubin"]) and str(df.iloc[0]["PREY90_Bilirubin"]).isdigit() else 1.0)
-                            prey90_albumin = st.number_input("PREY90_Albumin",step=0.1, help="Enter the albumin value in g/dl",value = float(df.iloc[0]["PREY90_Albumin"]) if pd.notnull(df.iloc[0]["PREY90_Albumin"]) and str(df.iloc[0]["PREY90_Albumin"]).isdigit() else 0.0)
-                            prey90_inr = st.number_input("PREY90_inr",step=0.1, help="Enter the INR value",value = float(df.iloc[0]["PREY90_INR"]) if pd.notnull(df.iloc[0]["PREY90_INR"]) and str(df.iloc[0]["PREY90_INR"]).isdigit() else 0.0)
-                            prey90_creatinine = st.number_input("PREY90_creatinine",step=0.1, help="Enter the creatinine value in mg/dl",value = float(df.iloc[0]["PREY90_Creatinine"]) if pd.notnull(df.iloc[0]["PREY90_Creatinine"]) and str(df.iloc[0]["PREY90_Creatinine"]).isdigit() else 0.0)
-                            prey90_sodium = st.number_input("PREY90_sodium",step=0.1, help="Enter the sodium value in mmol/L",value = float(df.iloc[0]["PREY90_Sodium"]) if pd.notnull(df.iloc[0]["PREY90_Sodium"]) and str(df.iloc[0]["PREY90_Sodium"]).isdigit() else 0.0)
-                            prey90_ast = st.number_input("PREY90_AST",step=0.1, help="Enter AST value in U/L",value = float(df.iloc[0]["PREY90_AST"]) if pd.notnull(df.iloc[0]["PREY90_AST"]) and str(df.iloc[0]["PREY90_AST"]).isdigit() else 0.0)
-                            prey90_alt = st.number_input("PREY90_ALT",step=0.1, help="Enter ALT value in U/L",value = float(df.iloc[0]["PREY90_ALT"]) if pd.notnull(df.iloc[0]["PREY90_ALT"]) and str(df.iloc[0]["PREY90_ALT"]).isdigit() else 0.0)
-                            prey90_alkaline_phosphatase = st.number_input("PREY90_Alkaline Phosphatase",step=0.1, help="Enter Alkaline Phosphatase value in U/L",value = float(df.iloc[0]["PREY90_Alkaline Phosphatase"]) if pd.notnull(df.iloc[0]["PREY90_Alkaline Phosphatase"]) and str(df.iloc[0]["PREY90_Alkaline Phosphatase"]).isdigit() else 0.0)
-                            prey90_potassium = st.number_input("PREY90_potassium",step=0.1, help="Enter the potassium value in mmol/L",value = float(df.iloc[0]["PREY90_Potassium"]) if pd.notnull(df.iloc[0]["PREY90_Potassium"]) and str(df.iloc[0]["PREY90_Potassium"]).isdigit() else 0.0)
+                            prey90_bilirubin = st.number_input("PREY90_Bilirubin",step=0.1,min_value=1.0,value = float(df.iloc[0]["PREY_BILI"]) if pd.notnull(df.iloc[0]["PREY_BILI"]) and str(df.iloc[0]["PREY_BILI"]).isdigit() else 1.0)
+                            prey90_albumin = st.number_input("PREY90_Albumin",step=0.1, help="Enter the albumin value in g/dl",value = float(df.iloc[0]["PREY_ALBUMIN"]) if pd.notnull(df.iloc[0]["PREY_ALBUMIN"]) and str(df.iloc[0]["PREY_ALBUMIN"]).isdigit() else 0.0)
+                            prey90_inr = st.number_input("PREY90_inr",step=0.1, help="Enter the INR value",value = float(df.iloc[0]["PREY_INR"]) if pd.notnull(df.iloc[0]["PREY_INR"]) and str(df.iloc[0]["PREY_INR"]).isdigit() else 0.0)
+                            prey90_creatinine = st.number_input("PREY90_creatinine",step=0.1, help="Enter the creatinine value in mg/dl",value = float(df.iloc[0]["PREY_CREATININE"]) if pd.notnull(df.iloc[0]["PREY_CREATININE"]) and str(df.iloc[0]["PREY_CREATININE"]).isdigit() else 0.0)
+                            prey90_sodium = st.number_input("PREY90_sodium",step=0.1, help="Enter the sodium value in mmol/L",value = float(df.iloc[0]["PREY_SODIUM"]) if pd.notnull(df.iloc[0]["PREY_SODIUM"]) and str(df.iloc[0]["PREY_SODIUM"]).isdigit() else 0.0)
+                            prey90_ast = st.number_input("PREY90_AST",step=0.1, help="Enter AST value in U/L",value = float(df.iloc[0]["PREY_AST"]) if pd.notnull(df.iloc[0]["PREY_AST"]) and str(df.iloc[0]["PREY_AST"]).isdigit() else 0.0)
+                            prey90_alt = st.number_input("PREY90_ALT",step=0.1, help="Enter ALT value in U/L",value = float(df.iloc[0]["PREY_ALT"]) if pd.notnull(df.iloc[0]["PREY_ALT"]) and str(df.iloc[0]["PREY_ALT"]).isdigit() else 0.0)
+                            prey90_alkaline_phosphatase = st.number_input("PREY90_Alkaline Phosphatase",step=0.1, help="Enter Alkaline Phosphatase value in U/L",value = float(df.iloc[0]["PREY_ALP"]) if pd.notnull(df.iloc[0]["PREY_ALP"]) and str(df.iloc[0]["PREY_ALP"]).isdigit() else 0.0)
+                            prey90_potassium = st.number_input("PREY90_potassium",step=0.1, help="Enter the potassium value in mmol/L",value = float(df.iloc[0]["PREY_POTAS"]) if pd.notnull(df.iloc[0]["PREY_POTAS"]) and str(df.iloc[0]["PREY_POTAS"]).isdigit() else 0.0)
                             
                             prey90_ascites_ctcae = st.selectbox (
-                                "PREY90_Ascites CTCAE",
+                                "PREY90_Ascites CTCAE [ Excel : PREY_ASCITCTCAE ]",
                                 options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
                                 format_func=lambda x: {
                                 "none": "0. none",
@@ -4788,7 +4819,7 @@ def edit_existing_data():
 
                             }[x],
                                 help="Select Metavir_score",
-                                index=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"].index(df.iloc[0]["PREY90_AscitesCTCAE"]) if df.iloc[0]["PREY90_AscitesCTCAE"] else None,
+                                index=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"].index(df.iloc[0]["PREY_ASCITCTCAE"]) if df.iloc[0]["PREY_ASCITCTCAE"] else None,
                                 placeholder="Choose an option",
                             ) 
                             def findascitesclass(score):
@@ -4802,34 +4833,49 @@ def edit_existing_data():
 
                             prey90_ascites_free_text = st.text_area(
                                 "PREY90_Ascites Free Text",
-                                value = df.iloc[0]["PREY90_AscitesFT"],
+                                value = df.iloc[0]["PREY_ASCITFT"],
                             
                             )
 
                             prey90_ascites_diruetics = st.selectbox(
-                                "PREY90_Ascites Diruetics",
-                                options = ["Yes","No"],
-                                index=["Yes","No"].index(df.iloc[0]["PREY90_Ascitesdiruetics"]) if df.iloc[0]["PREY90_Ascitesdiruetics"] else None,  # No default selection
+                                "PREY90_Ascites Diruetics [ Excel : PREY_ASCITDIUR ]\n\nYes(1), No(0), NA  ",
+                            options=["1", "0","NA"],
+                            format_func=lambda x: {
+                                "1": "Yes ",
+                                "0": "No ",
+                                "NA" : "NA (not in chart)"
+                            }[x],
+                                index=["1", "0","NA"].index(df.iloc[0]["PREY_ASCITDIUR"]) if df.iloc[0]["PREY_ASCITDIUR"] else None,  # No default selection
                                 placeholder="Choose an option",
                 
                             )
                             prey90_ascites_paracentesis = st.selectbox(
-                                "PREY90_Ascites Paracentesis" ,
-                                options = ["Yes","No"],
-                                index=["Yes","No"].index(df.iloc[0]["PREY90_Ascitesparacentesis"]) if df.iloc[0]["PREY90_Ascitesparacentesis"] else None,  # No default selection
+                                "PREY90_Ascites Paracentesis [Excel :PREY_ASCITPARA]\n\nYes(1), No(0), NA" ,
+                            options=["1", "0","NA"],
+                            format_func=lambda x: {
+                                "1": "Yes ",
+                                "0": "No ",
+                                "NA" : "NA (not in chart)"
+                            }[x],
+                                index=["1", "0","NA"].index(df.iloc[0]["PREY_ASCITPARA"]) if df.iloc[0]["PREY_ASCITPARA"] else None,  # No default selection
                                 placeholder="Choose an option",
                 
                             )
                             prey90_ascites_hospitalization = st.selectbox(
-                                "PREY90_Ascites Hospitalization",
-                                options = ["Yes","No"],
-                                index=["Yes","No"].index(df.iloc[0]["PREY90_Asciteshospitalization"]) if df.iloc[0]["PREY90_Asciteshospitalization"] else None,  # No default selection
+                                "PREY90_Ascites Hospitalization [Excel : PREY_ASCITHOSP]\n\nYes(1), No(0), NA",
+                            options=["1", "0","NA"],
+                            format_func=lambda x: {
+                                "1": "Yes ",
+                                "0": "No ",
+                                "NA" : "NA (not in chart)"
+                            }[x],
+                                index=["1", "0","NA"].index(df.iloc[0]["PREY_ASCITHOSP"]) if df.iloc[0]["PREY_ASCITHOSP"] else None,  # No default selection
                                 placeholder="Choose an option",
                 
                             )
 
                             prey90_he_grade = st.selectbox(
-                                "PREY90_HE Grade",
+                                "PREY90_HE Grade [ Excel : PREY_HEGRADE ]\n\n(1) None, (2) Grade 1-2, (3) Grade 3-4 ",
                                 options=[1,2,3],
                                 format_func=lambda x: {
                                 1: "None",
@@ -4837,26 +4883,21 @@ def edit_existing_data():
                                 3: "Grade 3-4",
                                 
                             }[x],
-                                index=[1,2,3].index(int(df.iloc[0]["PREY90_HEgrade"])) if df.iloc[0]["PREY90_HEgrade"] else None,  # No default selection
+                                index=[1,2,3].index(int(df.iloc[0]["PREY_HEGRADE"])) if df.iloc[0]["PREY_HEGRADE"] else None,  # No default selection
                                 placeholder="Choose an option",
 
                             )
                         
-                            prey90_ecog = st.selectbox("PREY90_ECOG", options=["0", "1", "2", "3", "4", "NA"],
-                                index=["0", "1", "2", "3", "4", "NA"].index(df.iloc[0]["PREY90_ECOG"]) if df.iloc[0]["PREY90_ECOG"] else None,  # No default selection
+                            prey90_ecog = st.selectbox("PREY90_ECOG [Excel : PREY_ECOG]", options=["0", "1", "2", "3", "4", "NA"],
+                                index=["0", "1", "2", "3", "4", "NA"].index(df.iloc[0]["PREY_ECOG"]) if df.iloc[0]["PREY_ECOG"] else None,  # No default selection
                                 placeholder="Choose an option",)
 
-                            
-                            # Claculation of class and points
                             prey90_child_pugh_points_calc = calculatepoints(prey90_bilirubin,prey90_albumin,prey90_inr,prey90_ascites_ctcae,prey90_he_grade)
                             st.write("PREY90_CPcalc",prey90_child_pugh_points_calc)
                     
                             prey90_child_pugh_class_calc = calculate_class(prey90_child_pugh_points_calc)
                             st.write("PREY90_CPclass",prey90_child_pugh_class_calc)
                     
-                            # Additional Calculated Fields
-                            
-                            #prey90_bclc_stage_calc = st.text_input("PREY90_BCLC Stage calc", help="Enter calculated BCLC stage")
                             prey90_meld_score_calc = (3.78*(int(prey90_bilirubin)))+(11.2*(int(prey90_inr)))+(9.57*(int(prey90_creatinine)))+6.43
                             st.write("PREY90_MELD",prey90_meld_score_calc)
                     
@@ -4865,17 +4906,25 @@ def edit_existing_data():
                     
                             prey90_albi_score_calc = albi_calc(prey90_bilirubin,prey90_albumin)
                             st.write("PREY90_Albiscore",prey90_albi_score_calc)
-                    
                             prey90_albi_grade = albi_class(prey90_albi_score_calc)
                             st.write("PREY90_Albigrade",prey90_albi_grade)
-                    
-
-                            prey90_bclc_calc = st.text_area("PREY90_BCLC Stage calc",value = df.iloc[0]["PREY90_BCLC"])
-
+                            prey90_bclc_calc = st.selectbox("PREY90_BCLC Stage calc [ Excel : PREY_BCLC ]\n\n(NA) Not in chart, (0) Stage 0, (1) Stage A, (2) Stage B, (3) Stage C, (4) Stage D   ",
+                                options=["NA", "0", "1", "2", "3", "4"],
+                                format_func=lambda x: {
+                                    "NA": "(NA) Not in chart",
+                                    "0": " Stage 0: Very early stage, with a single nodule smaller than 2 cm in diameter",
+                                    "1": " Stage A: Early stage, with one nodule smaller than 5 cm or up to three nodules smaller than 3 cm",
+                                    "2": " Stage B: Intermediate stage, with multiple tumors in the liver",
+                                    "3": " Stage C: Advanced stage, with cancer that has spread to other organs or blood vessels",
+                                    "4": " Stage D: End-stage disease, with severe liver damage or the patient is very unwell",
+                                }[x],
+                                index=["NA", "0", "1", "2", "3", "4"].index(df.iloc[0]["PREY_BCLC"]) if df.iloc[0]["PREY_BCLC"] else None,
+                                placeholder="Choose an option",
+                            )
                         
                             st.subheader("Mapping Y90")
-                            my90_date = st.date_input("MY90_date", help="Enter the date",value = datetime.strptime(df.iloc[0]["MY90_date"], "%Y-%m-%d").date() if df.iloc[0]["MY90_date"] else None)
-                            my90_lung_shunt = st.number_input("MY90_Lung_shunt", min_value=0.0, step=0.1, help="Enter the lung shunt value",value = float(df.iloc[0]["MY90_Lung_shunt"]) if pd.notnull(df.iloc[0]["MY90_Lung_shunt"]) and str(df.iloc[0]["MY90_Lung_shunt"]).isdigit() else 0.0)
+                            my90_date = st.date_input("MY90_date", help="Enter the date",value = datetime.strptime(df.iloc[0]["MY_DATE"], "%Y-%m-%d").date() if df.iloc[0]["MY_DATE"] else None)
+                            my90_lung_shunt = st.number_input("MY90_Lung_shunt", min_value=0.0, step=0.1, help="Enter the lung shunt value",value = float(df.iloc[0]["MY_LUNGSHU"]) if pd.notnull(df.iloc[0]["MY_LUNGSHU"]) and str(df.iloc[0]["MY_LUNGSHU"]).isdigit() else 0.0)
                             
                             prey90_date_of_labs = (
                                 prey90_date_of_labs.strftime("%Y-%m-%d")
@@ -4892,36 +4941,36 @@ def edit_existing_data():
                             if submit_tab4:
                                
                                 data6 = {
-                                "PREY90_sx": prey90_symptoms,
-                                "PREY90_Datelabs": prey90_date_of_labs,
-                                "PREY90_AFP": prey90_afp,
-                                "PRE90_AFPbinary": prey90_afp_prior_to_tare,
-                                "PREY90_Bilirubin": prey90_bilirubin,
-                                "PREY90_Albumin": prey90_albumin,
-                                "PREY90_INR": prey90_inr,
-                                "PREY90_Creatinine": prey90_creatinine,
-                                "PREY90_Sodium": prey90_sodium,
-                                "PREY90_AST": prey90_ast,
-                                "PREY90_ALT": prey90_alt,
-                                "PREY90_Alkaline Phosphatase": prey90_alkaline_phosphatase,
-                                "PREY90_Potassium": prey90_potassium,
-                                "PREY90_AscitesCTCAE": prey90_ascites_ctcae,
-                                "PREY90_AscitesCTCAEnumb": prey90_ascites_classification,
-                                "PREY90_AscitesFT": prey90_ascites_free_text,
-                                "PREY90_Ascitesdiruetics": prey90_ascites_diruetics,
-                                "PREY90_Ascitesparacentesis": prey90_ascites_paracentesis,
-                                "PREY90_Asciteshospitalization": prey90_ascites_hospitalization,
-                                "PREY90_HEgrade": prey90_he_grade,
-                                "PREY90_ECOG": prey90_ecog,
-                                "PREY90_CPclass": prey90_child_pugh_class_calc,
-                                "PREY90_CPcalc": prey90_child_pugh_points_calc,
-                                "PREY90_MELD": prey90_meld_score_calc,
-                                "PREY90_MELDNa": prey90_meld_na_score_calc,
-                                "PREY90_Albiscore": prey90_albi_score_calc,
-                                "PREY90_Albigrade": prey90_albi_grade,
-                                "PREY90_BCLC": prey90_bclc_calc,
-                                "MY90_date": my90_date,
-                                "MY90_Lung_shunt": my90_lung_shunt,
+                                "PREY_SX": prey90_symptoms,
+                                "PREY_DATELABS": prey90_date_of_labs,
+                                "PREY_AFP": prey90_afp,
+                                "PREY_AFPBINARY": prey90_afp_prior_to_tare,
+                                "PREY_BILI": prey90_bilirubin,
+                                "PREY_ALBUMIN": prey90_albumin,
+                                "PREY_INR": prey90_inr,
+                                "PREY_CREATININE": prey90_creatinine,
+                                "PREY_SODIUM": prey90_sodium,
+                                "PREY_AST": prey90_ast,
+                                "PREY_ALT": prey90_alt,
+                                "PREY_ALP": prey90_alkaline_phosphatase,
+                                "PREY_POTAS": prey90_potassium,
+                                "PREY_ASCITCTCAE": prey90_ascites_ctcae,
+                                "PREY_ASCITNUMB": prey90_ascites_classification,
+                                "PREY_ASCITFT": prey90_ascites_free_text,
+                                "PREY_ASCITDIUR": prey90_ascites_diruetics,
+                                "PREY_ASCITPARA": prey90_ascites_paracentesis,
+                                "PREY_ASCITHOSP": prey90_ascites_hospitalization,
+                                "PREY_HEGRADE": prey90_he_grade,
+                                "PREY_ECOG": prey90_ecog,
+                                "PREY_CPCALC": prey90_child_pugh_points_calc,
+                                "PREY_CLASS": prey90_child_pugh_class_calc,
+                                "PREY_MELD": prey90_meld_score_calc,
+                                "PREY_MELDNA": prey90_meld_na_score_calc,
+                                "PREY_ALBISCORE": prey90_albi_score_calc,
+                                "PREY_ALBIGRADE": prey90_albi_grade,
+                                "PREY_BCLC": prey90_bclc_calc,
+                                "MY_DATE": my90_date,
+                                "MY_LUNGSHU": my90_lung_shunt,
                                 }
                                 update_google_sheet(data6,mrn)
                               
@@ -4945,7 +4994,7 @@ def edit_existing_data():
                             dayy90_afp_prior_to_tare = process_input(dayy90_afp)
                             st.write("DAYY90_AFP Binary : ",dayy90_afp_prior_to_tare)
 
-                            prey90_afp_binarydup = df.loc[df["MRN"] == mrn, "PRE90_AFPbinary"].values[0]
+                            prey90_afp_binarydup = df.loc[df["MRN"] == mrn, "PREY_AFPBINARY"].values[0]
                             st.write("PRE90_AFP BinaryDup",prey90_afp_binarydup)
                         
                         # Inputs for other variables
@@ -5503,8 +5552,8 @@ def edit_existing_data():
                                 else:
                                     return "Grade 3"
                             try : 
-                                prey90_bilirubin = df.loc[df["MRN"] == mrn,'PREY90_Bilirubin']
-                                prey90_albumin = df.loc[df["MRN"] == mrn,'PREY90_Albumin']
+                                prey90_bilirubin = df.loc[df["MRN"] == mrn,'PREY_BILI']
+                                prey90_albumin = df.loc[df["MRN"] == mrn,'PREY_ALBUMIN']
                                 k_ken_albipretareraw = albi_calc(prey90_bilirubin,prey90_albumin)
                                 st.write("K_ken_AlbiPreTARERaw : ", k_ken_albipretareraw)
                                 k_ken_albipretaregrade = albigrade(k_ken_albipretareraw)
