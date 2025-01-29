@@ -4070,7 +4070,6 @@ def edit_existing_data():
                                 help="Provide additional details for IVDU"
                         
                             )
-
                             cir_pmh_liver_addtional_factor = st.selectbox(
                                 "Cir_PMH_Liver Additional Factors [ Excel : CIRPMH_LIVERFAC ]\n\n (1) NAFLD, (2) MAFLD, (3) NASH, (4) Autoimmune Hepatitis, (5) Hereditary Hemochromatosis, (6) none",
                             options=["1", "2", "3", "4", "5", "6"],
@@ -4448,7 +4447,6 @@ def edit_existing_data():
                                     "HCCDX_ALBIGRADE": hcc_dx_albi_grade,
                                     "HCCDX_BCLC": hcc_dx_bclc_calc,
                                 }
-                                
                                 update_google_sheet(data4, mrn)
             
                     elif st.session_state.selected_tab == "Previous Therapy for HCC":
@@ -4546,7 +4544,6 @@ def edit_existing_data():
                                 placeholder="Choose an option",
                             )
                             PRVTHER_Resection_Date = 0 if PRVTHER_Resection == "0" else st.date_input("PRVTHER_Resection Date",value=datetime.strptime(df.iloc[0]["PTHER_RESECTIONDATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_RESECTIONDATE"] else None)
-
 
                             list1=[PRVTHER_Prior_LDT_Therapy, PRVTHER_Prior_RFA_Therapy, PRVTHER_Prior_TARE_Therapy, PRVTHER_Prior_SBRT_Therapy, PRVTHER_Prior_TACE_Therapy, PRVTHER_Prior_MWA_Therapy, PRVTHER_Resection ]
                             total_sum=0
