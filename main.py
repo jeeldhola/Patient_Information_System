@@ -8,7 +8,8 @@ import json
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
-credentials_info = st.secrets["connections"]
+credentials = st.secrets["connections"]
+credentials_info = json.dumps(dict(credentials))
 credentials = service_account.Credentials.from_service_account_info(credentials_info)
 # Google Sheets API setup
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
