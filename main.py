@@ -7,28 +7,14 @@ import json
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-gcp_service_account = {
 
-    "type": "service_account",
-  "project_id": "streemlit",
-  "private_key_id": "bbf8d00d0d99a68768c7292c1a32f0ee4dc8dcfe",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCpWmWhsHljUxXd\njsLf5aEbGD/Ei3/Ph5PqMsx7BdU8d4tU/RGrTEOww0Yge8gNHukN3UdJXAn14/As\nB/PKwd8RmqVlv5fIHV1ZDgOEmafoa58cMIavYldJuMRUh3LlJLDZy8DW2iZkVzGu\n+8Y1Wdp+Ugwv2mm5YIJ18aIRIwOc8JO86Q78y6Asf9ffjTdUFoenXSdY+i5eUIph\nBweuF6vlNipjLiGdts2X5dEXvflJszlbsY5LgxusjbQ5dqaSF8FvTXioILitFmuE\nanj1+KueDdzGPXn+tugyxhQ3BTfPziiFHv7vo7apQIVBcPJpFb9xuPQUS+7Vr8VS\n6CFADg1BAgMBAAECggEAC4YSr1duUyNms/5QZWLfPRQ/1pR1fH4pwwB06JQjh+tM\niFp2FtVoL8GB5pj1qmrlieN6Q9Qm+1vozl42KSBbGPwQcCWC4wOYhARPmfjIs6iL\nGaR1rb5/2QzhEy1qVIxUGmXid9w9S4uhXlpUiPHVy82ydZkjo5EdH4BzOj5LMyUR\nGirv3k1g/B29fQsLJ03JBv8kK6zpJDilokg4izzdcHRu+MOGn00gbeiYg7tZf/80\na/biMJFVvEb1KcfkvGf/TBcX82Mcwh5aUNmF2+pm1OFrMH4BeLKLbU8U2EF7meNy\nUxYbYwUIphdm6uWLuBBXvRrDHJIb7am3neyoFYn46QKBgQDty+9sSljILBs9WTKS\nRSVNI0JotY00ofMvtOwGER79XyREiv0dhO7xnCKD5Krru3I6MqsbdCVGEFhZlX1c\nlbURJhFJrMp1OCzxU12EeKQIjqFHqMxLLKYU8loiQuZLJaUar9dY01EG+i6undwa\nvq5+iQn9DLyN4q1oR+JkdyP7XQKBgQC2US9AD4R6vxwm3XcT8igs5Q2Ay2AR3gQ2\nMfRwlJhuYiQvirkLgxTbCMOJHLGuCqssRXO9afM+Xm3Q2oF7kSrSQ9+6w+/fVAMk\nL71SUoxrwzQ0yys1Jve0ALN2rz56HowfrzH61X02zy9m2m88NIR7+3R8KZ4acIv6\nJ2TM7unfNQKBgDFrVJK40MKpB/Az/WKQpDPnxAFm2bW6goPDodmQ7VPS1gK4r+nW\nmqHzxOiMOUlMZ2zY4t6NwMFS3Emh26/GHR83PhiFpH2/8vckUCcbu1tb6QCvf+WP\nneR0iW7dYGb1p95n9OUs5YYBsHnxrLCSOElryXuhjf4ewdMOPWqLqBqxAoGBAJ4A\nJY7C4/Dshp03+OaUSjT+HIGtvwg8/DFrgYe/f4rKCsoY0t0jMIPSSIMfFuzZ2hZ3\n6iIRG/jFJS6G7wgDerTWlaHqBIvq5v4JUW1ylLcfaLMID930c17P7LfCj8aNiqo6\nznmvYuCJFW9xhk0KxnYcKYshFh+bwfN9CGKB+rSxAoGBALc1UHxS+heRSttVDF/f\naHUMMFolM0NI4Bwab0nnQkG23JRMouEzhOh89l3GMfQPvjt9V1HXgfnMWaGuW5my\n6yOydKOsT4tWcDS0+TDhNu7avyf8xQ7rqecXDaVEr9vx4fjf7m93K/raeCKziNc9\nb3mY5+S325mM2mKCDXZRfg9U\n-----END PRIVATE KEY-----\n",
-  "client_email": "streemlit@streemlit.iam.gserviceaccount.com",
-  "client_id": "116186736102884875673",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/streemlit%40streemlit.iam.gserviceaccount.com",
-  "universe_domain": "googleapis.com"
-}
-credentials = service_account.Credentials.from_service_account_info(gcp_service_account)
+credentials_info = st.secrets["connections"]["gsheets"]
+credentials = service_account.Credentials.from_service_account_info(credentials_info)
 # Google Sheets API setup
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
-
 # Authenticate and create the service
 service = build('sheets', 'v4', credentials=credentials)
-
 # The ID and range of the spreadsheet
 SPREADSHEET_ID = '1Eb3pnP1MYlDaBCzz0pTc3h1yNBpslxfGI4QiAQEDAiw'  
 RANGE_NAME = 'Sheet1'  
