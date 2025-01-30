@@ -628,7 +628,7 @@ def login_page():
             st.error("Invalid username or password.")
 
 def add_new_data():
-    
+    st.title("Patient Information System")
     df=fetch_data_from_google_sheet()
     st.dataframe(df)
     def calculatepoints(bilirubin, albumin, inr, ascites, encephalopathy):
@@ -730,7 +730,7 @@ def add_new_data():
                         else:
                             return "NA" 
 
-    st.title("Patient Information System")
+    
 
     tabs = ["Patient Info", "Patient Demographics", "Cirrhosis PMH","HCC Diagnosis", "Previous Therapy for HCC", "Pre Y90", "Day_Y90", "Post Y90 Within 30 Days Labs", "Other Post Tare","Imaging Date","Dosimetry Data","AFP"]
 
@@ -738,7 +738,7 @@ def add_new_data():
 
     # Left column for vertical tabs
     with col1:
-        st.header("Patient Deatils")
+        st.header("Patient Details")
         st.session_state.selected_tab = st.radio("", tabs)
 
     with col2:
