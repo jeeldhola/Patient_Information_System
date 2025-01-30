@@ -1864,9 +1864,6 @@ def add_new_data():
                         #df.loc[df["MRN"] == mrn, "PREY_AFPBINARY"].values[0]
                         dayy90_afp_prior_to_tare = process_input(dayy90_afp)
                         st.write("DAYY90_AFP Binary",dayy90_afp_prior_to_tare)
-                        if hasattr(st.session_state, 'temp_mrn'):
-                            prey90_afp_binarydup = get_variable_value(st.session_state.temp_mrn,"PREY_AFPBINARY")
-                            st.write("PRE90_AFP BinaryDup",prey90_afp_binarydup)
                         dayy90_sodium = st.number_input("DAYY90_sodium",step=0.1)
                         dayy90_creatinine = st.number_input("DAYY90_creatinine",step=0.1)
                         dayy90_inr = st.number_input("DAYY90_inr",step=0.1)
@@ -1882,7 +1879,7 @@ def add_new_data():
                         dayy90_potassium = st.number_input("DAY90_Potassium",step=0.1)
 
                         dayy90_ascites_ctcae = st.selectbox (
-                            "DAYY90_Ascites CTCAE",
+                            "DAYY90_Ascites CTCAE [Excel : DAYY_ASCITCTCAE]  ",
                             options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
                             format_func=lambda x: {
                             "none": "0. none",
@@ -1907,7 +1904,7 @@ def add_new_data():
                         dayy90_ascites_classification = 1 if dayy90_ascites_ctcae == "none" else findascitesclass(dayy90_ascites_ctcae)
                         st.write("Day90_AscitesCTCAEnumb",dayy90_ascites_classification)
                         dayy90_he_grade = st.selectbox(
-                            "DAYY90_HE Grade",
+                            "DAYY90_HE Grade [Excel : DAYY_HEGRADE]\n\n(1) None, (2) Grade 1-2, (3) Grade 3-4",
                             options=[1,2,3],
                             format_func=lambda x: {
                             1: "None",
@@ -1919,7 +1916,7 @@ def add_new_data():
                             placeholder="Choose an option",
                         )
                        
-                        dayy90_ecog = st.selectbox("DAYY90_ECOG", options=["0", "1", "2", "3", "4", "NA"],
+                        dayy90_ecog = st.selectbox("DAYY90_ECOG [Excel : DAYY_ECOG]  ", options=["0", "1", "2", "3", "4", "NA"],
                             index=None,  # No default selection
                             placeholder="Choose an option",)
                         
@@ -1935,11 +1932,27 @@ def add_new_data():
                         st.write("DAYY90_Albiscore",dayy90_albi_score_calc)
                         dayy90_albi_grade = albi_class(dayy90_albi_score_calc)
                         st.write("DAYY90_Albigrade",dayy90_albi_grade)
-                        dayy90_bclc_calc = st.text_area("PREY90_BCLC Stage calc")
-
+                       
+                        dayy90_bclc_calc = st.selectbox("PREY90_BCLC Stage calc [ Excel : DAYY_BCLC ]\n\n(NA) Not in chart, (0) Stage 0, (1) Stage A, (2) Stage B, (3) Stage C, (4) Stage D   ",
+                                options=["NA", "0", "1", "2", "3", "4"],
+                                format_func=lambda x: {
+                                    "NA": "(NA) Not in chart",
+                                    "0": " Stage 0: Very early stage, with a single nodule smaller than 2 cm in diameter",
+                                    "1": " Stage A: Early stage, with one nodule smaller than 5 cm or up to three nodules smaller than 3 cm",
+                                    "2": " Stage B: Intermediate stage, with multiple tumors in the liver",
+                                    "3": " Stage C: Advanced stage, with cancer that has spread to other organs or blood vessels",
+                                    "4": " Stage D: End-stage disease, with severe liver damage or the patient is very unwell",
+                                }[x],
+                                index=None,  # No default selection
+                                placeholder="Choose an option",
+                            )
 
                         dayy90_type_of_sphere = st.selectbox(
-                            "DAYY90_Type of Sphere", options=["Therasphere-1", "SIR-2"],
+                            "DAYY90_Type of Sphere [Excel : DAYY_SPHERE]\n\n(1) Therasphere, (2) SIR", options=["1", "2"],
+                            format_func=lambda x: {
+                                    "1": "Therasphere",
+                                    "2": "SIR",
+                                }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
@@ -1947,8 +1960,13 @@ def add_new_data():
                         dayy90_lt_notes_ftx = st.text_area("DAYY90_LT Notes Free Text")
 
                         ken_childpughscore = st.selectbox(
-                            "ken_ChildPughscore",
-                            options=["A","B","C"],
+                            "ken_ChildPughscore [Excel : KEN_CPPRE]\n\n(1) A, (2) B, (3) C ",
+                            options=["1","2","3"],
+                            format_func=lambda x: {
+                                    "1": "A",
+                                    "2": "B",
+                                    "3": "C"
+                                }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
@@ -1960,35 +1978,34 @@ def add_new_data():
                     
                         if submit_tab7:
                             data7 = {
-                                "DAYY90_AFP": dayy90_afp,
-                                "DAYY90_AFP Binary": dayy90_afp_prior_to_tare,
-                                "PRE90_AFP BinaryDup": prey90_afp_binarydup,
-                                "DAYY90_Sodium": dayy90_sodium,
-                                "DAYY90_Creatinine": dayy90_creatinine,
-                                "DAYY90_INR": dayy90_inr,
-                                "DAYY90_Albumin": dayy90_albumin,
-                                "DAYY90_Bilirubin": dayy90_bilirubin,
-                                "DAYY90_AST": dayy90_ast,
-                                "DAYY90_ALT": dayy90_alt,
-                                "DAYY90_Alkphos": dayy90_alkaline_phosphatase,
-                                "DAYY90_Leukocytes": dayy90_leukocytes,
-                                "DAYY90_Platelets": dayy90_platelets,
-                                "DAY90_Potassium": dayy90_potassium,
-                                "Day90_AscitesCTCAE": dayy90_ascites_ctcae,
-                                "Day90_AscitesCTCAEnumb": dayy90_ascites_classification,
-                                "Day90_HEgrade": dayy90_he_grade,
-                                "Day90_ECOG": dayy90_ecog,
-                                "DAYY90_CPclass": dayy90_child_pugh_class_calc,
-                                "DAYY90_CPcalc": dayy90_child_pugh_points_calc,
-                                "DAYY90_MELD": dayy90_meld_score_calc,
-                                "DAYY90_MELDNa": dayy90_meld_na_score_calc,
-                                "DAYY90_Albiscore": dayy90_albi_score_calc,
-                                "DAYY90_Albigrade": dayy90_albi_grade,
-                                "DAYY90_BCLC": dayy90_bclc_calc,
-                                "DAYY90_Sphere": dayy90_type_of_sphere,
-                                "DAYY90_LTnoteFT": dayy90_lt_notes_ftx,
-                                "ken_ChildPughscore": ken_childpughscore,
-                                "ken_MELDpreTARE (MELDpreTARE)": ken_meldpretare,
+                                "DAYY_AFP": dayy90_afp,
+                                "DAYY_AFPBINARY": dayy90_afp_prior_to_tare,
+                                "DAYY_SODIUM": dayy90_sodium,
+                                "DAYY_CREATININE": dayy90_creatinine,
+                                "DAYY_INR": dayy90_inr,
+                                "DAYY_ALBUMIN": dayy90_albumin,
+                                "DAYY_BILI": dayy90_bilirubin,
+                                "DAYY_AST": dayy90_ast,
+                                "DAYY_ALT": dayy90_alt,
+                                "DAYY_ALP": dayy90_alkaline_phosphatase,
+                                "DAYY_LEUK": dayy90_leukocytes,
+                                "DAYY_PLT": dayy90_platelets,
+                                "DAYY_POTAS": dayy90_potassium,
+                                "DAYY_ASCITCTCAE": dayy90_ascites_ctcae,
+                                "DAYY_ASCITNUMB": dayy90_ascites_classification,
+                                "DAYY_HEGRADE": dayy90_he_grade,
+                                "DAYY_ECOG": dayy90_ecog,
+                                "DAYY_CPCALC": dayy90_child_pugh_points_calc,
+                                "DAYY_CPCLASS": dayy90_child_pugh_class_calc,
+                                "DAYY_MELD": dayy90_meld_score_calc,
+                                "DAYY_MELDNA": dayy90_meld_na_score_calc,
+                                "DAYY_ALBISCORE": dayy90_albi_score_calc,
+                                "DAYY_ALBIGRADE": dayy90_albi_grade,
+                                "DAYY_BCLC": dayy90_bclc_calc,
+                                "DAYY_SPHERE": dayy90_type_of_sphere,
+                                "DAYY_LTFT": dayy90_lt_notes_ftx,
+                                "KEN_CPPRE": ken_childpughscore,
+                                "KEN_MELDPRE": ken_meldpretare
                                 }
                             if "patient_info" in st.session_state :
                                 update_google_sheet(data7, st.session_state.temp_mrn)
@@ -2003,7 +2020,7 @@ def add_new_data():
                 if "MRN" not in st.session_state.data:
                     st.warning("Please complete the Patient Information tab first.")
                 else:
-                    try:
+                    #try:
                         posty90_date_labs = st.date_input("POSTY90_30DY_date_labs", help="Enter the date of lab tests")
                         posty90_afp = st.text_input("POSTY90_30DY_afp", help="Enter AFP value in ng/dl or NA")
                         posty90_afp_date = st.date_input("POSTY90_30DY_afp DATE", help="Enter the date for AFP")
@@ -2020,7 +2037,7 @@ def add_new_data():
                         posty90_potassium = st.number_input("POSTY90_30DY_potassium", help="Enter the potassium value in mmol/L",step=0.1)
                         
                         posty90_ascites_ctcae = st.selectbox (
-                        "30DY_AE_AscitesCTCAE",
+                        "30DY_AE_AscitesCTCAE [Excel : POST30_ASCITCTCAE]",
                         options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
                         format_func=lambda x: {
                         "none": "0. none",
@@ -2043,30 +2060,42 @@ def add_new_data():
                                     return 3
                         
                         posty90_ascites_classification = 1 if posty90_ascites_ctcae == "none" else findascitesclass(posty90_ascites_ctcae)
-
+                        st.write("POST 30 days Y90 Ascites CTCAE Number" ,posty90_ascites_classification)
                         posty90_ascites_diruetics = st.selectbox(
-                            "30DY_AE_Ascitesdiruetics",
-                            options = ["Yes","No"],
-                            index=None,  # No default selection
+                            "30DY_AE_Ascitesdiruetics[Excel : POST30_ASCITDIUR]\n\n Yes (1), No (0)",
+                                options=["1", "0"],
+                                format_func=lambda x: {
+                                        "1": "Yes",
+                                        "0": "No",
+                                    }[x],
+                            index= None,
                             placeholder="Choose an option",
             
                         )
                         posty90_ascites_paracentesis = st.selectbox(
-                            "30DY_AE_Ascitesparacentesis" ,
-                            options = ["Yes","No"],
-                            index=None,  # No default selection
+                            "30DY_AE_Ascitesparacentesis[Excel : POST30_ASCITPARA]\n\n Yes (1), No (0)",
+                                options=["1", "0"],
+                                format_func=lambda x: {
+                                        "1": "Yes",
+                                        "0": "No",
+                                    }[x],
+                            index=  None,
                             placeholder="Choose an option",
             
                         )
                         posty90_ascites_hospitalization = st.selectbox(
-                            "30DY_AE_Asciteshospitalization",
-                            options = ["Yes","No"],
-                            index=None,  # No default selection
+                            "30DY_AE_Asciteshospitalization[Excel : POST30_ASCITHOSP]\n\n Yes (1), No (0)",
+                                options=["1", "0"],
+                                format_func=lambda x: {
+                                        "1": "Yes",
+                                        "0": "No",
+                                    }[x],
+                            index=None,
                             placeholder="Choose an option",
             
                         )
                         posty90_he_grade = st.selectbox(
-                            "30DY_AE_HE Grade",
+                            "30DY_AE_HE Grade [Excel : POST30_HEGRADE]\n\n(1) None, (2) Grade 1-2, (3) Grade 3-4",
                             options=[1,2,3],
                             format_func=lambda x: {
                             1: "None",
@@ -2076,245 +2105,258 @@ def add_new_data():
                         }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
-
                         )
 
                         posty90_ascites_free_text = st.text_area(
                             "30DY_AE_ascities_freetext",
-                        
+
                         )
 
-                        posty90_ecog = st.selectbox("POSTY90_30DY_ECOG", options=["0", "1", "2", "3", "4", "NA"],
+                        posty90_ecog = st.selectbox("POSTY90_30DY_ECOG [Excel : POST30_ECOG]", options=["0", "1", "2", "3", "4", "NA"],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                             )
                         
-                        posty90_child_pugh_class = st.selectbox(
-                            "POSTY90_30DY_Child-Pugh Class calc",
-                            options=["Class A", "Class B", "Class C", "NA"],
-                            help="Select the Child-Pugh class",
-                        index=None,  # No default selection
-                        placeholder="Choose an option",
-                        )
-
-                        inputp90 = st.text_input(
-                            "POSTY90_30DY_Child-Pugh Points calc",
-                            help="Write in number in range 5-15, or NA"
-                        )
-                        posty90_child_pugh_points = validate_input(inputp90)
-
-                        posty90_bclc = st.selectbox(
-                            "POSTY90_30DY_BCLC stage",
-                            options=["0", "A", "B", "C", "D"],
-                            help="Select the BCLC stage",
-                        index=None,  # No default selection
-                        placeholder="Choose an option",
-                        )
-
-                        input_meld = st.text_input(
-                            "POSTY90_30DY_MELD EMR",
-                            help="Write in number in range 6-40, or NA"
-                        )
-                        posty90_meld = validate_input2(input_meld)
-
-
-                        input_meld_na = st.text_input(
-                            "POSTY90_30DY_MELD Na EMR",
-                            help="Write in number in range 6-40, or NA"
-                        )
-                        posty90_meld_na = validate_input2(input_meld_na)
-
-                        posty90_albi_score = st.number_input(
-                            "POSTY90_30DY_ALBI Score calc",
-                            help="Enter ALBI score",step=0.1
-                        )
+                        posty90_child_pugh_points = calculatepoints(posty90_bilirubin,posty90_albumin,posty90_inr,posty90_ascites_ctcae,posty90_he_grade)
+                        st.write("DAYY90_CPcalc",posty90_child_pugh_points)
+                        posty90_child_pugh_class = calculate_class(posty90_child_pugh_points)
+                        # Additional Calculated Fields
+                        st.write("DAYY90_CPclass",posty90_child_pugh_class)
+                        #prey90_bclc_stage_calc = st.text_input("PREY90_BCLC Stage calc", help="Enter calculated BCLC stage")
+                        posty90_meld = (3.78*(int(posty90_bilirubin)))+(11.2*(int(posty90_inr)))+(9.57*(int(posty90_creatinine)))+6.43
+                        st.write("DAYY90_MELD",posty90_meld)
+                        posty90_meld_na = posty90_meld + 1.32*(137-int(posty90_sodium)) - (0.033*posty90_meld*(137-int(posty90_sodium)))
+                        st.write("DAYY90_MELDNa",posty90_meld_na)
+                        posty90_albi_score = albi_calc(posty90_bilirubin,posty90_albumin)
+                        st.write("DAYY90_Albiscore",posty90_albi_score)
                         posty90_albi_grade = albi_class(posty90_albi_score)
+                        st.write("DAYY90_Albigrade",posty90_albi_grade)
 
+                        posty90_bclc = st.selectbox("PREY90_BCLC Stage calc [ Excel : POST30_BCLC ]\n\n(NA) Not in chart, (0) Stage 0, (1) Stage A, (2) Stage B, (3) Stage C, (4) Stage D   ",
+                            options=["NA", "0", "1", "2", "3", "4"],
+                            format_func=lambda x: {
+                                "NA": "(NA) Not in chart",
+                                "0": " Stage 0: Very early stage, with a single nodule smaller than 2 cm in diameter",
+                                "1": " Stage A: Early stage, with one nodule smaller than 5 cm or up to three nodules smaller than 3 cm",
+                                "2": " Stage B: Intermediate stage, with multiple tumors in the liver",
+                                "3": " Stage C: Advanced stage, with cancer that has spread to other organs or blood vessels",
+                                "4": " Stage D: End-stage disease, with severe liver damage or the patient is very unwell",
+                            }[x],
+                            index = None,
+                            placeholder="Choose an option"
+                            )
                     
                         ken_bclc_stage_post90 = st.text_input(
                             "Ken_BCLCStagepost90",
-                            help="Enter BCLC Stage Post-90"
+                            help="Enter BCLC Stage Post-90",
+                          
                         )
 
                         ken_meld_stage_post90 = st.text_input(
                             "Ken_MELD_Stagepost90",
-                            help="Enter MELD Score Pre-TARE"
+                            help="Enter MELD Score Pre-TARE",
+                           
                         )
                         ## New Part
                         st.subheader("Post_Y90_within_30_days_adverse_events")
                         DYAE_CTCAE_portal_htn = st.selectbox(
-                            "30DYAE_portal_htn CTCAE",
+                            "30DYAE_portal_htn CTCAE [Excel : AE30_PORTHTN]",
                             options=["0","1","2","3","4","5"],
-                        index=None,  # No default selection
+                        index=None,
                         placeholder="Choose an option",
                         )
                         DYAE_CTCAE_Vascular_comp = st.selectbox(
-                            "30DYAE_Vascular comp CTCAE",
+                            "30DYAE_Vascular comp CTCAE [Excel : AE30_VASCULAR]",
                             options=["0","1","2","3","4","5"],
-                        index=None,  # No default selection
+                        index= None,
                         placeholder="Choose an option",
                         )
                         DYAE_CTCAE_fatigue = st.selectbox(
-                            "30DYAE_fatigue CTCAE",
+                            "30DYAE_fatigue CTCAE [Excel : AE30_FATIGUE]",
                             options=["0","1","2"],
-                        index=None,  # No default selection
+                        index= None,
                         placeholder="Choose an option",
                         )
                         DYAE_CTCAE_diarrhea = st.selectbox(
-                            "30DYAE_diarrhea CTCAE",
+                            "30DYAE_diarrhea CTCAE [Excel : AE30_DIAR]",
                             options=["0","1","2","3","4","5"],
-                        index=None,  # No default selection
+                        index= None,
                         placeholder="Choose an option",
                         )
-
                         DYAE_CTCAE_hypoalbuminemia_emr = st.text_input(
-                            "30DYAE_hypoalbuminemia CTCAE"
+                            "30DYAE_hypoalbuminemia CTCAE",
+                            
                         )
                         DYAE_CTCAE_hyperbilirubinemia_emr = st.text_input(
-                            "30DYAE_hyperbilirubinemia CTCAE"
+                            "30DYAE_hyperbilirubinemia CTCAE",
+                            
                         )
                         DYAE_CTCAE_Increase_creatinine_emr = st.text_input(
-                            "30DYAE_Increase_creatinine CTCAE"
+                            "30DYAE_Increase_creatinine CTCAE",
                         )
                         DYAE_CTCAE_abdominal_pain = st.selectbox(
-                            "30DYAE_abdominal pain CTCAE",
+                            "30DYAE_abdominal pain CTCAE [Excel : AE30_ABDPAIN]",
                             options=["0","1","2","3"],
-                        index=None,  # No default selection
+                        index= None,
                         placeholder="Choose an option",
                         )
                         DYAE_CTCAE_sepsis = st.selectbox(
-                            "30DYAE_sepsis CTCAE",
+                            "30DYAE_sepsis CTCAE [Excel : AE30_SEPSIS]",
                             options=["0","3","4","5"],
-                        index=None,  # No default selection
+                        index= None,
                         placeholder="Choose an option",
                         )
-                        
                         DYAE_CTCAE_bacterial_peritonitis = st.selectbox(
-                            "30DYAE_CTCAE_bacterial_peritonitis",
+                            "30DYAE_CTCAE_bacterial_peritonitis [Excel : AE30_BACTPER]",
                             options=["0", "3", "4", "5"],
-                        index=None,  # No default selection
+                        index= None,
                         placeholder="Choose an option",
                         )
-
                         DYAE_CTCAE_hemorrhage = st.selectbox(
-                        "30DYAE_CTCAE_hemorrhage",
+                        "30DYAE_CTCAE_hemorrhage [Excel : AE30_HEMOR]",
                         options=["0", "3", "4", "5"],
-                        index=None,  # No default selection
+                        index= None,
                         placeholder="Choose an option",
                         )
-
                         DYAE_CTCAE_anorexia = st.selectbox(
-                            "30DYAE_CTCAE_anorexia",
+                            "30DYAE_CTCAE_anorexia [Excel : AE30_ANOREX]",
                             options=["0", "1", "2", "3"],
-                        index=None,  # No default selection
+                        index=None,
                         placeholder="Choose an option",
                         )
-
                         DYAE_CTCAE_intrahepatic_fistula = st.selectbox(
-                            "30DYAE_CTCAE_intrahepatic_fistula",
+                            "30DYAE_CTCAE_intrahepatic_fistula [Excel : AE30_IHFIST]",
                             options=["0","2", "3", "4", "5"],
-                        index=None,  # No default selection
+                        index= None,
                         placeholder="Choose an option",
                         )
-
                         DYAE_CTCAE_constipation = st.selectbox(
-                            "30DYAE_CTCAE_constipation",
+                            "30DYAE_CTCAE_constipation [Excel : AE30_CONSTI]",
                             options=["0", "1", "2", "3"],
-                        index=None,  # No default selection
+                        index=None,
                         placeholder="Choose an option",
                         )
-
                         DYAE_CTCAE_nausea = st.selectbox(
-                            "30DYAE_CTCAE_nausea",
+                            "30DYAE_CTCAE_nausea [Excel : AE30_NAUS]",
                             options=["0", "1", "2", "3"],
-                        index=None,  # No default selection
+                        index= None,
                         placeholder="Choose an option",
                         )
-
                         DYAE_CTCAE_vomiting = st.selectbox(
-                            "30DYAE_CTCAE_vomiting",
+                            "30DYAE_CTCAE_vomiting [Excel : AE30_VOM]",
                             options=["0","1","2", "3", "4", "5"],
-                        index=None,  # No default selection
+                        index= None,
                         placeholder="Choose an option",
                         )
-
                         DYAE_CTCAE_cholecystitis = st.selectbox(
-                            "30DYAE_CTCAE_cholecystitis",
+                            "30DYAE_CTCAE_cholecystitis [Excel : AE30_CHOLE]",
                             options=["0", "2","3", "4", "5"],
-                        index=None,  # No default selection
+                        index=None,
                         placeholder="Choose an option",
                         )
-
                         DYAE_CTCAE_gastric_ulcers = st.selectbox(
-                            "30DYAE_CTCAE_gastric_ulcers",
+                            "30DYAE_CTCAE_gastric_ulcers [Excel : AE30_GULCER]",
                             options=["0","1","2", "3", "4", "5"],
-                        index=None,  # No default selection
+                        index= None,
                         placeholder="Choose an option",
                         )
-
                         DYAE_CTCAE_hyperkalemia = st.selectbox(
-                            "30DYAE_CTCAE_hyperkalemia",
+                            "30DYAE_CTCAE_hyperkalemia [Excel : AE30_HYPERKAL]",
                             options=["NA"],
-                        index=None,  # No default selection
+                        index= None,
                         placeholder="Choose an option",
                         )
-
                         DYAE_CTCAE_respiratory_failure = st.selectbox(
-                            "30DYAE_CTCAE_respiratory_failure",
+                            "30DYAE_CTCAE_respiratory_failure [Excel : AE30_RESPFAIL]",
                             options=["0", "4", "5"],
-                        index=None,  # No default selection
+                        index=None,
                         placeholder="Choose an option",
                         )
-
                         DYAE_CTCAE_AKI = st.selectbox(
-                            "30DYAE_CTCAE_AKI",
+                            "30DYAE_CTCAE_AKI [Excel : AE30_AKI]",
                             options=["0", "3", "4", "5"],
-                        index=None,  # No default selection
+                        index= None,
                         placeholder="Choose an option",
                         )
 
                         DYAE_CTCAE_Radiation_pneumonitis = st.selectbox(
-                            "30DYAE_CTCAE_Radiation_pneumonitis",
+                            "30DYAE_CTCAE_Radiation_pneumonitis [Excel : AE30_RADPNEUM]",
                             options=["0","1","2", "3", "4", "5"],
-                        index=None,  # No default selection
+                        index= None,
                         placeholder="Choose an option",
                         )
 
+                        ae30_alt = st.text_input("AE30_ALT", )
+                        ae30_ast = st.text_input("AE30_AST", )
+                        ae30_alp = st.text_input("AE30_ALP",)
+                        ae30_plt = st.text_input("AE30_PLT",)
+                        ae30_otherft = st.text_input("AE30_OTHERFT",)
+                        ae30_other = st.text_input("AE30_OTHER",)
+                        ae30_gradesum12 = st.text_input("AE30_GRADESUM12", )
+                        ae30_gradesum345 = st.text_input("AE30_GRADESUM345", )
+
+
+
                         DYAE_AE_other = st.text_area(
                             "30DY_AE_other",
-                            help="Other Adverse Events (Free Text)"
+                            help="Other Adverse Events (Free Text)",
+                            
                         )
 
                         DYAE_AE_date_of_AE = st.text_input(
                             "90DY_AE_date_of_AE",
-                            help="(if AE is present after 30 days but before 90 write it here and the date)"
+                            help="(if AE is present after 30 days but before 90 write it here and the date)",
+                            
                         )
                         ken_grandedtoxicity = st.text_area(
-                            "Ken_GradeandToxicity",
+                            "AE90_OTHERFT",
+                            
 
                         )
+                        ae90_gradesum12 = st.text_input("AE90_GRADESUM12")
+                        ae90_gradesum345 = st.text_input("AE90_GRADESUM345")
                         dy_ae_hospitalization_3 = st.selectbox(
-                            "90DY_AE_Hospitalization 3 months",
-                            options=["Yes","No"],
-                            index=None,  # No default selection
+                            "90DY_AE_Hospitalization 3 months [Excel : AE90_HOSP3]\n\n Yes (1), No (0)",
+                                options=["1", "0"],
+                                format_func=lambda x: {
+                                        "1": "Yes",
+                                        "0": "No",
+                                    }[x],
+                            
+                            index=None,
                         placeholder="Choose an option",
                         )
                         dy_ae_hospitalization_6 = st.selectbox(
-                            "90DY_AE_Hospitalization 6 months",
-                            options=["Yes","No"],
-                            index=None,  # No default selection
+                            "90DY_AE_Hospitalization 6 months [Excel : AE30_HOSP3DATE]\n\n Yes (1), No (0)",
+                                options=["1", "0"],
+                                format_func=lambda x: {
+                                        "1": "Yes",
+                                        "0": "No",
+                                    }[x],
+                            
+                            index= None,
                         placeholder="Choose an option",
                         )
                         dy_ae_hosp6mo = st.selectbox(
-                            "90DY_AE_Hosp6mo",
-                            options=["Yes","No"],
-                            index=None,  # No default selection
+                            "90DY_AE_Hosp6mo [Excel : AE90_HOSP6]\n\n Yes (1), No (0)",
+                                options=["1", "0"],
+                                format_func=lambda x: {
+                                        "1": "Yes",
+                                        "0": "No",
+                                    }[x],
+                            
+                            index=None,
                         placeholder="Choose an option",
                         )
                         dy_ae_death_due = st.selectbox(
-                            "90DY_AE_Death due to AE",
-                            options=["Yes","No"],
-                            index=None,  # No default selection
+                            "90DY_AE_Death due to AE [Excel : AE30_DEATHAE]\n\n Yes (1), No (0)",
+                                options=["1", "0"],
+                                format_func=lambda x: {
+                                        "1": "Yes",
+                                        "0": "No",
+                                    }[x],
+                            
+                            index=None,
                         placeholder="Choose an option",
                         )
 
@@ -2324,74 +2366,85 @@ def add_new_data():
                         if submit_tab8:
                                 
                                 data8={
-                                    "POSTY90_30DY_Datelabs": posty90_date_labs.strftime("%Y-%m-%d"),
-                                    "POSTY90_30DY_AFP": posty90_afp,
-                                    "POSTY90_30DY_AFPdate": posty90_afp_date.strftime("%Y-%m-%d"),
-                                    "POSTY90_30DY_Sodium": posty90_sodium,
-                                    "POSTY90_30DY_Creatinine": posty90_creatinine,
-                                    "POSTY90_30DY_INR": posty90_inr,
-                                    "POSTY90_30DY_Albumin": posty90_albumin,
-                                    "POSTY90_30DY_Bilirubin": posty90_bilirubin,
-                                    "POSTY90_30DY_AST": posty90_ast,
-                                    "POSTY90_30DY_ALT": posty90_alt,
-                                    "POSTY90_30DY_ALP": posty90_alkaline_phosphatase,
-                                    "POSTY90_30DY_Leukocytes": posty90_leukocytes,
-                                    "POSTY90_30DY_Platelets": posty90_platelets,
-                                    "POSTY90_30DY_Potassium": posty90_potassium,
-                                    "30DY_AE_AscitesCTCAE": posty90_ascites_ctcae,
-                                    "30DY_AE_AscitesCTCAEnumb": posty90_ascites_classification,
-                                    "30DY_AE_Ascitesdiruetics": posty90_ascites_diruetics,
-                                    "30DY_AE_Ascitesparacentesis": posty90_ascites_paracentesis,
-                                    "30DY_AE_Asciteshospitalization": posty90_ascites_hospitalization,
-                                    "30DY_AE_HEgrade": posty90_he_grade,
-                                    "30DY_AE_ascities_freetext": posty90_ascites_free_text,
-                                    "POSTY90_30DY_ECOG": posty90_ecog,
-                                    "POSTY90_30DY_CPclass": posty90_child_pugh_class,
-                                    "POSTY90_30DY_CPcalc": posty90_child_pugh_points,
-                                    "POSTY90_30DY_MELD": posty90_meld,
-                                    "POSTY90_30DY_MELDNa": posty90_meld_na,
-                                    "POSTY90_30DY_ALBIscore": posty90_albi_score,
-                                    "POSTY90_30DY_ALBIgrade": posty90_albi_grade,
-                                    "POSTY90_30DY_BCLC": posty90_bclc,
+                                    "POST30_LABSDATE": posty90_date_labs.strftime("%Y-%m-%d"),
+                                    "POST30_AFP": posty90_afp,
+                                    "POST30_AFPDATE": posty90_afp_date.strftime("%Y-%m-%d"),
+                                    "POST30_SODIUM": posty90_sodium,
+                                    "POST30_CREATININE": posty90_creatinine,
+                                    "POST30_INR": posty90_inr,
+                                    "POST30_ALBUMIN": posty90_albumin,
+                                    "POST30_BILI": posty90_bilirubin,
+                                    "POST30_AST": posty90_ast,
+                                    "POST30_ALT": posty90_alt,
+                                    "POST30_ALP": posty90_alkaline_phosphatase,
+                                    "POST30_LEUK": posty90_leukocytes,
+                                    "POST30_PLT": posty90_platelets,
+                                    "POST30_POTAS": posty90_potassium,
+                                    "POST30_ASCITCTCAE": posty90_ascites_ctcae,
+                                    "POST30_ASCITNUMB": posty90_ascites_classification,
+                                    "POST30_ASCITDIUR": posty90_ascites_diruetics,
+                                    "POST30_ASCITPARA": posty90_ascites_paracentesis,
+                                    "POST30_ASCITHOSP": posty90_ascites_hospitalization,
+                                    "POST30_HEGRADE": posty90_he_grade,
+                                    "POST30_ASCITFT": posty90_ascites_free_text,
+                                    "POST30_ECOG": posty90_ecog,
+                                    "POST30_CPCALC": posty90_child_pugh_points,
+                                    "POST30_CPCLASS": posty90_child_pugh_class,
+                                    "POST30_MELD": posty90_meld,
+                                    "POST30_MELDNA": posty90_meld_na,
+                                    "POST30_ALBISCORE": posty90_albi_score,
+                                    "POST30_ALBIGRADE": posty90_albi_grade,
+                                    "POST30_BCLC": posty90_bclc,
                                     "Ken_BCLCStagepost90": ken_bclc_stage_post90,
                                     "Ken_MELD_Stagepost90": ken_meld_stage_post90,
-                                    "30DY_AE_Portalhtn": DYAE_CTCAE_portal_htn,
-                                    "30DY_AE_Vascularcomp": DYAE_CTCAE_Vascular_comp,
-                                    "30DY_AE_Fatigue": DYAE_CTCAE_fatigue,
-                                    "30DY_AE_Diarrhea": DYAE_CTCAE_diarrhea,
-                                    "30DY_AE_Hypoalbuminemia": DYAE_CTCAE_hypoalbuminemia_emr,
-                                    "30DY_AE_Hyperbilirubinemia": DYAE_CTCAE_hyperbilirubinemia_emr,
-                                    "30DY_AE_Increasecreatine": DYAE_CTCAE_Increase_creatinine_emr,
-                                    "30DY_AE_Abdominalpain": DYAE_CTCAE_abdominal_pain,
-                                    "30DY_AE_Sepsis": DYAE_CTCAE_sepsis,
-                                    "30DY_AE_BacterialPer": DYAE_CTCAE_bacterial_peritonitis,
-                                    "30DY_AE_Hemorrhage": DYAE_CTCAE_hemorrhage,
-                                    "30DY_AE_Anorexia": DYAE_CTCAE_anorexia,
-                                    "30DY_AE_Intrahepaticfistula": DYAE_CTCAE_intrahepatic_fistula,
-                                    "30DY_AE_Constipation": DYAE_CTCAE_constipation,
-                                    "30DY_AE_Nausea": DYAE_CTCAE_nausea,
-                                    "30DY_AE_Vomiting": DYAE_CTCAE_vomiting,
-                                    "30DY_AE_Cholecystitis": DYAE_CTCAE_cholecystitis,
-                                    "30DY_AE_Gastriculcer": DYAE_CTCAE_gastric_ulcers,
-                                    "30DY_AE_Hyperkalemia": DYAE_CTCAE_hyperkalemia,
-                                    "30DY_AE_Respfailure": DYAE_CTCAE_respiratory_failure,
-                                    "30DY_AE_AKI": DYAE_CTCAE_AKI,
-                                    "30DY_AE_Radiationpneumonitis": DYAE_CTCAE_Radiation_pneumonitis,
+                                    "AE30_PORTHTN": DYAE_CTCAE_portal_htn,
+                                    "AE30_VASCULAR": DYAE_CTCAE_Vascular_comp,
+                                    "AE30_FATIGUE": DYAE_CTCAE_fatigue,
+                                    "AE30_DIAR": DYAE_CTCAE_diarrhea,
+                                    "AE30_HYPOALBUM": DYAE_CTCAE_hypoalbuminemia_emr,
+                                    "AE30_HYPERBILI": DYAE_CTCAE_hyperbilirubinemia_emr,
+                                    "AE30_INCREASECR": DYAE_CTCAE_Increase_creatinine_emr,
+                                    "AE30_ABDPAIN": DYAE_CTCAE_abdominal_pain,
+                                    "AE30_SEPSIS": DYAE_CTCAE_sepsis,
+                                    "AE30_BACTPER": DYAE_CTCAE_bacterial_peritonitis,
+                                    "AE30_HEMOR": DYAE_CTCAE_hemorrhage,
+                                    "AE30_ANOREX": DYAE_CTCAE_anorexia,
+                                    "AE30_IHFIST": DYAE_CTCAE_intrahepatic_fistula,
+                                    "AE30_CONSTI": DYAE_CTCAE_constipation,
+                                    "AE30_NAUS": DYAE_CTCAE_nausea,
+                                    "AE30_VOM": DYAE_CTCAE_vomiting,
+                                    "AE30_CHOLE": DYAE_CTCAE_cholecystitis,
+                                    "AE30_GULCER": DYAE_CTCAE_gastric_ulcers,
+                                    "AE30_RESPFAIL": DYAE_CTCAE_respiratory_failure,
+                                    "AE30_AKI": DYAE_CTCAE_AKI,
+                                    "AE30_RADPNEUM": DYAE_CTCAE_Radiation_pneumonitis,
+                                    "AE30_HYPERKAL": DYAE_CTCAE_hyperkalemia,
+                                    "AE30_ALT" : ae30_alt,
+                                    "AE30_AST" : ae30_ast,
+                                    "AE30_ALP" : ae30_alp,
+                                    "AE30_PLT" : ae30_plt,
+                                    "AE30_OTHERFT" : ae30_otherft,
+                                    "AE30_OTHER" : ae30_other,
+                                    "AE30_GRADESUM12" : ae30_gradesum12,
+                                    "AE30_GRADESUM345" : ae30_gradesum345,
                                     "30DY_AE_Other": DYAE_AE_other,
-                                    "90DY_AE_DateofAE": DYAE_AE_date_of_AE,
-                                    "Additional Notes FT": ken_grandedtoxicity,
-                                    "90DY_AE_Hosp3mo": dy_ae_hospitalization_3,
-                                    "90DY_AE_Datehosp3mo": dy_ae_hospitalization_6,
-                                    "90DY_AE_Hosp6mo": dy_ae_hosp6mo,
-                                    "90DY_AE_DeathduetoAE": dy_ae_death_due
+                                    "AE90_DATE": DYAE_AE_date_of_AE,
+                                    "AE90_OTHERFT": ken_grandedtoxicity,
+                                    "AE90_GRADESUM12" : ae90_gradesum12,
+                                    "AE90_GRADESUM345" : ae90_gradesum345,
+                                    "AE90_HOSP3": dy_ae_hospitalization_3,
+                                    "AE30_HOSP3DATE": dy_ae_hospitalization_6,
+                                    "AE90_HOSP6": dy_ae_hosp6mo,
+                                    "AE30_DEATHAE": dy_ae_death_due
+                                    
                                 }
                             
                                 if "patient_info" in st.session_state:
                                     update_google_sheet(data8, st.session_state.temp_mrn)
                                 else:
                                     st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
-                    except:
-                        st.warning("Please Fill Patient Information Page")
+                    #except:
+                     #   st.warning("Please Fill Patient Information Page")
         
         elif st.session_state.selected_tab == "Other Post Tare":
             st.subheader("Other_post_TARE")
@@ -2399,7 +2452,7 @@ def add_new_data():
                 if "MRN" not in st.session_state.data:
                     st.warning("Please complete the Patient Information tab first.")
                 else:
-                    try:
+                    #try:
                         oc_liver_transplant = st.radio("OC_Liver_transplant", options=["Yes", "No"])
                         oc_liver_transplant_date = st.date_input("OC_Liver_transplant_date")
 
@@ -2435,10 +2488,11 @@ def add_new_data():
                             st.write("K_ken_AlbiPreTAREGrade: ",k_ken_albipretaregrade)
                         except:
                             st.warning("Fill Pre Y90 Tab")
-                        
+                        #k_ken_albiposttareraw = 0
+                        #k_ken_albiposttaregrade =""
                         try :
-                            posty90_bilirubin = get_variable_value(st.session_state.temp_mrn,"POSTY90_30DY_Bilirubin")
-                            posty90_albumin = get_variable_value(st.session_state.temp_mrn,"POSTY90_30DY_Albumin")
+                            posty90_bilirubin = get_variable_value(st.session_state.temp_mrn,"POST30_BILI")
+                            posty90_albumin = get_variable_value(st.session_state.temp_mrn,"POST30_ALBUMIN")
                             
                             k_ken_albiposttareraw = albi_calc(posty90_bilirubin,posty90_albumin)
                             st.write("K_ken_AlbiPostTARERaw : ", k_ken_albiposttareraw)
@@ -2467,46 +2521,59 @@ def add_new_data():
                                 update_google_sheet(data9, st.session_state.temp_mrn)
                             else:
                                 st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
-                    except:
-                           st.warning("Please Fill Patient Information Page")
+                    #except:
+                     #      st.warning("Please Fill Patient Information Page")
         
         elif st.session_state.selected_tab == "Imaging Date":
             st.subheader("Imaging Date")
             with st.form("imaging_date_form"):
-                try:
+                #try:
                     if "MRN" not in st.session_state.data:
                         st.warning("Please complete the Patient Information tab first.")
                     else:
                         st.subheader("Imaging PreY90")
                         
                         PREY90_prescan_modality = st.selectbox(
-                                "PREY90_prescan_modality",
-                                options=["CT","MRI"],
+                                "PREY90_prescan_modality [Excel : PREY_MOD]\n\n(1) CT, (2) MRI",
+                                        options=["1","2"],
+                                        format_func=lambda x: {
+                                            "1": "CT",
+                                            "2": "MRI",
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
                         PREY90_Imaging_Date = st.date_input("PREY90_Imaging Date")
                         PREY90_total_number_of_lesions = st.selectbox(
-                                "PREY90_total number of lesions",
-                                options=["1","2",">3"],
+                                "PREY90_total number of lesions [Excel : PREY_TOTLES]\n\n(1) 1,(2) 2,(3) >=3",
+                                 options=["1", "2", "3"],
+                            format_func=lambda x: {
+                                            "1": "1",
+                                            "2": "2",
+                                            "3" : ">=3"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
                         PREY90_Number_Involved_Lobes = st.selectbox(
-                                "PREY90_Number Involved Lobes",
-                                options=["Unilobar","Bilobar"],
+                                "PREY90_Number Involved Lobes [Excel : PREY_LOBES]\n\n(1) Unilobar, (2) Bilobar",
+                                        options=["1","2"],
+                                        format_func=lambda x: {
+                                            "1": "Unilobar",
+                                            "2": "Bilobar",
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
                         PREY90_target_lesion_1_segments = st.multiselect(
-                                "PREY90_target_lesion_1_segments",
+                                "PREY90_target_lesion_1_segments [Excel : PREY_TL1SEG]",
                                 options=["1","2","3","4a","4b","5","6","7","8","NA"],
                                 placeholder="Select all that apply"
                         
                         )
                         PREY90_target_lesion_1_segments = ", ".join(PREY90_target_lesion_1_segments)
                         PREY90_TL1_LAD = st.number_input(
-                            "PREY90_TL1_LAD",
+                            "PREY90_Target Lesion_LAD",
                             step=0.1
                         )
 
@@ -2522,7 +2589,7 @@ def add_new_data():
                         PREY90_Target_Lesion_1_VOL = 4/3*3.14*(PREY90_Target_Lesion_1_PAD)*(PREY90_TL1_LAD)*PREY90_Target_Lesion_1_CCD
                         st.write("PREY90_Target Lesion 1 VOL",PREY90_Target_Lesion_1_VOL)
                         PREY90_Target_Lesion_2_segments = st.selectbox(
-                                "PREY90_Target_Lesion_2_segments",
+                                "PREY90_Target_Lesion_2_segments [Excel : PREY_TL2SEG]",
                                 options=["1","2","3","4a","4b","5","6","7","8","NA"],
                         index=None,  # No default selection
                         placeholder="Choose an option",
@@ -2544,7 +2611,7 @@ def add_new_data():
                         st.write("PREY90_Target Lesion 2 VOL",PREY90_Target_Lesion_2_VOL)
                         PREY90_pretx_targeted_Lesion_Dia_Sum = max(PREY90_TL1_LAD,PREY90_Target_Lesion_1_PAD,PREY90_Target_Lesion_1_CCD)+max(PREY90_Target_Lesion_2_PAD,PREY90_Target_Lesion_2_LAD,PREY90_Target_Lesion_2_CCD)
                         st.write("PREY90_ pretx targeted Lesion Dia Sum",PREY90_pretx_targeted_Lesion_Dia_Sum)
-                        PREY90_Non_Target_Lesion_Location = st.selectbox( "PREY90_Non-Target Lesion Location" , options=["1","2","3","4a","4b","5","6","7","8","NA"],
+                        PREY90_Non_Target_Lesion_Location = st.selectbox( "PREY90_Non-Target Lesion Location [Excel : PREY_NTLOC]" , options=["1","2","3","4a","4b","5","6","7","8","NA"],
                         index=None,  # No default selection
                         placeholder="Choose an option",)
 
@@ -2569,8 +2636,12 @@ def add_new_data():
                         )
 
                         PREY90_Pre_Y90_Extrahepatic_Disease = st.selectbox(
-                            "PREY90_Pre Y90 Extrahepatic Disease",
-                            options=["Yes", "No", "NA"],
+                            "PREY90_Pre Y90 Extrahepatic Disease [Excel : PREY_EHD]\n\n Yes (1), No (0)",
+                                    options=["1", "0"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -2581,29 +2652,42 @@ def add_new_data():
                         )
 
                         PREY90_PVT = st.selectbox(
-                            "PREY90_PVT",
-                            options=["Yes", "No", "NA"],
+                            "PREY90_PVT [Excel : PREY_PVT]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
 
                         PREY90_PVT_Location = st.selectbox(
-                            "PREY90_PVT Location",
+                            "PREY90_PVT Location [Excel : PREY_PVTLOC]",
                             options=["RPV", "LPV"],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
 
                         PREY90_Features_of_cirrhosis = st.selectbox(
-                            "PREY90_Features of cirrhosis",
-                            options=["Yes", "No", "NA"],
+                            "PREY90_Features of cirrhosis [Excel : PREY_CIRRH]\n\n\n\n Yes (1), No (0)",
+                                    options=["1", "0"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
                         st.subheader("Imaging_1st_Followup")
                         FU_Scan_Modality = st.selectbox(
-                            "1st_FU_Scan Modality",
-                            options=["CT", "MRI"],
+                            "1st_FU_Scan Modality[Excel : FU1_MOD]\n\n(1) CT, (2) MRI",
+                                        options=["1","2"],
+                                        format_func=lambda x: {
+                                            "1": "CT",
+                                            "2": "MRI",
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -2618,8 +2702,13 @@ def add_new_data():
                         FU_Months_Since_Y90 = relativedelta(FU_Imaging_Date, fetch_date).months
                         st.write("1st_FU_Months Since Y90",FU_Months_Since_Y90)
                         FU_Total_number_of_lesions = st.selectbox(
-                            "1st_FU_Total number of lesions",
-                            options=["1", "2", ">3"],
+                            "1st_FU_Total number of lesions [Excel : FU1_TOTLES]\n\n(1) 1,(2) 2,(3) >=3",
+                            options=["1", "2", "3"],
+                            format_func=lambda x: {
+                                            "1": "1",
+                                            "2": "2",
+                                            "3" : ">=3"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -2640,7 +2729,7 @@ def add_new_data():
                         )
 
                         FU_Target_Lesion_2_Segments = st.selectbox(
-                            "1st_FU_Target Lesion 2 Segments",
+                            "1st_FU_Target Lesion 2 Segments [Excel : 1st_FU_Target Lesion 2 Segments]",
                             options=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"],
                         index=None,  # No default selection
                         placeholder="Choose an option",
@@ -2682,8 +2771,13 @@ def add_new_data():
                         FU_Non_targeted_Lesion_Dia_Sum = max(FU_Non_Target_Lesion_2_LAD_Art_Enhanc,FU_Non_Target_Lesion_2_PAD_Art_Enhanc,FU_Non_Target_Lesion_2_CCD_Art_Enhanc)
                         st.write("1st_FU_Non-targeted Lesion Dia Sum",FU_Non_targeted_Lesion_Dia_Sum)
                         FU_Lesion_Necrosis = st.selectbox(
-                            "1st_FU_Lesion Necrosis",
-                            options=["No", "Yes", "NA"],
+                            "1st_FU_Lesion Necrosis [Excel : FU1_NECROSIS]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -2694,22 +2788,37 @@ def add_new_data():
                         )
 
                         FU_Non_target_lesion_response = st.selectbox(
-                            "1st_FU_Non target lesion response",
-                            options=["No", "Yes", "NA"],
+                            "1st_FU_Non target lesion response[Excel : FU1_NTLRSP]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
 
                         FU_New_Lesions = st.selectbox(
-                            "1st_FU_New Lesions",
-                            options=["No", "Yes", "NA"],
+                            "1st_FU_New Lesions[Excel : FU1_NEWLESION]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
 
                         FU_NEW_Extrahepatic_Disease = st.selectbox(
-                            "1st_FU_NEW Extrahepatic Disease",
-                            options=["No", "Yes", "NA"],
+                            "1st_FU_NEW Extrahepatic Disease[Excel : FU1_NEWEHD]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -2735,8 +2844,12 @@ def add_new_data():
                         st.subheader("Imaging_2nd_Followup")
 
                         FU2_Scan_Modality = st.selectbox(
-                            "2nd_FU_Scan Modality",
-                            options=["CT", "MRI"],
+                            "2nd_FU_Scan Modality Excel : FU2_MOD]\n\n(1) CT, (2) MRI",
+                                        options=["1","2"],
+                                        format_func=lambda x: {
+                                            "1": "CT",
+                                            "2": "MRI",
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -2746,8 +2859,13 @@ def add_new_data():
                         FU2_Months_Since_Y90 = relativedelta(FU2_Imaging_Date, fetch_date).months
                         st.write("2nd_FU_Months Since Y90",FU2_Months_Since_Y90)
                         FU2_Total_number_of_lesions = st.selectbox(
-                            "2nd_FU_Total number of lesions",
-                            options=["1", "2", ">3"],
+                            "2nd_FU_Total number of lesions[Excel : FU2_TOTLES]\n\n(1) 1,(2) 2,(3) >=3",
+                                 options=["1", "2", "3"],
+                            format_func=lambda x: {
+                                            "1": "1",
+                                            "2": "2",
+                                            "3" : ">=3"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -2768,7 +2886,7 @@ def add_new_data():
                         )
 
                         FU2_Target_Lesion_2_Segments = st.selectbox(
-                            "2nd_FU_Target Lesion 2 Segments",
+                            "2nd_FU_Target Lesion 2 Segments [Excel : FU2_TL2SEG]",
                             options=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"],
                         index=None,  # No default selection
                         placeholder="Choose an option",
@@ -2809,8 +2927,13 @@ def add_new_data():
                         FU2_Non_targeted_Lesion_Dia_Sum = max(FU2_Non_Target_Lesion_1_LAD_Art_Enhanc, FU2_Non_Target_Lesion_1_PAD_Art_Enhanc, FU2_Non_Target_Lesion_1_CCD_Art_Enhanc)
                         st.write("2nd_FU_Non-targeted Lesion Dia Sum",FU2_Non_targeted_Lesion_Dia_Sum)
                         FU2_Lesion_Necrosis = st.selectbox(
-                            "2nd_FU_Lesion Necrosis",
-                            options=["No", "Yes", "NA"],
+                            "2nd_FU_Lesion Necrosis  [Excel : FU2_NEC]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -2821,22 +2944,37 @@ def add_new_data():
                         )
 
                         FU2_Non_target_lesion_response = st.selectbox(
-                            "2nd_FU_Non target lesion response",
-                            options=["No", "Yes", "NA"],
+                            "2nd_FU_Non target lesion response[Excel : FU2_NTLRSP]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
 
                         FU2_New_Lesions = st.selectbox(
-                            "2nd_FU_New Lesions",
-                            options=["No", "Yes", "NA"],
+                            "2nd_FU_New Lesions[Excel : FU2_NEWLES]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
 
                         FU2_NEW_Extrahepatic_Disease = st.selectbox(
-                            "2nd_FU_NEW Extrahepatic Disease",
-                            options=["No", "Yes", "NA"],
+                            "2nd_FU_NEW Extrahepatic Disease[Excel : FU2_EHD]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -2862,8 +3000,12 @@ def add_new_data():
                         # 3rd Imaging Follow-up
                         st.subheader("Imaging_3rd_Followup")
                         FU3_Scan_Modality = st.selectbox(
-                            "3rd_FU_Scan Modality",
-                            options=["CT", "MRI"],
+                            "3rd_FU_Scan Modality[Excel : FU3_MOD]\n\n(1) CT, (2) MRI",
+                                        options=["1","2"],
+                                        format_func=lambda x: {
+                                            "1": "CT",
+                                            "2": "MRI",
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -2871,8 +3013,14 @@ def add_new_data():
                         FU3_Months_Since_Y90 = relativedelta(FU3_Imaging_Date, fetch_date).months
                         st.write("3rd_FU_Months Since Y90",FU3_Months_Since_Y90)
                         FU3_Total_number_of_lesions = st.selectbox(
-                            "3rd_FU_Total number of lesions",
-                            options=["1", "2", ">3"],
+                            "3rd_FU_Total number of lesions[Excel : FU3_TOTLES]\n\n(1) 1,(2) 2,(3) >=3",
+                                 options=["1", "2", "3"],
+                            format_func=lambda x: {
+                                            "1": "1",
+                                            "2": "2",
+                                            "3" : ">=3"
+                                        }[x],
+
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -2893,7 +3041,7 @@ def add_new_data():
                         )
 
                         FU3_Target_Lesion_2_Segments = st.selectbox(
-                            "3rd_FU_Target Lesion 2 Segments",
+                            "3rd_FU_Target Lesion 2 Segments [Excel : FU3_TL2SEG]",
                             options=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"],
                         index=None,  # No default selection
                         placeholder="Choose an option",
@@ -2934,8 +3082,13 @@ def add_new_data():
                         FU3_Non_targeted_Lesion_Dia_Sum = max(FU3_Non_Target_Lesion_1_LAD_Art_Enhanc, FU3_Non_Target_Lesion_1_PAD_Art_Enhanc, FU3_Non_Target_Lesion_1_CCD_Art_Enhanc)
                         st.write("3rd_FU_Non-targeted Lesion Dia Sum",FU3_Non_targeted_Lesion_Dia_Sum)
                         FU3_Lesion_Necrosis = st.selectbox(
-                            "3rd_FU_Lesion Necrosis",
-                            options=["No", "Yes", "NA"],
+                            "3rd_FU_Lesion Necrosis[Excel : FU3_NEC]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -2946,22 +3099,37 @@ def add_new_data():
                         )
 
                         FU3_Non_target_lesion_response = st.selectbox(
-                            "3rd_FU_Non target lesion response",
-                            options=["No", "Yes", "NA"],
+                            "3rd_FU_Non target lesion response[Excel : FU3_NTLRSP]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
 
                         FU3_New_Lesions = st.selectbox(
-                            "3rd_FU_New Lesions",
-                            options=["No", "Yes", "NA"],
+                            "3rd_FU_New Lesions[Excel : FU3_NEWLES]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
 
                         FU3_NEW_Extrahepatic_Disease = st.selectbox(
-                            "3rd_FU_NEW Extrahepatic Disease",
-                            options=["No", "Yes", "NA"],
+                            "3rd_FU_NEW Extrahepatic Disease[Excel : FU3_EHD]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -2987,8 +3155,12 @@ def add_new_data():
                         st.subheader("Imaging_4th_Followup")
 
                         FU4_Scan_Modality = st.selectbox(
-                            "4th_FU_Scan Modality",
-                            options=["CT", "MRI"],
+                            "4th_FU_Scan Modality [Excel : 4th_FU_Scan Modality]\n\n(1) CT, (2) MRI",
+                                        options=["1","2"],
+                                        format_func=lambda x: {
+                                            "1": "CT",
+                                            "2": "MRI",
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -2998,8 +3170,13 @@ def add_new_data():
                         FU4_Months_Since_Y90 = relativedelta(FU4_Imaging_Date, fetch_date).months
                         st.write("4th_FU_Months Since Y90",FU4_Months_Since_Y90)
                         FU4_Total_number_of_lesions = st.selectbox(
-                            "4th_FU_Total number of lesions",
-                            options=["1", "2", ">3"],
+                            "4th_FU_Total number of lesions [Excel : 4th_FU_Total number of lesions]\n\n(1) 1,(2) 2,(3) >=3",
+                                 options=["1", "2", "3"],
+                            format_func=lambda x: {
+                                            "1": "1",
+                                            "2": "2",
+                                            "3" : ">=3"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -3020,7 +3197,7 @@ def add_new_data():
                         )
 
                         FU4_Target_Lesion_2_Segments = st.selectbox(
-                            "4th_FU_Target Lesion 2 Segments",
+                            "4th_FU_Target Lesion 2 Segments [Excel : 4th_FU_Target Lesion 2 Segments]",
                             options=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"],
                         index=None,  # No default selection
                         placeholder="Choose an option",
@@ -3061,8 +3238,13 @@ def add_new_data():
                         FU4_Non_targeted_Lesion_Dia_Sum = max(FU4_Non_Target_Lesion_1_LAD_Art_Enhanc, FU4_Non_Target_Lesion_1_PAD_Art_Enhanc, FU4_Non_Target_Lesion_1_CCD_Art_Enhanc)
                         st.write("4th_FU_Non-targeted Lesion Dia Sum",FU4_Non_targeted_Lesion_Dia_Sum)
                         FU4_Lesion_Necrosis = st.selectbox(
-                            "4th_FU_Lesion Necrosis",
-                            options=["No", "Yes", "NA"],
+                            "4th_FU_Lesion Necrosis  [Excel : 4th_FU_Lesion Necrosis]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -3073,22 +3255,37 @@ def add_new_data():
                         )
 
                         FU4_Non_target_lesion_response = st.selectbox(
-                            "4th_FU_Non target lesion response",
-                            options=["No", "Yes", "NA"],
+                            "4th_FU_Non target lesion response  [Excel : 4th_FU_Non target lesion response]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
 
                         FU4_New_Lesions = st.selectbox(
-                            "4th_FU_New Lesions",
-                            options=["No", "Yes", "NA"],
+                            "4th_FU_New Lesions  [Excel : 4th_FU_New Lesions]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
 
                         FU4_NEW_Extrahepatic_Disease = st.selectbox(
-                            "4th_FU_NEW Extrahepatic Disease",
-                            options=["No", "Yes", "NA"],
+                            "4th_FU_NEW Extrahepatic Disease  [Excel : 4th_FU_NEW Extrahepatic Disease]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -3114,20 +3311,19 @@ def add_new_data():
                         # 5th Imaging Follow-up
                         st.subheader("Imaging_5th_Followup")
 
-                        FU5_Scan_Modality = st.selectbox(
-                            "5th_FU_Scan Modality",
-                            options=["CT", "MRI"],
-                        index=None,  # No default selection
-                        placeholder="Choose an option",
-                        )
-
+                        
                         FU5_Imaging_Date = st.date_input("5th_FU_Imaging Date")
 
                         FU5_Months_Since_Y90 = relativedelta(FU5_Imaging_Date, fetch_date).months
                         st.write("5th_FU_Months Since Y90",FU5_Months_Since_Y90)
                         FU5_Total_number_of_lesions = st.selectbox(
-                            "5th_FU_Total number of lesions",
-                            options=["1", "2", ">3"],
+                            "5th_FU_Total number of lesions [Excel : 5th_FU_Total number of lesions]\n\n(1) 1,(2) 2,(3) >=3",
+                                 options=["1", "2", "3"],
+                            format_func=lambda x: {
+                                            "1": "1",
+                                            "2": "2",
+                                            "3" : ">=3"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -3149,35 +3345,39 @@ def add_new_data():
 
                         FU5_Non_targeted_Lesion_Dia_Sum = max(FU5_Non_Target_Lesion_1_LAD_Art_Enhanc, FU5_Non_Target_Lesion_1_PAD_Art_Enhanc, FU5_Non_Target_Lesion_1_CCD_Art_Enhanc)
                         st.write("5th_FU_Non-targeted Lesion Dia Sum",FU5_Non_targeted_Lesion_Dia_Sum)
-                        FU5_Lesion_Necrosis = st.selectbox(
-                            "5th_FU_Lesion Necrosis",
-                            options=["No", "Yes", "NA"],
-                        index=None,  # No default selection
-                        placeholder="Choose an option",
-                        )
-
-                        FU5_Reviewers_Initials = st.text_input(
-                            "5th_FU_Reviewers Initials",
-                            help="Free-text input for reviewer name"
-                        )
-
+                      
                         FU5_Non_target_lesion_response = st.selectbox(
-                            "5th_FU_Non target lesion response",
-                            options=["No", "Yes", "NA"],
+                            "5th_FU_Non target lesion response [Excel : 5th_FU_Non target lesion response]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
 
                         FU5_New_Lesions = st.selectbox(
-                            "5th_FU_New Lesions",
-                            options=["No", "Yes", "NA"],
+                            "5th_FU_New Lesions [Excel : 5th_FU_New Lesions]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
 
                         FU5_NEW_Extrahepatic_Disease = st.selectbox(
-                            "5th_FU_NEW Extrahepatic Disease",
-                            options=["No", "Yes", "NA"],
+                            "5th_FU_NEW Extrahepatic Disease  [Excel : 5th_FU_NEW Extrahepatic Disease]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
@@ -3202,7 +3402,7 @@ def add_new_data():
                         st.subheader("Imaging_Dates for OS or PFS")
 
                         dead = st.selectbox(
-                                "Dead",
+                                "Dead [Excel : Dead]\n\n Yes (1), No (0)",
                                 options=["0", "1"],
                                 format_func=lambda x:{
                                         "0":"No",
@@ -3216,7 +3416,7 @@ def add_new_data():
                         Time_to_Death = 'NA' if dead == 0 else relativedelta(Date_of_Death, fetch_date).months
                         st.write("Time to Death",Time_to_Death)
                         OLT = st.selectbox(
-                                "OLT",
+                                "OLT [Excel : OLT]\n\n Yes (1), No (0)",
                                 options=["0", "1"],
                                 format_func=lambda x:{
                                         "0":"No",
@@ -3230,7 +3430,7 @@ def add_new_data():
                         Time_to_OLT = 'NA' if OLT == 0 else relativedelta(Date_of_Death, fetch_date).months
                         st.write("Time to OLT",Time_to_OLT)
                         Repeat_tx_post_Y90 = st.selectbox(
-                                "Repeat tx post Y90",
+                                "Repeat tx post Y90 [Excel : Repeat tx post Y90]\n\n Yes (1), No (0)",
                                 options=["0", "1"],
                                 format_func=lambda x:{
                                         "0":"No",
@@ -3251,7 +3451,7 @@ def add_new_data():
                                 Time_to_Localized_Progression = relativedelta(Date_of_Localized_Progression, fetch_date).years
                         st.write("Time to localized progression",Time_to_Localized_Progression)
                         Date_of_Overall_Progression = st.text_input("Date of Overall Progression")
-
+                        Time_to_overall_progression = ''
                         if Date_of_Overall_Progression == "No Progression":
                                 Time_to_overall_progression = 'NA'
                         else:
@@ -3272,118 +3472,118 @@ def add_new_data():
                         if submit_tab10:
                             #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
                             data10={
-                                    "PREY90_prescan_modality": PREY90_prescan_modality,
-                                    "PREY90_Imaging Date": PREY90_Imaging_Date.strftime("%Y-%m-%d"),
-                                    "PREY90_total number of lesions": PREY90_total_number_of_lesions,
-                                    "PREY90_Number Involved Lobes": PREY90_Number_Involved_Lobes,
-                                    "PREY90_target_lesion_1_segments": PREY90_target_lesion_1_segments,
-                                    "PREY90_TL1_LAD": PREY90_TL1_LAD,
-                                    "PREY90_Target Lesion 1 PAD": PREY90_Target_Lesion_1_PAD,
-                                    "PREY90_Target Lesion 1 CCD": PREY90_Target_Lesion_1_CCD,
-                                    "PREY90_Target Lesion 1 VOL": PREY90_Target_Lesion_1_VOL,
-                                    "PREY90_Target lesion 2 Segments": PREY90_Target_Lesion_2_segments,
-                                    "PREY90_Target Lesion 2 LAD": PREY90_Target_Lesion_2_LAD,
-                                    "PREY90_Target Lesion 2 PAD": PREY90_Target_Lesion_2_PAD,
-                                    "PREY90_Target Lesion 2 CCD": PREY90_Target_Lesion_2_CCD,
-                                    "PREY90_Target Lesion 2 VOL": PREY90_Target_Lesion_2_VOL,
-                                    "PREY90_pretx targeted Lesion Dia Sum": PREY90_pretx_targeted_Lesion_Dia_Sum,
-                                    "PREY90_Non-Target Lesion Location": PREY90_Non_Target_Lesion_Location,
-                                    "PREY90_Non-Target Lesion 2 LAD Art Enhanc": PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "PREY90_Non-Target Lesion 2 PAD Art Enhanc": PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "PREY90_Non-Target Lesion 2 CCD Art Enhanc": PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "PREY90_Non-targeted Lesion Dia Sum": PREY90_Non_targeted_Lesion_Dia_Sum,
-                                    "PREY90_Reviewers Initials": PREY90_Reviewers_Initials,
-                                    "PREY90_Pre Y90 Extrahepatic Disease": PREY90_Pre_Y90_Extrahepatic_Disease,
-                                    "PREY90_Pre Y90 Extrahepatic Disease Location": PREY90_Pre_Y90_Extrahepatic_Disease_Location,
-                                    "PREY90_PVT": PREY90_PVT,
-                                    "PREY90_PVT Location": PREY90_PVT_Location,
-                                    "PREY90_Features of cirrhosis": PREY90_Features_of_cirrhosis,
-                                    "1st_FU_Scan Modality": FU_Scan_Modality,
-                                    "1st_FU_Imaging Date": FU_Imaging_Date.strftime("%Y-%m-%d"),
-                                    "1st_FU_Months Since Y90": FU_Months_Since_Y90,
-                                    "1st_FU_Total number of lesions": FU_Total_number_of_lesions,
-                                    "1st_FU_Target Lesion 1 LAD Art Enhanc": FU_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "1st_FU_Target Lesion 1 PAD Art Enhanc": FU_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "1st_FU_Target Lesion 1 CCD Art Enhanc": FU_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "1st_FU_Target Lesion 2 Segments": FU_Target_Lesion_2_Segments,
-                                    "1st_FU_Target Lesion 2 LAD Art Enhanc": FU_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "1st_FU_Target Lesion 2 PAD Art Enhanc": FU_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "1st_FU_Target Lesion 2 CCD Art Enhanc": FU_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "1st_FU_Follow up 1 targeted Lesion Dia Sum": FU_Follow_up_1_targeted_Lesion_Dia_Sum,
-                                    "1st_FU_Non-Target Lesion 2 LAD Art Enhanc": FU_Non_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "1st_FU_Non-Target Lesion 2 PAD Art Enhanc": FU_Non_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "1st_FU_Non-Target Lesion 2 CCD Art Enhanc": FU_Non_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "1st_FU_Non-targeted Lesion Dia Sum": FU_Non_targeted_Lesion_Dia_Sum,
-                                    "1st_FU_Lesion Necrosis": FU_Lesion_Necrosis,
-                                    "1st_FU_Reviewers Initials": FU_Reviewers_Initials,
-                                    "1st_FU_Non target lesion response": FU_Non_target_lesion_response,
-                                    "1st_FU_New Lesions": FU_New_Lesions,
-                                    "1st_FU_NEW Extrahepatic Disease": FU_NEW_Extrahepatic_Disease,
-                                    "1st_FU_NEW Extrahepatic Dz Location": FU_NEW_Extrahepatic_Dz_Location,
-                                    "1st_FU_NEW Extrahepatic Dz Date": FU_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
-                                    "1st_FU_% change non target lesion": FU_change_non_target_lesion,
-                                    "1st_FU_% Change Target Dia": FU_change_target_lesion,
-                                    "1st_FU_mRECIST LOCALIZED":first_fu_mrecist_localized ,
-                                    "1st_FU_mRECIST Overall":first_fu_mrecist_overall ,
-                                    "1st_FU_Free Text": FU_Free_Text,
-                                    "2nd_FU_Scan Modality": FU2_Scan_Modality,
-                                    "2nd_FU_Imaging Date": FU2_Imaging_Date.strftime("%Y-%m-%d"),
-                                    "2nd_FU_Months Since Y90": FU2_Months_Since_Y90,
-                                    "2nd_FU_Total number of lesions": FU2_Total_number_of_lesions,
-                                    "2nd_FU_Target Lesion 1 LAD Art Enhanc": FU2_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "2nd_FU_Target Lesion 1 PAD Art Enhanc": FU2_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "2nd_FU_Target Lesion 1 CCD Art Enhanc": FU2_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "2nd_FU_Target Lesion 2 Segments": FU2_Target_Lesion_2_Segments,
-                                    "2nd_FU_Target Lesion 2 LAD Art Enhanc": FU2_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "2nd_FU_Target Lesion 2 PAD Art Enhanc": FU2_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "2nd_FU_Target Lesion 2 CCD Art Enhanc": FU2_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "2nd_FU_Follow up 2 targeted Lesion Dia Sum": FU2_Follow_up_2_targeted_Lesion_Dia_Sum,
-                                    "2nd_FU_Non-Target Lesion 1 LAD Art Enhanc": FU2_Non_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "2nd_FU_Non-Target Lesion 1 PAD Art Enhanc": FU2_Non_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "2nd_FU_Non-Target Lesion 1 CCD Art Enhanc": FU2_Non_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "2nd_FU_Non-targeted Lesion Dia Sum": FU2_Non_targeted_Lesion_Dia_Sum,
-                                    "2nd_FU_Lesion Necrosis": FU2_Lesion_Necrosis,
-                                    "2nd_FU_Reviewers Initials": FU2_Reviewers_Initials,
-                                    "2nd_FU_Non target lesion response": FU2_Non_target_lesion_response,
-                                    "2nd_FU_New Lesions": FU2_New_Lesions,
-                                    "2nd_FU_Extrahepatic Disease": FU2_NEW_Extrahepatic_Disease,
-                                    "2nd_FU_NEW Extrahepatic Dz Location": FU2_NEW_Extrahepatic_Dz_Location,
-                                    "2nd_FU_NEW Extrahepatic Dz Date": FU2_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
-                                    "2nd_FU_% change non target lesion": FU2_change_non_target_lesion,
-                                    "2nd_FU_% Change Target Dia": FU2_change_target_lesion,
-                                    "2nd_FU_mRECIST Calc": second_fu_mrecist_calc ,
-                                    "2nd_FU_mRECIST LOCALIZED":second_fu_mrecist_localized ,
-                                    "2nd_FU_mRECIST Overall":second_fu_mrecist_overall ,
-                                    "2nd_FU_Free Text": FU2_Free_Text,
-                                    "3rd_FU_Scan Modality": FU3_Scan_Modality,
-                                    "3rd_FU_Imaging Date": FU3_Imaging_Date.strftime("%Y-%m-%d"),
-                                    "3rd_FU_Months Since Y90": FU3_Months_Since_Y90,
-                                    "3rd_FU_Total number of lesions": FU3_Total_number_of_lesions,
-                                    "3rd_FU_Target Lesion 1 LAD Art Enhanc": FU3_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "3rd_FU_Target Lesion 1 PAD Art Enhanc": FU3_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "3rd_FU_Target Lesion 1 CCD Art Enhanc": FU3_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "3rd_FU_Target Lesion 2 Segments": FU3_Target_Lesion_2_Segments,
-                                    "3rd_FU_Target Lesion 2 LAD Art Enhanc": FU3_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "3rd_FU_Target Lesion 2 PAD Art Enhanc": FU3_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "3rd_FU_Target Lesion 2 CCD Art Enhanc": FU3_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "3rd_FU_Follow up 2 targeted Lesion Dia Sum": FU3_Follow_up_2_targeted_Lesion_Dia_Sum,
-                                    "3rd_FU_Non-Target Lesion 1 LAD Art Enhanc": FU3_Non_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "3rd_FU_Non-Target Lesion 1 PAD Art Enhanc": FU3_Non_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "3rd_FU_Non-Target Lesion 1 CCD Art Enhanc": FU3_Non_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "3rd_FU_Non-targeted Lesion Dia Sum": FU3_Non_targeted_Lesion_Dia_Sum,
-                                    "3rd_FU_Lesion Necrosis": FU3_Lesion_Necrosis,
-                                    "3rd_FU_Reviewers Initials": FU3_Reviewers_Initials,
-                                    "3rd_FU_Non target lesion response": FU3_Non_target_lesion_response,
-                                    "3rd_FU_New Lesions": FU3_New_Lesions,
-                                    "3rd_FU_Extrahepatic Disease": FU3_NEW_Extrahepatic_Disease,
-                                    "3rd_FU_NEW Extrahepatic Dz Location": FU3_NEW_Extrahepatic_Dz_Location,
-                                    "3rd_FU_NEW Extrahepatic Dz Date": FU3_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
-                                    "3rd_FU_% change for non target lesion": FU3_change_non_target_lesion,
-                                    "3rd_FU_% Change Target Dia": FU3_change_target_lesion,
-                                    "3rd_FU_mRECIST Calc" :third_fu_mrecist_calc,
-                                    "3rd_FU_mRECIST LOCALIZED" :third_fu_mrecist_localized ,
-                                    "3rd_FU_mRECIST Overall" :third_fu_mrecist_overall ,
-                                    "3rd_FU_Free Text": FU3_Free_Text,
+                                    "PREY_MOD": PREY90_prescan_modality,
+                                    "PREY_IMG_DATE": PREY90_Imaging_Date.strftime("%Y-%m-%d"),
+                                    "PREY_TOTLES": PREY90_total_number_of_lesions,
+                                    "PREY_LOBES": PREY90_Number_Involved_Lobes,
+                                    "PREY_TL1SEG": PREY90_target_lesion_1_segments,
+                                    "PREY_TL1LAD": PREY90_TL1_LAD,
+                                    "PREY_TL1PAD": PREY90_Target_Lesion_1_PAD,
+                                    "PREY_TL1CCD": PREY90_Target_Lesion_1_CCD,
+                                    "PREY_TL1VOL": PREY90_Target_Lesion_1_VOL,
+                                    "PREY_TL2SEG": PREY90_Target_Lesion_2_segments,
+                                    "PREY_TL2LAD": PREY90_Target_Lesion_2_LAD,
+                                    "PREY_TL2PAD": PREY90_Target_Lesion_2_PAD,
+                                    "PREY_TL2CCD": PREY90_Target_Lesion_2_CCD,
+                                    "PREY_TL2VOL": PREY90_Target_Lesion_2_VOL,
+                                    "PREY_TLDIA": PREY90_pretx_targeted_Lesion_Dia_Sum,
+                                    "PREY_NTLOC": PREY90_Non_Target_Lesion_Location,
+                                    "PREY_NTL1LAD": PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "PREY_NTL1PAD": PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "PREY_NTL1CCD": PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "PREY_NTLDIA": PREY90_Non_targeted_Lesion_Dia_Sum,
+                                    "PREY_REVFT": PREY90_Reviewers_Initials,
+                                    "PREY_EHD": PREY90_Pre_Y90_Extrahepatic_Disease,
+                                    "PREY_EHDLOCFT": PREY90_Pre_Y90_Extrahepatic_Disease_Location,
+                                    "PREY_PVT": PREY90_PVT,
+                                    "PREY_PVTLOC": PREY90_PVT_Location,
+                                    "PREY_CIRRH": PREY90_Features_of_cirrhosis,
+                                    "FU1_MOD": FU_Scan_Modality,
+                                    "FU1_IMG_DATE": FU_Imaging_Date.strftime("%Y-%m-%d"),
+                                    "FU1_MS_Y90": FU_Months_Since_Y90,
+                                    "FU1_TOTLES": FU_Total_number_of_lesions,
+                                    "FU1_TL1LAD": FU_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU1_TL1PAD": FU_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU1_TL1CCD": FU_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU1_TL2SEG": FU_Target_Lesion_2_Segments,
+                                    "FU1_TL2LAD": FU_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU1_TL2PAD": FU_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU1_TL2CCD": FU_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU1_TLDIA": FU_Follow_up_1_targeted_Lesion_Dia_Sum,
+                                    "FU1_NTL1LAD": FU_Non_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU1_NTL1PAD": FU_Non_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU1_NTL1CCD": FU_Non_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU1_NTLDIA": FU_Non_targeted_Lesion_Dia_Sum,
+                                    "FU1_NECROSIS": FU_Lesion_Necrosis,
+                                    "FU1_REVFT": FU_Reviewers_Initials,
+                                    "FU1_NTLRSP": FU_Non_target_lesion_response,
+                                    "FU1_NEWLESION": FU_New_Lesions,
+                                    "FU1_NEWEHD": FU_NEW_Extrahepatic_Disease,
+                                    "FU1_EHDLOC": FU_NEW_Extrahepatic_Dz_Location,
+                                    "FU1_EHDDATE": FU_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
+                                    "FU1_NTCHG": FU_change_non_target_lesion,
+                                    "FU1_TDCHG": FU_change_target_lesion,
+                                    "FU1_MREC_LOCAL": first_fu_mrecist_localized,
+                                    "FU1_MREC_OVERALL": first_fu_mrecist_overall,
+                                    "FU1_FT": FU_Free_Text,
+                                    "FU2_MOD": FU2_Scan_Modality,
+                                    "FU2_IMG_DATE": FU2_Imaging_Date.strftime("%Y-%m-%d"),
+                                    "FU2_MS_Y90": FU2_Months_Since_Y90,
+                                    "FU2_TOTLES": FU2_Total_number_of_lesions,
+                                    "FU2_TL1LAD": FU2_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU2_TL1PAD": FU2_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU2_TL1CCD": FU2_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU2_TL2SEG": FU2_Target_Lesion_2_Segments,
+                                    "FU2_TL2LAD": FU2_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU2_TL2PAD": FU2_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU2_TL2CCD": FU2_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU2_TLDIA": FU2_Follow_up_2_targeted_Lesion_Dia_Sum,
+                                    "FU2_NTL1LAD": FU2_Non_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU2_NTL1PAD": FU2_Non_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU2_NTL1CCD": FU2_Non_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU2_NTLDIA": FU2_Non_targeted_Lesion_Dia_Sum,
+                                    "FU2_NECROSIS": FU2_Lesion_Necrosis,
+                                    "FU2_REV": FU2_Reviewers_Initials,
+                                    "FU2_NTLRSP": FU2_Non_target_lesion_response,
+                                    "FU2_NEWLES": FU2_New_Lesions,
+                                    "FU2_EHD": FU2_NEW_Extrahepatic_Disease,
+                                    "FU2_EHDLOC": FU2_NEW_Extrahepatic_Dz_Location,
+                                    "FU2_EHDDATE": FU2_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
+                                    "FU2_NTCHG": FU2_change_non_target_lesion,
+                                    "FU2_TDCHG": FU2_change_target_lesion,
+                                    "FU2_MREC_CALC": second_fu_mrecist_calc,
+                                    "FU2_MREC_LOCAL": second_fu_mrecist_localized,
+                                    "FU2_MREC_OVERALL": second_fu_mrecist_overall,
+                                    "FU2_FT": FU2_Free_Text,
+                                    "FU3_MOD": FU3_Scan_Modality,
+                                    "FU3_IMG_DATE": FU3_Imaging_Date.strftime("%Y-%m-%d"),
+                                    "FU3_MS_Y90": FU3_Months_Since_Y90,
+                                    "FU3_TOTLES": FU3_Total_number_of_lesions,
+                                    "FU3_TL1LAD": FU3_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU3_TL1PAD": FU3_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU3_TL1CCD": FU3_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU3_TL2SEG": FU3_Target_Lesion_2_Segments,
+                                    "FU3_TL2LAD": FU3_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU3_TL2PAD": FU3_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU3_TL2CCD": FU3_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU3_TLDIA": FU3_Follow_up_2_targeted_Lesion_Dia_Sum,
+                                    "FU3_NTL1LAD": FU3_Non_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU3_NTL1PAD": FU3_Non_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU3_NTL1CCD": FU3_Non_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU3_NTLDIA": FU3_Non_targeted_Lesion_Dia_Sum,
+                                    "FU3_NEC": FU3_Lesion_Necrosis,
+                                    "FU3_REV": FU3_Reviewers_Initials,
+                                    "FU3_NTLRSP": FU3_Non_target_lesion_response,
+                                    "FU3_NEWLES": FU3_New_Lesions,
+                                    "FU3_EHD": FU3_NEW_Extrahepatic_Disease,
+                                    "FU3_EHDLOC": FU3_NEW_Extrahepatic_Dz_Location,
+                                    "FU3_EHDDATE": FU3_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
+                                    "FU3_NTCHG": FU3_change_non_target_lesion,
+                                    "FU3_TDCHG": FU3_change_target_lesion,
+                                    "FU3_MREC_CALC": third_fu_mrecist_calc,
+                                    "FU3_MREC_LOCAL": third_fu_mrecist_localized,
+                                    "FU3_MREC_OVERALL": third_fu_mrecist_overall,
+                                    "FU3_FT": FU3_Free_Text,
                                     "4th_FU_Scan Modality": FU4_Scan_Modality,
                                     "4th_FU_Imaging Date": FU4_Imaging_Date.strftime("%Y-%m-%d"),
                                     "4th_FU_Months Since Y90": FU4_Months_Since_Y90,
@@ -3439,6 +3639,13 @@ def add_new_data():
                                     "Date of Repeat tx Post Y90": Date_of_Repeat_tx_Post_Y90.strftime("%Y-%m-%d") if Date_of_Repeat_tx_Post_Y90 != 'NA' else Date_of_Repeat_tx_Post_Y90,
                                     "Time to Repeat Tx Post Y90": Time_to_Repeat_Tx_Post_Y90,
                                     "Date of Localized Progression": Date_of_Localized_Progression,
+                                    "Time to Repeat Tx Post Y90": Time_to_Repeat_Tx_Post_Y90,
+                                    "Date of Localized Progression": Date_of_Localized_Progression,
+                                    "Time to localized progression" : Time_to_Localized_Progression,
+                                    "Date of Overall (Local or systemic) Progression" :Date_of_Overall_Progression,
+                                    "Time to Overall (Local or systemic) Progression" :Time_to_overall_progression,
+                                    "Date of Last Follow up or last imaging date (if not OLT, Death, Repeat tx)": Date_of_Last_Follow_up_last_imaging_date.strftime("%Y-%m-%d"),
+                                    "Time to Last follow up": Time_to_Last_Follow_up_last_imaging_date,
                                     "Notes Free text" : notes_free_text,
                                     "BestmRECIST" :bestm_recist,
                                     "Date BestmRECIST":date_bestm_recist,
@@ -3452,8 +3659,8 @@ def add_new_data():
                             else:
                                 st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
                             
-                except:
-                    st.warning("Please Fill Patient Information Page")
+                #except:
+                 #   st.warning("Please Fill Patient Information Page")
     
         elif st.session_state.selected_tab == "Dosimetry Data":
             st.subheader("Dosimetry Data")
@@ -3461,7 +3668,18 @@ def add_new_data():
                 if "MRN" not in st.session_state.data:
                     st.warning("Please complete the Patient Information tab first.")
                 else:
-                    try:
+                    #try:
+                        trlnkid = st.selectbox(
+                                "TRLNKID [Excel : TRLNKID]\n\n Tumor 1 (1), Tumor 2 (2)",
+                                    options=["1", "2"],
+                                    format_func=lambda x: {
+                                            "1": "Tumor 1",
+                                            "2": "Tumor 2",
+                                        }[x],
+                               
+                                index= None,
+                            placeholder="Choose an option",
+                            )
                         input_GTV_mean_dose = st.text_input("GTV mean dose")
                         input_Tx_vol_mean_dose = st.text_input("Tx vol mean dose")
                         input_Liver_Vol_Mean_dose = st.text_input("Liver Vol Mean dose")
@@ -3487,6 +3705,7 @@ def add_new_data():
                         input_NEW = st.text_input("NEW")
                         input_GTV_less_D95_Vol_ml = st.text_input("GTV < D95 Vol_ml")
                         input_GTV_less_D95_Mean_Dose = st.text_input("GTV < D95 Mean Dose")
+                        input_GTV_less_D95_Mx_Dose = st.text_input("GTV < D95 Max Dose",value = df.iloc[0]["GTVLT_D95MAX"])
                         input_GTV_less_D95_Min_Dose = st.text_input("GTV < D95 Min Dose")
                         input_GTV_less_D95_SD = st.text_input("GTV < D95 SD")
                         input_GTV_less_D95_Vol_1 = st.text_input("GTV < D95 Vol_1")
@@ -3499,6 +3718,7 @@ def add_new_data():
                         input_GTV_less_D95_SD_2 = st.text_input("GTV < D95 SD_2")
                         input_GTV_less_100_Gy_Vol = st.text_input("GTV < 100 Gy Vol")
                         input_GTV_less_100_Gy_Mean_Dose = st.text_input("GTV < 100 Gy Mean Dose")
+                        input_GTV_less_100_Gy_Max_Dose = st.text_input("GTV < 100 Gy Max Dose",value = df.iloc[0]["GTVLT_100MAX"])
                         input_GTV_less_100_Gy_Min_Dose = st.text_input("GTV < 100 Gy Min Dose")
                         input_GTV_less_100_Gy_SD = st.text_input("GTV < 100 Gy SD")
 
@@ -3506,15 +3726,16 @@ def add_new_data():
 
                         if submit_dosimetry_data:
                             data11 = {
-                                    "GTV mean dose": input_GTV_mean_dose,
-                                    "Tx vol mean dose": input_Tx_vol_mean_dose,
-                                    "Liver Vol Mean dose": input_Liver_Vol_Mean_dose,
-                                    "Healthy Liver mean dose": input_Healthy_Liver_mean_dose,
-                                    "GTV Vol": input_GTV_Vol,
-                                    "Tx vol": input_Tx_vol,
-                                    "Liver vol": input_Liver_vol,
-                                    "Healthy Liver Vol": input_Healthy_Liver_Vol,
-                                    "GTV/Liver": input_GTV_Liver,
+                                    "TRLNKID": trlnkid,
+                                    "GTV_MEANDOSE": input_GTV_mean_dose,
+                                    "TXVOL_MEANDOSE": input_Tx_vol_mean_dose,
+                                    "LIVVOL__MEANDOSE": input_Liver_Vol_Mean_dose,
+                                    "HEALTHYLIV_MEANDOSE": input_Healthy_Liver_mean_dose,
+                                    "GTV_VOL": input_GTV_Vol,
+                                    "TX_VOL": input_Tx_vol,
+                                    "LIVER_VOL": input_Liver_vol,
+                                    "HEALTHYLIV_VOL": input_Healthy_Liver_Vol,
+                                    "GTVLIV_FRAC": input_GTV_Liver,
                                     "D98": input_D98,
                                     "D95": input_D95,
                                     "D90": input_D90,
@@ -3524,33 +3745,34 @@ def add_new_data():
                                     "V200": input_V200,
                                     "V300": input_V300,
                                     "V400": input_V400,
-                                    "ActivityBq": input_ActivityBq,
-                                    "ActivityCi": input_ActivityCi,
-                                    "Tx vol Activity Density": input_Tx_vol_Activity_Density,
-                                    "NEW": input_NEW,
-                                    "GTV < D95 Vol_ml": input_GTV_less_D95_Vol_ml,
-                                    "GTV < D95 Mean Dose": input_GTV_less_D95_Mean_Dose,
-                                    "GTV < D95 Min Dose": input_GTV_less_D95_Min_Dose,
-                                    "GTV < D95 SD": input_GTV_less_D95_SD,
-                                    "GTV < D95 Vol_1": input_GTV_less_D95_Vol_1,
-                                    "GTV < D95 Mean Dose_1": input_GTV_less_D95_Mean_Dose_1,
-                                    "GTV < D95 Min Dose_1": input_GTV_less_D95_Min_Dose_1,
-                                    "GTV < D95 SD_1": input_GTV_less_D95_SD_1,
-                                    "GTV < D95 Vol_2": input_GTV_less_D95_Vol_2,
-                                    "GTV < D95 Mean Dose_2": input_GTV_less_D95_Mean_Dose_2,
-                                    "GTV < D95 Min Dose_2": input_GTV_less_D95_Min_Dose_2,
-                                    "GTV < D95 SD_2": input_GTV_less_D95_SD_2,
-                                    "GTV < 100 Gy Vol": input_GTV_less_100_Gy_Vol,
-                                    "GTV < 100 Gy Mean Dose": input_GTV_less_100_Gy_Mean_Dose,
-                                    "GTV < 100 Gy Min Dose": input_GTV_less_100_Gy_Min_Dose,
-                                    "GTV < 100 Gy SD": input_GTV_less_100_Gy_SD
+                                    "ACTIVITYBQ": input_ActivityBq,
+                                    "ACTIVITYCI": input_ActivityCi,
+                                    "ACTIVITY_TXVOL": input_Tx_vol_Activity_Density,
+                                    "GTVLT_D95VOL": input_GTV_less_D95_Vol_ml,
+                                    "GTVLT_D95MEAN": input_GTV_less_D95_Mean_Dose,
+                                    "GTVLT_D95MAX": input_GTV_less_D95_Mx_Dose,
+                                    "GTVLT_D95MIN": input_GTV_less_D95_Min_Dose,
+                                    "GTVLT_D95SD": input_GTV_less_D95_SD,
+                                    "V1_GTVLT_D95VOL": input_GTV_less_D95_Vol_1,
+                                    "V1_GTVLT_D95MEAN": input_GTV_less_D95_Mean_Dose_1,
+                                    "V1_GTVLT_D95MIN": input_GTV_less_D95_Min_Dose_1,
+                                    "V1_GTVLT_D95SD": input_GTV_less_D95_SD_1,
+                                    "V2_GTVLT_D95VOL": input_GTV_less_D95_Vol_2,
+                                    "V2_GTVLT_D95MEAN": input_GTV_less_D95_Mean_Dose_2,
+                                    "V2_GTVLT_D95MIN": input_GTV_less_D95_Min_Dose_2,
+                                    "V2_GTVLT_D95SD": input_GTV_less_D95_SD_2,
+                                    "GTVLT_100VOL": input_GTV_less_100_Gy_Vol,
+                                    "GTVLT_100MEAN": input_GTV_less_100_Gy_Mean_Dose,
+                                    "GTVLT_100MAX": input_GTV_less_100_Gy_Max_Dose,
+                                    "GTVLT_100MIN": input_GTV_less_100_Gy_Min_Dose,
+                                    "GTVLT_100SD": input_GTV_less_100_Gy_SD
                                 }
                             if "patient_info" in st.session_state:
                                 update_google_sheet(data11, st.session_state.temp_mrn)
                             else:
                                 st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
-                    except:
-                        st.warning("Please Fill Patient Information Page")
+                    #except:
+                     #   st.warning("Please Fill Patient Information Page")
     
         elif st.session_state.selected_tab == "AFP":
             st.subheader("Dosimetry Data")
@@ -3559,39 +3781,39 @@ def add_new_data():
                     st.warning("Please complete the Patient Information tab first.")
                 else:
                     try:
-                        input_1AFP_Date = st.text_area("1AFP Date")
+                        input_1AFP_DATE = st.text_area("1AFP Date")
                         input_1AFP = st.text_area("1AFP")
-                        input_2AFP_Date = st.text_area("2AFP Date")
+                        input_2AFP_DATE = st.text_area("2AFP Date")
                         input_2AFP = st.text_area("2AFP")
-                        input_3AFP_Date = st.text_area("3AFP Date")
+                        input_3AFP_DATE = st.text_area("3AFP Date")
                         input_3AFP = st.text_area("3AFP")
-                        input_4AFP_Date = st.text_area("4AFP Date")
+                        input_4AFP_DATE = st.text_area("4AFP Date")
                         input_4AFP = st.text_area("4AFP")
-                        input_5AFP_Date = st.text_area("5AFP Date")
+                        input_5AFP_DATE = st.text_area("5AFP Date")
                         input_5AFP = st.text_area("5AFP")
-                        input_6AFP_Date = st.text_area("6AFP Date")
+                        input_6AFP_DATE = st.text_area("6AFP Date")
                         input_6AFP = st.text_area("6AFP")
-                        input_7AFP_Date = st.text_area("7AFP Date")
+                        input_7AFP_DATE = st.text_area("7AFP Date")
                         input_7AFP = st.text_area("7AFP")
-                        input_8AFP_Date = st.text_area("8AFP Date")
+                        input_8AFP_DATE = st.text_area("8AFP Date")
                         input_8AFP = st.text_area("8AFP")
-                        input_9AFP_Date = st.text_area("9AFP Date")
+                        input_9AFP_DATE = st.text_area("9AFP Date")
                         input_9AFP = st.text_area("9AFP")
-                        input_10AFP_Date = st.text_area("10AFP Date")
+                        input_10AFP_DATE = st.text_area("10AFP Date")
                         input_10AFP = st.text_area("10AFP")
-                        input_11AFP_Date = st.text_area("11AFP Date")
+                        input_11AFP_DATE = st.text_area("11AFP Date")
                         input_11AFP = st.text_area("11AFP")
-                        input_12AFP_Date = st.text_area("12AFP Date")
+                        input_12AFP_DATE = st.text_area("12AFP Date")
                         input_12AFP = st.text_area("12AFP")
-                        input_13AFP_Date = st.text_area("13AFP Date")
+                        input_13AFP_DATE = st.text_area("13AFP Date")
                         input_13AFP = st.text_area("13AFP")
-                        input_14AFP_Date = st.text_area("14AFP Date")
+                        input_14AFP_DATE = st.text_area("14AFP Date")
                         input_14AFP = st.text_area("14AFP")
-                        input_15AFP_Date = st.text_area("15AFP Date")
+                        input_15AFP_DATE = st.text_area("15AFP Date")
                         input_15AFP = st.text_area("15AFP")
-                        input_16AFP_Date = st.text_area("16AFP Date")
+                        input_16AFP_DATE = st.text_area("16AFP Date")
                         input_16AFP = st.text_area("16AFP")
-                        input_17AFP_Date = st.text_area("17AFP Date")
+                        input_17AFP_DATE = st.text_area("17AFP Date")
                         input_17AFP = st.text_area("17AFP")
                         input_18AFP_DATE = st.text_area("18AFP DATE")
                         input_18AFP = st.text_area("18AFP")
@@ -3619,7 +3841,7 @@ def add_new_data():
                         input_29AFP = st.text_area("29AFP")
                         input_30AFP_DATE = st.text_area("30AFP DATE")
                         input_30AFP = st.text_area("30AFP")
-                        input_31AFP_Date = st.text_area("31AFP Date")
+                        input_31AFP_DATE = st.text_area("31AFP Date")
                         input_31AFP = st.text_area("31AFP")
                         input_32AFP_DATE = st.text_area("32AFP DATE")
                         input_32AFP = st.text_area("32AFP")
@@ -3632,40 +3854,40 @@ def add_new_data():
 
                         if submit_afp:
                             data12 = {
-                                    "1AFP Date": input_1AFP_Date, "1AFP": input_1AFP,
-                                    "2AFP Date": input_2AFP_Date, "2AFP": input_2AFP,
-                                    "3AFP Date": input_3AFP_Date, "3AFP": input_3AFP,
-                                    "4AFP Date": input_4AFP_Date, "4AFP": input_4AFP,
-                                    "5AFP Date": input_5AFP_Date, "5AFP": input_5AFP,
-                                    "6AFP Date": input_6AFP_Date, "6AFP": input_6AFP,
-                                    "7AFP Date": input_7AFP_Date, "7AFP": input_7AFP,
-                                    "8AFP Date": input_8AFP_Date, "8AFP": input_8AFP,
-                                    "9AFP Date": input_9AFP_Date, "9AFP": input_9AFP,
-                                    "10AFP Date": input_10AFP_Date, "10AFP": input_10AFP,
-                                    "11AFP Date": input_11AFP_Date, "11AFP": input_11AFP,
-                                    "12AFP Date": input_12AFP_Date, "12AFP": input_12AFP,
-                                    "13AFP Date": input_13AFP_Date, "13AFP": input_13AFP,
-                                    "14AFP Date": input_14AFP_Date, "14AFP": input_14AFP,
-                                    "15AFP Date": input_15AFP_Date, "15AFP": input_15AFP,
-                                    "16AFP Date": input_16AFP_Date, "16AFP": input_16AFP,
-                                    "17AFP Date": input_17AFP_Date, "17AFP": input_17AFP,
-                                    "18AFP DATE": input_18AFP_DATE, "18AFP": input_18AFP,
-                                    "19AFP DATE": input_19AFP_DATE, "19AFP": input_19AFP,
-                                    "20AFP DATE": input_20AFP_DATE, "20AFP": input_20AFP,
-                                    "21AFP DATE": input_21AFP_DATE, "21AFP": input_21AFP,
-                                    "22AFP DATE": input_22AFP_DATE, "22AFP": input_22AFP,
-                                    "23AFP DATE": input_23AFP_DATE, "23AFP": input_23AFP,
-                                    "24AFP DATE": input_24AFP_DATE, "24AFP": input_24AFP,
-                                    "25AFP DATE": input_25AFP_DATE, "25AFP": input_25AFP,
-                                    "26AFP DATE": input_26AFP_DATE, "26AFP": input_26AFP,
-                                    "27AFP DATE": input_27AFP_DATE, "27AFP": input_27AFP,
-                                    "28AFP DATE": input_28AFP_DATE, "28AFP": input_28AFP,
-                                    "29AFP DATE": input_29AFP_DATE, "29AFP": input_29AFP,
-                                    "30AFP DATE": input_30AFP_DATE, "30AFP": input_30AFP,
-                                    "31AFP Date": input_31AFP_Date, "31AFP": input_31AFP,
-                                    "32AFP DATE": input_32AFP_DATE, "32AFP": input_32AFP,
-                                    "33AFP DATE": input_33AFP_DATE, "33AFP": input_33AFP,
-                                    "34AFP DATE": input_34AFP_DATE, "34AFP": input_34AFP
+                                    "1AFPDATE": input_1AFP_DATE, "1AFP": input_1AFP,
+                                    "2AFPDATE": input_2AFP_DATE, "2AFP": input_2AFP,
+                                    "3AFPDATE": input_3AFP_DATE, "3AFP": input_3AFP,
+                                    "4AFPDATE": input_4AFP_DATE, "4AFP": input_4AFP,
+                                    "5AFPDATE": input_5AFP_DATE, "5AFP": input_5AFP,
+                                    "6AFPDATE": input_6AFP_DATE, "6AFP": input_6AFP,
+                                    "7AFPDATE": input_7AFP_DATE, "7AFP": input_7AFP,
+                                    "8AFPDATE": input_8AFP_DATE, "8AFP": input_8AFP,
+                                    "9AFPDATE": input_9AFP_DATE, "9AFP": input_9AFP,
+                                    "10AFPDATE": input_10AFP_DATE, "10AFP": input_10AFP,
+                                    "11AFPDATE": input_11AFP_DATE, "11AFP": input_11AFP,
+                                    "12AFPDATE": input_12AFP_DATE, "12AFP": input_12AFP,
+                                    "13AFPDATE": input_13AFP_DATE, "13AFP": input_13AFP,
+                                    "14AFPDATE": input_14AFP_DATE, "14AFP": input_14AFP,
+                                    "15AFPDATE": input_15AFP_DATE, "15AFP": input_15AFP,
+                                    "16AFPDATE": input_16AFP_DATE, "16AFP": input_16AFP,
+                                    "17AFPDATE": input_17AFP_DATE, "17AFP": input_17AFP,
+                                    "18AFPDATE": input_18AFP_DATE, "18AFP": input_18AFP,
+                                    "19AFPDATE": input_19AFP_DATE, "19AFP": input_19AFP,
+                                    "20AFPDATE": input_20AFP_DATE, "20AFP": input_20AFP,
+                                    "21AFPDATE": input_21AFP_DATE, "21AFP": input_21AFP,
+                                    "22AFPDATE": input_22AFP_DATE, "22AFP": input_22AFP,
+                                    "23AFPDATE": input_23AFP_DATE, "23AFP": input_23AFP,
+                                    "24AFPDATE": input_24AFP_DATE, "24AFP": input_24AFP,
+                                    "25AFPDATE": input_25AFP_DATE, "25AFP": input_25AFP,
+                                    "26AFPDATE": input_26AFP_DATE, "26AFP": input_26AFP,
+                                    "27AFPDATE": input_27AFP_DATE, "27AFP": input_27AFP,
+                                    "28AFPDATE": input_28AFP_DATE, "28AFP": input_28AFP,
+                                    "29AFPDATE": input_29AFP_DATE, "29AFP": input_29AFP,
+                                    "30AFPDATE": input_30AFP_DATE, "30AFP": input_30AFP,
+                                    "31AFPDATE": input_31AFP_DATE, "31AFP": input_31AFP,
+                                    "32AFPDATE": input_32AFP_DATE, "32AFP": input_32AFP,
+                                    "33AFPDATE": input_33AFP_DATE, "33AFP": input_33AFP,
+                                    "34AFPDATE": input_34AFP_DATE, "34AFP": input_34AFP
                                 }
                             if "patient_info" in st.session_state :
                                 update_google_sheet(data12, st.session_state.temp_mrn)
@@ -4070,6 +4292,7 @@ def edit_existing_data():
                                 help="Provide additional details for IVDU"
                         
                             )
+
                             cir_pmh_liver_addtional_factor = st.selectbox(
                                 "Cir_PMH_Liver Additional Factors [ Excel : CIRPMH_LIVERFAC ]\n\n (1) NAFLD, (2) MAFLD, (3) NASH, (4) Autoimmune Hepatitis, (5) Hereditary Hemochromatosis, (6) none",
                             options=["1", "2", "3", "4", "5", "6"],
@@ -4447,6 +4670,7 @@ def edit_existing_data():
                                     "HCCDX_ALBIGRADE": hcc_dx_albi_grade,
                                     "HCCDX_BCLC": hcc_dx_bclc_calc,
                                 }
+                                
                                 update_google_sheet(data4, mrn)
             
                     elif st.session_state.selected_tab == "Previous Therapy for HCC":
@@ -4544,6 +4768,7 @@ def edit_existing_data():
                                 placeholder="Choose an option",
                             )
                             PRVTHER_Resection_Date = 0 if PRVTHER_Resection == "0" else st.date_input("PRVTHER_Resection Date",value=datetime.strptime(df.iloc[0]["PTHER_RESECTIONDATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_RESECTIONDATE"] else None)
+
 
                             list1=[PRVTHER_Prior_LDT_Therapy, PRVTHER_Prior_RFA_Therapy, PRVTHER_Prior_TARE_Therapy, PRVTHER_Prior_SBRT_Therapy, PRVTHER_Prior_TACE_Therapy, PRVTHER_Prior_MWA_Therapy, PRVTHER_Resection ]
                             total_sum=0
@@ -4975,7 +5200,7 @@ def edit_existing_data():
                         st.subheader("Day_Y90")
                         with st.form("day_y90_form"):
 
-                            dayy90_afp = st.text_input("DAYY90_AFP",value = df.iloc[0]["DAYY90_AFP"])
+                            dayy90_afp = st.text_input("DAYY90_AFP",value = df.iloc[0]["DAYY_AFP"])
                             def process_input(value):
                                 
                     # Handle the 'NA' case
@@ -4990,29 +5215,26 @@ def edit_existing_data():
 
                             dayy90_afp_prior_to_tare = process_input(dayy90_afp)
                             st.write("DAYY90_AFP Binary : ",dayy90_afp_prior_to_tare)
-
-                            prey90_afp_binarydup = df.loc[df["MRN"] == mrn, "PREY_AFPBINARY"].values[0]
-                            st.write("PRE90_AFP BinaryDup",prey90_afp_binarydup)
                         
                         # Inputs for other variables
-                            dayy90_sodium = st.number_input("DAYY90_sodium",step=0.1,value = float(df.iloc[0]["DAYY90_Sodium"]) if pd.notnull(df.iloc[0]["DAYY90_Sodium"]) and str(df.iloc[0]["DAYY90_Sodium"]).isdigit() else 0.0)
-                            dayy90_creatinine = st.number_input("DAYY90_creatinine",step=0.1,value = float(df.iloc[0]["DAYY90_Creatinine"]) if pd.notnull(df.iloc[0]["DAYY90_Creatinine"]) and str(df.iloc[0]["DAYY90_Creatinine"]).isdigit() else 0.0
+                            dayy90_sodium = st.number_input("DAYY90_sodium",step=0.1,value = float(df.iloc[0]["DAYY_SODIUM"]) if pd.notnull(df.iloc[0]["DAYY_SODIUM"]) and str(df.iloc[0]["DAYY_SODIUM"]).isdigit() else 0.0)
+                            dayy90_creatinine = st.number_input("DAYY90_creatinine",step=0.1,value = float(df.iloc[0]["DAYY_CREATININE"]) if pd.notnull(df.iloc[0]["DAYY_CREATININE"]) and str(df.iloc[0]["DAYY_CREATININE"]).isdigit() else 0.0
                                                                 )
-                            dayy90_inr = st.number_input("DAYY90_inr",step=0.1,value = float(df.iloc[0]["DAYY90_INR"]) if pd.notnull(df.iloc[0]["DAYY90_INR"]) and str(df.iloc[0]["DAYY90_INR"]).isdigit() else 0.0)
-                            dayy90_albumin = st.number_input("DAYY90_albumin",step=0.1,value = float(df.iloc[0]["DAYY90_Albumin"]) if pd.notnull(df.iloc[0]["DAYY90_Albumin"]) and str(df.iloc[0]["DAYY90_Albumin"]).isdigit() else 0.0)
-                            dayy90_bilirubin = st.number_input("DAYY90_bilirubin",min_value=1.0,step=0.1,value = float(df.iloc[0]["DAYY90_Bilirubin"]) if pd.notnull(df.iloc[0]["DAYY90_Bilirubin"]) and str(df.iloc[0]["DAYY90_Bilirubin"]).isdigit() else 1.0)
-                            dayy90_ast = st.number_input("DAYY90_AST",step=0.1,value = float(df.iloc[0]["DAYY90_AST"]) if pd.notnull(df.iloc[0]["DAYY90_AST"]) and str(df.iloc[0]["DAYY90_AST"]).isdigit() else 0.0)
-                            dayy90_alt = st.number_input("DAYY90_ALT",step=0.1,value = float(df.iloc[0]["DAYY90_ALT"]) if pd.notnull(df.iloc[0]["DAYY90_ALT"]) and str(df.iloc[0]["DAYY90_ALT"]).isdigit() else 0.0)
+                            dayy90_inr = st.number_input("DAYY90_inr",step=0.1,value = float(df.iloc[0]["DAYY_INR"]) if pd.notnull(df.iloc[0]["DAYY_INR"]) and str(df.iloc[0]["DAYY_INR"]).isdigit() else 0.0)
+                            dayy90_albumin = st.number_input("DAYY90_albumin",step=0.1,value = float(df.iloc[0]["DAYY_ALBUMIN"]) if pd.notnull(df.iloc[0]["DAYY_ALBUMIN"]) and str(df.iloc[0]["DAYY_ALBUMIN"]).isdigit() else 0.0)
+                            dayy90_bilirubin = st.number_input("DAYY90_bilirubin",min_value=1.0,step=0.1,value = float(df.iloc[0]["DAYY_BILI"]) if pd.notnull(df.iloc[0]["DAYY_BILI"]) and str(df.iloc[0]["DAYY_BILI"]).isdigit() else 1.0)
+                            dayy90_ast = st.number_input("DAYY90_AST",step=0.1,value = float(df.iloc[0]["DAYY_AST"]) if pd.notnull(df.iloc[0]["DAYY_AST"]) and str(df.iloc[0]["DAYY_AST"]).isdigit() else 0.0)
+                            dayy90_alt = st.number_input("DAYY90_ALT",step=0.1,value = float(df.iloc[0]["DAYY_ALT"]) if pd.notnull(df.iloc[0]["DAYY_ALT"]) and str(df.iloc[0]["DAYY_ALT"]).isdigit() else 0.0)
                             dayy90_alkaline_phosphatase = st.number_input(
                                 "DAYY90_Alkaline Phosphatase",step=0.1,
-                                value = float(df.iloc[0]["DAYY90_Alkphos"]) if pd.notnull(df.iloc[0]["DAYY90_Alkphos"]) and str(df.iloc[0]["DAYY90_Alkphos"]).isdigit() else 0.0
+                                value = float(df.iloc[0]["DAYY_ALP"]) if pd.notnull(df.iloc[0]["DAYY_ALP"]) and str(df.iloc[0]["DAYY_ALP"]).isdigit() else 0.0
                             )
-                            dayy90_leukocytes = st.number_input("DAYY90_leukocytes",step=0.1,value = float(df.iloc[0]["DAYY90_Leukocytes"]) if pd.notnull(df.iloc[0]["DAYY90_Leukocytes"]) and str(df.iloc[0]["DAYY90_Leukocytes"]).isdigit() else 0.0)
-                            dayy90_platelets = st.number_input("DAYY90_platelets",step=0.1,value = float(df.iloc[0]["DAYY90_Platelets"]) if pd.notnull(df.iloc[0]["DAYY90_Platelets"]) and str(df.iloc[0]["DAYY90_Platelets"]).isdigit() else 0.0)
-                            dayy90_potassium = st.number_input("DAY90_Potassium",step=0.1,value = float(df.iloc[0]["DAY90_Potassium"]) if pd.notnull(df.iloc[0]["DAY90_Potassium"]) and str(df.iloc[0]["DAY90_Potassium"]).isdigit() else 0.0)
+                            dayy90_leukocytes = st.number_input("DAYY90_leukocytes",step=0.1,value = float(df.iloc[0]["DAYY_LEUK"]) if pd.notnull(df.iloc[0]["DAYY_LEUK"]) and str(df.iloc[0]["DAYY_LEUK"]).isdigit() else 0.0)
+                            dayy90_platelets = st.number_input("DAYY90_platelets",step=0.1,value = float(df.iloc[0]["DAYY_PLT"]) if pd.notnull(df.iloc[0]["DAYY_PLT"]) and str(df.iloc[0]["DAYY_PLT"]).isdigit() else 0.0)
+                            dayy90_potassium = st.number_input("DAY90_Potassium",step=0.1,value = float(df.iloc[0]["DAYY_POTAS"]) if pd.notnull(df.iloc[0]["DAYY_POTAS"]) and str(df.iloc[0]["DAYY_POTAS"]).isdigit() else 0.0)
 
                             dayy90_ascites_ctcae = st.selectbox (
-                                "DAYY90_Ascites CTCAE",
+                                "DAYY90_Ascites CTCAE [Excel : DAYY_ASCITCTCAE]  ",
                                 options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
                                 format_func=lambda x: {
                                 "none": "0. none",
@@ -5025,7 +5247,7 @@ def edit_existing_data():
 
                             }[x],
                                 help="Select Metavir_score",
-                                index=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"].index(df.iloc[0]["Day90_AscitesCTCAE"]) if df.iloc[0]["Day90_AscitesCTCAE"] else None,
+                                index=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"].index(df.iloc[0]["DAYY_ASCITCTCAE"]) if df.iloc[0]["DAYY_ASCITCTCAE"] else None,
                                 placeholder="Choose an option",
                             ) 
                             def findascitesclass(score):
@@ -5038,7 +5260,7 @@ def edit_existing_data():
                             st.write("Day90_AscitesCTCAEnumb ",dayy90_ascites_classification)
 
                             dayy90_he_grade = st.selectbox(
-                                "DAYY90_HE Grade",
+                                "DAYY90_HE Grade [Excel : DAYY_HEGRADE]\n\n(1) None, (2) Grade 1-2, (3) Grade 3-4",
                                 options=[1,2,3],
                                 format_func=lambda x: {
                                 1: "None",
@@ -5046,13 +5268,13 @@ def edit_existing_data():
                                 3: "Grade 3-4",
                                 
                             }[x],
-                                index=[1,2,3].index(int(df.iloc[0]["Day90_HEgrade"])) if df.iloc[0]["Day90_HEgrade"] else None,  # No default selection
+                                index=[1,2,3].index(int(df.iloc[0]["DAYY_HEGRADE"])) if df.iloc[0]["DAYY_HEGRADE"] else None,  # No default selection
                                 placeholder="Choose an option",
 
                             )
                         
-                            dayy90_ecog = st.selectbox("DAYY90_ECOG", options=["0", "1", "2", "3", "4", "NA"],
-                                index=["0", "1", "2", "3", "4", "NA"].index(df.iloc[0]["Day90_ECOG"]) if df.iloc[0]["Day90_ECOG"] else None,  # No default selection
+                            dayy90_ecog = st.selectbox("DAYY90_ECOG [Excel : DAYY_ECOG]", options=["0", "1", "2", "3", "4", "NA"],
+                                index=["0", "1", "2", "3", "4", "NA"].index(df.iloc[0]["DAYY_ECOG"]) if df.iloc[0]["DAYY_ECOG"] else None,  # No default selection
                                 placeholder="Choose an option",)
                             
                             dayy90_child_pugh_points_calc = calculatepoints(dayy90_bilirubin,dayy90_albumin,dayy90_inr,dayy90_ascites_ctcae,dayy90_he_grade)
@@ -5070,23 +5292,45 @@ def edit_existing_data():
                             dayy90_albi_grade = albi_class(dayy90_albi_score_calc)
                             st.write("DAYY90_Albigrade",dayy90_albi_grade)
 
-                            dayy90_bclc_calc = st.text_area("PREY90_BCLC Stage calc",value = df.iloc[0]["DAYY90_BCLC"])
+                            dayy90_bclc_calc = st.selectbox("PREY90_BCLC Stage calc [ Excel : DAYY_BCLC ]\n\n(NA) Not in chart, (0) Stage 0, (1) Stage A, (2) Stage B, (3) Stage C, (4) Stage D   ",
+                                options=["NA", "0", "1", "2", "3", "4"],
+                                format_func=lambda x: {
+                                    "NA": "(NA) Not in chart",
+                                    "0": " Stage 0: Very early stage, with a single nodule smaller than 2 cm in diameter",
+                                    "1": " Stage A: Early stage, with one nodule smaller than 5 cm or up to three nodules smaller than 3 cm",
+                                    "2": " Stage B: Intermediate stage, with multiple tumors in the liver",
+                                    "3": " Stage C: Advanced stage, with cancer that has spread to other organs or blood vessels",
+                                    "4": " Stage D: End-stage disease, with severe liver damage or the patient is very unwell",
+                                }[x],
+                                index = ["NA", "0", "1", "2", "3", "4"].index(df.iloc[0]["DAYY_BCLC"]) if df.iloc[0]["DAYY_BCLC"] else None,
+                                placeholder="Choose an option"
+                                )
 
                             dayy90_type_of_sphere = st.selectbox(
-                                "DAYY90_Type of Sphere", options=["Therasphere-1", "SIR-2"],
-                                index=["Therasphere-1", "SIR-2"].index(df.iloc[0]["DAYY90_Sphere"]) if df.iloc[0]["DAYY90_Sphere"] else None,  
+                                "DAYY90_Type of Sphere [Excel : DAYY_SPHERE]\n\n(1) Therasphere, (2) SIR", options=["1", "2"],
+                            format_func=lambda x: {
+                                    "1": "Therasphere",
+                                    "2": "SIR",
+                                }[x],
+                                index=["1", "2"].index(df.iloc[0]["DAYY_SPHERE"]) if df.iloc[0]["DAYY_SPHERE"] else None,  
                                 placeholder="Choose an option",
                             )
 
-                            dayy90_lt_notes_ftx = st.text_area("DAYY90_LT Notes Free Text",value = df.iloc[0]["DAYY90_LTnoteFT"])
+                            dayy90_lt_notes_ftx = st.text_area("DAYY90_LT Notes Free Text",value = df.iloc[0]["DAYY_LTFT"])
 
                             ken_childpughscore = st.selectbox(
-                                "ken_ChildPughscore",
-                                options=["A","B","C"],
-                                index=["A","B","C"].index(df.iloc[0]["ken_ChildPughscore"]) if df.iloc[0]["ken_ChildPughscore"] else None,  
+                                "ken_ChildPughscore [Excel : KEN_CPPRE]\n\n(1) A, (2) B, (3) C ",
+                            options=["1","2","3"],
+                            format_func=lambda x: {
+                                    "1": "A",
+                                    "2": "B",
+                                    "3": "C"
+                                }[x],
+                               
+                                index=["1","2","3"].index(df.iloc[0]["KEN_CPPRE"]) if df.iloc[0]["KEN_CPPRE"] else None,  
                                 placeholder="Choose an option",
                             )
-                            ken_meldpretare = st.number_input("ken_MELDpreTARE",step=0.1,value = float(df.iloc[0]["ken_MELDpreTARE (MELDpreTARE)"]) if pd.notnull(df.iloc[0]["ken_MELDpreTARE (MELDpreTARE)"]) and str(df.iloc[0]["ken_MELDpreTARE (MELDpreTARE)"]).isdigit() else 0.0)
+                            ken_meldpretare = st.number_input("ken_MELDpreTARE",step=0.1,value = float(df.iloc[0]["KEN_MELDPRE"]) if pd.notnull(df.iloc[0]["KEN_MELDPRE"]) and str(df.iloc[0]["KEN_MELDPRE"]).isdigit() else 0.0)
 
 
                         # Submit button
@@ -5094,35 +5338,34 @@ def edit_existing_data():
                         
                             if submit_tab7:
                                 data7 = {
-                                    "DAYY90_AFP": dayy90_afp,
-                                    "DAYY90_AFP Binary": dayy90_afp_prior_to_tare,
-                                    "PRE90_AFP BinaryDup": prey90_afp_binarydup,
-                                    "DAYY90_Sodium": dayy90_sodium,
-                                    "DAYY90_Creatinine": dayy90_creatinine,
-                                    "DAYY90_INR": dayy90_inr,
-                                    "DAYY90_Albumin": dayy90_albumin,
-                                    "DAYY90_Bilirubin": dayy90_bilirubin,
-                                    "DAYY90_AST": dayy90_ast,
-                                    "DAYY90_ALT": dayy90_alt,
-                                    "DAYY90_Alkphos": dayy90_alkaline_phosphatase,
-                                    "DAYY90_Leukocytes": dayy90_leukocytes,
-                                    "DAYY90_Platelets": dayy90_platelets,
-                                    "DAY90_Potassium": dayy90_potassium,
-                                    "Day90_AscitesCTCAE": dayy90_ascites_ctcae,
-                                    "Day90_AscitesCTCAEnumb": dayy90_ascites_classification,
-                                    "Day90_HEgrade": dayy90_he_grade,
-                                    "Day90_ECOG": dayy90_ecog,
-                                    "DAYY90_CPclass": dayy90_child_pugh_class_calc,
-                                    "DAYY90_CPcalc": dayy90_child_pugh_points_calc,
-                                    "DAYY90_MELD": dayy90_meld_score_calc,
-                                    "DAYY90_MELDNa": dayy90_meld_na_score_calc,
-                                    "DAYY90_Albiscore": dayy90_albi_score_calc,
-                                    "DAYY90_Albigrade": dayy90_albi_grade,
-                                    "DAYY90_BCLC": dayy90_bclc_calc,
-                                    "DAYY90_Sphere": dayy90_type_of_sphere,
-                                    "DAYY90_LTnoteFT": dayy90_lt_notes_ftx,
-                                    "ken_ChildPughscore": ken_childpughscore,
-                                    "ken_MELDpreTARE (MELDpreTARE)": ken_meldpretare,
+                                    "DAYY_AFP": dayy90_afp,
+                                    "DAYY_AFPBINARY": dayy90_afp_prior_to_tare,
+                                    "DAYY_SODIUM": dayy90_sodium,
+                                    "DAYY_CREATININE": dayy90_creatinine,
+                                    "DAYY_INR": dayy90_inr,
+                                    "DAYY_ALBUMIN": dayy90_albumin,
+                                    "DAYY_BILI": dayy90_bilirubin,
+                                    "DAYY_AST": dayy90_ast,
+                                    "DAYY_ALT": dayy90_alt,
+                                    "DAYY_ALP": dayy90_alkaline_phosphatase,
+                                    "DAYY_LEUK": dayy90_leukocytes,
+                                    "DAYY_PLT": dayy90_platelets,
+                                    "DAYY_POTAS": dayy90_potassium,
+                                    "DAYY_ASCITCTCAE": dayy90_ascites_ctcae,
+                                    "DAYY_ASCITNUMB": dayy90_ascites_classification,
+                                    "DAYY_HEGRADE": dayy90_he_grade,
+                                    "DAYY_ECOG": dayy90_ecog,
+                                    "DAYY_CPCALC": dayy90_child_pugh_points_calc,
+                                    "DAYY_CPCLASS": dayy90_child_pugh_class_calc,
+                                    "DAYY_MELD": dayy90_meld_score_calc,
+                                    "DAYY_MELDNA": dayy90_meld_na_score_calc,
+                                    "DAYY_ALBISCORE": dayy90_albi_score_calc,
+                                    "DAYY_ALBIGRADE": dayy90_albi_grade,
+                                    "DAYY_BCLC": dayy90_bclc_calc,
+                                    "DAYY_SPHERE": dayy90_type_of_sphere,
+                                    "DAYY_LTFT": dayy90_lt_notes_ftx,
+                                    "KEN_CPPRE": ken_childpughscore,
+                                    "KEN_MELDPRE": ken_meldpretare
                                     }
                                 update_google_sheet(data7, mrn)
                 
@@ -5130,23 +5373,23 @@ def edit_existing_data():
                         st.subheader("Post Y90 Within 30 Days Labs")
                         with st.form("post_y90_form"):
 
-                            posty90_date_labs = st.date_input("POSTY90_30DY_date_labs", value = datetime.strptime(df.iloc[0]["POSTY90_30DY_Datelabs"], "%Y-%m-%d").date() if df.iloc[0]["POSTY90_30DY_Datelabs"] else None)
-                            posty90_afp = st.text_input("POSTY90_30DY_afp", value = df.iloc[0]["POSTY90_30DY_AFP"])
-                            posty90_afp_date = st.date_input("POSTY90_30DY_afp DATE", value = datetime.strptime(df.iloc[0]["POSTY90_30DY_AFPdate"], "%Y-%m-%d").date() if df.iloc[0]["POSTY90_30DY_AFPdate"] else None)
-                            posty90_sodium = st.number_input("POSTY90_30DY_Sodium",step=0.1, value = float(df.iloc[0]["POSTY90_30DY_Sodium"]) if pd.notnull(df.iloc[0]["POSTY90_30DY_Sodium"]) and str(df.iloc[0]["POSTY90_30DY_Sodium"]).isdigit() else 0.0)
-                            posty90_creatinine = st.number_input("POSTY90_30DY_creatinine",step=0.1, value = float(df.iloc[0]["POSTY90_30DY_Creatinine"]) if pd.notnull(df.iloc[0]["POSTY90_30DY_Creatinine"]) and str(df.iloc[0]["POSTY90_30DY_Creatinine"]).isdigit() else 0.0)
-                            posty90_inr = st.number_input("POSTY90_30DY_INR",step=0.1,value = float(df.iloc[0]["POSTY90_30DY_INR"]) if pd.notnull(df.iloc[0]["POSTY90_30DY_INR"]) and str(df.iloc[0]["POSTY90_30DY_INR"]).isdigit() else 0.0)
-                            posty90_albumin = st.number_input("POSTY90_30DY_albumin",step=0.1, value = float(df.iloc[0]["POSTY90_30DY_Albumin"]) if pd.notnull(df.iloc[0]["POSTY90_30DY_Albumin"]) and str(df.iloc[0]["POSTY90_30DY_Albumin"]).isdigit() else 0.0)
-                            posty90_bilirubin = st.number_input("POSTY90_30DY_bilirubin",min_value=1.0,step=0.1,value = float(df.iloc[0]["POSTY90_30DY_Bilirubin"]) if pd.notnull(df.iloc[0]["POSTY90_30DY_Bilirubin"]) and str(df.iloc[0]["POSTY90_30DY_Bilirubin"]).isdigit() else 1.0)
-                            posty90_ast = st.number_input("POSTY90_30DY_AST", step=0.1,value = float(df.iloc[0]["POSTY90_30DY_AST"]) if pd.notnull(df.iloc[0]["POSTY90_30DY_AST"]) and str(df.iloc[0]["POSTY90_30DY_AST"]).isdigit() else 0.0)
-                            posty90_alt = st.number_input("POSTY90_30DY_ALT",step=0.1,value = float(df.iloc[0]["POSTY90_30DY_ALT"]) if pd.notnull(df.iloc[0]["POSTY90_30DY_ALT"]) and str(df.iloc[0]["POSTY90_30DY_ALT"]).isdigit() else 0.0)
-                            posty90_alkaline_phosphatase = st.number_input("POSTY90_30DY_Alkaline Phosphatase",step=0.1,value = float(df.iloc[0]["POSTY90_30DY_ALP"]) if pd.notnull(df.iloc[0]["POSTY90_30DY_ALP"]) and str(df.iloc[0]["POSTY90_30DY_ALP"]).isdigit() else 0.0)
-                            posty90_leukocytes = st.number_input("POSTY90_30DY_leukocytes",step=0.1,value = float(df.iloc[0]["POSTY90_30DY_Leukocytes"]) if pd.notnull(df.iloc[0]["POSTY90_30DY_Leukocytes"]) and str(df.iloc[0]["POSTY90_30DY_Leukocytes"]).isdigit() else 0.0)
-                            posty90_platelets = st.number_input("POSTY90_30DY_platelets",step=0.1,value = float(df.iloc[0]["POSTY90_30DY_Platelets"]) if pd.notnull(df.iloc[0]["POSTY90_30DY_Platelets"]) and str(df.iloc[0]["POSTY90_30DY_Platelets"]).isdigit() else 0.0)
-                            posty90_potassium = st.number_input("POSTY90_30DY_potassium",step=0.1,value = float(df.iloc[0]["POSTY90_30DY_Potassium"]) if pd.notnull(df.iloc[0]["POSTY90_30DY_Potassium"]) and str(df.iloc[0]["POSTY90_30DY_Potassium"]).isdigit() else 0.0)
+                            posty90_date_labs = st.date_input("POSTY90_30DY_date_labs", value = datetime.strptime(df.iloc[0]["POST30_LABSDATE"], "%Y-%m-%d").date() if df.iloc[0]["POST30_LABSDATE"] else None)
+                            posty90_afp = st.text_input("POSTY90_30DY_afp", value = df.iloc[0]["POST30_AFP"])
+                            posty90_afp_date = st.date_input("POSTY90_30DY_afp DATE", value = datetime.strptime(df.iloc[0]["POST30_AFPDATE"], "%Y-%m-%d").date() if df.iloc[0]["POST30_AFPDATE"] else None)
+                            posty90_sodium = st.number_input("POSTY90_30DY_Sodium", step=0.1, value = float(df.iloc[0]["POST30_SODIUM"]) if pd.notnull(df.iloc[0]["POST30_SODIUM"]) and str(df.iloc[0]["POST30_SODIUM"]).isdigit() else 0.0)
+                            posty90_creatinine = st.number_input("POSTY90_30DY_creatinine", step=0.1, value = float(df.iloc[0]["POST30_CREATININE"]) if pd.notnull(df.iloc[0]["POST30_CREATININE"]) and str(df.iloc[0]["POST30_CREATININE"]).isdigit() else 0.0)
+                            posty90_inr = st.number_input("POSTY90_30DY_INR", step=0.1, value = float(df.iloc[0]["POST30_INR"]) if pd.notnull(df.iloc[0]["POST30_INR"]) and str(df.iloc[0]["POST30_INR"]).isdigit() else 0.0)
+                            posty90_albumin = st.number_input("POSTY90_30DY_albumin", step=0.1, value = float(df.iloc[0]["POST30_ALBUMIN"]) if pd.notnull(df.iloc[0]["POST30_ALBUMIN"]) and str(df.iloc[0]["POST30_ALBUMIN"]).isdigit() else 0.0)
+                            posty90_bilirubin = st.number_input("POSTY90_30DY_bilirubin", min_value=1.0, step=0.1, value = float(df.iloc[0]["POST30_BILI"]) if pd.notnull(df.iloc[0]["POST30_BILI"]) and str(df.iloc[0]["POST30_BILI"]).isdigit() else 1.0)
+                            posty90_ast = st.number_input("POSTY90_30DY_AST", step=0.1, value = float(df.iloc[0]["POST30_AST"]) if pd.notnull(df.iloc[0]["POST30_AST"]) and str(df.iloc[0]["POST30_AST"]).isdigit() else 0.0)
+                            posty90_alt = st.number_input("POSTY90_30DY_ALT", step=0.1, value = float(df.iloc[0]["POST30_ALT"]) if pd.notnull(df.iloc[0]["POST30_ALT"]) and str(df.iloc[0]["POST30_ALT"]).isdigit() else 0.0)
+                            posty90_alkaline_phosphatase = st.number_input("POSTY90_30DY_Alkaline Phosphatase", step=0.1, value = float(df.iloc[0]["POST30_ALP"]) if pd.notnull(df.iloc[0]["POST30_ALP"]) and str(df.iloc[0]["POST30_ALP"]).isdigit() else 0.0)
+                            posty90_leukocytes = st.number_input("POSTY90_30DY_leukocytes", step=0.1, value = float(df.iloc[0]["POST30_LEUK"]) if pd.notnull(df.iloc[0]["POST30_LEUK"]) and str(df.iloc[0]["POST30_LEUK"]).isdigit() else 0.0)
+                            posty90_platelets = st.number_input("POSTY90_30DY_platelets", step=0.1, value = float(df.iloc[0]["POST30_PLT"]) if pd.notnull(df.iloc[0]["POST30_PLT"]) and str(df.iloc[0]["POST30_PLT"]).isdigit() else 0.0)
+                            posty90_potassium = st.number_input("POSTY90_30DY_potassium", step=0.1, value = float(df.iloc[0]["POST30_POTAS"]) if pd.notnull(df.iloc[0]["POST30_POTAS"]) and str(df.iloc[0]["POST30_POTAS"]).isdigit() else 0.0)
                             
                             posty90_ascites_ctcae = st.selectbox (
-                            "30DY_AE_AscitesCTCAE",
+                            "30DY_AE_AscitesCTCAE [Excel : POST30_ASCITCTCAE]",
                             options=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"],
                             format_func=lambda x: {
                             "none": "0. none",
@@ -5159,7 +5402,7 @@ def edit_existing_data():
 
                             }[x],
                                 help="Select Metavir_score",
-                                index=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"].index(df.iloc[0]["30DY_AE_AscitesCTCAE"]) if df.iloc[0]["30DY_AE_AscitesCTCAE"] else None,
+                                index=["none", "Asymptomatic","Minimal ascities/Mild abd distension","Symptomatic","moderate ascities/Symptomatic medical intervention", "Severe symptoms, invasive intervention indicated", "Life Threatening: Urgent operation intervention indicated"].index(df.iloc[0]["POST30_ASCITCTCAE"]) if df.iloc[0]["POST30_ASCITCTCAE"] else None,
                                 placeholder="Choose an option",
                             ) 
                             def findascitesclass(score):
@@ -5171,28 +5414,40 @@ def edit_existing_data():
                             posty90_ascites_classification = 1 if posty90_ascites_ctcae == "none" else findascitesclass(posty90_ascites_ctcae)
                             st.write("30DY_AE_AscitesCTCAEnumb : ",posty90_ascites_classification)
                             posty90_ascites_diruetics = st.selectbox(
-                                "30DY_AE_Ascitesdiruetics",
-                                options = ["Yes","No"],
-                                index=["Yes","No"].index(df.iloc[0]["30DY_AE_Ascitesdiruetics"]) if df.iloc[0]["30DY_AE_Ascitesdiruetics"] else None,
+                                "30DY_AE_Ascitesdiruetics[Excel : POST30_ASCITDIUR]\n\n Yes (1), No (0)",
+                                    options=["1", "0"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                        }[x],
+                                index=["1","0"].index(df.iloc[0]["POST30_ASCITDIUR"]) if df.iloc[0]["POST30_ASCITDIUR"] else None,
                                 placeholder="Choose an option",
                 
                             )
                             posty90_ascites_paracentesis = st.selectbox(
-                                "30DY_AE_Ascitesparacentesis" ,
-                                options = ["Yes","No"],
-                                index=["Yes","No"].index(df.iloc[0]["30DY_AE_Ascitesparacentesis"]) if df.iloc[0]["30DY_AE_Ascitesparacentesis"] else None,
+                                "30DY_AE_Ascitesparacentesis[Excel : POST30_ASCITPARA]\n\n Yes (1), No (0)",
+                                    options=["1", "0"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                        }[x],
+                                index=["1","0"].index(df.iloc[0]["POST30_ASCITPARA"]) if df.iloc[0]["POST30_ASCITPARA"] else None,
                                 placeholder="Choose an option",
                 
                             )
                             posty90_ascites_hospitalization = st.selectbox(
-                                "30DY_AE_Asciteshospitalization",
-                                options = ["Yes","No"],
-                                index=["Yes","No"].index(df.iloc[0]["30DY_AE_Asciteshospitalization"]) if df.iloc[0]["30DY_AE_Asciteshospitalization"] else None,
+                                "30DY_AE_Asciteshospitalization[Excel : POST30_ASCITHOSP]\n\n Yes (1), No (0)",
+                                    options=["1", "0"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                        }[x],
+                                index=["1","0"].index(df.iloc[0]["POST30_ASCITHOSP"]) if df.iloc[0]["POST30_ASCITHOSP"] else None,
                                 placeholder="Choose an option",
                 
                             )
                             posty90_he_grade = st.selectbox(
-                                "30DY_AE_HE Grade",
+                                "30DY_AE_HE Grade [Excel : POST30_HEGRADE]\n\n(1) None, (2) Grade 1-2, (3) Grade 3-4",
                                 options=[1,2,3],
                                 format_func=lambda x: {
                                 1: "None",
@@ -5200,69 +5455,49 @@ def edit_existing_data():
                                 3: "Grade 3-4",
                                 
                             }[x],
-                                index=[1,2,3].index(int(df.iloc[0]["30DY_AE_HEgrade"])) if df.iloc[0]["30DY_AE_HEgrade"] else None,
+                                index=[1,2,3].index(int(df.iloc[0]["POST30_HEGRADE"])) if df.iloc[0]["POST30_HEGRADE"] else None,
                                 placeholder="Choose an option",
 
                             )
 
                             posty90_ascites_free_text = st.text_area(
                                 "30DY_AE_ascities_freetext",
-                                value = df.iloc[0]["30DY_AE_ascities_freetext"]
+                                value = df.iloc[0]["POST30_ASCITFT"]
                             
                             )
 
-                            posty90_ecog = st.selectbox("POSTY90_30DY_ECOG", options=["0", "1", "2", "3", "4", "NA"],
-                                index=["0", "1", "2", "3", "4", "NA"].index(df.iloc[0]["POSTY90_30DY_ECOG"]) if df.iloc[0]["POSTY90_30DY_ECOG"] else None,
+                            posty90_ecog = st.selectbox("POSTY90_30DY_ECOG [Excel : POST30_ECOG]", options=["0", "1", "2", "3", "4", "NA"],
+                                index=["0", "1", "2", "3", "4", "NA"].index(df.iloc[0]["POST30_ECOG"]) if df.iloc[0]["POST30_ECOG"] else None,
                                 placeholder="Choose an option",
                                 )
-                            
-                            posty90_child_pugh_class = st.selectbox(
-                                "POSTY90_30DY_Child-Pugh Class calc",
-                                options=["Class A", "Class B", "Class C", "NA"],
-                                help="Select the Child-Pugh class",
-                            index=["Class A", "Class B", "Class C", "NA"].index(df.iloc[0]["POSTY90_30DY_CPcalc"]) if df.iloc[0]["POSTY90_30DY_CPcalc"] else None,
-                            placeholder="Choose an option",
-                            )
-
-                            inputp90 = st.text_input(
-                                "POSTY90_30DY_Child-Pugh Points calc",
-                                help="Write in number in range 5-15, or NA",
-                                value = df.iloc[0]["POSTY90_30DY_CPclass"]
-                                
-                            )
-                            posty90_child_pugh_points = validate_input(inputp90)
-
-                            posty90_bclc = st.selectbox(
-                                "POSTY90_30DY_BCLC stage",
-                                options=["0", "A", "B", "C", "D"],
-                                help="Select the BCLC stage",
-                            index=["0", "A", "B", "C", "D"].index(df.iloc[0]["POSTY90_30DY_BCLC"]) if df.iloc[0]["POSTY90_30DY_BCLC"] else None,
-                            placeholder="Choose an option",
-                            )
-
-                            input_meld = st.text_input(
-                                "POSTY90_30DY_MELD EMR",
-                                help="Write in number in range 6-40, or NA",
-                                value = df.iloc[0]["POSTY90_30DY_MELD"]
-                            )
-                            posty90_meld = validate_input2(input_meld)
-
-
-                            input_meld_na = st.text_input(
-                                "POSTY90_30DY_MELD Na EMR",
-                                help="Write in number in range 6-40, or NA",
-                                value = df.iloc[0]["POSTY90_30DY_MELDNa"]
-                            )
-                            posty90_meld_na = validate_input2(input_meld_na)
-
-                            posty90_albi_score = st.number_input(
-                                "POSTY90_30DY_ALBI Score calc",step=0.1,
-                                help="Enter ALBI score",
-                                value = float(df.iloc[0]["POSTY90_30DY_ALBIscore"]) if pd.notnull(df.iloc[0]["POSTY90_30DY_ALBIscore"]) and str(df.iloc[0]["POSTY90_30DY_ALBIscore"]).isdigit() else 0.0
-                            )
+                            posty90_child_pugh_points = calculatepoints(posty90_bilirubin,posty90_albumin,posty90_inr,posty90_ascites_ctcae,posty90_he_grade)
+                            st.write("DAYY90_CPcalc",posty90_child_pugh_points)
+                            posty90_child_pugh_class = calculate_class(posty90_child_pugh_points)
+                            # Additional Calculated Fields
+                            st.write("DAYY90_CPclass",posty90_child_pugh_class)
+                            #prey90_bclc_stage_calc = st.text_input("PREY90_BCLC Stage calc", help="Enter calculated BCLC stage")
+                            posty90_meld = (3.78*(int(posty90_bilirubin)))+(11.2*(int(posty90_inr)))+(9.57*(int(posty90_creatinine)))+6.43
+                            st.write("DAYY90_MELD",posty90_meld)
+                            posty90_meld_na = posty90_meld + 1.32*(137-int(posty90_sodium)) - (0.033*posty90_meld*(137-int(posty90_sodium)))
+                            st.write("DAYY90_MELDNa",posty90_meld_na)
+                            posty90_albi_score = albi_calc(posty90_bilirubin,posty90_albumin)
+                            st.write("DAYY90_Albiscore",posty90_albi_score)
                             posty90_albi_grade = albi_class(posty90_albi_score)
-                            st.write("POSTY90_30DY_ALBIgrade ",posty90_albi_grade)
+                            st.write("DAYY90_Albigrade",posty90_albi_grade)
 
+                            posty90_bclc = st.selectbox("PREY90_BCLC Stage calc [ Excel : POST30_BCLC ]\n\n(NA) Not in chart, (0) Stage 0, (1) Stage A, (2) Stage B, (3) Stage C, (4) Stage D   ",
+                                options=["NA", "0", "1", "2", "3", "4"],
+                                format_func=lambda x: {
+                                    "NA": "(NA) Not in chart",
+                                    "0": " Stage 0: Very early stage, with a single nodule smaller than 2 cm in diameter",
+                                    "1": " Stage A: Early stage, with one nodule smaller than 5 cm or up to three nodules smaller than 3 cm",
+                                    "2": " Stage B: Intermediate stage, with multiple tumors in the liver",
+                                    "3": " Stage C: Advanced stage, with cancer that has spread to other organs or blood vessels",
+                                    "4": " Stage D: End-stage disease, with severe liver damage or the patient is very unwell",
+                                }[x],
+                                index = ["NA", "0", "1", "2", "3", "4"].index(df.iloc[0]["POST30_BCLC"]) if df.iloc[0]["POST30_BCLC"] else None,
+                                placeholder="Choose an option"
+                                )
                         
                             ken_bclc_stage_post90 = st.text_input(
                                 "Ken_BCLCStagepost90",
@@ -5278,132 +5513,142 @@ def edit_existing_data():
                             ## New Part
                             st.subheader("Post_Y90_within_30_days_adverse_events")
                             DYAE_CTCAE_portal_htn = st.selectbox(
-                                "30DYAE_portal_htn CTCAE",
+                                "30DYAE_portal_htn CTCAE [Excel : AE30_PORTHTN]",
                                 options=["0","1","2","3","4","5"],
-                            index=["0","1","2","3","4","5"].index(df.iloc[0]["30DY_AE_Portalhtn"]) if df.iloc[0]["30DY_AE_Portalhtn"] else None,
+                            index=["0","1","2","3","4","5"].index(df.iloc[0]["AE30_PORTHTN"]) if df.iloc[0]["AE30_PORTHTN"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_Vascular_comp = st.selectbox(
-                                "30DYAE_Vascular comp CTCAE",
+                                "30DYAE_Vascular comp CTCAE [Excel : AE30_VASCULAR]",
                                 options=["0","1","2","3","4","5"],
-                            index=["0","1","2","3","4","5"].index(df.iloc[0]["30DY_AE_Vascularcomp"]) if df.iloc[0]["30DY_AE_Vascularcomp"] else None,
+                            index=["0","1","2","3","4","5"].index(df.iloc[0]["AE30_VASCULAR"]) if df.iloc[0]["AE30_VASCULAR"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_fatigue = st.selectbox(
-                                "30DYAE_fatigue CTCAE",
+                                "30DYAE_fatigue CTCAE [Excel : AE30_FATIGUE]",
                                 options=["0","1","2"],
-                            index=["0","1","2"].index(df.iloc[0]["30DY_AE_Fatigue"]) if df.iloc[0]["30DY_AE_Fatigue"] else None,
+                            index=["0","1","2"].index(df.iloc[0]["AE30_FATIGUE"]) if df.iloc[0]["AE30_FATIGUE"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_diarrhea = st.selectbox(
-                                "30DYAE_diarrhea CTCAE",
+                                "30DYAE_diarrhea CTCAE [Excel : AE30_DIAR]",
                                 options=["0","1","2","3","4","5"],
-                            index=["0","1","2","3","4","5"].index(df.iloc[0]["30DY_AE_Diarrhea"]) if df.iloc[0]["30DY_AE_Diarrhea"] else None,
+                            index=["0","1","2","3","4","5"].index(df.iloc[0]["AE30_DIAR"]) if df.iloc[0]["AE30_DIAR"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_hypoalbuminemia_emr = st.text_input(
                                 "30DYAE_hypoalbuminemia CTCAE",
-                                value=df.iloc[0]["30DY_AE_Hypoalbuminemia"]
+                                value=df.iloc[0]["AE30_HYPOALBUM"]
                             )
                             DYAE_CTCAE_hyperbilirubinemia_emr = st.text_input(
                                 "30DYAE_hyperbilirubinemia CTCAE",
-                                value=df.iloc[0]["30DY_AE_Hyperbilirubinemia"]
+                                value=df.iloc[0]["AE30_HYPERBILI"]
                             )
                             DYAE_CTCAE_Increase_creatinine_emr = st.text_input(
                                 "30DYAE_Increase_creatinine CTCAE",
-                                value=df.iloc[0]["30DY_AE_Increasecreatine"]
+                                value=df.iloc[0]["AE30_INCREASECR"]
                             )
                             DYAE_CTCAE_abdominal_pain = st.selectbox(
-                                "30DYAE_abdominal pain CTCAE",
+                                "30DYAE_abdominal pain CTCAE [Excel : AE30_ABDPAIN]",
                                 options=["0","1","2","3"],
-                            index=["0","1","2","3"].index(df.iloc[0]["30DY_AE_Abdominalpain"]) if df.iloc[0]["30DY_AE_Abdominalpain"] else None,
+                            index=["0","1","2","3"].index(df.iloc[0]["AE30_ABDPAIN"]) if df.iloc[0]["AE30_ABDPAIN"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_sepsis = st.selectbox(
-                                "30DYAE_sepsis CTCAE",
+                                "30DYAE_sepsis CTCAE [Excel : AE30_SEPSIS]",
                                 options=["0","3","4","5"],
-                            index=["0","3","4","5"].index(df.iloc[0]["30DY_AE_Sepsis"]) if df.iloc[0]["30DY_AE_Sepsis"] else None,
+                            index=["0","3","4","5"].index(df.iloc[0]["AE30_SEPSIS"]) if df.iloc[0]["AE30_SEPSIS"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_bacterial_peritonitis = st.selectbox(
-                                "30DYAE_CTCAE_bacterial_peritonitis",
+                                "30DYAE_CTCAE_bacterial_peritonitis [Excel : AE30_BACTPER]",
                                 options=["0", "3", "4", "5"],
-                            index=["0", "3", "4", "5"].index(df.iloc[0]["30DY_AE_BacterialPer"]) if df.iloc[0]["30DY_AE_BacterialPer"] else None,
+                            index=["0", "3", "4", "5"].index(df.iloc[0]["AE30_BACTPER"]) if df.iloc[0]["AE30_BACTPER"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_hemorrhage = st.selectbox(
-                            "30DYAE_CTCAE_hemorrhage",
+                            "30DYAE_CTCAE_hemorrhage [Excel : AE30_HEMOR]",
                             options=["0", "3", "4", "5"],
-                            index=["0", "3", "4", "5"].index(df.iloc[0]["30DY_AE_Hemorrhage"]) if df.iloc[0]["30DY_AE_Hemorrhage"] else None,
+                            index=["0", "3", "4", "5"].index(df.iloc[0]["AE30_HEMOR"]) if df.iloc[0]["AE30_HEMOR"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_anorexia = st.selectbox(
-                                "30DYAE_CTCAE_anorexia",
+                                "30DYAE_CTCAE_anorexia [Excel : AE30_ANOREX]",
                                 options=["0", "1", "2", "3"],
-                            index=["0", "1", "2", "3"].index(df.iloc[0]["30DY_AE_Anorexia"]) if df.iloc[0]["30DY_AE_Anorexia"] else None,
+                            index=["0", "1", "2", "3"].index(df.iloc[0]["AE30_ANOREX"]) if df.iloc[0]["AE30_ANOREX"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_intrahepatic_fistula = st.selectbox(
-                                "30DYAE_CTCAE_intrahepatic_fistula",
+                                "30DYAE_CTCAE_intrahepatic_fistula [Excel : AE30_IHFIST]",
                                 options=["0","2", "3", "4", "5"],
-                            index=["0","2", "3", "4", "5"].index(df.iloc[0]["30DY_AE_Intrahepaticfistula"]) if df.iloc[0]["30DY_AE_Intrahepaticfistula"] else None,
+                            index=["0","2", "3", "4", "5"].index(df.iloc[0]["AE30_IHFIST"]) if df.iloc[0]["AE30_IHFIST"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_constipation = st.selectbox(
-                                "30DYAE_CTCAE_constipation",
+                                "30DYAE_CTCAE_constipation [Excel : AE30_CONSTI]",
                                 options=["0", "1", "2", "3"],
-                            index=["0", "1", "2", "3"].index(df.iloc[0]["30DY_AE_Constipation"]) if df.iloc[0]["30DY_AE_Constipation"] else None,
+                            index=["0", "1", "2", "3"].index(df.iloc[0]["AE30_CONSTI"]) if df.iloc[0]["AE30_CONSTI"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_nausea = st.selectbox(
-                                "30DYAE_CTCAE_nausea",
+                                "30DYAE_CTCAE_nausea [Excel : AE30_NAUS]",
                                 options=["0", "1", "2", "3"],
-                            index=["0", "1", "2", "3"].index(df.iloc[0]["30DY_AE_Nausea"]) if df.iloc[0]["30DY_AE_Nausea"] else None,
+                            index=["0", "1", "2", "3"].index(df.iloc[0]["AE30_NAUS"]) if df.iloc[0]["AE30_NAUS"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_vomiting = st.selectbox(
-                                "30DYAE_CTCAE_vomiting",
+                                "30DYAE_CTCAE_vomiting [Excel : AE30_VOM]",
                                 options=["0","1","2", "3", "4", "5"],
-                            index=["0","1","2", "3", "4", "5"].index(df.iloc[0]["30DY_AE_Vomiting"]) if df.iloc[0]["30DY_AE_Vomiting"] else None,
+                            index=["0","1","2", "3", "4", "5"].index(df.iloc[0]["AE30_VOM"]) if df.iloc[0]["AE30_VOM"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_cholecystitis = st.selectbox(
-                                "30DYAE_CTCAE_cholecystitis",
+                                "30DYAE_CTCAE_cholecystitis [Excel : AE30_CHOLE]",
                                 options=["0", "2","3", "4", "5"],
-                            index=["0", "2","3", "4", "5"].index(df.iloc[0]["30DY_AE_Cholecystitis"]) if df.iloc[0]["30DY_AE_Cholecystitis"] else None,
+                            index=["0", "2","3", "4", "5"].index(df.iloc[0]["AE30_CHOLE"]) if df.iloc[0]["AE30_CHOLE"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_gastric_ulcers = st.selectbox(
-                                "30DYAE_CTCAE_gastric_ulcers",
+                                "30DYAE_CTCAE_gastric_ulcers [Excel : AE30_GULCER]",
                                 options=["0","1","2", "3", "4", "5"],
-                            index=["0","1","2", "3", "4", "5"].index(df.iloc[0]["30DY_AE_Gastriculcer"]) if df.iloc[0]["30DY_AE_Gastriculcer"] else None,
+                            index=["0","1","2", "3", "4", "5"].index(df.iloc[0]["AE30_GULCER"]) if df.iloc[0]["AE30_GULCER"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_hyperkalemia = st.selectbox(
-                                "30DYAE_CTCAE_hyperkalemia",
+                                "30DYAE_CTCAE_hyperkalemia [Excel : AE30_HYPERKAL]",
                                 options=["NA"],
-                            index=["NA"].index(df.iloc[0]["30DY_AE_Hyperkalemia"]) if df.iloc[0]["30DY_AE_Hyperkalemia"] else None,
+                            index=["NA"].index(df.iloc[0]["AE30_HYPERKAL"]) if df.iloc[0]["AE30_HYPERKAL"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_respiratory_failure = st.selectbox(
-                                "30DYAE_CTCAE_respiratory_failure",
+                                "30DYAE_CTCAE_respiratory_failure [Excel : AE30_RESPFAIL]",
                                 options=["0", "4", "5"],
-                            index=["0", "4", "5"].index(df.iloc[0]["30DY_AE_Respfailure"]) if df.iloc[0]["30DY_AE_Respfailure"] else None,
+                            index=["0", "4", "5"].index(df.iloc[0]["AE30_RESPFAIL"]) if df.iloc[0]["AE30_RESPFAIL"] else None,
                             placeholder="Choose an option",
                             )
                             DYAE_CTCAE_AKI = st.selectbox(
-                                "30DYAE_CTCAE_AKI",
+                                "30DYAE_CTCAE_AKI [Excel : AE30_AKI]",
                                 options=["0", "3", "4", "5"],
-                            index=["0", "3", "4", "5"].index(df.iloc[0]["30DY_AE_AKI"]) if df.iloc[0]["30DY_AE_AKI"] else None,
+                            index=["0", "3", "4", "5"].index(df.iloc[0]["AE30_AKI"]) if df.iloc[0]["AE30_AKI"] else None,
                             placeholder="Choose an option",
                             )
 
                             DYAE_CTCAE_Radiation_pneumonitis = st.selectbox(
-                                "30DYAE_CTCAE_Radiation_pneumonitis",
+                                "30DYAE_CTCAE_Radiation_pneumonitis [Excel : AE30_RADPNEUM]",
                                 options=["0","1","2", "3", "4", "5"],
-                            index=["0","1","2", "3", "4", "5"].index(df.iloc[0]["30DY_AE_Radiationpneumonitis"]) if df.iloc[0]["30DY_AE_Radiationpneumonitis"] else None,
+                            index=["0","1","2", "3", "4", "5"].index(df.iloc[0]["AE30_RADPNEUM"]) if df.iloc[0]["AE30_RADPNEUM"] else None,
                             placeholder="Choose an option",
                             )
+                            ae30_alt = st.text_input("AE30_ALT", value=df.iloc[0]["AE30_ALT"] if "AE30_ALT" in df.columns else "")
+                            ae30_ast = st.text_input("AE30_AST", value=df.iloc[0]["AE30_AST"] if "AE30_AST" in df.columns else "")
+                            ae30_alp = st.text_input("AE30_ALP", value=df.iloc[0]["AE30_ALP"] if "AE30_ALP" in df.columns else "")
+                            ae30_plt = st.text_input("AE30_PLT", value=df.iloc[0]["AE30_PLT"] if "AE30_PLT" in df.columns else "")
+                            ae30_otherft = st.text_input("AE30_OTHERFT", value=df.iloc[0]["AE30_OTHERFT"] if "AE30_OTHERFT" in df.columns else "")
+                            ae30_other = st.text_input("AE30_OTHER", value=df.iloc[0]["AE30_OTHER"] if "AE30_OTHER" in df.columns else "")
+                            ae30_gradesum12 = st.text_input("AE30_GRADESUM12", value=df.iloc[0]["AE30_GRADESUM12"] if "AE30_GRADESUM12" in df.columns else "")
+                            ae30_gradesum345 = st.text_input("AE30_GRADESUM345", value=df.iloc[0]["AE30_GRADESUM345"] if "AE30_GRADESUM345" in df.columns else "")
+
+
 
                             DYAE_AE_other = st.text_area(
                                 "30DY_AE_other",
@@ -5414,35 +5659,57 @@ def edit_existing_data():
                             DYAE_AE_date_of_AE = st.text_input(
                                 "90DY_AE_date_of_AE",
                                 help="(if AE is present after 30 days but before 90 write it here and the date)",
-                                value=df.iloc[0]["90DY_AE_DateofAE"]
+                                value=df.iloc[0]["AE90_DATE"]
                             )
                             ken_grandedtoxicity = st.text_area(
-                                "Ken_GradeandToxicity",
-                                value=df.iloc[0]["Additional Notes FT"]
+                                "AE90_OTHERFT",
+                                value=df.iloc[0]["AE90_OTHERFT"]
 
                             )
+                            ae90_gradesum12 = st.text_input("AE90_GRADESUM12", value=df.iloc[0]["AE90_GRADESUM12"] )
+                            ae90_gradesum345 = st.text_input("AE90_GRADESUM345", value=df.iloc[0]["AE90_GRADESUM345"] )
                             dy_ae_hospitalization_3 = st.selectbox(
-                                "90DY_AE_Hospitalization 3 months",
-                                options=["Yes","No"],
-                                index=["Yes","No"].index(df.iloc[0]["90DY_AE_Hosp3mo"]) if df.iloc[0]["90DY_AE_Hosp3mo"] else None,
+                                "90DY_AE_Hospitalization 3 months [Excel : AE90_HOSP3]\n\n Yes (1), No (0)",
+                                    options=["1", "0"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                        }[x],
+                                
+                                index=["1","0"].index(df.iloc[0]["AE90_HOSP3"]) if df.iloc[0]["AE90_HOSP3"] else None,
                             placeholder="Choose an option",
                             )
                             dy_ae_hospitalization_6 = st.selectbox(
-                                "90DY_AE_Hospitalization 6 months",
-                                options=["Yes","No"],
-                                index=["Yes","No"].index(df.iloc[0]["90DY_AE_Datehosp3mo"]) if df.iloc[0]["90DY_AE_Datehosp3mo"] else None,
+                                "90DY_AE_Hospitalization 6 months [Excel : AE30_HOSP3DATE]\n\n Yes (1), No (0)",
+                                    options=["1", "0"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                        }[x],
+                             
+                                index=["1","0"].index(df.iloc[0]["AE30_HOSP3DATE"]) if df.iloc[0]["AE30_HOSP3DATE"] else None,
                             placeholder="Choose an option",
                             )
                             dy_ae_hosp6mo = st.selectbox(
-                                "90DY_AE_Hosp6mo",
-                                options=["Yes","No"],
-                                index=["Yes","No"].index(df.iloc[0]["90DY_AE_Hosp6mo"]) if df.iloc[0]["90DY_AE_Hosp6mo"] else None,
+                                "90DY_AE_Hosp6mo [Excel : AE90_HOSP6]\n\n Yes (1), No (0)",
+                                    options=["1", "0"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                        }[x],
+                                
+                                index=["1","0"].index(df.iloc[0]["AE90_HOSP6"]) if df.iloc[0]["AE90_HOSP6"] else None,
                             placeholder="Choose an option",
                             )
                             dy_ae_death_due = st.selectbox(
-                                "90DY_AE_Death due to AE",
-                                options=["Yes","No"],
-                                index=["Yes","No"].index(df.iloc[0]["90DY_AE_DeathduetoAE"]) if df.iloc[0]["90DY_AE_DeathduetoAE"] else None,
+                                "90DY_AE_Death due to AE [Excel : AE30_DEATHAE]\n\n Yes (1), No (0)",
+                                    options=["1", "0"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                        }[x],
+                               
+                                index=["1","0"].index(df.iloc[0]["AE30_DEATHAE"]) if df.iloc[0]["AE30_DEATHAE"] else None,
                             placeholder="Choose an option",
                             )
                             posty90_date_labs = (
@@ -5460,66 +5727,76 @@ def edit_existing_data():
                             if submit_tab8:
                                     
                                     data8={
-                                    "POSTY90_30DY_Datelabs": posty90_date_labs,
-                                    "POSTY90_30DY_AFP": posty90_afp,
-                                    "POSTY90_30DY_AFPdate": posty90_afp_date,
-                                    "POSTY90_30DY_Sodium": posty90_sodium,
-                                    "POSTY90_30DY_Creatinine": posty90_creatinine,
-                                    "POSTY90_30DY_INR": posty90_inr,
-                                    "POSTY90_30DY_Albumin": posty90_albumin,
-                                    "POSTY90_30DY_Bilirubin": posty90_bilirubin,
-                                    "POSTY90_30DY_AST": posty90_ast,
-                                    "POSTY90_30DY_ALT": posty90_alt,
-                                    "POSTY90_30DY_ALP": posty90_alkaline_phosphatase,
-                                    "POSTY90_30DY_Leukocytes": posty90_leukocytes,
-                                    "POSTY90_30DY_Platelets": posty90_platelets,
-                                    "POSTY90_30DY_Potassium": posty90_potassium,
-                                    "30DY_AE_AscitesCTCAE": posty90_ascites_ctcae,
-                                    "30DY_AE_AscitesCTCAEnumb": posty90_ascites_classification,
-                                    "30DY_AE_Ascitesdiruetics": posty90_ascites_diruetics,
-                                    "30DY_AE_Ascitesparacentesis": posty90_ascites_paracentesis,
-                                    "30DY_AE_Asciteshospitalization": posty90_ascites_hospitalization,
-                                    "30DY_AE_HEgrade": posty90_he_grade,
-                                    "30DY_AE_ascities_freetext": posty90_ascites_free_text,
-                                    "POSTY90_30DY_ECOG": posty90_ecog,
-                                    "POSTY90_30DY_CPclass": posty90_child_pugh_class,
-                                    "POSTY90_30DY_CPcalc": posty90_child_pugh_points,
-                                    "POSTY90_30DY_MELD": posty90_meld,
-                                    "POSTY90_30DY_MELDNa": posty90_meld_na,
-                                    "POSTY90_30DY_ALBIscore": posty90_albi_score,
-                                    "POSTY90_30DY_ALBIgrade": posty90_albi_grade,
-                                    "POSTY90_30DY_BCLC": posty90_bclc,
+                                    "POST30_LABSDATE": posty90_date_labs,
+                                    "POST30_AFP": posty90_afp,
+                                    "POST30_AFPDATE": posty90_afp_date,
+                                    "POST30_SODIUM": posty90_sodium,
+                                    "POST30_CREATININE": posty90_creatinine,
+                                    "POST30_INR": posty90_inr,
+                                    "POST30_ALBUMIN": posty90_albumin,
+                                    "POST30_BILI": posty90_bilirubin,
+                                    "POST30_AST": posty90_ast,
+                                    "POST30_ALT": posty90_alt,
+                                    "POST30_ALP": posty90_alkaline_phosphatase,
+                                    "POST30_LEUK": posty90_leukocytes,
+                                    "POST30_PLT": posty90_platelets,
+                                    "POST30_POTAS": posty90_potassium,
+                                    "POST30_ASCITCTCAE": posty90_ascites_ctcae,
+                                    "POST30_ASCITNUMB": posty90_ascites_classification,
+                                    "POST30_ASCITDIUR": posty90_ascites_diruetics,
+                                    "POST30_ASCITPARA": posty90_ascites_paracentesis,
+                                    "POST30_ASCITHOSP": posty90_ascites_hospitalization,
+                                    "POST30_HEGRADE": posty90_he_grade,
+                                    "POST30_ASCITFT": posty90_ascites_free_text,
+                                    "POST30_ECOG": posty90_ecog,
+                                    "POST30_CPCALC": posty90_child_pugh_points,
+                                    "POST30_CPCLASS": posty90_child_pugh_class,
+                                    "POST30_MELD": posty90_meld,
+                                    "POST30_MELDNA": posty90_meld_na,
+                                    "POST30_ALBISCORE": posty90_albi_score,
+                                    "POST30_ALBIGRADE": posty90_albi_grade,
+                                    "POST30_BCLC": posty90_bclc,
                                     "Ken_BCLCStagepost90": ken_bclc_stage_post90,
                                     "Ken_MELD_Stagepost90": ken_meld_stage_post90,
-                                    "30DY_AE_Portalhtn": DYAE_CTCAE_portal_htn,
-                                    "30DY_AE_Vascularcomp": DYAE_CTCAE_Vascular_comp,
-                                    "30DY_AE_Fatigue": DYAE_CTCAE_fatigue,
-                                    "30DY_AE_Diarrhea": DYAE_CTCAE_diarrhea,
-                                    "30DY_AE_Hypoalbuminemia": DYAE_CTCAE_hypoalbuminemia_emr,
-                                    "30DY_AE_Hyperbilirubinemia": DYAE_CTCAE_hyperbilirubinemia_emr,
-                                    "30DY_AE_Increasecreatine": DYAE_CTCAE_Increase_creatinine_emr,
-                                    "30DY_AE_Abdominalpain": DYAE_CTCAE_abdominal_pain,
-                                    "30DY_AE_Sepsis": DYAE_CTCAE_sepsis,
-                                    "30DY_AE_BacterialPer": DYAE_CTCAE_bacterial_peritonitis,
-                                    "30DY_AE_Hemorrhage": DYAE_CTCAE_hemorrhage,
-                                    "30DY_AE_Anorexia": DYAE_CTCAE_anorexia,
-                                    "30DY_AE_Intrahepaticfistula": DYAE_CTCAE_intrahepatic_fistula,
-                                    "30DY_AE_Constipation": DYAE_CTCAE_constipation,
-                                    "30DY_AE_Nausea": DYAE_CTCAE_nausea,
-                                    "30DY_AE_Vomiting": DYAE_CTCAE_vomiting,
-                                    "30DY_AE_Cholecystitis": DYAE_CTCAE_cholecystitis,
-                                    "30DY_AE_Gastriculcer": DYAE_CTCAE_gastric_ulcers,
-                                    "30DY_AE_Hyperkalemia": DYAE_CTCAE_hyperkalemia,
-                                    "30DY_AE_Respfailure": DYAE_CTCAE_respiratory_failure,
-                                    "30DY_AE_AKI": DYAE_CTCAE_AKI,
-                                    "30DY_AE_Radiationpneumonitis": DYAE_CTCAE_Radiation_pneumonitis,
+                                    "AE30_PORTHTN": DYAE_CTCAE_portal_htn,
+                                    "AE30_VASCULAR": DYAE_CTCAE_Vascular_comp,
+                                    "AE30_FATIGUE": DYAE_CTCAE_fatigue,
+                                    "AE30_DIAR": DYAE_CTCAE_diarrhea,
+                                    "AE30_HYPOALBUM": DYAE_CTCAE_hypoalbuminemia_emr,
+                                    "AE30_HYPERBILI": DYAE_CTCAE_hyperbilirubinemia_emr,
+                                    "AE30_INCREASECR": DYAE_CTCAE_Increase_creatinine_emr,
+                                    "AE30_ABDPAIN": DYAE_CTCAE_abdominal_pain,
+                                    "AE30_SEPSIS": DYAE_CTCAE_sepsis,
+                                    "AE30_BACTPER": DYAE_CTCAE_bacterial_peritonitis,
+                                    "AE30_HEMOR": DYAE_CTCAE_hemorrhage,
+                                    "AE30_ANOREX": DYAE_CTCAE_anorexia,
+                                    "AE30_IHFIST": DYAE_CTCAE_intrahepatic_fistula,
+                                    "AE30_CONSTI": DYAE_CTCAE_constipation,
+                                    "AE30_NAUS": DYAE_CTCAE_nausea,
+                                    "AE30_VOM": DYAE_CTCAE_vomiting,
+                                    "AE30_CHOLE": DYAE_CTCAE_cholecystitis,
+                                    "AE30_GULCER": DYAE_CTCAE_gastric_ulcers,
+                                    "AE30_RESPFAIL": DYAE_CTCAE_respiratory_failure,
+                                    "AE30_AKI": DYAE_CTCAE_AKI,
+                                    "AE30_RADPNEUM": DYAE_CTCAE_Radiation_pneumonitis,
+                                    "AE30_HYPERKAL": DYAE_CTCAE_hyperkalemia,
+                                    "AE30_ALT" : ae30_alt,
+                                    "AE30_AST" : ae30_ast,
+                                    "AE30_ALP" : ae30_alp,
+                                    "AE30_PLT" : ae30_plt,
+                                    "AE30_OTHERFT" : ae30_otherft,
+                                    "AE30_OTHER" : ae30_other,
+                                    "AE30_GRADESUM12" : ae30_gradesum12,
+                                    "AE30_GRADESUM345" : ae30_gradesum345,
                                     "30DY_AE_Other": DYAE_AE_other,
-                                    "90DY_AE_DateofAE": DYAE_AE_date_of_AE,
-                                    "Additional Notes FT": ken_grandedtoxicity,
-                                    "90DY_AE_Hosp3mo": dy_ae_hospitalization_3,
-                                    "90DY_AE_Datehosp3mo": dy_ae_hospitalization_6,
-                                    "90DY_AE_Hosp6mo": dy_ae_hosp6mo,
-                                    "90DY_AE_DeathduetoAE": dy_ae_death_due
+                                    "AE90_DATE": DYAE_AE_date_of_AE,
+                                    "AE90_OTHERFT": ken_grandedtoxicity,
+                                    "AE90_GRADESUM12" : ae90_gradesum12,
+                                    "AE90_GRADESUM345" : ae90_gradesum345,
+                                    "AE90_HOSP3": dy_ae_hospitalization_3,
+                                    "AE30_HOSP3DATE": dy_ae_hospitalization_6,
+                                    "AE90_HOSP6": dy_ae_hosp6mo,
+                                    "AE30_DEATHAE": dy_ae_death_due
                                     }
                                     update_google_sheet(data8, mrn)                             
                                 
@@ -5558,8 +5835,8 @@ def edit_existing_data():
                             except:
                                 st.warning("Fill Pre Y90 Tab")
                             try :
-                                posty90_bilirubin = df.loc[df["MRN"] == mrn,'POSTY90_30DY_Bilirubin']
-                                posty90_albumin = df.loc[df["MRN"] == mrn,'POSTY90_30DY_Albumin']
+                                posty90_bilirubin = df.loc[df["MRN"] == mrn,'POST30_BILI']
+                                posty90_albumin = df.loc[df["MRN"] == mrn,'POST30_ALBUMIN']
                                 k_ken_albiposttareraw = albi_calc(posty90_bilirubin,posty90_albumin)
                                 st.write("K_ken_AlbiPostTARERaw : ", k_ken_albiposttareraw)
                                 k_ken_albiposttaregrade = albigrade(k_ken_albiposttareraw)
@@ -5590,26 +5867,34 @@ def edit_existing_data():
                         st.subheader("Imaging Date")
                         with st.form("imaging_date_form"):
                                 PREY90_prescan_modality = st.selectbox(
-                                        "PREY90_prescan_modality",
-                                        options=["CT","MRI"],
-                                index=["CT","MRI"].index(df.iloc[0]["PREY90_prescan_modality"]) if df.iloc[0]["PREY90_prescan_modality"] else None,
+                                        "PREY90_prescan_modality [Excel : PREY_MOD]\n\n(1) CT, (2) MRI",
+                                        options=["1","2"],
+                                        format_func=lambda x: {
+                                            "1": "CT",
+                                            "2": "MRI",
+                                        }[x],
+                                index=["1","2"].index(df.iloc[0]["PREY_MOD"]) if df.iloc[0]["PREY_MOD"] else None,
                                 placeholder="Choose an option",
                                 )
-                                PREY90_Imaging_Date = st.date_input("PREY90_Imaging Date" ,value = datetime.strptime(df.iloc[0]["PREY90_Imaging Date"], "%Y-%m-%d").date() if df.iloc[0]["PREY90_Imaging Date"] else None
+                                PREY90_Imaging_Date = st.date_input("PREY90_Imaging Date" ,value = datetime.strptime(df.iloc[0]["PREY_IMG_DATE"], "%Y-%m-%d").date() if df.iloc[0]["PREY_IMG_DATE"] else None
                                 )
                                 PREY90_total_number_of_lesions = st.selectbox(
-                                        "PREY90_total number of lesions",
+                                        "PREY90_total number of lesions [Excel : PREY_TOTLES]",
                                         options=["1","2",">3"],
-                                index=["1","2",">3"].index(df.iloc[0]["PREY90_total number of lesions"]) if df.iloc[0]["PREY90_total number of lesions"] else None,
+                                index=["1","2",">3"].index(df.iloc[0]["PREY_TOTLES"]) if df.iloc[0]["PREY_TOTLES"] else None,
                                 placeholder="Choose an option",
                                 )
                                 PREY90_Number_Involved_Lobes = st.selectbox(
-                                        "PREY90_Number Involved Lobes",
-                                        options=["Unilobar","Bilobar"],
-                                index=["Unilobar","Bilobar"].index(df.iloc[0]["PREY90_Number Involved Lobes"]) if df.iloc[0]["PREY90_Number Involved Lobes"] else None,
+                                        "PREY90_Number Involved Lobes [Excel : PREY_LOBES]\n\n(1) Unilobar, (2) Bilobar",
+                                        options=["1","2"],
+                                        format_func=lambda x: {
+                                            "1": "Unilobar",
+                                            "2": "Bilobar",
+                                        }[x],
+                                index=["1","2"].index(df.iloc[0]["PREY_LOBES"]) if df.iloc[0]["PREY_LOBES"] else None,
                                 placeholder="Choose an option",
                                 )
-                                prey90_sx = df.loc[df["MRN"] == mrn, "PREY90_target_lesion_1_segments"].values[0]
+                                prey90_sx = df.loc[df["MRN"] == mrn, "PREY_TL1SEG"].values[0]
                                 if prey90_sx:
                                     # If complications is a string, split it into a list and strip spaces
                                     prey90_sx_list = [comp.strip() for comp in prey90_sx.split(',')] if isinstance(prey90_sx, str) else prey90_sx
@@ -5618,7 +5903,7 @@ def edit_existing_data():
                                 valid_prey90_sx = ["1","2","3","4a","4b","5","6","7","8","NA"]
                                 prey90_sx_list = [comp for comp in prey90_sx_list if comp in valid_prey90_sx]
                                 PREY90_target_lesion_1_segments = st.multiselect(
-                                        "PREY90_target_lesion_1_segments",
+                                        "PREY90_target_lesion_1_segments [Excel : PREY_TL1SEG]",
                                         options=["1","2","3","4a","4b","5","6","7","8","NA"],
                                         default=prey90_sx_list,
                                         placeholder="Select all that apply"
@@ -5627,466 +5912,610 @@ def edit_existing_data():
                                 PREY90_TL1_LAD = st.number_input(
                                     "PREY90_TL1_LAD",
                                     step=0.1,
-                                    value = float(df.iloc[0]["PREY90_TL1_LAD"]) if pd.notnull(df.iloc[0]["PREY90_TL1_LAD"]) and df.iloc[0]["PREY90_TL1_LAD"] != "" else 0.0
+                                    value = float(df.iloc[0]["PREY_TL1LAD"]) if pd.notnull(df.iloc[0]["PREY_TL1LAD"]) and df.iloc[0]["PREY_TL1LAD"] != "" else 0.0
                                 )
                                 PREY90_Target_Lesion_1_PAD = st.number_input(
                                     "PREY90_Target Lesion 1 PAD",step=0.1,
-                                    value = float(df.iloc[0]["PREY90_Target Lesion 1 PAD"]) if pd.notnull(df.iloc[0]["PREY90_Target Lesion 1 PAD"]) and df.iloc[0]["PREY90_Target Lesion 1 PAD"] != "" else 0.0
+                                    value = float(df.iloc[0]["PREY_TL1PAD"]) if pd.notnull(df.iloc[0]["PREY_TL1PAD"]) and df.iloc[0]["PREY_TL1PAD"] != "" else 0.0
                                 )
                                 PREY90_Target_Lesion_1_CCD = st.number_input(
                                     "PREY90_Target Lesion 1 CCD",step=0.1,
-                                     value = float(df.iloc[0]["PREY90_Target Lesion 1 CCD"]) if pd.notnull(df.iloc[0]["PREY90_Target Lesion 1 CCD"]) and df.iloc[0]["PREY90_Target Lesion 1 CCD"] != "" else 0.0
+                                     value = float(df.iloc[0]["PREY_TL1CCD"]) if pd.notnull(df.iloc[0]["PREY_TL1CCD"]) and df.iloc[0]["PREY_TL1CCD"] != "" else 0.0
                                 )
                                 PREY90_Target_Lesion_1_VOL = 4/3*3.14*(PREY90_Target_Lesion_1_PAD)*(PREY90_TL1_LAD)*PREY90_Target_Lesion_1_CCD
                                 st.write("PREY90_Target Lesion 1 VOL",PREY90_Target_Lesion_1_VOL)
                                 PREY90_Target_Lesion_2_segments = st.selectbox(
-                                        "PREY90_Target_Lesion_2_segments",
+                                        "PREY90_Target_Lesion_2_segments [Excel : PREY_TL2SEG]",
                                         options=["1","2","3","4a","4b","5","6","7","8","NA"],
-                        index=["1","2","3","4a","4b","5","6","7","8","NA"].index(df.iloc[0]["PREY90_Target lesion 2 Segments"]) if df.iloc[0]["PREY90_Target lesion 2 Segments"] else None,
+                        index=["1","2","3","4a","4b","5","6","7","8","NA"].index(df.iloc[0]["PREY_TL2SEG"]) if df.iloc[0]["PREY_TL2SEG"] else None,
                         placeholder="Choose an option",
                                 )
                                 PREY90_Target_Lesion_2_LAD = st.number_input(
                                     "PREY90_Target_Lesion_2_LAD",step=0.1,
-                                    value = float(df.iloc[0]["PREY90_Target Lesion 2 LAD"]) if pd.notnull(df.iloc[0]["PREY90_Target Lesion 2 LAD"]) and df.iloc[0]["PREY90_Target Lesion 2 LAD"] != "" else 0.0
+                                    value = float(df.iloc[0]["PREY_TL2LAD"]) if pd.notnull(df.iloc[0]["PREY_TL2LAD"]) and df.iloc[0]["PREY_TL2LAD"] != "" else 0.0
                                 )
                                 PREY90_Target_Lesion_2_PAD = st.number_input(
                                     "PREY90_Target Lesion 2 PAD",
-                                    step=0.1,value = float(df.iloc[0]["PREY90_Target Lesion 2 PAD"]) if pd.notnull(df.iloc[0]["PREY90_Target Lesion 2 PAD"]) and df.iloc[0]["PREY90_Target Lesion 2 PAD"] != "" else 0.0
+                                    step=0.1,value = float(df.iloc[0]["PREY_TL2PAD"]) if pd.notnull(df.iloc[0]["PREY_TL2PAD"]) and df.iloc[0]["PREY_TL2PAD"] != "" else 0.0
                                 )
                                 PREY90_Target_Lesion_2_CCD = st.number_input(
                                     "PREY90_Target Lesion 2 CCD",
-                                    step=0.1,value = float(df.iloc[0]["PREY90_Target Lesion 2 CCD"]) if pd.notnull(df.iloc[0]["PREY90_Target Lesion 2 CCD"]) and df.iloc[0]["PREY90_Target Lesion 2 CCD"] != "" else 0.0
+                                    step=0.1,value = float(df.iloc[0]["PREY_TL2CCD"]) if pd.notnull(df.iloc[0]["PREY_TL2CCD"]) and df.iloc[0]["PREY_TL2CCD"] != "" else 0.0
                                 )
                                 PREY90_Target_Lesion_2_VOL = 4/3*3.14*(PREY90_Target_Lesion_2_PAD)*(PREY90_Target_Lesion_2_LAD)*PREY90_Target_Lesion_2_CCD
                                 st.write("PREY90_Target Lesion 2 VOL",PREY90_Target_Lesion_2_VOL)
                                 PREY90_pretx_targeted_Lesion_Dia_Sum = max(PREY90_TL1_LAD,PREY90_Target_Lesion_1_PAD,PREY90_Target_Lesion_1_CCD)+max(PREY90_Target_Lesion_2_PAD,PREY90_Target_Lesion_2_LAD,PREY90_Target_Lesion_2_CCD)
                                 st.write("PREY90_ pretx targeted Lesion Dia Sum",PREY90_pretx_targeted_Lesion_Dia_Sum)
-                                PREY90_Non_Target_Lesion_Location = st.selectbox( "PREY90_Non-Target Lesion Location" , options=["1","2","3","4a","4b","5","6","7","8","NA"],
-                                index=["1","2","3","4a","4b","5","6","7","8","NA"].index(df.iloc[0]["PREY90_Non-Target Lesion Location"]) if df.iloc[0]["PREY90_Non-Target Lesion Location"] else None,
-                                placeholder="Choose an option",)
+                                PREY90_Non_Target_Lesion_Location = st.selectbox( 
+                                    "PREY90_Non-Target Lesion Location [Excel : PREY_NTLOC]" , options=["1","2","3","4a","4b","5","6","7","8","NA"],
+                                index=["1","2","3","4a","4b","5","6","7","8","NA"].index(df.iloc[0]["PREY_NTLOC"]) if df.iloc[0]["PREY_NTLOC"] else None,
+                                placeholder="Choose an option",
+                                )
                                 PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
                                     "PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["PREY90_Non-Target Lesion 2 LAD Art Enhanc"]) if pd.notnull(df.iloc[0]["PREY90_Non-Target Lesion 2 LAD Art Enhanc"]) and df.iloc[0]["PREY90_Non-Target Lesion 2 LAD Art Enhanc"] != "" else 0.0
+                                    step=0.1,value = float(df.iloc[0]["PREY_NTL1LAD"]) if pd.notnull(df.iloc[0]["PREY_NTL1LAD"]) and df.iloc[0]["PREY_NTL1LAD"] != "" else 0.0
                                 )
                                 PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
                                     "PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["PREY90_Non-Target Lesion 2 PAD Art Enhanc"]) if pd.notnull(df.iloc[0]["PREY90_Non-Target Lesion 2 PAD Art Enhanc"]) and df.iloc[0]["PREY90_Non-Target Lesion 2 PAD Art Enhanc"] != "" else 0.0
+                                    step=0.1,value = float(df.iloc[0]["PREY_NTL1PAD"]) if pd.notnull(df.iloc[0]["PREY_NTL1PAD"]) and df.iloc[0]["PREY_NTL1PAD"] != "" else 0.0
                                 )
                                 PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
                                     "PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["PREY90_Non-Target Lesion 2 CCD Art Enhanc"]) if pd.notnull(df.iloc[0]["PREY90_Non-Target Lesion 2 CCD Art Enhanc"]) and df.iloc[0]["PREY90_Non-Target Lesion 2 CCD Art Enhanc"] != "" else 0.0
+                                    step=0.1,value = float(df.iloc[0]["PREY_NTL1CCD"]) if pd.notnull(df.iloc[0]["PREY_NTL1CCD"]) and df.iloc[0]["PREY_NTL1CCD"] != "" else 0.0
                                 )
                                 PREY90_Non_targeted_Lesion_Dia_Sum = max(PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc)
                                 st.write("PREY90_Non-targeted Lesion Dia Sum",PREY90_Non_targeted_Lesion_Dia_Sum)
                                 PREY90_Reviewers_Initials = st.text_input(
                                     "PREY90_Reviewers Initials",
                                     help="Free-text input for reviewer name",
-                                    value = df.iloc[0]["PREY90_Reviewers Initials"]
+                                    value = df.iloc[0]["PREY_REVFT"]
                                 )
                                 PREY90_Pre_Y90_Extrahepatic_Disease = st.selectbox(
-                                    "PREY90_Pre Y90 Extrahepatic Disease",
-                                    options=["Yes", "No", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["PREY90_Pre Y90 Extrahepatic Disease"]) if df.iloc[0]["PREY90_Pre Y90 Extrahepatic Disease"] else None,
+                                    "PREY90_Pre Y90 Extrahepatic Disease [Excel : PREY_EHD]\n\n Yes (1), No (0)",
+                                    options=["1", "0"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                        }[x],
+                        index=["1", "0"].index(df.iloc[0]["PREY_EHD"]) if df.iloc[0]["PREY_EHD"] else None,
                         placeholder="Choose an option",
                                 )
                                 PREY90_Pre_Y90_Extrahepatic_Disease_Location = st.text_input(
                                     "PREY90_Pre Y90 Extrahepatic Disease Location",
                                     help="Free Text",
-                                    value=df.iloc[0]["PREY90_Pre Y90 Extrahepatic Disease Location"]
+                                    value=df.iloc[0]["PREY_EHDLOCFT"]
                                 )
                                 PREY90_PVT = st.selectbox(
-                                    "PREY90_PVT",
-                                    options=["Yes", "No", "NA"],
-                        index=["Yes", "No", "NA"].index(df.iloc[0]["PREY90_PVT"]) if df.iloc[0]["PREY90_PVT"] else None,
+                                    "PREY90_PVT [Excel : PREY_PVT]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                        index=["1", "0", "NA"].index(df.iloc[0]["PREY_PVT"]) if df.iloc[0]["PREY_PVT"] else None,
                         placeholder="Choose an option",
                                 )
                                 PREY90_PVT_Location = st.selectbox(
-                                    "PREY90_PVT Location",
+                                    "PREY90_PVT Location [Excel : PREY_PVTLOC]",
                                     options=["RPV", "LPV"],
-                        index=["RPV", "LPV"].index(df.iloc[0]["PREY90_PVT Location"]) if df.iloc[0]["PREY90_PVT Location"] else None,
+                        index=["RPV", "LPV"].index(df.iloc[0]["PREY_PVTLOC"]) if df.iloc[0]["PREY_PVTLOC"] else None,
                         placeholder="Choose an option",
                                 )
                                 PREY90_Features_of_cirrhosis = st.selectbox(
-                                    "PREY90_Features of cirrhosis",
-                                    options=["Yes", "No", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["PREY90_Features of cirrhosis"]) if df.iloc[0]["PREY90_Features of cirrhosis"] else None,
-                        placeholder="Choose an option",
+                                    "PREY90_Features of cirrhosis [Excel : PREY_CIRRH]\n\n\n\n Yes (1), No (0)",
+                                    options=["1", "0"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                        }[x],
+                                    index=["1", "0"].index(df.iloc[0]["PREY_CIRRH"]) if df.iloc[0]["PREY_CIRRH"] else None,
+                                    placeholder="Choose an option",
                                 )
                                 st.subheader("Imaging_1st_Followup")
 
                                 FU_Scan_Modality = st.selectbox(
-                                    "1st_FU_Scan Modality",
-                                    options=["CT", "MRI"],
-                        index=["CT", "MRI"].index(df.iloc[0]["1st_FU_Scan Modality"]) if df.iloc[0]["1st_FU_Scan Modality"] else None,
+                                    "1st_FU_Scan Modality[Excel : FU1_MOD]\n\n(1) CT, (2) MRI",
+                                        options=["1","2"],
+                                        format_func=lambda x: {
+                                            "1": "CT",
+                                            "2": "MRI",
+                                        }[x],
+                        index=["1", "2"].index(df.iloc[0]["FU1_MOD"]) if df.iloc[0]["FU1_MOD"] else None,
                         placeholder="Choose an option",
                                 )
-                                FU_Imaging_Date = st.date_input("1st_FU_Imaging Date",value = datetime.strptime(df.iloc[0]["1st_FU_Imaging Date"], "%Y-%m-%d").date() if df.iloc[0]["1st_FU_Imaging Date"] else None)
+                                FU_Imaging_Date = st.date_input("1st_FU_Imaging Date",value = datetime.strptime(df.iloc[0]["FU1_IMG_DATE"], "%Y-%m-%d").date() if df.iloc[0]["FU1_IMG_DATE"] else None)
                                 FU_Months_Since_Y90 = relativedelta(FU_Imaging_Date, fetch_date).months
                                 st.write("1st_FU_Months Since Y90",FU_Months_Since_Y90)
                                 FU_Total_number_of_lesions = st.selectbox(
-                                    "1st_FU_Total number of lesions",
-                                    options=["1", "2", ">3"],
-                        index=["1", "2", ">3"].index(df.iloc[0]["1st_FU_Total number of lesions"]) if df.iloc[0]["1st_FU_Total number of lesions"] else None, 
+                                   "1st_FU_Total number of lesions [Excel : FU1_TOTLES]\n\n(1) 1,(2) 2,(3) >=3",
+                            options=["1", "2", "3"],
+                            format_func=lambda x: {
+                                            "1": "1",
+                                            "2": "2",
+                                            "3" : ">=3"
+                                        }[x],
+                        index=["1", "2", "3"].index(df.iloc[0]["FU1_TOTLES"]) if df.iloc[0]["FU1_TOTLES"] else None, 
                         placeholder="Choose an option",
                                 )
                                 FU_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
                                     "1st_FU_Target Lesion 1 LAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["1st_FU_Target Lesion 1 LAD Art Enhanc"]) if pd.notnull(df.iloc[0]["1st_FU_Target Lesion 1 LAD Art Enhanc"]) and df.iloc[0]["1st_FU_Target Lesion 1 LAD Art Enhanc"] != "" else 0.0
+                                    step=0.1,value = float(df.iloc[0]["FU1_TL1LAD"]) if pd.notnull(df.iloc[0]["FU1_TL1LAD"]) and df.iloc[0]["FU1_TL1LAD"] != "" else 0.0
                                 )
                                 FU_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
                                     "1st_FU_Target Lesion 1 PAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["1st_FU_Target Lesion 1 PAD Art Enhanc"]) if pd.notnull(df.iloc[0]["1st_FU_Target Lesion 1 PAD Art Enhanc"]) and df.iloc[0]["1st_FU_Target Lesion 1 PAD Art Enhanc"] != "" else 0.0
+                                    step=0.1,value = float(df.iloc[0]["FU1_TL1PAD"]) if pd.notnull(df.iloc[0]["FU1_TL1PAD"]) and df.iloc[0]["FU1_TL1PAD"] != "" else 0.0
                                 )
                                 FU_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
                                     "1st_FU_Target Lesion 1 CCD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["1st_FU_Target Lesion 1 CCD Art Enhanc"]) if pd.notnull(df.iloc[0]["1st_FU_Target Lesion 1 CCD Art Enhanc"]) and df.iloc[0]["1st_FU_Target Lesion 1 CCD Art Enhanc"] != "" else 0.0
+                                    step=0.1,value = float(df.iloc[0]["FU1_TL1CCD"]) if pd.notnull(df.iloc[0]["FU1_TL1CCD"]) and df.iloc[0]["FU1_TL1CCD"] != "" else 0.0
                                 )
                                 FU_Target_Lesion_2_Segments = st.selectbox(
-                                    "1st_FU_Target Lesion 2 Segments",
+                                    "1st_FU_Target Lesion 2 Segments [Excel : 1st_FU_Target Lesion 2 Segments]",
                                     options=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"],
-                        index=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"].index(df.iloc[0]["1st_FU_Target Lesion 2 Segments"]) if df.iloc[0]["1st_FU_Target Lesion 2 Segments"] else None,
+                        index=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"].index(df.iloc[0]["FU1_TL2SEG"]) if df.iloc[0]["FU1_TL2SEG"] else None,
                         placeholder="Choose an option",
                                 )
                                 FU_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
                                     "1st_FU_Target Lesion 2 LAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["1st_FU_Target Lesion 2 LAD Art Enhanc"]) if pd.notnull(df.iloc[0]["1st_FU_Target Lesion 2 LAD Art Enhanc"]) and df.iloc[0]["1st_FU_Target Lesion 2 LAD Art Enhanc"] != "" else 0.0
+                                    step=0.1,value = float(df.iloc[0]["FU1_TL2LAD"]) if pd.notnull(df.iloc[0]["FU1_TL2LAD"]) and df.iloc[0]["FU1_TL2LAD"] != "" else 0.0
                                 )
                                 FU_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
                                     "1st_FU_Target Lesion 2 PAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["1st_FU_Target Lesion 2 PAD Art Enhanc"]) if pd.notnull(df.iloc[0]["1st_FU_Target Lesion 2 PAD Art Enhanc"]) and df.iloc[0]["1st_FU_Target Lesion 2 PAD Art Enhanc"] !="" else 0.0
+                                    step=0.1,value = float(df.iloc[0]["FU1_TL2PAD"]) if pd.notnull(df.iloc[0]["FU1_TL2PAD"]) and df.iloc[0]["FU1_TL2PAD"] !="" else 0.0
                                 )
                                 FU_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
                                     "1st_FU_Target Lesion 2 CCD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["1st_FU_Target Lesion 2 CCD Art Enhanc"]) if pd.notnull(df.iloc[0]["1st_FU_Target Lesion 2 CCD Art Enhanc"]) and df.iloc[0]["1st_FU_Target Lesion 2 CCD Art Enhanc"] !="" else 0.0
+                                    step=0.1,value = float(df.iloc[0]["FU1_TL2CCD"]) if pd.notnull(df.iloc[0]["FU1_TL2CCD"]) and df.iloc[0]["FU1_TL2CCD"] !="" else 0.0
                                 )
                                 FU_Follow_up_1_targeted_Lesion_Dia_Sum = max(FU_Target_Lesion_1_CCD_Art_Enhanc,FU_Target_Lesion_1_PAD_Art_Enhanc,FU_Target_Lesion_1_LAD_Art_Enhanc)+max(FU_Target_Lesion_2_CCD_Art_Enhanc,FU_Target_Lesion_2_PAD_Art_Enhanc,FU_Target_Lesion_2_LAD_Art_Enhanc)
                                 st.write("1st_FU_Follow up 1 targeted Lesion Dia Sum",FU_Follow_up_1_targeted_Lesion_Dia_Sum)
                                 FU_Non_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
                                     "1st_FU_Non-Target Lesion 2 LAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["1st_FU_Non-Target Lesion 2 LAD Art Enhanc"]) if pd.notnull(df.iloc[0]["1st_FU_Non-Target Lesion 2 LAD Art Enhanc"]) and df.iloc[0]["1st_FU_Non-Target Lesion 2 LAD Art Enhanc"] !="" else 0.0
+                                    step=0.1,value = float(df.iloc[0]["FU1_NTL1LAD"]) if pd.notnull(df.iloc[0]["FU1_NTL1LAD"]) and df.iloc[0]["FU1_NTL1LAD"] !="" else 0.0
                                 )
                                 FU_Non_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
                                     "1st_FU_Non-Target Lesion 2 PAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["1st_FU_Non-Target Lesion 2 PAD Art Enhanc"]) if pd.notnull(df.iloc[0]["1st_FU_Non-Target Lesion 2 PAD Art Enhanc"]) and df.iloc[0]["1st_FU_Non-Target Lesion 2 PAD Art Enhanc"] !="" else 0.0
+                                    step=0.1,value = float(df.iloc[0]["FU1_NTL1PAD"]) if pd.notnull(df.iloc[0]["FU1_NTL1PAD"]) and df.iloc[0]["FU1_NTL1PAD"] !="" else 0.0
                                 )
                                 FU_Non_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
                                     "1st_FU_Non-Target Lesion 2 CCD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["1st_FU_Non-Target Lesion 2 CCD Art Enhanc"]) if pd.notnull(df.iloc[0]["1st_FU_Non-Target Lesion 2 CCD Art Enhanc"]) and df.iloc[0]["1st_FU_Non-Target Lesion 2 CCD Art Enhanc"] !=""  else 0.0
+                                    step=0.1,value = float(df.iloc[0]["FU1_NTL1CCD"]) if pd.notnull(df.iloc[0]["FU1_NTL1CCD"]) and df.iloc[0]["FU1_NTL1CCD"] !=""  else 0.0
                                 )
                                 FU_Non_targeted_Lesion_Dia_Sum = max(FU_Non_Target_Lesion_2_LAD_Art_Enhanc,FU_Non_Target_Lesion_2_PAD_Art_Enhanc,FU_Non_Target_Lesion_2_CCD_Art_Enhanc)
                                 st.write("1st_FU_Non-targeted Lesion Dia Sum",FU_Non_targeted_Lesion_Dia_Sum)
                                 FU_Lesion_Necrosis = st.selectbox(
-                                    "1st_FU_Lesion Necrosis",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["1st_FU_Lesion Necrosis"]) if df.iloc[0]["1st_FU_Lesion Necrosis"] else None,
+                                   "1st_FU_Lesion Necrosis [Excel : FU1_NECROSIS]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                        index=["1", "0", "NA"].index(df.iloc[0]["FU1_NECROSIS"]) if df.iloc[0]["FU1_NECROSIS"] else None,
                         placeholder="Choose an option",
                                 )
                                 FU_Reviewers_Initials = st.text_input(
                                     "1st_FU_Reviewers Initials",
                                     help="Free-text input for reviewer name",
-                                    value = df.iloc[0]["1st_FU_Reviewers Initials"]
+                                    value = df.iloc[0]["FU1_REVFT"]
                                 )
                                 FU_Non_target_lesion_response = st.selectbox(
-                                    "1st_FU_Non target lesion response",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["1st_FU_Non target lesion response"]) if df.iloc[0]["1st_FU_Non target lesion response"] else None,
+                                    "1st_FU_Non target lesion response[Excel : FU1_NTLRSP]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                        index=["1", "0", "NA"].index(df.iloc[0]["FU1_NTLRSP"]) if df.iloc[0]["FU1_NTLRSP"] else None,
                         placeholder="Choose an option",
                                 )
                                 FU_New_Lesions = st.selectbox(
-                                    "1st_FU_New Lesions",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["1st_FU_New Lesions"]) if df.iloc[0]["1st_FU_New Lesions"] else None,
+                                    "1st_FU_New Lesions[Excel : FU1_NEWLESION]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                        index=["1", "0", "NA"].index(df.iloc[0]["FU1_NEWLESION"]) if df.iloc[0]["FU1_NEWLESION"] else None,
                         placeholder="Choose an option",
                                 )
                                 FU_NEW_Extrahepatic_Disease = st.selectbox(
-                                    "1st_FU_NEW Extrahepatic Disease",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["1st_FU_NEW Extrahepatic Disease"]) if df.iloc[0]["1st_FU_NEW Extrahepatic Disease"] else None,
+                                    "1st_FU_NEW Extrahepatic Disease[Excel : FU1_NEWEHD]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                        index=["1", "0", "NA"].index(df.iloc[0]["FU1_NEWEHD"]) if df.iloc[0]["FU1_NEWEHD"] else None,
                         placeholder="Choose an option",
                                 )
                                 FU_NEW_Extrahepatic_Dz_Location = st.text_input(
                                     "1st_FU_NEW Extrahepatic Dz Location",
                                     help="Free text",
-                                    value=df.iloc[0]["1st_FU_NEW Extrahepatic Dz Location"]
+                                    value=df.iloc[0]["FU1_EHDLOC"]
                                 )
-                                FU_NEW_Extrahepatic_Dz_Date = st.date_input("1st_FU_NEW Extrahepatic Dz Date",value = datetime.strptime(df.iloc[0]["1st_FU_NEW Extrahepatic Dz Date"], "%Y-%m-%d").date() if df.iloc[0]["1st_FU_NEW Extrahepatic Dz Date"] else None)
+                                FU_NEW_Extrahepatic_Dz_Date = st.date_input("1st_FU_NEW Extrahepatic Dz Date",value = datetime.strptime(df.iloc[0]["FU1_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU1_EHDDATE"] else None)
                                 FU_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU_Non_targeted_Lesion_Dia_Sum)/max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
                                 st.write("1st_FU_% change for non target lesion",FU_change_non_target_lesion)
                                 FU_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU_Follow_up_1_targeted_Lesion_Dia_Sum)/max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
                                 st.write("1st_FU_% Change Target Dia",FU_change_target_lesion)
-                                first_fu_mrecist_localized = st.text_input("1st_FU_mRECIST LOCALIZED",value=df.iloc[0]["1st_FU_mRECIST LOCALIZED"])
-                                first_fu_mrecist_overall = st.text_input("1st_FU_mRECIST Overall",value=df.iloc[0]["1st_FU_mRECIST Overall"])
+                                first_fu_mrecist_localized = st.text_input("1st_FU_mRECIST LOCALIZED",value=df.iloc[0]["FU1_MREC_LOCAL"])
+                                first_fu_mrecist_overall = st.text_input("1st_FU_mRECIST Overall",value=df.iloc[0]["FU1_MREC_OVERALL"])
                                 FU_Free_Text = st.text_area(
                                     "1st_FU_Free Text",
                                     help="Free text",
-                                    value = df.iloc[0]["1st_FU_Free Text"]
+                                    value = df.iloc[0]["FU1_FT"]
                                 )
                                 st.subheader("Imaging_2nd_Followup")
 
+                               
                                 FU2_Scan_Modality = st.selectbox(
-                                    "2nd_FU_Scan Modality",
-                                    options=["CT", "MRI"],
-                                    index=["CT", "MRI"].index(df.iloc[0]["2nd_FU_Scan Modality"]) if df.iloc[0]["2nd_FU_Scan Modality"] else None,
-                        placeholder="Choose an option",
+                                    "2nd_FU_Scan Modality Excel : FU2_MOD]\n\n(1) CT, (2) MRI",
+                                        options=["1","2"],
+                                        format_func=lambda x: {
+                                            "1": "CT",
+                                            "2": "MRI",
+                                        }[x],
+                                    index=["1", "2"].index(df.iloc[0]["FU2_MOD"]) if df.iloc[0]["FU2_MOD"] else None,
+                                    placeholder="Choose an option",
                                 )
-                                FU2_Imaging_Date = st.date_input("2nd_FU_Imaging Date",value = datetime.strptime(df.iloc[0]["2nd_FU_Imaging Date"], "%Y-%m-%d").date() if df.iloc[0]["2nd_FU_Imaging Date"] else None)
+                                FU2_Imaging_Date = st.date_input(
+                                        "2nd_FU_Imaging Date",
+                                        value=datetime.strptime(df.iloc[0]["FU2_IMG_DATE"], "%Y-%m-%d").date() if df.iloc[0]["FU2_IMG_DATE"] else None,
+                                    )
 
                                 FU2_Months_Since_Y90 = relativedelta(FU2_Imaging_Date, fetch_date).months
                                 st.write("2nd_FU_Months Since Y90",FU2_Months_Since_Y90)
+
                                 FU2_Total_number_of_lesions = st.selectbox(
-                                    "2nd_FU_Total number of lesions",
-                                    options=["1", "2", ">3"],
-                        index=["1", "2", ">3"].index(df.iloc[0]["2nd_FU_Total number of lesions"]) if df.iloc[0]["2nd_FU_Total number of lesions"] else None, 
-                        placeholder="Choose an option",
+                                    "2nd_FU_Total number of lesions[Excel : FU2_TOTLES]\n\n(1) 1,(2) 2,(3) >=3",
+                                 options=["1", "2", "3"],
+                            format_func=lambda x: {
+                                            "1": "1",
+                                            "2": "2",
+                                            "3" : ">=3"
+                                        }[x],
+                                    index=["1", "2", "3"].index(df.iloc[0]["FU2_TOTLES"]) if df.iloc[0]["FU2_TOTLES"] else None,
+                                    placeholder="Choose an option",
                                 )
                                 FU2_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
                                     "2nd_FU_Target Lesion 1 LAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["2nd_FU_Target Lesion 1 LAD Art Enhanc"]) if pd.notnull(df.iloc[0]["2nd_FU_Target Lesion 1 LAD Art Enhanc"]) and df.iloc[0]["2nd_FU_Target Lesion 1 LAD Art Enhanc"] !="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU2_TL1LAD"]) if pd.notnull(df.iloc[0]["FU2_TL1LAD"]) and df.iloc[0]["FU2_TL1LAD"] != "" else 0.0,
                                 )
                                 FU2_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
                                     "2nd_FU_Target Lesion 1 PAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["2nd_FU_Target Lesion 1 PAD Art Enhanc"]) if pd.notnull(df.iloc[0]["2nd_FU_Target Lesion 1 PAD Art Enhanc"]) and df.iloc[0]["2nd_FU_Target Lesion 1 PAD Art Enhanc"] != "" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU2_TL1PAD"]) if pd.notnull(df.iloc[0]["FU2_TL1PAD"]) and df.iloc[0]["FU2_TL1PAD"] != "" else 0.0,
                                 )
 
                                 FU2_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
                                     "2nd_FU_Target Lesion 1 CCD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["2nd_FU_Target Lesion 1 CCD Art Enhanc"]) if pd.notnull(df.iloc[0]["2nd_FU_Target Lesion 1 CCD Art Enhanc"]) and df.iloc[0]["2nd_FU_Target Lesion 1 CCD Art Enhanc"]!="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU2_TL1CCD"]) if pd.notnull(df.iloc[0]["FU2_TL1CCD"]) and df.iloc[0]["FU2_TL1CCD"] != "" else 0.0,
                                 )
-
                                 FU2_Target_Lesion_2_Segments = st.selectbox(
-                                    "2nd_FU_Target Lesion 2 Segments",
+                                   "2nd_FU_Target Lesion 2 Segments [Excel : FU2_TL2SEG]",
                                     options=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"],
-                        index=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"].index(df.iloc[0]["2nd_FU_Target Lesion 2 Segments"]) if df.iloc[0]["2nd_FU_Target Lesion 2 Segments"] else None,
-                        placeholder="Choose an option",
+                                    index=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"].index(df.iloc[0]["FU2_TL2SEG"]) if df.iloc[0]["FU2_TL2SEG"] else None,
+                                    placeholder="Choose an option",
                                 )
 
                                 FU2_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
                                     "2nd_FU_Target Lesion 2 LAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["2nd_FU_Target Lesion 2 LAD Art Enhanc"]) if pd.notnull(df.iloc[0]["2nd_FU_Target Lesion 2 LAD Art Enhanc"]) and df.iloc[0]["2nd_FU_Target Lesion 2 LAD Art Enhanc"] !="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU2_TL2LAD"]) if pd.notnull(df.iloc[0]["FU2_TL2LAD"]) and df.iloc[0]["FU2_TL2LAD"] != "" else 0.0,
                                 )
 
                                 FU2_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
                                     "2nd_FU_Target Lesion 2 PAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["2nd_FU_Target Lesion 2 PAD Art Enhanc"]) if pd.notnull(df.iloc[0]["2nd_FU_Target Lesion 2 PAD Art Enhanc"]) and df.iloc[0]["2nd_FU_Target Lesion 2 PAD Art Enhanc"]!="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU2_TL2PAD"]) if pd.notnull(df.iloc[0]["FU2_TL2PAD"]) and df.iloc[0]["FU2_TL2PAD"] != "" else 0.0,
                                 )
 
                                 FU2_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
                                     "2nd_FU_Target Lesion 2 CCD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["2nd_FU_Target Lesion 2 CCD Art Enhanc"]) if pd.notnull(df.iloc[0]["2nd_FU_Target Lesion 2 CCD Art Enhanc"]) and df.iloc[0]["2nd_FU_Target Lesion 2 CCD Art Enhanc"] !="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU2_TL2CCD"]) if pd.notnull(df.iloc[0]["FU2_TL2CCD"]) and df.iloc[0]["FU2_TL2CCD"] != "" else 0.0,
                                 )
 
                                 FU2_Follow_up_2_targeted_Lesion_Dia_Sum = max(FU2_Target_Lesion_1_CCD_Art_Enhanc, FU2_Target_Lesion_1_PAD_Art_Enhanc, FU2_Target_Lesion_1_LAD_Art_Enhanc) + max(FU2_Target_Lesion_2_CCD_Art_Enhanc, FU2_Target_Lesion_2_PAD_Art_Enhanc, FU2_Target_Lesion_2_LAD_Art_Enhanc)
                                 st.write("2nd_FU_Follow up 2 targeted Lesion Dia Sum",FU2_Follow_up_2_targeted_Lesion_Dia_Sum)
+                                
                                 FU2_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
                                     "2nd_FU_Non-Target Lesion 1 LAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["2nd_FU_Non-Target Lesion 1 LAD Art Enhanc"]) if pd.notnull(df.iloc[0]["2nd_FU_Non-Target Lesion 1 LAD Art Enhanc"]) and df.iloc[0]["2nd_FU_Non-Target Lesion 1 LAD Art Enhanc"] !="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU2_NTL1LAD"]) if pd.notnull(df.iloc[0]["FU2_NTL1LAD"]) and df.iloc[0]["FU2_NTL1LAD"] != "" else 0.0,
                                 )
 
                                 FU2_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
                                     "2nd_FU_Non-Target Lesion 1 PAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["2nd_FU_Non-Target Lesion 1 PAD Art Enhanc"]) if pd.notnull(df.iloc[0]["2nd_FU_Non-Target Lesion 1 PAD Art Enhanc"]) and df.iloc[0]["2nd_FU_Non-Target Lesion 1 PAD Art Enhanc"] !="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU2_NTL1PAD"]) if pd.notnull(df.iloc[0]["FU2_NTL1PAD"]) and df.iloc[0]["FU2_NTL1PAD"] != "" else 0.0,
                                 )
 
                                 FU2_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
                                     "2nd_FU_Non-Target Lesion 1 CCD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["2nd_FU_Non-Target Lesion 1 CCD Art Enhanc"]) if pd.notnull(df.iloc[0]["2nd_FU_Non-Target Lesion 1 CCD Art Enhanc"]) and df.iloc[0]["2nd_FU_Non-Target Lesion 1 CCD Art Enhanc"] !="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU2_NTL1CCD"]) if pd.notnull(df.iloc[0]["FU2_NTL1CCD"]) and df.iloc[0]["FU2_NTL1CCD"] != "" else 0.0,
                                 )
 
                                 FU2_Non_targeted_Lesion_Dia_Sum = max(FU2_Non_Target_Lesion_1_LAD_Art_Enhanc, FU2_Non_Target_Lesion_1_PAD_Art_Enhanc, FU2_Non_Target_Lesion_1_CCD_Art_Enhanc)
                                 st.write("2nd_FU_Non-targeted Lesion Dia Sum",FU2_Non_targeted_Lesion_Dia_Sum)
+                                
                                 FU2_Lesion_Necrosis = st.selectbox(
-                                    "2nd_FU_Lesion Necrosis",
-                                    options=["No", "Yes", "NA"],
-                                    index=["No", "Yes", "NA"].index(df.iloc[0]["2nd_FU_Lesion Necrosis"]) if df.iloc[0]["2nd_FU_Lesion Necrosis"] else None,
+                                    "2nd_FU_Lesion Necrosis  [Excel : FU2_NEC]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                                    index=["1", "0", "NA"].index(df.iloc[0]["FU2_NECROSIS"]) if df.iloc[0]["FU2_NECROSIS"] else None,
                                     placeholder="Choose an option",
                                 )
 
                                 FU2_Reviewers_Initials = st.text_input(
                                     "2nd_FU_Reviewers Initials",
                                     help="Free-text input for reviewer name",
-                                    value = df.iloc[0]["2nd_FU_Reviewers Initials"]
+                                    value=df.iloc[0]["FU2_REV"],
                                 )
 
+                                
                                 FU2_Non_target_lesion_response = st.selectbox(
-                                    "2nd_FU_Non target lesion response",
-                                    options=["No", "Yes", "NA"],
-                                    index=["No", "Yes", "NA"].index(df.iloc[0]["2nd_FU_Non target lesion response"]) if df.iloc[0]["2nd_FU_Non target lesion response"] else None,
+                                    "2nd_FU_Non target lesion response[Excel : FU2_NTLRSP]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                                    index=["1", "0", "NA"].index(df.iloc[0]["FU2_NTLRSP"]) if df.iloc[0]["FU2_NTLRSP"] else None,
                                     placeholder="Choose an option",
                                 )
 
                                 FU2_New_Lesions = st.selectbox(
-                                    "2nd_FU_New Lesions",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["2nd_FU_New Lesions"]) if df.iloc[0]["2nd_FU_New Lesions"] else None,
-                        placeholder="Choose an option",
+                                    "2nd_FU_New Lesions[Excel : FU2_NEWLES]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                                    index=["1", "0", "NA"].index(df.iloc[0]["FU2_NEWLES"]) if df.iloc[0]["FU2_NEWLES"] else None,
+                                    placeholder="Choose an option",
                                 )
 
                                 FU2_NEW_Extrahepatic_Disease = st.selectbox(
-                                    "2nd_FU_NEW Extrahepatic Disease",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["2nd_FU_Extrahepatic Disease"]) if df.iloc[0]["2nd_FU_Extrahepatic Disease"] else None,
-                        placeholder="Choose an option",
+                                    "2nd_FU_NEW Extrahepatic Disease[Excel : FU2_EHD]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                                    index=["1", "0", "NA"].index(df.iloc[0]["FU2_EHD"]) if df.iloc[0]["FU2_EHD"] else None,
+                                    placeholder="Choose an option",
                                 )
 
                                 FU2_NEW_Extrahepatic_Dz_Location = st.text_input(
                                     "2nd_FU_NEW Extrahepatic Dz Location",
                                     help="Free text",
-                                    value=df.iloc[0]["2nd_FU_NEW Extrahepatic Dz Location"]
+                                    value=df.iloc[0]["FU2_EHDLOC"],
                                 )
 
-                                FU2_NEW_Extrahepatic_Dz_Date = st.date_input("2nd_FU_NEW Extrahepatic Dz Date",value = datetime.strptime(df.iloc[0]["2nd_FU_NEW Extrahepatic Dz Date"], "%Y-%m-%d").date() if df.iloc[0]["2nd_FU_NEW Extrahepatic Dz Date"] else None)
+                                FU2_NEW_Extrahepatic_Dz_Date = st.date_input(
+                                    "2nd_FU_NEW Extrahepatic Dz Date",
+                                    value=datetime.strptime(df.iloc[0]["FU2_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU2_EHDDATE"] else None,
+                                )
 
                                 FU2_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU2_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
                                 st.write("2nd_FU_% change for non target lesion",FU2_change_non_target_lesion)
                                 FU2_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU2_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
                                 st.write("2nd_FU_% Change Target Dia",FU2_change_target_lesion)
-                                second_fu_mrecist_calc = st.text_input("2nd_FU_mRECIST Calc",value=df.iloc[0]["2nd_FU_mRECIST Calc"])
-                                second_fu_mrecist_localized = st.text_input("2nd_FU_mRECIST LOCALIZED",value=df.iloc[0]["2nd_FU_mRECIST LOCALIZED"])
-                                second_fu_mrecist_overall = st.text_input("2nd_FU_mRECIST Overall",value=df.iloc[0]["2nd_FU_mRECIST Overall"])
+
+                                second_fu_mrecist_calc = st.text_input("2nd_FU_mRECIST Calc",value=df.iloc[0]["FU2_MREC_CALC"])
+                                second_fu_mrecist_localized = st.text_input("2nd_FU_mRECIST LOCALIZED",value=df.iloc[0]["FU2_MREC_LOCAL"])
+                                second_fu_mrecist_overall = st.text_input("2nd_FU_mRECIST Overall",value=df.iloc[0]["FU2_MREC_OVERALL"])
                                 FU2_Free_Text = st.text_area(
                                     "2nd_FU_Free Text",
                                     help="Free text",
-                                    value = df.iloc[0]["2nd_FU_Free Text"]
+                                    value = df.iloc[0]["FU2_FT"]
                                 )
-
-                               
                                 st.subheader("Imaging_3rd_Followup")
-
                                 FU3_Scan_Modality = st.selectbox(
-                                    "3rd_FU_Scan Modality",
-                                    options=["CT", "MRI"],
-                        index=["CT", "MRI"].index(df.iloc[0]["3rd_FU_Scan Modality"]) if df.iloc[0]["3rd_FU_Scan Modality"] else None,
-                        placeholder="Choose an option",
+                                    "3rd_FU_Scan Modality[Excel : FU3_MOD]\n\n(1) CT, (2) MRI",
+                                        options=["1","2"],
+                                        format_func=lambda x: {
+                                            "1": "CT",
+                                            "2": "MRI",
+                                        }[x],
+                                    index=["1", "2"].index(df.iloc[0]["FU3_MOD"]) if df.iloc[0]["FU3_MOD"] else None,
+                                    placeholder="Choose an option",
                                 )
 
-                                FU3_Imaging_Date = st.date_input("3rd_FU_Imaging Date",value = datetime.strptime(df.iloc[0]["3rd_FU_Imaging Date"], "%Y-%m-%d").date() if df.iloc[0]["3rd_FU_Imaging Date"] else None)
-
+                                FU3_Imaging_Date = st.date_input(
+                                    "3rd_FU_Imaging Date",
+                                    value=datetime.strptime(df.iloc[0]["FU3_IMG_DATE"], "%Y-%m-%d").date()
+                                    if df.iloc[0]["FU3_IMG_DATE"] else None
+                                )
                                 FU3_Months_Since_Y90 = relativedelta(FU3_Imaging_Date, fetch_date).months
                                 st.write("3rd_FU_Months Since Y90",FU3_Months_Since_Y90)
+                                
                                 FU3_Total_number_of_lesions = st.selectbox(
-                                    "3rd_FU_Total number of lesions",
-                                    options=["1", "2", ">3"],
-                        index=["1", "2", ">3"].index(df.iloc[0]["3rd_FU_Total number of lesions"]) if df.iloc[0]["3rd_FU_Total number of lesions"] else None, 
-                        placeholder="Choose an option",
+                                    "3rd_FU_Total number of lesions[Excel : FU3_TOTLES]\n\n(1) 1,(2) 2,(3) >=3",
+                                 options=["1", "2", "3"],
+                            format_func=lambda x: {
+                                            "1": "1",
+                                            "2": "2",
+                                            "3" : ">=3"
+                                        }[x],
+                                    index=["1", "2", "3"].index(df.iloc[0]["FU3_TOTLES"]) if df.iloc[0]["FU3_TOTLES"] else None,
+                                    placeholder="Choose an option",
                                 )
 
                                 FU3_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
                                     "3rd_FU_Target Lesion 1 LAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["3rd_FU_Target Lesion 1 LAD Art Enhanc"]) if pd.notnull(df.iloc[0]["3rd_FU_Target Lesion 1 LAD Art Enhanc"]) and df.iloc[0]["3rd_FU_Target Lesion 1 LAD Art Enhanc"] !="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU3_TL1LAD"]) if pd.notnull(df.iloc[0]["FU3_TL1LAD"]) and df.iloc[0]["FU3_TL1LAD"] != "" else 0.0
                                 )
 
                                 FU3_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
                                     "3rd_FU_Target Lesion 1 PAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["3rd_FU_Target Lesion 1 PAD Art Enhanc"]) if pd.notnull(df.iloc[0]["3rd_FU_Target Lesion 1 PAD Art Enhanc"]) and df.iloc[0]["3rd_FU_Target Lesion 1 PAD Art Enhanc"] !="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU3_TL1PAD"]) if pd.notnull(df.iloc[0]["FU3_TL1PAD"]) and df.iloc[0]["FU3_TL1PAD"] != "" else 0.0
                                 )
 
                                 FU3_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
                                     "3rd_FU_Target Lesion 1 CCD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["3rd_FU_Target Lesion 1 CCD Art Enhanc"]) if pd.notnull(df.iloc[0]["3rd_FU_Target Lesion 1 CCD Art Enhanc"]) and df.iloc[0]["3rd_FU_Target Lesion 1 CCD Art Enhanc"] !="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU3_TL1CCD"]) if pd.notnull(df.iloc[0]["FU3_TL1CCD"]) and df.iloc[0]["FU3_TL1CCD"] != "" else 0.0
                                 )
 
                                 FU3_Target_Lesion_2_Segments = st.selectbox(
-                                    "3rd_FU_Target Lesion 2 Segments",
+                                    "3rd_FU_Target Lesion 2 Segments [Excel : FU3_TL2SEG]",
                                     options=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"],
-                        index=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"].index(df.iloc[0]["3rd_FU_Target Lesion 2 Segments"]) if df.iloc[0]["3rd_FU_Target Lesion 2 Segments"] else None,
-                        placeholder="Choose an option",
+                                    index=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"].index(df.iloc[0]["FU3_TL2SEG"]) if df.iloc[0]["FU3_TL2SEG"] else None,
+                                    placeholder="Choose an option",
                                 )
 
                                 FU3_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
                                     "3rd_FU_Target Lesion 2 LAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["3rd_FU_Target Lesion 2 LAD Art Enhanc"]) if pd.notnull(df.iloc[0]["3rd_FU_Target Lesion 2 LAD Art Enhanc"]) and df.iloc[0]["3rd_FU_Target Lesion 2 LAD Art Enhanc"] !="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU3_TL2LAD"]) if pd.notnull(df.iloc[0]["FU3_TL2LAD"]) and df.iloc[0]["FU3_TL2LAD"] != "" else 0.0
                                 )
 
                                 FU3_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
                                     "3rd_FU_Target Lesion 2 PAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["3rd_FU_Target Lesion 2 PAD Art Enhanc"]) if pd.notnull(df.iloc[0]["3rd_FU_Target Lesion 2 PAD Art Enhanc"]) and df.iloc[0]["3rd_FU_Target Lesion 2 PAD Art Enhanc"] !="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU3_TL2PAD"]) if pd.notnull(df.iloc[0]["FU3_TL2PAD"]) and df.iloc[0]["FU3_TL2PAD"] != "" else 0.0
                                 )
 
                                 FU3_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
                                     "3rd_FU_Target Lesion 2 CCD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["3rd_FU_Target Lesion 2 CCD Art Enhanc"]) if pd.notnull(df.iloc[0]["3rd_FU_Target Lesion 2 CCD Art Enhanc"]) and df.iloc[0]["3rd_FU_Target Lesion 2 CCD Art Enhanc"] !="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU3_TL2CCD"]) if pd.notnull(df.iloc[0]["FU3_TL2CCD"]) and df.iloc[0]["FU3_TL2CCD"] != "" else 0.0
                                 )
 
                                 FU3_Follow_up_2_targeted_Lesion_Dia_Sum = max(FU3_Target_Lesion_1_CCD_Art_Enhanc, FU3_Target_Lesion_1_PAD_Art_Enhanc, FU3_Target_Lesion_1_LAD_Art_Enhanc) + max(FU3_Target_Lesion_2_CCD_Art_Enhanc, FU3_Target_Lesion_2_PAD_Art_Enhanc, FU3_Target_Lesion_2_LAD_Art_Enhanc)
                                 st.write("3rd_FU_Follow up 3 targeted Lesion Dia Sum",FU3_Follow_up_2_targeted_Lesion_Dia_Sum)
+                                
                                 FU3_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
                                     "3rd_FU_Non-Target Lesion 1 LAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["3rd_FU_Non-Target Lesion 1 LAD Art Enhanc"]) if pd.notnull(df.iloc[0]["3rd_FU_Non-Target Lesion 1 LAD Art Enhanc"]) and df.iloc[0]["3rd_FU_Non-Target Lesion 1 LAD Art Enhanc"]!="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU3_NTL1LAD"]) if pd.notnull(df.iloc[0]["FU3_NTL1LAD"]) and df.iloc[0]["FU3_NTL1LAD"] != "" else 0.0
                                 )
 
                                 FU3_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
                                     "3rd_FU_Non-Target Lesion 1 PAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["3rd_FU_Non-Target Lesion 1 PAD Art Enhanc"]) if pd.notnull(df.iloc[0]["3rd_FU_Non-Target Lesion 1 PAD Art Enhanc"]) and df.iloc[0]["3rd_FU_Non-Target Lesion 1 PAD Art Enhanc"] !="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU3_NTL1PAD"]) if pd.notnull(df.iloc[0]["FU3_NTL1PAD"]) and df.iloc[0]["FU3_NTL1PAD"] != "" else 0.0
                                 )
 
                                 FU3_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
                                     "3rd_FU_Non-Target Lesion 1 CCD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["3rd_FU_Non-Target Lesion 1 CCD Art Enhanc"]) if pd.notnull(df.iloc[0]["3rd_FU_Non-Target Lesion 1 CCD Art Enhanc"]) and df.iloc[0]["3rd_FU_Non-Target Lesion 1 CCD Art Enhanc"] !="" else 0.0
+                                    step=0.1,
+                                    value=float(df.iloc[0]["FU3_NTL1CCD"]) if pd.notnull(df.iloc[0]["FU3_NTL1CCD"]) and df.iloc[0]["FU3_NTL1CCD"] != "" else 0.0
                                 )
 
                                 FU3_Non_targeted_Lesion_Dia_Sum = max(FU3_Non_Target_Lesion_1_LAD_Art_Enhanc, FU3_Non_Target_Lesion_1_PAD_Art_Enhanc, FU3_Non_Target_Lesion_1_CCD_Art_Enhanc)
                                 st.write("3rd_FU_Non-targeted Lesion Dia Sum",FU3_Non_targeted_Lesion_Dia_Sum)
+
                                 FU3_Lesion_Necrosis = st.selectbox(
-                                    "3rd_FU_Lesion Necrosis",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["3rd_FU_Lesion Necrosis"]) if df.iloc[0]["3rd_FU_Lesion Necrosis"] else None,
-                        placeholder="Choose an option",
+                                    "3rd_FU_Lesion Necrosis[Excel : FU3_NEC]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                                         index=["1", "0", "NA"].index(df.iloc[0]["FU3_NEC"]) if df.iloc[0]["FU3_NEC"] else None,
+                                    placeholder="Choose an option",
                                 )
 
                                 FU3_Reviewers_Initials = st.text_input(
                                     "3rd_FU_Reviewers Initials",
                                     help="Free-text input for reviewer name",
-                                    value = df.iloc[0]["3rd_FU_Reviewers Initials"]
+                                    value=df.iloc[0]["FU3_REV"]
                                 )
 
                                 FU3_Non_target_lesion_response = st.selectbox(
-                                    "3rd_FU_Non target lesion response",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["3rd_FU_Non target lesion response"]) if df.iloc[0]["3rd_FU_Non target lesion response"] else None,
-                        placeholder="Choose an option",
+                                    "3rd_FU_Non target lesion response[Excel : FU3_NTLRSP]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                                    index=["1", "0", "NA"].index(df.iloc[0]["FU3_NTLRSP"]) if df.iloc[0]["FU3_NTLRSP"] else None,
+                                    placeholder="Choose an option",
                                 )
 
                                 FU3_New_Lesions = st.selectbox(
-                                    "3rd_FU_New Lesions",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["3rd_FU_New Lesions"]) if df.iloc[0]["3rd_FU_New Lesions"] else None,
-                        placeholder="Choose an option",
+                                    "3rd_FU_New Lesions[Excel : FU3_NEWLES]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                                    index=["1", "0", "NA"].index(df.iloc[0]["FU3_NEWLES"]) if df.iloc[0]["FU3_NEWLES"] else None,
+                                    placeholder="Choose an option",
                                 )
 
                                 FU3_NEW_Extrahepatic_Disease = st.selectbox(
-                                    "3rd_FU_NEW Extrahepatic Disease",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["3rd_FU_Extrahepatic Disease"]) if df.iloc[0]["3rd_FU_Extrahepatic Disease"] else None,
-                        placeholder="Choose an option",
+                                     "3rd_FU_NEW Extrahepatic Disease[Excel : FU3_EHD]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                                    index=["1", "0", "NA"].index(df.iloc[0]["FU3_EHD"]) if df.iloc[0]["FU3_EHD"] else None,
+                                    placeholder="Choose an option",
                                 )
 
                                 FU3_NEW_Extrahepatic_Dz_Location = st.text_input(
                                     "3rd_FU_NEW Extrahepatic Dz Location",
                                     help="Free text",
-                                    value=df.iloc[0]["3rd_FU_NEW Extrahepatic Dz Location"]
+                                    value=df.iloc[0]["FU3_EHDLOC"]
                                 )
 
-                                FU3_NEW_Extrahepatic_Dz_Date = st.date_input("3rd_FU_NEW Extrahepatic Dz Date",value = datetime.strptime(df.iloc[0]["3rd_FU_NEW Extrahepatic Dz Date"], "%Y-%m-%d").date() if df.iloc[0]["3rd_FU_NEW Extrahepatic Dz Date"] else None)
+                                FU3_NEW_Extrahepatic_Dz_Date = st.date_input(
+                                    "3rd_FU_NEW Extrahepatic Dz Date",
+                                    value=datetime.strptime(df.iloc[0]["FU3_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU3_EHDDATE"] else None
+                                )
 
-                                FU3_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU3_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
-                                st.write("3rd_FU_% change for non target lesion",FU3_change_non_target_lesion)
-                                FU3_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU3_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
-                                st.write("3rd_FU_% Change Target Dia",FU3_change_target_lesion)
-                                third_fu_mrecist_calc = st.text_input("3rd_FU_mRECIST Calc",value=df.iloc[0]["3rd_FU_mRECIST Calc"])
-                                third_fu_mrecist_localized = st.text_input("3rd_FU_mRECIST LOCALIZED",value=df.iloc[0]["3rd_FU_mRECIST LOCALIZED"])
-                                third_fu_mrecist_overall = st.text_input("3rd_FU_mRECIST Overall",value=df.iloc[0]["3rd_FU_mRECIST Overall"])
+                                FU3_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU3_Non_targeted_Lesion_Dia_Sum) / max(1, PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                                st.write("3rd_FU_% change for non target lesion", FU3_change_non_target_lesion)
+
+                                FU3_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU3_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1, PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                                st.write("3rd_FU_% Change Target Dia", FU3_change_target_lesion)
+
+                                third_fu_mrecist_calc = st.text_input("3rd_FU_mRECIST Calc", value=df.iloc[0]["FU3_MREC_CALC"])
+                                third_fu_mrecist_localized = st.text_input("3rd_FU_mRECIST LOCALIZED", value=df.iloc[0]["FU3_MREC_LOCAL"])
+                                third_fu_mrecist_overall = st.text_input("3rd_FU_mRECIST Overall", value=df.iloc[0]["FU3_MREC_OVERALL"])
+
                                 FU3_Free_Text = st.text_area(
                                     "3rd_FU_Free Text",
                                     help="Free text",
-                                    value = df.iloc[0]["3rd_FU_Free Text"]
+                                    value=df.iloc[0]["FU3_FT"]
                                 )
                                 # 4th Imaging Follow-up
                                 st.subheader("Imaging_4th_Followup")
 
                                 FU4_Scan_Modality = st.selectbox(
-                                    "4th_FU_Scan Modality",
-                                    options=["CT", "MRI"],
-                        index=["CT", "MRI"].index(df.iloc[0]["4th_FU_Scan Modality"]) if df.iloc[0]["4th_FU_Scan Modality"] else None, 
+                                    "4th_FU_Scan Modality [Excel : 4th_FU_Scan Modality]\n\n(1) CT, (2) MRI",
+                                        options=["1","2"],
+                                        format_func=lambda x: {
+                                            "1": "CT",
+                                            "2": "MRI",
+                                        }[x],
+                        index=["1", "2"].index(df.iloc[0]["4th_FU_Scan Modality"]) if df.iloc[0]["4th_FU_Scan Modality"] else None, 
                         placeholder="Choose an option",
                                 )
 
@@ -6095,9 +6524,14 @@ def edit_existing_data():
                                 FU4_Months_Since_Y90 = relativedelta(FU4_Imaging_Date, fetch_date).months
                                 st.write("4th_FU_Months Since Y90",FU4_Months_Since_Y90)
                                 FU4_Total_number_of_lesions = st.selectbox(
-                                    "4th_FU_Total number of lesions",
-                                    options=["1", "2", ">3"],
-                        index=["1", "2", ">3"].index(df.iloc[0]["4th_FU_Total number of lesions"]) if df.iloc[0]["4th_FU_Total number of lesions"] else None,  # No default selection
+                                    "4th_FU_Total number of lesions [Excel : 4th_FU_Total number of lesions]\n\n(1) 1,(2) 2,(3) >=3",
+                                 options=["1", "2", "3"],
+                            format_func=lambda x: {
+                                            "1": "1",
+                                            "2": "2",
+                                            "3" : ">=3"
+                                        }[x],
+                        index=["1", "2", "3"].index(df.iloc[0]["4th_FU_Total number of lesions"]) if df.iloc[0]["4th_FU_Total number of lesions"] else None,  # No default selection
                         placeholder="Choose an option",
                                 )
                                 FU4_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
@@ -6113,7 +6547,7 @@ def edit_existing_data():
                                     step=0.1,value = float(df.iloc[0]["4th_FU_Target Lesion 1 CCD Art Enhanc"]) if pd.notnull(df.iloc[0]["4th_FU_Target Lesion 1 CCD Art Enhanc"]) and df.iloc[0]["4th_FU_Target Lesion 1 CCD Art Enhanc"] !="" else 0.0
                                 )
                                 FU4_Target_Lesion_2_Segments = st.selectbox(
-                                    "4th_FU_Target Lesion 2 Segments",
+                                    "4th_FU_Target Lesion 2 Segments [Excel : 4th_FU_Target Lesion 2 Segments]",
                                     options=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"],
                         index=["1", "2", "3", "4a", "4b", "5", "6", "7", "8", "NA"].index(df.iloc[0]["4th_FU_Target Lesion 2 Segments"]) if df.iloc[0]["4th_FU_Target Lesion 2 Segments"] else None,
                         placeholder="Choose an option",
@@ -6152,9 +6586,14 @@ def edit_existing_data():
                                 FU4_Non_targeted_Lesion_Dia_Sum = max(FU4_Non_Target_Lesion_1_LAD_Art_Enhanc, FU4_Non_Target_Lesion_1_PAD_Art_Enhanc, FU4_Non_Target_Lesion_1_CCD_Art_Enhanc)
                                 st.write("4th_FU_Non-targeted Lesion Dia Sum",FU4_Non_targeted_Lesion_Dia_Sum)
                                 FU4_Lesion_Necrosis = st.selectbox(
-                                    "4th_FU_Lesion Necrosis",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["4th_FU_Lesion Necrosis"]) if df.iloc[0]["4th_FU_Lesion Necrosis"] else None,
+                                    "4th_FU_Lesion Necrosis  [Excel : 4th_FU_Lesion Necrosis]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                        index=["1", "0", "NA"].index(df.iloc[0]["4th_FU_Lesion Necrosis"]) if df.iloc[0]["4th_FU_Lesion Necrosis"] else None,
                         placeholder="Choose an option",
                                 )
 
@@ -6165,23 +6604,38 @@ def edit_existing_data():
                                 )
 
                                 FU4_Non_target_lesion_response = st.selectbox(
-                                    "4th_FU_Non target lesion response",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["4th_FU_Non target lesion response"]) if df.iloc[0]["4th_FU_Non target lesion response"] else None,
+                                    "4th_FU_Non target lesion response  [Excel : 4th_FU_Non target lesion response]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                        index=["1", "0", "NA"].index(df.iloc[0]["4th_FU_Non target lesion response"]) if df.iloc[0]["4th_FU_Non target lesion response"] else None,
                         placeholder="Choose an option",
                                 )
 
                                 FU4_New_Lesions = st.selectbox(
-                                    "4th_FU_New Lesions",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["4th_FU_New Lesions"]) if df.iloc[0]["4th_FU_New Lesions"] else None,
+                                    "4th_FU_New Lesions  [Excel : 4th_FU_New Lesions]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                        index=["1", "0", "NA"].index(df.iloc[0]["4th_FU_New Lesions"]) if df.iloc[0]["4th_FU_New Lesions"] else None,
                         placeholder="Choose an option",
                                 )
 
                                 FU4_NEW_Extrahepatic_Disease = st.selectbox(
-                                    "4th_FU_NEW Extrahepatic Disease",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["4th_FU_Extrahepatic Disease"]) if df.iloc[0]["4th_FU_Extrahepatic Disease"] else None,
+                                    "4th_FU_NEW Extrahepatic Disease  [Excel : 4th_FU_NEW Extrahepatic Disease]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                        index=["1", "0", "NA"].index(df.iloc[0]["4th_FU_Extrahepatic Disease"]) if df.iloc[0]["4th_FU_Extrahepatic Disease"] else None,
                         placeholder="Choose an option",
                                 )
 
@@ -6213,9 +6667,14 @@ def edit_existing_data():
                                 st.write("5th_FU_Months Since Y90",FU5_Months_Since_Y90)
 
                                 FU5_Total_number_of_lesions = st.selectbox(
-                                    "5th_FU_Total number of lesions",
-                                    options=["1", "2", ">3"],
-                                    index=["1", "2", ">3"].index(df.iloc[0]["5th_FU_Total number of lesions"]) if df.iloc[0]["5th_FU_Total number of lesions"] else None,
+                                    "5th_FU_Total number of lesions [Excel : 5th_FU_Total number of lesions]\n\n(1) 1,(2) 2,(3) >=3",
+                                 options=["1", "2", "3"],
+                            format_func=lambda x: {
+                                            "1": "1",
+                                            "2": "2",
+                                            "3" : ">=3"
+                                        }[x],
+                                    index=["1", "2", "3"].index(df.iloc[0]["5th_FU_Total number of lesions"]) if df.iloc[0]["5th_FU_Total number of lesions"] else None,
                                     placeholder="Choose an option",
                                 )
 
@@ -6237,23 +6696,38 @@ def edit_existing_data():
                                 FU5_Non_targeted_Lesion_Dia_Sum = max(FU5_Non_Target_Lesion_1_LAD_Art_Enhanc, FU5_Non_Target_Lesion_1_PAD_Art_Enhanc, FU5_Non_Target_Lesion_1_CCD_Art_Enhanc)
                                 st.write("5th_FU_Non-targeted Lesion Dia Sum",FU5_Non_targeted_Lesion_Dia_Sum)
                                 FU5_Non_target_lesion_response = st.selectbox(
-                                    "5th_FU_Non target lesion response",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["5th_FU_Non target lesion response"]) if df.iloc[0]["5th_FU_Non target lesion response"] else None,
+                                    "5th_FU_Non target lesion response [Excel : 5th_FU_Non target lesion response]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                        index=["1", "0", "NA"].index(df.iloc[0]["5th_FU_Non target lesion response"]) if df.iloc[0]["5th_FU_Non target lesion response"] else None,
                         placeholder="Choose an option",
                                 )
 
                                 FU5_New_Lesions = st.selectbox(
-                                    "5th_FU_New Lesions",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["5th_FU_New Lesions"]) if df.iloc[0]["5th_FU_New Lesions"] else None,
+                                    "5th_FU_New Lesions [Excel : 5th_FU_New Lesions]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                        index=["1", "0", "NA"].index(df.iloc[0]["5th_FU_New Lesions"]) if df.iloc[0]["5th_FU_New Lesions"] else None,
                         placeholder="Choose an option",
                                 )
 
                                 FU5_NEW_Extrahepatic_Disease = st.selectbox(
-                                    "5th_FU_NEW Extrahepatic Disease",
-                                    options=["No", "Yes", "NA"],
-                        index=["No", "Yes", "NA"].index(df.iloc[0]["5th_FU_Extrahepatic Disease"]) if df.iloc[0]["5th_FU_Extrahepatic Disease"] else None,
+                                    "5th_FU_NEW Extrahepatic Disease  [Excel : 5th_FU_NEW Extrahepatic Disease]\n\n Yes (1), No (0), NA",
+                                    options=["1", "0", "NA"],
+                                    format_func=lambda x: {
+                                            "1": "Yes",
+                                            "0": "No",
+                                            "NA": "NA"
+                                        }[x],
+                        index=["1", "0", "NA"].index(df.iloc[0]["5th_FU_Extrahepatic Disease"]) if df.iloc[0]["5th_FU_Extrahepatic Disease"] else None,
                         placeholder="Choose an option",
                                 )
 
@@ -6280,12 +6754,12 @@ def edit_existing_data():
                                 st.subheader("Imaging_Dates for OS or PFS")
 
                                 dead = st.selectbox(
-                                        "Dead",
-                                        options=["0", "1"],
-                                        format_func=lambda x:{
-                                                "0":"No",
-                                                "1":"Yes"
-                                        }[x],
+                                        "Dead [Excel : Dead]\n\n Yes (1), No (0)",
+                                options=["0", "1"],
+                                format_func=lambda x:{
+                                        "0":"No",
+                                        "1":"Yes"
+                                }[x],
                                         index=["0", "1"].index(df.iloc[0]["Dead"]) if df.iloc[0]["Dead"] else None,
                                         placeholder="Choose an option",
                                 )
@@ -6294,12 +6768,12 @@ def edit_existing_data():
                                 Time_to_Death = 'NA' if dead == 0 else relativedelta(Date_of_Death, fetch_date).months
                                 st.write("Time to Death",Time_to_Death)
                                 OLT = st.selectbox(
-                                        "OLT",
-                                        options=["0", "1"],
-                                        format_func=lambda x:{
-                                                "0":"No",
-                                                "1":"Yes"
-                                        }[x],
+                                        "OLT [Excel : OLT]\n\n Yes (1), No (0)",
+                                options=["0", "1"],
+                                format_func=lambda x:{
+                                        "0":"No",
+                                        "1":"Yes"
+                                }[x],
                                         index=["0", "1"].index(df.iloc[0]["OLT"]) if df.iloc[0]["OLT"] else None, 
                                         placeholder="Choose an option",
                                 )
@@ -6308,12 +6782,12 @@ def edit_existing_data():
                                 Time_to_OLT = 'NA' if OLT == 0 else relativedelta(Date_of_Death, fetch_date).months
                                 st.write("Time to OLT",Time_to_OLT)
                                 Repeat_tx_post_Y90 = st.selectbox(
-                                        "Repeat tx post Y90",
-                                        options=["0", "1"],
-                                        format_func=lambda x:{
-                                                "0":"No",
-                                                "1":"Yes"
-                                        }[x],
+                                        "Repeat tx post Y90 [Excel : Repeat tx post Y90]\n\n Yes (1), No (0)",
+                                options=["0", "1"],
+                                format_func=lambda x:{
+                                        "0":"No",
+                                        "1":"Yes"
+                                }[x],
                                         index=["0", "1"].index(df.iloc[0]["Repeat tx post Y90"]) if df.iloc[0]["Repeat tx post Y90"] else None,  # No default selection
                                         placeholder="Choose an option",
                                 )
@@ -6329,7 +6803,7 @@ def edit_existing_data():
                                         Time_to_Localized_Progression = relativedelta(Date_of_Localized_Progression, fetch_date).years
                                 st.write("Time to localized progression",Time_to_Localized_Progression)
                                 Date_of_Overall_Progression = st.text_input("Date of Overall Progression",value = df.iloc[0]["Date of Overall (Local or systemic) Progression"])
-
+                                Time_to_overall_progression =""
                                 if Date_of_Overall_Progression == "No Progression":
                                         Time_to_overall_progression = 'NA'
                                 else:
@@ -6406,123 +6880,126 @@ def edit_existing_data():
                                     Date_of_OLT = Date_of_OLT.strftime("%Y-%m-%d")
                                 if Date_of_Death != None and Date_of_Death != "NA" :
                                     Date_of_Death = Date_of_Death.strftime("%Y-%m-%d")
+                                if Date_of_Last_Follow_up_last_imaging_date != None and Date_of_Last_Follow_up_last_imaging_date != "NA" :
+                                    Date_of_Last_Follow_up_last_imaging_date = Date_of_Last_Follow_up_last_imaging_date.strftime("%Y-%m-%d")
+                                    
                                 submit_tab10 = st.form_submit_button("Submit")
 
                                 if submit_tab10:
                                     
                                     data10={
-                                    "PREY90_prescan_modality": PREY90_prescan_modality,
-                                    "PREY90_Imaging Date": PREY90_Imaging_Date,
-                                    "PREY90_total number of lesions": PREY90_total_number_of_lesions,
-                                    "PREY90_Number Involved Lobes": PREY90_Number_Involved_Lobes,
-                                    "PREY90_target_lesion_1_segments": PREY90_target_lesion_1_segments,
-                                    "PREY90_TL1_LAD": PREY90_TL1_LAD,
-                                    "PREY90_Target Lesion 1 PAD": PREY90_Target_Lesion_1_PAD,
-                                    "PREY90_Target Lesion 1 CCD": PREY90_Target_Lesion_1_CCD,
-                                    "PREY90_Target Lesion 1 VOL": PREY90_Target_Lesion_1_VOL,
-                                    "PREY90_Target lesion 2 Segments": PREY90_Target_Lesion_2_segments,
-                                    "PREY90_Target Lesion 2 LAD": PREY90_Target_Lesion_2_LAD,
-                                    "PREY90_Target Lesion 2 PAD": PREY90_Target_Lesion_2_PAD,
-                                    "PREY90_Target Lesion 2 CCD": PREY90_Target_Lesion_2_CCD,
-                                    "PREY90_Target Lesion 2 VOL": PREY90_Target_Lesion_2_VOL,
-                                    "PREY90_pretx targeted Lesion Dia Sum": PREY90_pretx_targeted_Lesion_Dia_Sum,
-                                    "PREY90_Non-Target Lesion Location": PREY90_Non_Target_Lesion_Location,
-                                    "PREY90_Non-Target Lesion 2 LAD Art Enhanc": PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "PREY90_Non-Target Lesion 2 PAD Art Enhanc": PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "PREY90_Non-Target Lesion 2 CCD Art Enhanc": PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "PREY90_Non-targeted Lesion Dia Sum": PREY90_Non_targeted_Lesion_Dia_Sum,
-                                    "PREY90_Reviewers Initials": PREY90_Reviewers_Initials,
-                                    "PREY90_Pre Y90 Extrahepatic Disease": PREY90_Pre_Y90_Extrahepatic_Disease,
-                                    "PREY90_Pre Y90 Extrahepatic Disease Location": PREY90_Pre_Y90_Extrahepatic_Disease_Location,
-                                    "PREY90_PVT": PREY90_PVT,
-                                    "PREY90_PVT Location": PREY90_PVT_Location,
-                                    "PREY90_Features of cirrhosis": PREY90_Features_of_cirrhosis,
-                                    "1st_FU_Scan Modality": FU_Scan_Modality,
-                                    "1st_FU_Imaging Date": FU_Imaging_Date,
-                                    "1st_FU_Months Since Y90": FU_Months_Since_Y90,
-                                    "1st_FU_Total number of lesions": FU_Total_number_of_lesions,
-                                    "1st_FU_Target Lesion 1 LAD Art Enhanc": FU_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "1st_FU_Target Lesion 1 PAD Art Enhanc": FU_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "1st_FU_Target Lesion 1 CCD Art Enhanc": FU_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "1st_FU_Target Lesion 2 Segments": FU_Target_Lesion_2_Segments,
-                                    "1st_FU_Target Lesion 2 LAD Art Enhanc": FU_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "1st_FU_Target Lesion 2 PAD Art Enhanc": FU_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "1st_FU_Target Lesion 2 CCD Art Enhanc": FU_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "1st_FU_Follow up 1 targeted Lesion Dia Sum": FU_Follow_up_1_targeted_Lesion_Dia_Sum,
-                                    "1st_FU_Non-Target Lesion 2 LAD Art Enhanc": FU_Non_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "1st_FU_Non-Target Lesion 2 PAD Art Enhanc": FU_Non_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "1st_FU_Non-Target Lesion 2 CCD Art Enhanc": FU_Non_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "1st_FU_Non-targeted Lesion Dia Sum": FU_Non_targeted_Lesion_Dia_Sum,
-                                    "1st_FU_Lesion Necrosis": FU_Lesion_Necrosis,
-                                    "1st_FU_Reviewers Initials": FU_Reviewers_Initials,
-                                    "1st_FU_Non target lesion response": FU_Non_target_lesion_response,
-                                    "1st_FU_New Lesions": FU_New_Lesions,
-                                    "1st_FU_NEW Extrahepatic Disease": FU_NEW_Extrahepatic_Disease,
-                                    "1st_FU_NEW Extrahepatic Dz Location": FU_NEW_Extrahepatic_Dz_Location,
-                                    "1st_FU_NEW Extrahepatic Dz Date": FU_NEW_Extrahepatic_Dz_Date,
-                                    "1st_FU_% change non target lesion": FU_change_non_target_lesion,
-                                    "1st_FU_% Change Target Dia": FU_change_target_lesion,
-                                    "1st_FU_mRECIST LOCALIZED":first_fu_mrecist_localized ,
-                                    "1st_FU_mRECIST Overall":first_fu_mrecist_overall ,
-                                    "1st_FU_Free Text": FU_Free_Text,
-                                    "2nd_FU_Scan Modality": FU2_Scan_Modality,
-                                    "2nd_FU_Imaging Date": FU2_Imaging_Date,
-                                    "2nd_FU_Months Since Y90": FU2_Months_Since_Y90,
-                                    "2nd_FU_Total number of lesions": FU2_Total_number_of_lesions,
-                                    "2nd_FU_Target Lesion 1 LAD Art Enhanc": FU2_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "2nd_FU_Target Lesion 1 PAD Art Enhanc": FU2_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "2nd_FU_Target Lesion 1 CCD Art Enhanc": FU2_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "2nd_FU_Target Lesion 2 Segments": FU2_Target_Lesion_2_Segments,
-                                    "2nd_FU_Target Lesion 2 LAD Art Enhanc": FU2_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "2nd_FU_Target Lesion 2 PAD Art Enhanc": FU2_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "2nd_FU_Target Lesion 2 CCD Art Enhanc": FU2_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "2nd_FU_Follow up 2 targeted Lesion Dia Sum": FU2_Follow_up_2_targeted_Lesion_Dia_Sum,
-                                    "2nd_FU_Non-Target Lesion 1 LAD Art Enhanc": FU2_Non_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "2nd_FU_Non-Target Lesion 1 PAD Art Enhanc": FU2_Non_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "2nd_FU_Non-Target Lesion 1 CCD Art Enhanc": FU2_Non_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "2nd_FU_Non-targeted Lesion Dia Sum": FU2_Non_targeted_Lesion_Dia_Sum,
-                                    "2nd_FU_Lesion Necrosis": FU2_Lesion_Necrosis,
-                                    "2nd_FU_Reviewers Initials": FU2_Reviewers_Initials,
-                                    "2nd_FU_Non target lesion response": FU2_Non_target_lesion_response,
-                                    "2nd_FU_New Lesions": FU2_New_Lesions,
-                                    "2nd_FU_Extrahepatic Disease": FU2_NEW_Extrahepatic_Disease,
-                                    "2nd_FU_NEW Extrahepatic Dz Location": FU2_NEW_Extrahepatic_Dz_Location,
-                                    "2nd_FU_NEW Extrahepatic Dz Date": FU2_NEW_Extrahepatic_Dz_Date,
-                                    "2nd_FU_% change non target lesion": FU2_change_non_target_lesion,
-                                    "2nd_FU_% Change Target Dia": FU2_change_target_lesion,
-                                    "2nd_FU_mRECIST Calc": second_fu_mrecist_calc ,
-                                    "2nd_FU_mRECIST LOCALIZED":second_fu_mrecist_localized ,
-                                    "2nd_FU_mRECIST Overall":second_fu_mrecist_overall ,
-                                    "2nd_FU_Free Text": FU2_Free_Text,
-                                    "3rd_FU_Scan Modality": FU3_Scan_Modality,
-                                    "3rd_FU_Imaging Date": FU3_Imaging_Date,
-                                    "3rd_FU_Months Since Y90": FU3_Months_Since_Y90,
-                                    "3rd_FU_Total number of lesions": FU3_Total_number_of_lesions,
-                                    "3rd_FU_Target Lesion 1 LAD Art Enhanc": FU3_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "3rd_FU_Target Lesion 1 PAD Art Enhanc": FU3_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "3rd_FU_Target Lesion 1 CCD Art Enhanc": FU3_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "3rd_FU_Target Lesion 2 Segments": FU3_Target_Lesion_2_Segments,
-                                    "3rd_FU_Target Lesion 2 LAD Art Enhanc": FU3_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "3rd_FU_Target Lesion 2 PAD Art Enhanc": FU3_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "3rd_FU_Target Lesion 2 CCD Art Enhanc": FU3_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "3rd_FU_Follow up 2 targeted Lesion Dia Sum": FU3_Follow_up_2_targeted_Lesion_Dia_Sum,
-                                    "3rd_FU_Non-Target Lesion 1 LAD Art Enhanc": FU3_Non_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "3rd_FU_Non-Target Lesion 1 PAD Art Enhanc": FU3_Non_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "3rd_FU_Non-Target Lesion 1 CCD Art Enhanc": FU3_Non_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "3rd_FU_Non-targeted Lesion Dia Sum": FU3_Non_targeted_Lesion_Dia_Sum,
-                                    "3rd_FU_Lesion Necrosis": FU3_Lesion_Necrosis,
-                                    "3rd_FU_Reviewers Initials": FU3_Reviewers_Initials,
-                                    "3rd_FU_Non target lesion response": FU3_Non_target_lesion_response,
-                                    "3rd_FU_New Lesions": FU3_New_Lesions,
-                                    "3rd_FU_Extrahepatic Disease": FU3_NEW_Extrahepatic_Disease,
-                                    "3rd_FU_NEW Extrahepatic Dz Location": FU3_NEW_Extrahepatic_Dz_Location,
-                                    "3rd_FU_NEW Extrahepatic Dz Date": FU3_NEW_Extrahepatic_Dz_Date,
-                                    "3rd_FU_% change for non target lesion": FU3_change_non_target_lesion,
-                                    "3rd_FU_% Change Target Dia": FU3_change_target_lesion,
-                                    "3rd_FU_mRECIST Calc" :third_fu_mrecist_calc,
-                                    "3rd_FU_mRECIST LOCALIZED" :third_fu_mrecist_localized ,
-                                    "3rd_FU_mRECIST Overall" :third_fu_mrecist_overall ,
-                                    "3rd_FU_Free Text": FU3_Free_Text,
+                                    "PREY_MOD": PREY90_prescan_modality,
+                                    "PREY_IMG_DATE": PREY90_Imaging_Date,
+                                    "PREY_TOTLES": PREY90_total_number_of_lesions,
+                                    "PREY_LOBES": PREY90_Number_Involved_Lobes,
+                                    "PREY_TL1SEG": PREY90_target_lesion_1_segments,
+                                    "PREY_TL1LAD": PREY90_TL1_LAD,
+                                    "PREY_TL1PAD": PREY90_Target_Lesion_1_PAD,
+                                    "PREY_TL1CCD": PREY90_Target_Lesion_1_CCD,
+                                    "PREY_TL1VOL": PREY90_Target_Lesion_1_VOL,
+                                    "PREY_TL2SEG": PREY90_Target_Lesion_2_segments,
+                                    "PREY_TL2LAD": PREY90_Target_Lesion_2_LAD,
+                                    "PREY_TL2PAD": PREY90_Target_Lesion_2_PAD,
+                                    "PREY_TL2CCD": PREY90_Target_Lesion_2_CCD,
+                                    "PREY_TL2VOL": PREY90_Target_Lesion_2_VOL,
+                                    "PREY_TLDIA": PREY90_pretx_targeted_Lesion_Dia_Sum,
+                                    "PREY_NTLOC": PREY90_Non_Target_Lesion_Location,
+                                    "PREY_NTL1LAD": PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "PREY_NTL1PAD": PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "PREY_NTL1CCD": PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "PREY_NTLDIA": PREY90_Non_targeted_Lesion_Dia_Sum,
+                                    "PREY_REVFT": PREY90_Reviewers_Initials,
+                                    "PREY_EHD": PREY90_Pre_Y90_Extrahepatic_Disease,
+                                    "PREY_EHDLOCFT": PREY90_Pre_Y90_Extrahepatic_Disease_Location,
+                                    "PREY_PVT": PREY90_PVT,
+                                    "PREY_PVTLOC": PREY90_PVT_Location,
+                                    "PREY_CIRRH": PREY90_Features_of_cirrhosis,
+                                    "FU1_MOD": FU_Scan_Modality,
+                                    "FU1_IMG_DATE": FU_Imaging_Date,
+                                    "FU1_MS_Y90": FU_Months_Since_Y90,
+                                    "FU1_TOTLES": FU_Total_number_of_lesions,
+                                    "FU1_TL1LAD": FU_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU1_TL1PAD": FU_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU1_TL1CCD": FU_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU1_TL2SEG": FU_Target_Lesion_2_Segments,
+                                    "FU1_TL2LAD": FU_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU1_TL2PAD": FU_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU1_TL2CCD": FU_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU1_TLDIA": FU_Follow_up_1_targeted_Lesion_Dia_Sum,
+                                    "FU1_NTL1LAD": FU_Non_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU1_NTL1PAD": FU_Non_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU1_NTL1CCD": FU_Non_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU1_NTLDIA": FU_Non_targeted_Lesion_Dia_Sum,
+                                    "FU1_NECROSIS": FU_Lesion_Necrosis,
+                                    "FU1_REVFT": FU_Reviewers_Initials,
+                                    "FU1_NTLRSP": FU_Non_target_lesion_response,
+                                    "FU1_NEWLESION": FU_New_Lesions,
+                                    "FU1_NEWEHD": FU_NEW_Extrahepatic_Disease,
+                                    "FU1_EHDLOC": FU_NEW_Extrahepatic_Dz_Location,
+                                    "FU1_EHDDATE": FU_NEW_Extrahepatic_Dz_Date,
+                                    "FU1_NTCHG": FU_change_non_target_lesion,
+                                    "FU1_TDCHG": FU_change_target_lesion,
+                                    "FU1_MREC_LOCAL": first_fu_mrecist_localized,
+                                    "FU1_MREC_OVERALL": first_fu_mrecist_overall,
+                                    "FU1_FT": FU_Free_Text,
+                                    "FU2_MOD": FU2_Scan_Modality,
+                                    "FU2_IMG_DATE": FU2_Imaging_Date,
+                                    "FU2_MS_Y90": FU2_Months_Since_Y90,
+                                    "FU2_TOTLES": FU2_Total_number_of_lesions,
+                                    "FU2_TL1LAD": FU2_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU2_TL1PAD": FU2_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU2_TL1CCD": FU2_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU2_TL2SEG": FU2_Target_Lesion_2_Segments,
+                                    "FU2_TL2LAD": FU2_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU2_TL2PAD": FU2_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU2_TL2CCD": FU2_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU2_TLDIA": FU2_Follow_up_2_targeted_Lesion_Dia_Sum,
+                                    "FU2_NTL1LAD": FU2_Non_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU2_NTL1PAD": FU2_Non_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU2_NTL1CCD": FU2_Non_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU2_NTLDIA": FU2_Non_targeted_Lesion_Dia_Sum,
+                                    "FU2_NECROSIS": FU2_Lesion_Necrosis,
+                                    "FU2_REV": FU2_Reviewers_Initials,
+                                    "FU2_NTLRSP": FU2_Non_target_lesion_response,
+                                    "FU2_NEWLES": FU2_New_Lesions,
+                                    "FU2_EHD": FU2_NEW_Extrahepatic_Disease,
+                                    "FU2_EHDLOC": FU2_NEW_Extrahepatic_Dz_Location,
+                                    "FU2_EHDDATE": FU2_NEW_Extrahepatic_Dz_Date,
+                                    "FU2_NTCHG": FU2_change_non_target_lesion,
+                                    "FU2_TDCHG": FU2_change_target_lesion,
+                                    "FU2_MREC_CALC": second_fu_mrecist_calc,
+                                    "FU2_MREC_LOCAL": second_fu_mrecist_localized,
+                                    "FU2_MREC_OVERALL": second_fu_mrecist_overall,
+                                    "FU2_FT": FU2_Free_Text,
+                                    "FU3_MOD": FU3_Scan_Modality,
+                                    "FU3_IMG_DATE": FU3_Imaging_Date,
+                                    "FU3_MS_Y90": FU3_Months_Since_Y90,
+                                    "FU3_TOTLES": FU3_Total_number_of_lesions,
+                                    "FU3_TL1LAD": FU3_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU3_TL1PAD": FU3_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU3_TL1CCD": FU3_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU3_TL2SEG": FU3_Target_Lesion_2_Segments,
+                                    "FU3_TL2LAD": FU3_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU3_TL2PAD": FU3_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU3_TL2CCD": FU3_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU3_TLDIA": FU3_Follow_up_2_targeted_Lesion_Dia_Sum,
+                                    "FU3_NTL1LAD": FU3_Non_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU3_NTL1PAD": FU3_Non_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU3_NTL1CCD": FU3_Non_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU3_NTLDIA": FU3_Non_targeted_Lesion_Dia_Sum,
+                                    "FU3_NEC": FU3_Lesion_Necrosis,
+                                    "FU3_REV": FU3_Reviewers_Initials,
+                                    "FU3_NTLRSP": FU3_Non_target_lesion_response,
+                                    "FU3_NEWLES": FU3_New_Lesions,
+                                    "FU3_EHD": FU3_NEW_Extrahepatic_Disease,
+                                    "FU3_EHDLOC": FU3_NEW_Extrahepatic_Dz_Location,
+                                    "FU3_EHDDATE": FU3_NEW_Extrahepatic_Dz_Date,
+                                    "FU3_NTCHG": FU3_change_non_target_lesion,
+                                    "FU3_TDCHG": FU3_change_target_lesion,
+                                    "FU3_MREC_CALC": third_fu_mrecist_calc,
+                                    "FU3_MREC_LOCAL": third_fu_mrecist_localized,
+                                    "FU3_MREC_OVERALL": third_fu_mrecist_overall,
+                                    "FU3_FT": FU3_Free_Text,
                                     "4th_FU_Scan Modality": FU4_Scan_Modality,
                                     "4th_FU_Imaging Date": FU4_Imaging_Date,
                                     "4th_FU_Months Since Y90": FU4_Months_Since_Y90,
@@ -6579,6 +7056,11 @@ def edit_existing_data():
                                     "Date of Repeat tx Post Y90": Date_of_Repeat_tx_Post_Y90 if Date_of_Repeat_tx_Post_Y90 != 'NA' else Date_of_Repeat_tx_Post_Y90,
                                     "Time to Repeat Tx Post Y90": Time_to_Repeat_Tx_Post_Y90,
                                     "Date of Localized Progression": Date_of_Localized_Progression,
+                                    "Time to localized progression" : Time_to_Localized_Progression,
+                                    "Date of Overall (Local or systemic) Progression" :Date_of_Overall_Progression,
+                                    "Time to Overall (Local or systemic) Progression" :Time_to_overall_progression,
+                                    "Date of Last Follow up or last imaging date (if not OLT, Death, Repeat tx)": Date_of_Last_Follow_up_last_imaging_date,
+                                    "Time to Last follow up": Time_to_Last_Follow_up_last_imaging_date,
                                     "Notes Free text" : notes_free_text,
                                     "BestmRECIST" :bestm_recist,
                                     "Date BestmRECIST":date_bestm_recist,
@@ -6591,15 +7073,25 @@ def edit_existing_data():
                     elif st.session_state.selected_tab == "Dosimetry Data":
                         st.subheader("Dosimetry Data")
                         with st.form("dosimetry_data_form"):
-                
-                            input_GTV_mean_dose = st.text_input("GTV mean dose",value = df.iloc[0]["GTV mean dose"])
-                            input_Tx_vol_mean_dose = st.text_input("Tx vol mean dose",value = df.iloc[0]["Tx vol mean dose"])
-                            input_Liver_Vol_Mean_dose = st.text_input("Liver Vol Mean dose",value = df.iloc[0]["Liver Vol Mean dose"])
-                            input_Healthy_Liver_mean_dose = st.text_input("Healthy Liver mean dose",value = df.iloc[0]["Healthy Liver mean dose"])
-                            input_GTV_Vol = st.number_input("GTV Vol",step=0.1,value = float(df.iloc[0]["GTV Vol"]) if pd.notnull(df.iloc[0]["GTV Vol"]) and str(df.iloc[0]["GTV Vol"]).isdigit() else 0.0)
-                            input_Tx_vol = st.text_input("Tx vol",value = df.iloc[0]["Tx vol"])
-                            input_Liver_vol = st.number_input("Liver vol",step=0.1, min_value=0.1,value = float(df.iloc[0]["Liver vol"]) if pd.notnull(df.iloc[0]["Liver vol"]) and str(df.iloc[0]["Liver vol"]).isdigit() else 0.1)
-                            input_Healthy_Liver_Vol = st.text_input("Healthy Liver Vol",value = df.iloc[0]["Healthy Liver Vol"])
+                            trlnkid = st.selectbox(
+                                "TRLNKID [Excel : TRLNKID]\n\n Tumor 1 (1), Tumor 2 (2)",
+                                    options=["1", "2"],
+                                    format_func=lambda x: {
+                                            "1": "Tumor 1",
+                                            "2": "Tumor 2",
+                                        }[x],
+                               
+                                index=["1","2"].index(df.iloc[0]["TRLNKID"]) if df.iloc[0]["TRLNKID"] else None,
+                            placeholder="Choose an option",
+                            )
+                            input_GTV_mean_dose = st.text_input("GTV mean dose",value = df.iloc[0]["GTV_MEANDOSE"])
+                            input_Tx_vol_mean_dose = st.text_input("Tx vol mean dose",value = df.iloc[0]["TXVOL_MEANDOSE"])
+                            input_Liver_Vol_Mean_dose = st.text_input("Liver Vol Mean dose",value = df.iloc[0]["LIVVOL__MEANDOSE"])
+                            input_Healthy_Liver_mean_dose = st.text_input("Healthy Liver mean dose",value = df.iloc[0]["HEALTHYLIV_MEANDOSE"])
+                            input_GTV_Vol = st.number_input("GTV Vol",step=0.1,value = float(df.iloc[0]["GTV_VOL"]) if pd.notnull(df.iloc[0]["GTV_VOL"]) and str(df.iloc[0]["GTV_VOL"]).isdigit() else 0.0)
+                            input_Tx_vol = st.text_input("Tx vol",value = df.iloc[0]["TX_VOL"])
+                            input_Liver_vol = st.number_input("Liver vol",step=0.1, min_value=0.1,value = float(df.iloc[0]["LIVER_VOL"]) if pd.notnull(df.iloc[0]["LIVER_VOL"]) and str(df.iloc[0]["LIVER_VOL"]).isdigit() else 0.1)
+                            input_Healthy_Liver_Vol = st.text_input("Healthy Liver Vol",value = df.iloc[0]["HEALTHYLIV_VOL"])
                             input_GTV_Liver = (input_GTV_Vol)/(input_Liver_vol)*100
                             st.write("GTV/Liver ",input_GTV_Liver)
                             input_D98 = st.text_input("D98",value = df.iloc[0]["D98"])
@@ -6611,40 +7103,42 @@ def edit_existing_data():
                             input_V200 = st.text_input("V200",value = df.iloc[0]["V200"])
                             input_V300 = st.text_input("V300",value = df.iloc[0]["V300"])
                             input_V400 = st.text_input("V400",value = df.iloc[0]["V400"])
-                            input_ActivityBq = st.text_input("ActivityBq",value = df.iloc[0]["ActivityBq"])
-                            input_ActivityCi = st.text_input("ActivityCi",value = df.iloc[0]["ActivityCi"])
-                            input_Tx_vol_Activity_Density = st.text_input("Tx vol Activity Density",value = df.iloc[0]["Tx vol Activity Density"])
-                            input_NEW = st.text_input("NEW",value = df.iloc[0]["NEW"])
-                            input_GTV_less_D95_Vol_ml = st.text_input("GTV < D95 Vol_ml",value = df.iloc[0]["GTV < D95 Vol_ml"])
-                            input_GTV_less_D95_Mean_Dose = st.text_input("GTV < D95 Mean Dose",value = df.iloc[0]["GTV < D95 Mean Dose"])
-                            input_GTV_less_D95_Min_Dose = st.text_input("GTV < D95 Min Dose",value = df.iloc[0]["GTV < D95 Min Dose"])
-                            input_GTV_less_D95_SD = st.text_input("GTV < D95 SD",value = df.iloc[0]["GTV < D95 SD"])
-                            input_GTV_less_D95_Vol_1 = st.text_input("GTV < D95 Vol_1",value = df.iloc[0]["GTV < D95 Vol_1"])
-                            input_GTV_less_D95_Mean_Dose_1 = st.text_input("GTV < D95 Mean Dose_1",value = df.iloc[0]["GTV < D95 Mean Dose_1"])
-                            input_GTV_less_D95_Min_Dose_1 = st.text_input("GTV < D95 Min Dose_1",value = df.iloc[0]["GTV < D95 Min Dose_1"])
-                            input_GTV_less_D95_SD_1 = st.text_input("GTV < D95 SD_1",value = df.iloc[0]["GTV < D95 SD_1"])
-                            input_GTV_less_D95_Vol_2 = st.text_input("GTV < D95 Vol_2",value = df.iloc[0]["GTV < D95 Vol_2"])
-                            input_GTV_less_D95_Mean_Dose_2 = st.text_input("GTV < D95 Mean Dose_2",value = df.iloc[0]["GTV < D95 Mean Dose_2"])
-                            input_GTV_less_D95_Min_Dose_2 = st.text_input("GTV < D95 Min Dose_2",value = df.iloc[0]["GTV < D95 Min Dose_2"])
-                            input_GTV_less_D95_SD_2 = st.text_input("GTV < D95 SD_2",value = df.iloc[0]["GTV < D95 SD_2"])
-                            input_GTV_less_100_Gy_Vol = st.text_input("GTV < 100 Gy Vol",value = df.iloc[0]["GTV < 100 Gy Vol"])
-                            input_GTV_less_100_Gy_Mean_Dose = st.text_input("GTV < 100 Gy Mean Dose",value = df.iloc[0]["GTV < 100 Gy Mean Dose"])
-                            input_GTV_less_100_Gy_Min_Dose = st.text_input("GTV < 100 Gy Min Dose",value = df.iloc[0]["GTV < 100 Gy Min Dose"])
-                            input_GTV_less_100_Gy_SD = st.text_input("GTV < 100 Gy SD",value = df.iloc[0]["GTV < 100 Gy SD"])
+                            input_ActivityBq = st.text_input("ActivityBq",value = df.iloc[0]["ACTIVITYBQ"])
+                            input_ActivityCi = st.text_input("ActivityCi",value = df.iloc[0]["ACTIVITYCI"])
+                            input_Tx_vol_Activity_Density = st.text_input("Tx vol Activity Density",value = df.iloc[0]["ACTIVITY_TXVOL"])
+                            input_GTV_less_D95_Vol_ml = st.text_input("GTV < D95 Vol_ml",value = df.iloc[0]["GTVLT_D95VOL"])
+                            input_GTV_less_D95_Mean_Dose = st.text_input("GTV < D95 Mean Dose",value = df.iloc[0]["GTVLT_D95MEAN"])
+                            input_GTV_less_D95_Mx_Dose = st.text_input("GTV < D95 Max Dose",value = df.iloc[0]["GTVLT_D95MAX"])
+                            input_GTV_less_D95_Min_Dose = st.text_input("GTV < D95 Min Dose",value = df.iloc[0]["GTVLT_D95MIN"])
+                            input_GTV_less_D95_SD = st.text_input("GTV < D95 SD",value = df.iloc[0]["GTVLT_D95SD"])
+                            input_GTV_less_D95_Vol_1 = st.text_input("GTV < D95 Vol_1",value = df.iloc[0]["V1_GTVLT_D95VOL"])
+                            input_GTV_less_D95_Mean_Dose_1 = st.text_input("GTV < D95 Mean Dose_1",value = df.iloc[0]["V1_GTVLT_D95MEAN"])
+                            input_GTV_less_D95_Min_Dose_1 = st.text_input("GTV < D95 Min Dose_1",value = df.iloc[0]["V1_GTVLT_D95MIN"])
+                            input_GTV_less_D95_SD_1 = st.text_input("GTV < D95 SD_1",value = df.iloc[0]["V1_GTVLT_D95SD"])
+                            input_GTV_less_D95_Vol_2 = st.text_input("GTV < D95 Vol_2",value = df.iloc[0]["V2_GTVLT_D95VOL"])
+                            input_GTV_less_D95_Mean_Dose_2 = st.text_input("GTV < D95 Mean Dose_2",value = df.iloc[0]["V2_GTVLT_D95MEAN"])
+                            input_GTV_less_D95_Min_Dose_2 = st.text_input("GTV < D95 Min Dose_2",value = df.iloc[0]["V2_GTVLT_D95MIN"])
+                            input_GTV_less_D95_SD_2 = st.text_input("GTV < D95 SD_2",value = df.iloc[0]["V2_GTVLT_D95SD"])
+                            input_GTV_less_100_Gy_Vol = st.text_input("GTV < 100 Gy Vol",value = df.iloc[0]["GTVLT_100VOL"])
+                            input_GTV_less_100_Gy_Mean_Dose = st.text_input("GTV < 100 Gy Mean Dose",value = df.iloc[0]["GTVLT_100MEAN"])
+                            input_GTV_less_100_Gy_Max_Dose = st.text_input("GTV < 100 Gy Max Dose",value = df.iloc[0]["GTVLT_100MAX"])
+                            input_GTV_less_100_Gy_Min_Dose = st.text_input("GTV < 100 Gy Min Dose",value = df.iloc[0]["GTVLT_100MIN"])
+                            input_GTV_less_100_Gy_SD = st.text_input("GTV < 100 Gy SD",value = df.iloc[0]["GTVLT_100SD"])
 
                             submit_dosimetry_data = st.form_submit_button("Submit")
 
                             if submit_dosimetry_data:
                                 data11 = {
-                                    "GTV mean dose": input_GTV_mean_dose,
-                                    "Tx vol mean dose": input_Tx_vol_mean_dose,
-                                    "Liver Vol Mean dose": input_Liver_Vol_Mean_dose,
-                                    "Healthy Liver mean dose": input_Healthy_Liver_mean_dose,
-                                    "GTV Vol": input_GTV_Vol,
-                                    "Tx vol": input_Tx_vol,
-                                    "Liver vol": input_Liver_vol,
-                                    "Healthy Liver Vol": input_Healthy_Liver_Vol,
-                                    "GTV/Liver": input_GTV_Liver,
+                                    "TRLNKID": trlnkid,
+                                    "GTV_MEANDOSE": input_GTV_mean_dose,
+                                    "TXVOL_MEANDOSE": input_Tx_vol_mean_dose,
+                                    "LIVVOL__MEANDOSE": input_Liver_Vol_Mean_dose,
+                                    "HEALTHYLIV_MEANDOSE": input_Healthy_Liver_mean_dose,
+                                    "GTV_VOL": input_GTV_Vol,
+                                    "TX_VOL": input_Tx_vol,
+                                    "LIVER_VOL": input_Liver_vol,
+                                    "HEALTHYLIV_VOL": input_Healthy_Liver_Vol,
+                                    "GTVLIV_FRAC": input_GTV_Liver,
                                     "D98": input_D98,
                                     "D95": input_D95,
                                     "D90": input_D90,
@@ -6654,26 +7148,27 @@ def edit_existing_data():
                                     "V200": input_V200,
                                     "V300": input_V300,
                                     "V400": input_V400,
-                                    "ActivityBq": input_ActivityBq,
-                                    "ActivityCi": input_ActivityCi,
-                                    "Tx vol Activity Density": input_Tx_vol_Activity_Density,
-                                    "NEW": input_NEW,
-                                    "GTV < D95 Vol_ml": input_GTV_less_D95_Vol_ml,
-                                    "GTV < D95 Mean Dose": input_GTV_less_D95_Mean_Dose,
-                                    "GTV < D95 Min Dose": input_GTV_less_D95_Min_Dose,
-                                    "GTV < D95 SD": input_GTV_less_D95_SD,
-                                    "GTV < D95 Vol_1": input_GTV_less_D95_Vol_1,
-                                    "GTV < D95 Mean Dose_1": input_GTV_less_D95_Mean_Dose_1,
-                                    "GTV < D95 Min Dose_1": input_GTV_less_D95_Min_Dose_1,
-                                    "GTV < D95 SD_1": input_GTV_less_D95_SD_1,
-                                    "GTV < D95 Vol_2": input_GTV_less_D95_Vol_2,
-                                    "GTV < D95 Mean Dose_2": input_GTV_less_D95_Mean_Dose_2,
-                                    "GTV < D95 Min Dose_2": input_GTV_less_D95_Min_Dose_2,
-                                    "GTV < D95 SD_2": input_GTV_less_D95_SD_2,
-                                    "GTV < 100 Gy Vol": input_GTV_less_100_Gy_Vol,
-                                    "GTV < 100 Gy Mean Dose": input_GTV_less_100_Gy_Mean_Dose,
-                                    "GTV < 100 Gy Min Dose": input_GTV_less_100_Gy_Min_Dose,
-                                    "GTV < 100 Gy SD": input_GTV_less_100_Gy_SD
+                                    "ACTIVITYBQ": input_ActivityBq,
+                                    "ACTIVITYCI": input_ActivityCi,
+                                    "ACTIVITY_TXVOL": input_Tx_vol_Activity_Density,
+                                    "GTVLT_D95VOL": input_GTV_less_D95_Vol_ml,
+                                    "GTVLT_D95MEAN": input_GTV_less_D95_Mean_Dose,
+                                    "GTVLT_D95MAX": input_GTV_less_D95_Mx_Dose,
+                                    "GTVLT_D95MIN": input_GTV_less_D95_Min_Dose,
+                                    "GTVLT_D95SD": input_GTV_less_D95_SD,
+                                    "V1_GTVLT_D95VOL": input_GTV_less_D95_Vol_1,
+                                    "V1_GTVLT_D95MEAN": input_GTV_less_D95_Mean_Dose_1,
+                                    "V1_GTVLT_D95MIN": input_GTV_less_D95_Min_Dose_1,
+                                    "V1_GTVLT_D95SD": input_GTV_less_D95_SD_1,
+                                    "V2_GTVLT_D95VOL": input_GTV_less_D95_Vol_2,
+                                    "V2_GTVLT_D95MEAN": input_GTV_less_D95_Mean_Dose_2,
+                                    "V2_GTVLT_D95MIN": input_GTV_less_D95_Min_Dose_2,
+                                    "V2_GTVLT_D95SD": input_GTV_less_D95_SD_2,
+                                    "GTVLT_100VOL": input_GTV_less_100_Gy_Vol,
+                                    "GTVLT_100MEAN": input_GTV_less_100_Gy_Mean_Dose,
+                                    "GTVLT_100MAX": input_GTV_less_100_Gy_Max_Dose,
+                                    "GTVLT_100MIN": input_GTV_less_100_Gy_Min_Dose,
+                                    "GTVLT_100SD": input_GTV_less_100_Gy_SD
                                 }
                                 update_google_sheet(data11, mrn)
 
@@ -6681,113 +7176,113 @@ def edit_existing_data():
                         st.subheader("Dosimetry Data")
                         with st.form("dosimetry_data_form"):
                             
-                                input_1AFP_Date = st.text_area("1AFP Date",value = df.iloc[0]["1AFP Date"])
+                                input_1AFP_DATE = st.text_area("1AFP Date",value = df.iloc[0]["1AFPDATE"])
                                 input_1AFP = st.text_area("1AFP",value = df.iloc[0]["1AFP"])
-                                input_2AFP_Date = st.text_area("2AFP Date",value = df.iloc[0]["2AFP Date"])
+                                input_2AFP_DATE = st.text_area("2AFP Date",value = df.iloc[0]["2AFPDATE"])
                                 input_2AFP = st.text_area("2AFP",value = df.iloc[0]["2AFP"])
-                                input_3AFP_Date = st.text_area("3AFP Date",value = df.iloc[0]["3AFP Date"])
+                                input_3AFP_DATE = st.text_area("3AFP Date",value = df.iloc[0]["3AFPDATE"])
                                 input_3AFP = st.text_area("3AFP",value = df.iloc[0]["3AFP"])
-                                input_4AFP_Date = st.text_area("4AFP Date",value = df.iloc[0]["4AFP Date"])
+                                input_4AFP_DATE = st.text_area("4AFP Date",value = df.iloc[0]["4AFPDATE"])
                                 input_4AFP = st.text_area("4AFP",value = df.iloc[0]["4AFP"])
-                                input_5AFP_Date = st.text_area("5AFP Date",value = df.iloc[0]["5AFP Date"])
+                                input_5AFP_DATE = st.text_area("5AFP Date",value = df.iloc[0]["5AFPDATE"])
                                 input_5AFP = st.text_area("5AFP",value = df.iloc[0]["5AFP"])
-                                input_6AFP_Date = st.text_area("6AFP Date",value = df.iloc[0]["6AFP Date"])
+                                input_6AFP_DATE = st.text_area("6AFP Date",value = df.iloc[0]["6AFPDATE"])
                                 input_6AFP = st.text_area("6AFP",value = df.iloc[0]["6AFP"])
-                                input_7AFP_Date = st.text_area("7AFP Date",value = df.iloc[0]["7AFP Date"])
+                                input_7AFP_DATE = st.text_area("7AFP Date",value = df.iloc[0]["7AFPDATE"])
                                 input_7AFP = st.text_area("7AFP",value = df.iloc[0]["7AFP"])
-                                input_8AFP_Date = st.text_area("8AFP Date",value = df.iloc[0]["8AFP Date"])
+                                input_8AFP_DATE = st.text_area("8AFP Date",value = df.iloc[0]["8AFPDATE"])
                                 input_8AFP = st.text_area("8AFP",value = df.iloc[0]["8AFP"])
-                                input_9AFP_Date = st.text_area("9AFP Date",value = df.iloc[0]["9AFP Date"])
+                                input_9AFP_DATE = st.text_area("9AFP Date",value = df.iloc[0]["9AFPDATE"])
                                 input_9AFP = st.text_area("9AFP",value = df.iloc[0]["9AFP"])
-                                input_10AFP_Date = st.text_area("10AFP Date",value = df.iloc[0]["10AFP Date"])
-                                input_10AFP = st.text_area("10AFP",value = df.iloc[0]["10AFP Date"])
-                                input_11AFP_Date = st.text_area("11AFP Date",value = df.iloc[0]["11AFP Date"])
+                                input_10AFP_DATE = st.text_area("10AFP Date",value = df.iloc[0]["10AFPDATE"])
+                                input_10AFP = st.text_area("10AFP",value = df.iloc[0]["10AFPDATE"])
+                                input_11AFP_DATE = st.text_area("11AFP Date",value = df.iloc[0]["11AFPDATE"])
                                 input_11AFP = st.text_area("11AFP",value = df.iloc[0]["11AFP"])
-                                input_12AFP_Date = st.text_area("12AFP Date",value = df.iloc[0]["12AFP Date"])
+                                input_12AFP_DATE = st.text_area("12AFP Date",value = df.iloc[0]["12AFPDATE"])
                                 input_12AFP = st.text_area("12AFP",value = df.iloc[0]["12AFP"])
-                                input_13AFP_Date = st.text_area("13AFP Date",value = df.iloc[0]["13AFP Date"])
+                                input_13AFP_DATE = st.text_area("13AFP Date",value = df.iloc[0]["13AFPDATE"])
                                 input_13AFP = st.text_area("13AFP",value = df.iloc[0]["13AFP"])
-                                input_14AFP_Date = st.text_area("14AFP Date",value = df.iloc[0]["14AFP Date"])
+                                input_14AFP_DATE = st.text_area("14AFP Date",value = df.iloc[0]["14AFPDATE"])
                                 input_14AFP = st.text_area("14AFP",value = df.iloc[0]["14AFP"])
-                                input_15AFP_Date = st.text_area("15AFP Date",value = df.iloc[0]["15AFP Date"])
+                                input_15AFP_DATE = st.text_area("15AFP Date",value = df.iloc[0]["15AFPDATE"])
                                 input_15AFP = st.text_area("15AFP",value = df.iloc[0]["15AFP"])
-                                input_16AFP_Date = st.text_area("16AFP Date",value = df.iloc[0]["16AFP Date"])
+                                input_16AFP_DATE = st.text_area("16AFP Date",value = df.iloc[0]["16AFPDATE"])
                                 input_16AFP = st.text_area("16AFP",value = df.iloc[0]["16AFP"])
-                                input_17AFP_Date = st.text_area("17AFP Date",value = df.iloc[0]["17AFP Date"])
+                                input_17AFP_DATE = st.text_area("17AFP Date",value = df.iloc[0]["17AFPDATE"])
                                 input_17AFP = st.text_area("17AFP",value = df.iloc[0]["17AFP"])
-                                input_18AFP_DATE = st.text_area("18AFP DATE",value = df.iloc[0]["18AFP DATE"])
+                                input_18AFP_DATE = st.text_area("18AFP DATE",value = df.iloc[0]["18AFPDATE"])
                                 input_18AFP = st.text_area("18AFP",value = df.iloc[0]["18AFP"])
-                                input_19AFP_DATE = st.text_area("19AFP DATE",value = df.iloc[0]["19AFP DATE"])
+                                input_19AFP_DATE = st.text_area("19AFP DATE",value = df.iloc[0]["19AFPDATE"])
                                 input_19AFP = st.text_area("19AFP",value = df.iloc[0]["19AFP"])
-                                input_20AFP_DATE = st.text_area("20AFP DATE",value = df.iloc[0]["20AFP DATE"])
+                                input_20AFP_DATE = st.text_area("20AFP DATE",value = df.iloc[0]["20AFPDATE"])
                                 input_20AFP = st.text_area("20AFP",value = df.iloc[0]["20AFP"])
-                                input_21AFP_DATE = st.text_area("21AFP DATE",value = df.iloc[0]["21AFP DATE"])
+                                input_21AFP_DATE = st.text_area("21AFP DATE",value = df.iloc[0]["21AFPDATE"])
                                 input_21AFP = st.text_area("21AFP",value = df.iloc[0]["21AFP"])
-                                input_22AFP_DATE = st.text_area("22AFP DATE",value = df.iloc[0]["22AFP DATE"])
+                                input_22AFP_DATE = st.text_area("22AFP DATE",value = df.iloc[0]["22AFPDATE"])
                                 input_22AFP = st.text_area("22AFP",value = df.iloc[0]["22AFP"])
-                                input_23AFP_DATE = st.text_area("23AFP DATE",value = df.iloc[0]["23AFP DATE"])
+                                input_23AFP_DATE = st.text_area("23AFP DATE",value = df.iloc[0]["23AFPDATE"])
                                 input_23AFP = st.text_area("23AFP",value = df.iloc[0]["23AFP"])
-                                input_24AFP_DATE = st.text_area("24AFP DATE",value = df.iloc[0]["24AFP DATE"])
+                                input_24AFP_DATE = st.text_area("24AFP DATE",value = df.iloc[0]["24AFPDATE"])
                                 input_24AFP = st.text_area("24AFP",value = df.iloc[0]["24AFP"])
-                                input_25AFP_DATE = st.text_area("25AFP DATE",value = df.iloc[0]["25AFP DATE"])
+                                input_25AFP_DATE = st.text_area("25AFP DATE",value = df.iloc[0]["25AFPDATE"])
                                 input_25AFP = st.text_area("25AFP",value = df.iloc[0]["25AFP"])
-                                input_26AFP_DATE = st.text_area("26AFP DATE",value = df.iloc[0]["26AFP DATE"])
+                                input_26AFP_DATE = st.text_area("26AFP DATE",value = df.iloc[0]["26AFPDATE"])
                                 input_26AFP = st.text_area("26AFP",value = df.iloc[0]["26AFP"])
-                                input_27AFP_DATE = st.text_area("27AFP DATE",value = df.iloc[0]["27AFP DATE"])
+                                input_27AFP_DATE = st.text_area("27AFP DATE",value = df.iloc[0]["27AFPDATE"])
                                 input_27AFP = st.text_area("27AFP",value = df.iloc[0]["27AFP"])
-                                input_28AFP_DATE = st.text_area("28AFP DATE",value = df.iloc[0]["28AFP DATE"])
+                                input_28AFP_DATE = st.text_area("28AFP DATE",value = df.iloc[0]["28AFPDATE"])
                                 input_28AFP = st.text_area("28AFP",value = df.iloc[0]["28AFP"])
-                                input_29AFP_DATE = st.text_area("29AFP DATE",value = df.iloc[0]["29AFP DATE"])
+                                input_29AFP_DATE = st.text_area("29AFP DATE",value = df.iloc[0]["29AFPDATE"])
                                 input_29AFP = st.text_area("29AFP",value = df.iloc[0]["29AFP"])
-                                input_30AFP_DATE = st.text_area("30AFP DATE",value = df.iloc[0]["30AFP DATE"])
+                                input_30AFP_DATE = st.text_area("30AFP DATE",value = df.iloc[0]["30AFPDATE"])
                                 input_30AFP = st.text_area("30AFP",value = df.iloc[0]["30AFP"])
-                                input_31AFP_Date = st.text_area("31AFP Date",value = df.iloc[0]["31AFP Date"])
+                                input_31AFP_DATE = st.text_area("31AFP Date",value = df.iloc[0]["31AFPDATE"])
                                 input_31AFP = st.text_area("31AFP",value = df.iloc[0]["31AFP"])
-                                input_32AFP_DATE = st.text_area("32AFP DATE",value = df.iloc[0]["32AFP DATE"])
+                                input_32AFP_DATE = st.text_area("32AFP DATE",value = df.iloc[0]["32AFPDATE"])
                                 input_32AFP = st.text_area("32AFP",value = df.iloc[0]["32AFP"])
-                                input_33AFP_DATE = st.text_area("33AFP DATE",value = df.iloc[0]["33AFP DATE"])
+                                input_33AFP_DATE = st.text_area("33AFP DATE",value = df.iloc[0]["33AFPDATE"])
                                 input_33AFP = st.text_area("33AFP",value = df.iloc[0]["33AFP"])
-                                input_34AFP_DATE = st.text_area("34AFP DATE",value = df.iloc[0]["34AFP DATE"])
+                                input_34AFP_DATE = st.text_area("34AFP DATE",value = df.iloc[0]["34AFPDATE"])
                                 input_34AFP = st.text_area("34AFP",value = df.iloc[0]["34AFP"])
 
                                 submit_afp = st.form_submit_button("Submit")
 
                                 if submit_afp:
                                     data12 = {
-                                    "1AFP Date": input_1AFP_Date, "1AFP": input_1AFP,
-                                    "2AFP Date": input_2AFP_Date, "2AFP": input_2AFP,
-                                    "3AFP Date": input_3AFP_Date, "3AFP": input_3AFP,
-                                    "4AFP Date": input_4AFP_Date, "4AFP": input_4AFP,
-                                    "5AFP Date": input_5AFP_Date, "5AFP": input_5AFP,
-                                    "6AFP Date": input_6AFP_Date, "6AFP": input_6AFP,
-                                    "7AFP Date": input_7AFP_Date, "7AFP": input_7AFP,
-                                    "8AFP Date": input_8AFP_Date, "8AFP": input_8AFP,
-                                    "9AFP Date": input_9AFP_Date, "9AFP": input_9AFP,
-                                    "10AFP Date": input_10AFP_Date, "10AFP": input_10AFP,
-                                    "11AFP Date": input_11AFP_Date, "11AFP": input_11AFP,
-                                    "12AFP Date": input_12AFP_Date, "12AFP": input_12AFP,
-                                    "13AFP Date": input_13AFP_Date, "13AFP": input_13AFP,
-                                    "14AFP Date": input_14AFP_Date, "14AFP": input_14AFP,
-                                    "15AFP Date": input_15AFP_Date, "15AFP": input_15AFP,
-                                    "16AFP Date": input_16AFP_Date, "16AFP": input_16AFP,
-                                    "17AFP Date": input_17AFP_Date, "17AFP": input_17AFP,
-                                    "18AFP DATE": input_18AFP_DATE, "18AFP": input_18AFP,
-                                    "19AFP DATE": input_19AFP_DATE, "19AFP": input_19AFP,
-                                    "20AFP DATE": input_20AFP_DATE, "20AFP": input_20AFP,
-                                    "21AFP DATE": input_21AFP_DATE, "21AFP": input_21AFP,
-                                    "22AFP DATE": input_22AFP_DATE, "22AFP": input_22AFP,
-                                    "23AFP DATE": input_23AFP_DATE, "23AFP": input_23AFP,
-                                    "24AFP DATE": input_24AFP_DATE, "24AFP": input_24AFP,
-                                    "25AFP DATE": input_25AFP_DATE, "25AFP": input_25AFP,
-                                    "26AFP DATE": input_26AFP_DATE, "26AFP": input_26AFP,
-                                    "27AFP DATE": input_27AFP_DATE, "27AFP": input_27AFP,
-                                    "28AFP DATE": input_28AFP_DATE, "28AFP": input_28AFP,
-                                    "29AFP DATE": input_29AFP_DATE, "29AFP": input_29AFP,
-                                    "30AFP DATE": input_30AFP_DATE, "30AFP": input_30AFP,
-                                    "31AFP Date": input_31AFP_Date, "31AFP": input_31AFP,
-                                    "32AFP DATE": input_32AFP_DATE, "32AFP": input_32AFP,
-                                    "33AFP DATE": input_33AFP_DATE, "33AFP": input_33AFP,
-                                    "34AFP DATE": input_34AFP_DATE, "34AFP": input_34AFP
+                                    "1AFPDATE": input_1AFP_DATE, "1AFP": input_1AFP,
+                                    "2AFPDATE": input_2AFP_DATE, "2AFP": input_2AFP,
+                                    "3AFPDATE": input_3AFP_DATE, "3AFP": input_3AFP,
+                                    "4AFPDATE": input_4AFP_DATE, "4AFP": input_4AFP,
+                                    "5AFPDATE": input_5AFP_DATE, "5AFP": input_5AFP,
+                                    "6AFPDATE": input_6AFP_DATE, "6AFP": input_6AFP,
+                                    "7AFPDATE": input_7AFP_DATE, "7AFP": input_7AFP,
+                                    "8AFPDATE": input_8AFP_DATE, "8AFP": input_8AFP,
+                                    "9AFPDATE": input_9AFP_DATE, "9AFP": input_9AFP,
+                                    "10AFPDATE": input_10AFP_DATE, "10AFP": input_10AFP,
+                                    "11AFPDATE": input_11AFP_DATE, "11AFP": input_11AFP,
+                                    "12AFPDATE": input_12AFP_DATE, "12AFP": input_12AFP,
+                                    "13AFPDATE": input_13AFP_DATE, "13AFP": input_13AFP,
+                                    "14AFPDATE": input_14AFP_DATE, "14AFP": input_14AFP,
+                                    "15AFPDATE": input_15AFP_DATE, "15AFP": input_15AFP,
+                                    "16AFPDATE": input_16AFP_DATE, "16AFP": input_16AFP,
+                                    "17AFPDATE": input_17AFP_DATE, "17AFP": input_17AFP,
+                                    "18AFPDATE": input_18AFP_DATE, "18AFP": input_18AFP,
+                                    "19AFPDATE": input_19AFP_DATE, "19AFP": input_19AFP,
+                                    "20AFPDATE": input_20AFP_DATE, "20AFP": input_20AFP,
+                                    "21AFPDATE": input_21AFP_DATE, "21AFP": input_21AFP,
+                                    "22AFPDATE": input_22AFP_DATE, "22AFP": input_22AFP,
+                                    "23AFPDATE": input_23AFP_DATE, "23AFP": input_23AFP,
+                                    "24AFPDATE": input_24AFP_DATE, "24AFP": input_24AFP,
+                                    "25AFPDATE": input_25AFP_DATE, "25AFP": input_25AFP,
+                                    "26AFPDATE": input_26AFP_DATE, "26AFP": input_26AFP,
+                                    "27AFPDATE": input_27AFP_DATE, "27AFP": input_27AFP,
+                                    "28AFPDATE": input_28AFP_DATE, "28AFP": input_28AFP,
+                                    "29AFPDATE": input_29AFP_DATE, "29AFP": input_29AFP,
+                                    "30AFPDATE": input_30AFP_DATE, "30AFP": input_30AFP,
+                                    "31AFPDATE": input_31AFP_DATE, "31AFP": input_31AFP,
+                                    "32AFPDATE": input_32AFP_DATE, "32AFP": input_32AFP,
+                                    "33AFPDATE": input_33AFP_DATE, "33AFP": input_33AFP,
+                                    "34AFPDATE": input_34AFP_DATE, "34AFP": input_34AFP
                                     }
                                     update_google_sheet(data12,mrn)
 if st.session_state.logged_in:
