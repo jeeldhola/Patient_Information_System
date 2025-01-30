@@ -64,7 +64,7 @@ def fetch_data_from_google_sheet():
 
         # Create DataFrame
         df = pd.DataFrame(data_rows, columns=headers)
-
+        df = df.loc[:, ~df.columns.duplicated()]
         # Ensure MRN or any required column exists
         required_columns = ["MRN"]  # Add more required columns if needed
         for col in required_columns:
