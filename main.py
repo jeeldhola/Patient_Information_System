@@ -33,10 +33,10 @@ def append_to_google_sheet(data):
         result = service.spreadsheets().values().append(
             spreadsheetId=SPREADSHEET_ID, range=RANGE_NAME,
             valueInputOption='RAW', body=body).execute()
-        st.success("Data successfully saved to Google Sheets.")
+        st.success("Data saved successfully.")
         return True
     except Exception as e:
-        st.error(f"An error occurred while saving data to Google Sheets: {e}")
+        st.error(f"An error occurred while saving data : {e}")
         return False
 
 def fetch_data_from_google_sheet():
@@ -85,7 +85,7 @@ def update_google_sheet(data, mrn):
             st.error(f"No data found for MRN {mrn}.")
             return False
         if 'MRN' not in df.columns:
-            st.error(f"MRN column not found in Google Sheets.")
+            st.error(f"MRN column not found .")
             return False
         df['MRN'] = df['MRN'].astype(str)
         mrn = str(mrn)
@@ -95,7 +95,7 @@ def update_google_sheet(data, mrn):
             if key in df.columns:
                 df.at[index, key] = value
             else:
-                st.error(f"Column {key} not found in Google Sheets.")
+                st.error(f"Column {key} not found.")
                 return False
         values = [df.columns.tolist()] + df.values.tolist()
         body = {
@@ -104,10 +104,10 @@ def update_google_sheet(data, mrn):
         result = service.spreadsheets().values().update(
             spreadsheetId=SPREADSHEET_ID, range=RANGE_NAME,
             valueInputOption='RAW', body=body).execute()
-        st.success("Data successfully updated in Google Sheets.")
+        st.success("Data saved successfully.")
         return True
     except Exception as e:
-        st.error(f"An error occurred while updating data in Google Sheets: {e}")
+        st.error(f"An error occurred while updating data: {e}")
         return False
 st.markdown(
     """
@@ -144,6 +144,15 @@ st.markdown(
     .stDataFrame.st-emotion-cache-6nrhu6.egqaslz0 >div:nth-child(2){
     max-height: 200px!important;
     }
+    .stVerticalBlock st-emotion-cache-bjh2tb eiemyj3 >div:nth-child(2){
+        max-height: 500px;
+        overflow-y: auto;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .st-emotion-cache-j7qwjs.e1dbuyne3 {display: none !important;}
+    .st-emotion-cache-kgpedg.e1dbuyne10 {height : 0px;}
     
     </style>
     """,
@@ -173,10 +182,10 @@ username = "user"
 def fetch_data_for_mrn(mrn):
     df = fetch_data_from_google_sheet()
     if df.empty:
-        st.error(f"No data found in the Google Sheet.")
+        st.error(f"No data found.")
         return None
     if 'MRN' not in df.columns:
-        st.error(f"MRN column not found in the Google Sheet.")
+        st.error(f"MRN column not found.")
         return None
     if str(mrn) not in df['MRN'].values:
         st.error(f"No data found for MRN {mrn}.")
@@ -186,422 +195,169 @@ def fetch_data_for_mrn(mrn):
 
 if "data" not in st.session_state:
     st.session_state.data = pd.DataFrame(
-        columns=["FIRST", "LAST", "MRN","ID","Duplicate","TAREdate","PT","Tareage",
-    "Gender",
-    "Ethnicity",
-    "PMHxHTN",
-    "PMHxDM",
-    "Hypercholesterolemia",
-    "PMHxSmoking",
-    "Obesity",
-    "CirPMH_HBV",
-    "CirPMH_HBVFT",
-    "CirPMH_HBVART",
-    "CirPMH_HCV",
-    "CirPMH_HCVFT",
-    "CirPMH_HCVART",
-    "CirPMH_AUD",
-    "CirPMH_AUDFT",
-    "CirPMH_IVDU",
-    "CirPMH_IVDUFT",
-    "CirPMH_Liverfactors"
-    "Cirdx_Dxdate",
-    "Cirdx_Dxmethod",
-    "Cirdx_HPIFT",
-    "Cirdx_ImageemrFT",
-    "Cirdx_Metavir",
-    "Cirdx_Compatdx",
-    "Cirdx_Compatdxbinary",
-    "Cirdx_CompFT",
-    "Cirdx_DateLabs",
-    "Cirdx_AFP",
-    "Cirdx_AFP L3",
-    "Cirdx_AFPL3DateFT",
-    "Cirdx_AscitesCTCAE",
-    "Cirdx_AscitesCTCAEnumb",
-    "Cirdx_AscitesFT",
-    "HCCdx_HCCdxdate",
-    "HCCdx_Methoddx",
-    "HCCdx_Datelabs",
-    "HCCdx_AFP",
-    "HCCdx_AFP L3",
-    "HCCdx_AFPL3dateFT",
-    "HCCdx_Bilirubin",
-    "HCCdx_Albumin",
-    "HCCdx_INR",
-    "HCCdx_Creatinine",
-    "HCCdx_Sodium",
-    "HCCdx_AscitesCTCAE",
-    "HCCdx_AscitesCTCAEnumb",
-    "HCCdx_Ascitesdiruetics",
-    "HCCdx_Ascitesparacentesis",
-    "HCCdx_Asciteshospitalization",
-    "HCCdx_HEgrade",
-    "HCCdx_ECOG",
-    "HCCdx_LIRADS",
-    "HCCdx_CPcalc",
-    "HCCdx_CPclass",
-    "HCCdx_MELD",
-    "HCCdx_MELDNa",
-    "HCCdx_Albiscore",
-    "HCCdx_Albigrade",
-    "HCCdx_BCLC",
-    "PRVTHER_LDT",
-    "PRVTHER_RFA",
-    "PRVTHER_RFAdate",
-    "PRVTHER_TARE",
-    "PRVTHER_TAREdate",
-    "PRVTHER_SBRT",
-    "PRVTHER_SBRTdate",
-    "PRVTHER_TACE",
-    "PRVTHER_TACEdate",
-    "PRVTHER_MWA",
-    "PRVTHER_MWAdate",
-    "PRVTHER_Resection",
-    "PRVTHER_Resection date",
-    "PRVTHER_Prevtxsum",
-    "PRVTHER_NotesFT",
-    "PRVTHER_Totalrecur",
-    "PRVTHER_Locationprevtxseg",
-    "PRVTHER_Location of Previous Tx Segments FT",
-    "PRVTHER_RecurLocationFT",
-    "PRVTHER_RecurDate",
-    "PRVTHER_Recurrence Seg",
-    "PRVTHER_NewHCCoutsideprevsite",
-    "PRVTHER_NewHCCadjacentprevsite",
-    "PRVTHER_ResidualHCCnoteFT",
-    "PRVTHER_ResidualHCC",
-    "PRVTHER_SystemictherapyFT",
-    "PRVTHER_DateAFP",
-    "PRVTHER_AFP",
-    "PREY90_sx",
-    "PREY90_Datelabs",
-    "PREY90_AFP",
-    "PRE90_AFPbinary",
-    "PREY90_Bilirubin",
-    "PREY90_Albumin",
-    "PREY90_INR",
-    "PREY90_Creatinine",
-    "PREY90_Sodium",
-    "PREY90_AST",
-    "PREY90_ALT",
-    "PREY90_Alkaline Phosphatase",
-    "PREY90_Potassium",
-    "PREY90_AscitesCTCAE",
-    "PREY90_AscitesCTCAEnumb",
-    "PREY90_AscitesFT",
-    "PREY90_Ascitesdiruetics",
-    "PREY90_Ascitesparacentesis",
-    "PREY90_Asciteshospitalization",
-    "PREY90_HEgrade",
-    "PREY90_ECOG",
-    "PREY90_CPcalc",
-    "PREY90_CPclass",
-    "PREY90_MELD",
-    "PREY90_MELDNa",
-    "PREY90_Albiscore",
-    "PREY90_Albigrade",
-    "PREY90_BCLC",
-    "MY90_date",
-    "MY90_Lung_shunt",
-    "DAYY90_AFP",
-    "DAYY90_AFP Binary",
-    "PRE90_AFP BinaryDup",
-    "DAYY90_Sodium",
-    "DAYY90_Creatinine",
-    "DAYY90_INR",
-    "DAYY90_Albumin",
-    "DAYY90_Bilirubin",
-    "DAYY90_AST",
-    "DAYY90_ALT",
-    "DAYY90_Alkphos",
-    "DAYY90_Leukocytes",
-    "DAYY90_Platelets",
-    "DAY90_Potassium",
-    "Day90_AscitesCTCAE",
-    "Day90_AscitesCTCAEnumb",
-    "Day90_HEgrade",
-    "Day90_ECOG",
-    "DAYY90_CPcalc",
-    "DAYY90_CPclass",
-    "DAYY90_MELD",
-    "DAYY90_MELDNa",
-    "DAYY90_Albiscore",
-    "DAYY90_Albigrade",
-    "DAYY90_BCLC",
-    "DAYY90_Sphere",
-    "DAYY90_LTnoteFT",
-    "ken_ChildPughscore",
-    "ken_MELDpreTARE (MELDpreTARE)",
-    "POSTY90_30DY_Datelabs",
-    "POSTY90_30DY_AFP",
-    "POSTY90_30DY_AFPdate",
-    "POSTY90_30DY_Sodium",
-    "POSTY90_30DY_Creatinine",
-    "POSTY90_30DY_INR",
-    "POSTY90_30DY_Albumin",
-    "POSTY90_30DY_Bilirubin",
-    "POSTY90_30DY_AST",
-    "POSTY90_30DY_ALT",
-    "POSTY90_30DY_ALP",
-    "POSTY90_30DY_Leukocytes",
-    "POSTY90_30DY_Platelets",
-    "POSTY90_30DY_Potassium",
-    "30DY_AE_AscitesCTCAE",
-    "30DY_AE_AscitesCTCAEnumb",
-    "30DY_AE_Ascitesdiruetics",
-    "30DY_AE_Ascitesparacentesis",
-    "30DY_AE_Asciteshospitalization",
-    "30DY_AE_HEgrade",
-    "30DY_AE_ascities_freetext",
-    "POSTY90_30DY_ECOG",
-    "POSTY90_30DY_CPcalc",
-    "POSTY90_30DY_CPclass",
-    "POSTY90_30DY_MELD",
-    "POSTY90_30DY_MELDNa",
-    "POSTY90_30DY_ALBIscore",
-    "POSTY90_30DY_ALBIgrade",
-    "POSTY90_30DY_BCLC",
-    "Ken_BCLCStagepost90",
-    "Ken_MELD_Stagepost90"
-    "30DY_AE_Portalhtn",
-    "30DY_AE_Vascularcomp",
-    "30DY_AE_Fatigue",
-    "30DY_AE_Diarrhea",
-    "30DY_AE_Hypoalbuminemia",
-    "30DY_AE_Hyperbilirubinemia",
-    "30DY_AE_Increasecreatine",
-    "30DY_AE_Abdominalpain",
-    "30DY_AE_Sepsis",
-    "30DY_AE_BacterialPer",
-    "30DY_AE_Hemorrhage",
-    "30DY_AE_Anorexia",
-    "30DY_AE_Intrahepaticfistula",
-    "30DY_AE_Constipation",
-    "30DY_AE_Nausea",
-    "30DY_AE_Vomiting",
-    "30DY_AE_Cholecystitis",
-    "30DY_AE_Gastriculcer",
-    "30DY_AE_Hyperkalemia",
-    "30DY_AE_Respfailure",
-    "30DY_AE_AKI",
-    "30DY_AE_Radiationpneumonitis",
-    "30DY_AE_Other",
-    "90DY_AE_DateofAE",
-    "Additional Notes FT",
-    "90DY_AE_Hosp3mo",
-    "90DY_AE_Datehosp3mo",
-    "90DY_AE_Hosp6mo",
-    "90DY_AE_DeathduetoAE",
-    "OC_Liver_transplant",
-    "OC_Liver_transplant_date",
-    "K_ken_ToxgtG3",
-    "K_ken_ToxgtG2",
-    "K_ken_AlbiPreTARERaw",
-    "K_ken_AlbiPreTAREGrade",
-    "K_ken_AlbiPostTARERaw",
-    "K_ken_AliPostTAREGrade",
-    "PREY90_prescan_modality",
-    "PREY90_Imaging Date",
-    "PREY90_total number of lesions",
-    "PREY90_Number Involved Lobes",
-    "PREY90_target_lesion_1_segments",
-    "PREY90_TL1_LAD",
-    "PREY90_Target Lesion 1 PAD",
-    "PREY90_Target Lesion 1 CCD",
-    "PREY90_Target Lesion 1 VOL",
-    "PREY90_Target lesion 2 Segments",
-    "PREY90_Target Lesion 2 LAD",
-    "PREY90_Target Lesion 2 PAD",
-    "PREY90_Target Lesion 2 CCD",
-    "PREY90_Target Lesion 2 VOL",
-    "PREY90_pretx targeted Lesion Dia Sum",
-    "PREY90_Non-Target Lesion Location",
-    "PREY90_Non-Target Lesion 2 LAD Art Enhanc",
-    "PREY90_Non-Target Lesion 2 PAD Art Enhanc",
-    "PREY90_Non-Target Lesion 2 CCD Art Enhanc",
-    "PREY90_Non-targeted Lesion Dia Sum",
-    "PREY90_Reviewers Initials",
-    "PREY90_Pre Y90 Extrahepatic Disease",
-    "PREY90_Pre Y90 Extrahepatic Disease Location",
-    "PREY90_PVT",
-    "PREY90_PVT Location",
-    "PREY90_Features of cirrhosis",
-    "1st_FU_Scan Modality",
-    "1st_FU_Imaging Date",
-    "1st_FU_Months Since Y90",
-    "1st_FU_Total number of lesions",
-    "1st_FU_Target Lesion 1 LAD Art Enhanc",
-    "1st_FU_Target Lesion 1 PAD Art Enhanc",
-    "1st_FU_Target Lesion 1 CCD Art Enhanc",
-    "1st_FU_Target Lesion 2 Segments",
-    "1st_FU_Target Lesion 2 LAD Art Enhanc",
-    "1st_FU_Target Lesion 2 PAD Art Enhanc",
-    "1st_FU_Target Lesion 2 CCD Art Enhanc",
-    "1st_FU_Follow up 1 targeted Lesion Dia Sum",
-    "1st_FU_Non-Target Lesion 2 LAD Art Enhanc",
-    "1st_FU_Non-Target Lesion 2 PAD Art Enhanc",
-    "1st_FU_Non-Target Lesion 2 CCD Art Enhanc",
-    "1st_FU_Non-targeted Lesion Dia Sum",
-    "1st_FU_Lesion Necrosis",
-    "1st_FU_Reviewers Initials",
-    "1st_FU_Non target lesion response",
-    "1st_FU_New Lesions",
-    "1st_FU_NEW Extrahepatic Disease",
-    "1st_FU_NEW Extrahepatic Dz Location",
-    "1st_FU_NEW Extrahepatic Dz Date",
-    "1st_FU_% change non target lesion",
-    "1st_FU_% Change Target Dia",
-    "1st_FU_mRECIST LOCALIZED",
-    "1st_FU_mRECIST Overall",
-    "1st_FU_Free Text",
-    "2nd_FU_Scan Modality",
-    "2nd_FU_Imaging Date",
-    "2nd_FU_Months Since Y90",
-    "2nd_FU_Total number of lesions",
-    "2nd_FU_Target Lesion 1 LAD Art Enhanc",
-    "2nd_FU_Target Lesion 1 PAD Art Enhanc",
-    "2nd_FU_Target Lesion 1 CCD Art Enhanc",
-    "2nd_FU_Target Lesion 2 Segments",
-    "2nd_FU_Target Lesion 2 LAD Art Enhanc",
-    "2nd_FU_Target Lesion 2 PAD Art Enhanc",
-    "2nd_FU_Target Lesion 2 CCD Art Enhanc",
-    "2nd_FU_Follow up 2 targeted Lesion Dia Sum",
-    "2nd_FU_Non-Target Lesion 1 LAD Art Enhanc",
-    "2nd_FU_Non-Target Lesion 1 PAD Art Enhanc",
-    "2nd_FU_Non-Target Lesion 1 CCD Art Enhanc",
-    "2nd_FU_Non-targeted Lesion Dia Sum",
-    "2nd_FU_Lesion Necrosis",
-    "2nd_FU_Reviewers Initials",
-    "2nd_FU_Non target lesion response",
-    "2nd_FU_New Lesions",
-    "2nd_FU_Extrahepatic Disease",
-    "2nd_FU_NEW Extrahepatic Dz Location",
-    "2nd_FU_NEW Extrahepatic Dz Date",
-    "2nd_FU_% change non target lesion",
-    "2nd_FU_% Change Target Dia",
-    "2nd_FU_mRECIST LOCALIZED",
-    "2nd_FU_mRECIST LOCALIZED with Follow UP",
-    "2nd_FU_mRECIST Overall",
-    "2nd_FU_Free Text",
-    "3rd_FU_Scan Modality",
-    "3rd_FU_Imaging Date",
-    "3rd_FU_Months Since Y90",
-    "3rd_FU_Total number of lesions",
-    "3rd_FU_Target Lesion 1 LAD Art Enhanc",
-    "3rd_FU_Target Lesion 1 PAD Art Enhanc",
-    "3rd_FU_Target Lesion 1 CCD Art Enhanc",
-    "3rd_FU_Target Lesion 2 Segments",
-    "3rd_FU_Target Lesion 2 LAD Art Enhanc",
-    "3rd_FU_Target Lesion 2 PAD Art Enhanc",
-    "3rd_FU_Target Lesion 2 CCD Art Enhanc",
-    "3rd_FU_Follow up 2 targeted Lesion Dia Sum",
-    "3rd_FU_Non-Target Lesion 1 LAD Art Enhanc",
-    "3rd_FU_Non-Target Lesion 1 PAD Art Enhanc",
-    "3rd_FU_Non-Target Lesion 1 CCD Art Enhanc",
-    "3rd_FU_Non-targeted Lesion Dia Sum",
-    "3rd_FU_Lesion Necrosis",
-    "3rd_FU_Reviewers Initials",
-    "3rd_FU_Non target lesion response",
-    "3rd_FU_New Lesions",
-    "3rd_FU_Extrahepatic Disease",
-    "3rd_FU_NEW Extrahepatic Dz Location",
-    "3rd_FU_NEW Extrahepatic Dz Date",
-    "3rd_FU_% change for non target lesion",
-    "3rd_FU_% Change Target Dia",
-    "3rd_FU_mRECIST LOCALIZED",
-    "3rd_FU_mRECIST LOCALIZED with Follow UP",
-    "3rd_FU_mRECIST Overall",
-    "3rd_FU_Free Text",
-    "4th_FU_Scan Modality",
-    "4th_FU_Imaging Date",
-    "4th_FU_Months Since Y90",
-    "4th_FU_Total number of lesions",
-    "4th_FU_Target Lesion 1 LAD Art Enhanc",
-    "4th_FU_Target Lesion 1 PAD Art Enhanc",
-    "4th_FU_Target Lesion 1 CCD Art Enhanc",
-    "4th_FU_Target Lesion 2 Segments",
-    "4th_FU_Target Lesion 2 LAD Art Enhanc",
-    "4th_FU_Target Lesion 2 PAD Art Enhanc",
-    "4th_FU_Target Lesion 2 CCD Art Enhanc",
-    "4th_FU_Follow up 2 targeted Lesion Dia Sum",
-    "4th_FU_Non-Target Lesion 1 LAD Art Enhanc",
-    "4th_FU_Non-Target Lesion 1 PAD Art Enhanc",
-    "4th_FU_Non-Target Lesion 1 CCD Art Enhanc",
-    "4th_FU_Non-targeted Lesion Dia Sum",
-    "4th_FU_Lesion Necrosis",
-    "4th_FU_Reviewers Initials",
-    "4th_FU_Non target lesion response",
-    "4th_FU_New Lesions",
-    "4th_FU_Extrahepatic Disease",
-    "4th_FU_NEW Extrahepatic Dz Location",
-    "4th_FU_NEW Extrahepatic Dz Date",
-    "4th_FU_% change non target lesion",
-    "4th_FU_% Change Target Dia",
-    "4th_FU_mRECIST LOCALIZED",
-    "4th_FU_mRECIST LOCALIZED with Follow UP",
-    "4th_FU_mRECIST Overall",
-    "4th_FU_Free Text",
-    "5th_FU_Imaging Date",
-    "5th_FU_Months Since Y90",
-    "5th_FU_Total number of lesions",
-    "5th_FU_Non-Target Lesion 1 LAD Art Enhanc",
-    "5th_FU_Non-Target Lesion 1 PAD Art Enhanc",
-    "5th_FU_Non-Target Lesion 1 CCD Art Enhanc",
-    "5th_FU_Non-targeted Lesion Dia Sum",
-    "5th_FU_Non target lesion response",
-    "5th_FU_New Lesions",
-    "5th_FU_Extrahepatic Disease",
-    "5th_FU_NEW Extrahepatic Dz Location",
-    "5th_FU_NEW Extrahepatic Dz Date",
-    "5th_FU_% change non target lesion",
-    "5th_FU_% Change Target Dia",
-    "5th_FU_mRECIST LOCALIZED",
-    "5th_FU_mRECIST LOCALIZED with Follow UP",
-    "5th_FU_mRECIST Overall",
-    "Dead",
-    "Date of Death",
-    "Time to Death",
-    "OLT",
-    "Date of OLT",
-    "Time to OLT",
-    "Repeat tx post Y90",
-    "Date of Repeat tx Post Y90",
-    "Time to Repeat Tx Post Y90",
-    "Date of Localized Progression",
-    "Time to localized progression",
-    "Date of Overall (Local or systemic) Progression",
-    "Time to Overall (Local or systemic) Progression",
-    "Date of Last Follow up or last imaging date (if not OLT, Death, Repeat tx)",
-    "GTV mean dose", "Tx vol mean dose", "Liver Vol Mean dose", "Healthy Liver mean dose", 
-    "GTV Vol", "Tx vol", "Liver vol", "Healthy Liver Vol", "GTV/Liver", 
-    "D98", "D95", "D90", "D80", "D70", 
-    "V100", "V200", "V300", "V400", "ActivityBq", 
-    "ActivityCi", "Tx vol Activity Density", "NEW", 
-    "GTV < D95 Vol_ml", "GTV < D95 Mean Dose", "GTV < D95 Min Dose", 
-    "GTV < D95 SD", "GTV < D95 Vol_1", "GTV < D95 Mean Dose_1", 
-    "GTV < D95 Min Dose_1", "GTV < D95 SD_1", "GTV < D95 Vol_2", 
-    "GTV < D95 Mean Dose_2", "GTV < D95 Min Dose_2", "GTV < D95 SD_2", 
-    "GTV < 100 Gy Vol", "GTV < 100 Gy Mean Dose", "GTV < 100 Gy Min Dose", "GTV < 100 Gy SD",
-    "1AFP Date", "1AFP", "2AFP Date", "2AFP", "3AFP Date", "3AFP", "4AFP Date", "4AFP",
-    "5AFP Date", "5AFP", "6AFP Date", "6AFP", "7AFP Date", "7AFP", "8AFP Date", "8AFP",
-    "9AFP Date", "9AFP", "10AFP Date", "10AFP", "11AFP Date", "11AFP", "12AFP Date", "12AFP",
-    "13AFP Date", "13AFP", "14AFP Date", "14AFP", "15AFP Date", "15AFP", "16AFP Date", "16AFP",
-    "17AFP Date", "17AFP", "18AFP DATE", "18AFP", "19AFP DATE", "19AFP", "20AFP DATE", "20AFP",
-    "21AFP DATE", "21AFP", "22AFP DATE", "22AFP", "23AFP DATE", "23AFP", "24AFP DATE", "24AFP",
-    "25AFP DATE", "25AFP", "26AFP DATE", "26AFP", "27AFP DATE", "27AFP", "28AFP DATE", "28AFP",
-    "29AFP DATE", "29AFP", "30AFP DATE", "30AFP", "31AFP Date", "31AFP", "32AFP DATE", "32AFP",
-    "33AFP DATE", "33AFP", "34AFP DATE", "34AFP",]
+        columns=["FIRST", "LAST", "MRN","ID","Duplicate","TAREdate","PT","Tareage", "Gender", "Ethnicity", "PMHxHTN","PMHxDM", "Hypercholesterolemia", "PMHxSmoking", "Obesity", ]
     )
 # List of 11 tabs
-def calculate_comorbidities_total(hypertension, diabetes, hypercholesterolemia, smoking, obesity):
-    """Calculate total number of comorbidities"""
-    conditions = [hypertension, diabetes, hypercholesterolemia, smoking, obesity]
-    return sum(1 for condition in conditions if condition == 1)
+def hypoalbuminemia(b2):
+    if b2 >= 3:
+        return 0
+    elif b2 >= 2:
+        return 1
+    elif b2 >= 1:
+        return 2
+    elif b2 > 0:
+        return 3
+    else:
+        return 4
 
-def calculate_comorbidities_binary(total_count):
-    """Convert total count to binary (1 if >=1, 0 if 0)"""
-    return 1 if total_count >= 1 else 0
+def hyperbillirubine(e3, f3, d1=1.2):
+    if e3 <= d1:
+        if f3 <= d1:
+            return 0
+        elif f3 <= 1.5 * d1:
+            return 1
+        elif f3 <= 3 * d1:
+            return 2
+        elif f3 <= 10 * d1:
+            return 3
+        else:
+            return 4
+    else:
+        if f3 <= e3:
+            return 0
+        elif f3 <= 1.5 * e3:
+            return 1
+        elif f3 <= 3 * e3:
+            return 2
+        elif f3 <= 10 * e3:
+            return 3
+        else:
+            return 4
+
+def Increasecreatine(i2, j2, h1=1):
+    if i2 <= h1:
+        if j2 <= h1:
+            return 0
+        elif j2 <= 1.5 * h1:
+            return 1
+        elif j2 <= 3 * h1:
+            return 2
+        elif j2 <= 6 * h1:
+            return 3
+        else:
+            return 4
+    else:
+        if j2 <= i2:
+            return 0
+        elif j2 <= 1.5 * i2:
+            return 1
+        elif j2 <= 3 * i2:
+            return 2
+        elif j2 <= 6 * i2:
+            return 3
+        else:
+            return 4
+
+def hyperkalemia(n2, l1=5):
+    if n2 <= l1:
+        return 0
+    elif n2 <= 5.5:
+        return 1
+    elif n2 <= 6:
+        return 2
+    elif n2 <= 7:
+        return 3
+    else:
+        return 4
+
+def alt_calculate(q2, r2, p1=40.0):
+    if q2 <= p1:
+        if r2 <= p1:
+            return 0
+        elif r2 <= 3 * p1:
+            return 1
+        elif r2 <= 5 * p1:
+            return 2
+        elif r2 <= 20 * p1:
+            return 3
+        else:
+            return 4
+    else:
+        if r2 <= q2:
+            return 0
+        elif r2 <= 1.5 * q2:
+            return 1
+        elif r2 <= 3 * q2:
+            return 2
+        elif r2 <= 5 * q2:
+            return 3
+        elif r2 <= 20 * q2:
+            return 4
+        else:
+            return 5
+
+def ast_calculate(u2, v2, t1=40):
+    if u2 <= t1:
+        if v2 <= t1:
+            return 0
+        elif v2 <= 3 * t1:
+            return 1
+        elif v2 <= 5 * t1:
+            return 2
+        elif v2 <= 20 * t1:
+            return 3
+        else:
+            return 4
+    else:
+        if v2 <= u2:
+            return 0
+        elif v2 <= 1.5 * u2:
+            return 1
+        elif v2 <= 3 * u2:
+            return 2
+        elif v2 <= 5 * u2:
+            return 3
+        elif v2 <= 20 * u2:
+            return 4
+        else:
+            return 5
+
+def alp_calculate(y2, z2, x1=147):
+    if y2 <= x1:
+        if z2 <= x1:
+            return 0
+        elif z2 <= 2.5 * x1:
+            return 1
+        elif z2 <= 5 * x1:
+            return 2
+        elif z2 <= 20 * x1:
+            return 3
+        else:
+            return 4
+    else:
+        if z2 <= y2:
+            return 0
+        elif z2 <= 2.5 * y2:
+            return 1
+        elif z2 <= 5 * y2:
+            return 2
+        elif z2 <= 20 * y2:
+            return 3
+        else:
+            return 4
+
+def plt_calculate(ag2, ae1=150):
+    if ag2 >= ae1:
+        return 0
+    elif ag2 >= 75:
+        return 1
+    elif ag2 >= 50:
+        return 2
+    elif ag2 >= 25:
+        return 3
+    else:
+        return 4
+
 def get_variable_value(mrn, column_name):
     df = fetch_data_from_google_sheet()
     mrn = str(mrn)
@@ -618,6 +374,15 @@ def get_variable_value(mrn, column_name):
     return value
 def login_page():
     st.title("Login")
+    st.markdown(
+        """
+        <style>
+            .stSidebar  {display: none !important;}
+            .st-emotion-cache-1i55tjj.e1obcldf18 {display: none !important;}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
@@ -627,81 +392,98 @@ def login_page():
         else:
             st.error("Invalid username or password.")
 
+def calculatepoints(L, M, N, Q, U):
+       
+        if any(val is None or val == "" for val in [L, M, N, Q, U]):
+            return "NA"
+
+        # Convert values to float for comparison (handling potential string inputs)
+        try:
+            L, M, N, Q, U = float(L), float(M), float(N), int(Q), int(U)
+        except ValueError:
+            return "NA"  # Return "NA" if conversion fails (invalid data)
+
+        # Equivalent scoring logic
+        score = (
+            (1 if L < 2 else 2 if L <= 3 else 3) +
+            (1 if M > 3.5 else 2 if M >= 2.8 else 3) +
+            (1 if N < 1.7 else 2 if N <= 2.3 else 3) +
+            (1 if Q == 1 else 2 if Q == 2 else 3) +
+            (1 if U == 1 else 2 if U == 2 else 3)
+        )
+
+        return score
+
+def calculate_class(X):
+        if X is None or X == "" or X == "NA":
+            return "NA"
+
+        # Convert X to float for comparison
+        try:
+            X = float(X)
+        except ValueError:
+            return "NA"  # Return "NA" if conversion fails (invalid data)
+
+        # Apply conditions
+        if X <= 6:
+            return "A"
+        elif X <= 9:
+            return "B"
+        else:
+            return "C"
+
+def meld_calc(N, K, M):
+    # Check for missing values
+    if N is None or K is None or M is None or N == "" or K == "" or M == "":
+        return "NA"
+
+    try:
+        # Convert to float
+        N, K, M = float(N), float(K), float(M)
+
+        # Apply formula
+        result = (0.957 * math.log(max(N, 1)) + 
+                  0.378 * math.log(max(K, 1)) + 
+                  1.12 * math.log(max(M, 1)) + 
+                  0.643) * 10
+        
+        # Round to nearest whole number
+        return round(result, 0)
+
+    except ValueError:
+        return "NA" 
+
+def albi_calc(K,L):
+        if K is None or L is None or K == "" or L == "" or K == "NA" or L == "NA":
+            return "NA"
+        try:
+            K, L = float(K), float(L)
+            result = (math.log10(K * 17.1) * 0.66) + (L * -0.085 * 10)
+            return round(result, 2)
+        except ValueError:
+            return "NA"
+
+def albi_class(AB):
+        if AB is None or AB == "" or AB == "NA":
+            return "NA"
+        try:
+            # Convert to float
+            AB = float(AB)
+
+            # Apply conditions
+            if AB <= -2.6:
+                return 1
+            elif AB <= -1.39:
+                return 2
+            else:
+                return 3
+        except ValueError:
+            return "NA"
+
 def add_new_data():
     st.title("Patient Information System")
     df=fetch_data_from_google_sheet()
     st.dataframe(df)
-    def calculatepoints(bilirubin, albumin, inr, ascites, encephalopathy):
-                        if bilirubin < 2:
-                            bilirubin_points = 1
-                        elif 2 <= bilirubin <= 3:
-                            bilirubin_points = 2
-                        else:
-                            bilirubin_points = 3
-
-                        if albumin > 3.5:
-                            albumin_points = 1
-                        elif 2.8 <= albumin <= 3.5:
-                            albumin_points = 2
-                        else:
-                            albumin_points = 3
-
-                        if inr < 1.7:
-                            inr_points = 1
-                        elif 1.7 <= inr <= 2.3:
-                            inr_points = 2
-                        else:
-                            inr_points = 3
-
-            # Points for Ascites
-                        if ascites == 'none':
-                            ascites_points = 1
-                        elif ascites == 'Asymptomatic' or ascites == 'Minimal ascities/Mild abd distension, no sx' or ascites == "Symptomatic" :
-                            ascites_points = 2
-                        else:  # 'moderate/severe'
-                            ascites_points = 3
-
-            # Points for Hepatic Encephalopathy
-                        if encephalopathy == "1":
-                            encephalopathy_points = 1
-                        elif encephalopathy == "2":
-                            encephalopathy_points = 2
-                        else:
-                            encephalopathy_points = 3
-                             
-                             
-
-            # Total Child-Pugh score
-                        total_score = (
-                            bilirubin_points + albumin_points + inr_points + ascites_points + encephalopathy_points
-                        )
-
-                        return total_score
-
-    def calculate_class(poin):
-                        if 5 <= poin <= 6:
-                            return 'A'
-                        elif 7 <= poin <= 9:
-                            return 'B'
-                        elif 10 <= poin <= 15:
-                            return 'C'
-                        else:
-                            return "Invalid points: must be between 5 and 15."
-    
-    def albi_calc(a,b):
-                        a=int(a)*17.1
-                        b=int(b)
-                        t = math.log(a, 10)
-                        answer = round((t * 0.66) + (b * -0.085))
-                        return answer
-    
-    def albi_class(albi_score):
-        if albi_score <= -2.60:
-            return "Grade 1"
-        elif albi_score > -2.60 and albi_score <= -1.39:
-             return "Grade 2"
-        else:
-             return "Grade 3"
 
     def process_input(value):
                         
@@ -729,8 +511,6 @@ def add_new_data():
                             return "NA"  # Valid 'NA'
                         else:
                             return "NA" 
-
-    
 
     tabs = ["Patient Info", "Patient Demographics", "Cirrhosis PMH","HCC Diagnosis", "Previous Therapy for HCC", "Pre Y90", "Day_Y90", "Post Y90 Within 30 Days Labs", "Other Post Tare","Imaging Date","Dosimetry Data","AFP"]
 
@@ -1082,17 +862,7 @@ def add_new_data():
                         )
                         Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_String = ", ".join(Cirrhosis_Dx_Complications_at_Time_of_Diagnosis)
 
-                        Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary = st.selectbox(
-                            "Cirrhosis_Dx_Complications at Time of Diagnosis Binary [ Excel : CIRDX_COMPLDXBIN ]  ",
-                            options=["0","1"],
-                            format_func=lambda x: {
-                                "1": " >1 ",
-                                "0": "None",
-                            }[x],
-                            help="Provide details of Complications_at_Time_of_Diagnosis_Binary",
-                            index=None,  # No default selection
-                            placeholder="Choose an option",
-                        )
+                        Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary = 1 if Cirrhosis_Dx_Complications_at_Time_of_Diagnosis != "none" or Cirrhosis_Dx_Complications_at_Time_of_Diagnosis != None else 0
 
                         Cirrhosis_Dx_Complications_Free_Text =  st.text_area(
                             "Cirrhosis_Dx_Complications Free Text",
@@ -1132,9 +902,9 @@ def add_new_data():
                         ) 
                         def findascitesclass(score):
                             if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
-                                 return 2
+                                 return 1
                             elif score == "Symptomatic" or score == "moderate ascities/Symptomatic medical intervention":
-                                 return 3
+                                 return 2
                             elif score == "Severe symptoms, invasive intervention indicated" or score == "Life Threatening: Urgent operation intervention indicated" :
                                  return 3
                         
@@ -1239,13 +1009,13 @@ def add_new_data():
                         ) 
                         def findascitesclass(score):
                             if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
-                                 return "Slight"
+                                 return 1
                             elif score == "Symptomatic" or score == "moderate ascities/Symptomatic medical intervention":
-                                 return "Moderate"
+                                 return 2
                             elif score == "Severe symptoms, invasive intervention indicated" or score == "Life Threatening: Urgent operation intervention indicated" :
-                                 return "Severe"
+                                 return 3
                         
-                        hCC_dx_ascites_classification = "Absent" if hcc_dx_ascites_CTCAE == "none" else findascitesclass(hcc_dx_ascites_CTCAE)
+                        hCC_dx_ascites_classification = 1 if hcc_dx_ascites_CTCAE == "none" else findascitesclass(hcc_dx_ascites_CTCAE)
 
                         hcc_dx_ascites_diruetics = 0 if hcc_dx_ascites_CTCAE == "none" else st.selectbox(
                             "HCC_Dx_Ascites Diruetics [ Excel : HCCDX_ASCITDIUR ]\n\nYes(1), No(0)  ",
@@ -1283,11 +1053,11 @@ def add_new_data():
 
                         hcc_dx_he_grade = st.selectbox(
                             "HCC_Dx_HE Grade [ Excel : HCCDX_HEGRADE ]\n\n(1) None, (2) Grade 1-2, (3) Grade 3-4    ",
-                            options=["1","2","3"],
+                            options=[1,2,3],
                             format_func=lambda x: {
-                            "1": "None",
-                            "2": "Grade 1-2",
-                            "3": "Grade 3-4",
+                            1: "None",
+                            2: "Grade 1-2",
+                            3: "Grade 3-4",
                             
                         }[x],
                             index=None,  # No default selection
@@ -1306,20 +1076,13 @@ def add_new_data():
                             placeholder="Choose an option",
                         )
 
-                        hcc_dx_child_pugh_points_calc = calculatepoints(hcc_dx_bilirubin,hcc_dx_albumin,hcc_dx_inr,hcc_dx_ascites_CTCAE,hcc_dx_he_grade)
+                        hcc_dx_child_pugh_points_calc = calculatepoints(hcc_dx_bilirubin,hcc_dx_albumin,hcc_dx_inr,hCC_dx_ascites_classification,hcc_dx_he_grade)
                         hcc_dx_child_pugh_class_calc = calculate_class(hcc_dx_child_pugh_points_calc)
                         st.write("HCC_Dx_Child-Pugh Class calc",hcc_dx_child_pugh_class_calc)
                         st.write("HCC_Dx_Child-Pugh Points calc", hcc_dx_child_pugh_points_calc)
-                        #bclc_stage_calc = st.text_input("HCC_Dx_BCLC Stage calc")
-                        hcc_dx_meld_score_calc = (3.78*(int(hcc_dx_bilirubin)))+(11.2*(int(hcc_dx_inr)))+(9.57*(int(hcc_dx_creatinine)))+6.43
+                        hcc_dx_meld_score_calc = meld_calc(hcc_dx_creatinine,hcc_dx_bilirubin,hcc_dx_inr)
                         hcc_dx_meld_na_score_calc = hcc_dx_meld_score_calc + 1.32*(137-int(hcc_dx_sodium)) - (0.033*hcc_dx_meld_score_calc*(137-int(hcc_dx_sodium)))
-                        def albi_calc(a,b):
-                            a=int(a)*17.1
-                            b=int(b)
-                            t = math.log(a, 10)
-                            answer = round((t * 0.66) + (b * -0.085))
-                            return answer
-                        
+                        st.write("HCC_Dx_MELD Score calc",hcc_dx_meld_score_calc)                        
                         hcc_dx_albi_score_calc = albi_calc(hcc_dx_bilirubin, hcc_dx_albumin)
                         hcc_dx_albi_grade = albi_class(hcc_dx_albi_score_calc)
                         st.write("HCC_Dx_ALBI Score calc : ",hcc_dx_albi_score_calc)
@@ -1662,11 +1425,8 @@ def add_new_data():
                                 return 1 if numeric_value < 200 else 2
                             else:
                                 return "Invalid Input"
-
-                        
                     
                         prey90_afp_prior_to_tare = process_input(prey90_afp)
-                        
                         
                         prey90_bilirubin = st.number_input("PREY90_Bilirubin", help="Enter the bilirubin value in mg/dl",min_value=1.0,step=0.1)
                         prey90_albumin = st.number_input("PREY90_Albumin", help="Enter the albumin value in g/dl",step=0.1)
@@ -1697,8 +1457,10 @@ def add_new_data():
                         ) 
                         def findascitesclass(score):
                             if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
+                                 return 1
+                            elif score == "Symptomatic" or score == "moderate ascities/Symptomatic medical intervention":
                                  return 2
-                            else:
+                            elif score == "Severe symptoms, invasive intervention indicated" or score == "Life Threatening: Urgent operation intervention indicated" :
                                  return 3
                         
                         prey90_ascites_classification = 1 if prey90_ascites_ctcae == "none" else findascitesclass(prey90_ascites_ctcae)
@@ -1765,12 +1527,11 @@ def add_new_data():
 
                         
                         # Claculation of class and points
-                        prey90_child_pugh_points_calc = calculatepoints(prey90_bilirubin,prey90_albumin,prey90_inr,prey90_ascites_ctcae,prey90_he_grade)
+                        prey90_child_pugh_points_calc = calculatepoints(prey90_bilirubin,prey90_albumin,prey90_inr,prey90_ascites_classification,prey90_he_grade)
                         st.write("PREY90_CPcalc",prey90_child_pugh_points_calc)
                         prey90_child_pugh_class_calc = calculate_class(prey90_child_pugh_points_calc)
                         st.write("PREY90_CPclass",prey90_child_pugh_class_calc)
-                        
-                        prey90_meld_score_calc = (3.78*(int(prey90_bilirubin)))+(11.2*(int(prey90_inr)))+(9.57*(int(prey90_creatinine)))+6.43
+                        prey90_meld_score_calc = meld_calc(prey90_creatinine,prey90_bilirubin,prey90_inr)
                         st.write("PREY90_MELD",prey90_meld_score_calc)
                         prey90_meld_na_score_calc = prey90_meld_score_calc + 1.32*(137-int(prey90_sodium)) - (0.033*prey90_meld_score_calc*(137-int(prey90_sodium)))
                         st.write("PREY90_MELDNa",prey90_meld_na_score_calc)
@@ -1860,10 +1621,10 @@ def add_new_data():
                                 numeric_value = int(value)
                                 return 1 if numeric_value < 200 else 2
                             else:
-                                return "Invalid Input"
+                                return "Fill AFP"
                         #df.loc[df["MRN"] == mrn, "PREY_AFPBINARY"].values[0]
                         dayy90_afp_prior_to_tare = process_input(dayy90_afp)
-                        st.write("DAYY90_AFP Binary",dayy90_afp_prior_to_tare)
+                        st.write("DAYY90_AFP Binary : ",dayy90_afp_prior_to_tare)
                         dayy90_sodium = st.number_input("DAYY90_sodium",step=0.1)
                         dayy90_creatinine = st.number_input("DAYY90_creatinine",step=0.1)
                         dayy90_inr = st.number_input("DAYY90_inr",step=0.1)
@@ -1897,8 +1658,10 @@ def add_new_data():
                         ) 
                         def findascitesclass(score):
                             if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
+                                 return 1
+                            elif score == "Symptomatic" or score == "moderate ascities/Symptomatic medical intervention":
                                  return 2
-                            else:
+                            elif score == "Severe symptoms, invasive intervention indicated" or score == "Life Threatening: Urgent operation intervention indicated" :
                                  return 3
                         
                         dayy90_ascites_classification = 1 if dayy90_ascites_ctcae == "none" else findascitesclass(dayy90_ascites_ctcae)
@@ -1920,11 +1683,11 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",)
                         
-                        dayy90_child_pugh_points_calc = calculatepoints(dayy90_bilirubin,dayy90_albumin,dayy90_inr,dayy90_ascites_ctcae,dayy90_he_grade)
+                        dayy90_child_pugh_points_calc = calculatepoints(dayy90_bilirubin,dayy90_albumin,dayy90_inr,dayy90_ascites_classification,dayy90_he_grade)
                         st.write("DAYY90_CPcalc",dayy90_child_pugh_points_calc)
                         dayy90_child_pugh_class_calc = calculate_class(dayy90_child_pugh_points_calc)
                         st.write("DAYY90_CPclass",dayy90_child_pugh_class_calc)
-                        dayy90_meld_score_calc = (3.78*(int(dayy90_bilirubin)))+(11.2*(int(dayy90_inr)))+(9.57*(int(dayy90_creatinine)))+6.43
+                        dayy90_meld_score_calc = meld_calc(dayy90_creatinine,dayy90_bilirubin,dayy90_inr)
                         st.write("DAYY90_MELD",dayy90_meld_score_calc)
                         dayy90_meld_na_score_calc = dayy90_meld_score_calc + 1.32*(137-int(dayy90_sodium)) - (0.033*dayy90_meld_score_calc*(137-int(dayy90_sodium)))
                         st.write("DAYY90_MELDNa",dayy90_meld_na_score_calc)
@@ -2117,13 +1880,12 @@ def add_new_data():
                             placeholder="Choose an option",
                             )
                         
-                        posty90_child_pugh_points = calculatepoints(posty90_bilirubin,posty90_albumin,posty90_inr,posty90_ascites_ctcae,posty90_he_grade)
+                        posty90_child_pugh_points = calculatepoints(posty90_bilirubin,posty90_albumin,posty90_inr,posty90_ascites_classification,posty90_he_grade)
                         st.write("DAYY90_CPcalc",posty90_child_pugh_points)
                         posty90_child_pugh_class = calculate_class(posty90_child_pugh_points)
                         # Additional Calculated Fields
                         st.write("DAYY90_CPclass",posty90_child_pugh_class)
-                        #prey90_bclc_stage_calc = st.text_input("PREY90_BCLC Stage calc", help="Enter calculated BCLC stage")
-                        posty90_meld = (3.78*(int(posty90_bilirubin)))+(11.2*(int(posty90_inr)))+(9.57*(int(posty90_creatinine)))+6.43
+                        posty90_meld = meld_calc(posty90_creatinine,posty90_bilirubin,posty90_inr)
                         st.write("DAYY90_MELD",posty90_meld)
                         posty90_meld_na = posty90_meld + 1.32*(137-int(posty90_sodium)) - (0.033*posty90_meld*(137-int(posty90_sodium)))
                         st.write("DAYY90_MELDNa",posty90_meld_na)
@@ -2183,17 +1945,27 @@ def add_new_data():
                         index= None,
                         placeholder="Choose an option",
                         )
-                        DYAE_CTCAE_hypoalbuminemia_emr = st.text_input(
-                            "30DYAE_hypoalbuminemia CTCAE",
-                            
-                        )
-                        DYAE_CTCAE_hyperbilirubinemia_emr = st.text_input(
-                            "30DYAE_hyperbilirubinemia CTCAE",
-                            
-                        )
-                        DYAE_CTCAE_Increase_creatinine_emr = st.text_input(
-                            "30DYAE_Increase_creatinine CTCAE",
-                        )
+                        #Formula
+                        DYAE_CTCAE_hypoalbuminemia_emr = hypoalbuminemia(posty90_albumin)
+                        st.write("30 Days AE_hypoalbuminemia CTCAE : ",DYAE_CTCAE_hypoalbuminemia_emr)
+                        prey90_bili = get_variable_value(st.session_state.temp_mrn,"PREY_BILI")
+                        DYAE_CTCAE_hyperbilirubinemia_emr = 0
+                        if prey90_bili in [None, "", " "]:  # Ensure it's valid before using
+                            st.error("Cannot calculate 30 Days AE_hyperbilirubinemia CTCAE due to No data in PREY_BILI.")
+                        else:
+                            prey90_bili= float(prey90_bili)
+                            DYAE_CTCAE_hyperbilirubinemia_emr = hyperbillirubine(prey90_bili,posty90_bilirubin)
+                            st.write("30 Days AE_hyperbilirubinemia CTCAE : ",DYAE_CTCAE_hyperbilirubinemia_emr)
+
+                        prey90_creatinine = get_variable_value(st.session_state.temp_mrn,"PREY_CREATININE")
+                        DYAE_CTCAE_Increase_creatinine_emr = 0
+                        if prey90_creatinine in [None, "", " "]:  # Ensure it's valid before using
+                            st.error("Cannot calculate 30 Days AE_CTCAE_Increase creatinine CTCAE due to No data in PREY_CREATININE.")
+                        else:
+                            prey90_creatinine= float(prey90_creatinine)
+                            DYAE_CTCAE_Increase_creatinine_emr = Increasecreatine(prey90_creatinine,posty90_creatinine)
+                            st.write("30 Days AE_CTCAE_Increase creatinine CTCAE : ",DYAE_CTCAE_Increase_creatinine_emr)
+
                         DYAE_CTCAE_abdominal_pain = st.selectbox(
                             "30DYAE_abdominal pain CTCAE [Excel : AE30_ABDPAIN]",
                             options=["0","1","2","3"],
@@ -2260,12 +2032,7 @@ def add_new_data():
                         index= None,
                         placeholder="Choose an option",
                         )
-                        DYAE_CTCAE_hyperkalemia = st.selectbox(
-                            "30DYAE_CTCAE_hyperkalemia [Excel : AE30_HYPERKAL]",
-                            options=["NA"],
-                        index= None,
-                        placeholder="Choose an option",
-                        )
+                        
                         DYAE_CTCAE_respiratory_failure = st.selectbox(
                             "30DYAE_CTCAE_respiratory_failure [Excel : AE30_RESPFAIL]",
                             options=["0", "4", "5"],
@@ -2286,16 +2053,56 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
 
-                        ae30_alt = st.text_input("AE30_ALT", )
-                        ae30_ast = st.text_input("AE30_AST", )
-                        ae30_alp = st.text_input("AE30_ALP",)
-                        ae30_plt = st.text_input("AE30_PLT",)
+                        DYAE_CTCAE_hyperkalemia = hyperkalemia(posty90_potassium)
+                        st.write("30 Days AE CTCAE Hyperkalemia",DYAE_CTCAE_hyperkalemia)
+                        day90_alt = get_variable_value(st.session_state.temp_mrn, "DAYY_ALT")
+                        ae30_alt = 0
+                        if day90_alt in [None, "", " "]:  # Ensure it's valid before using
+                            st.error("Cannot calculate AE30_ALT due to No data in DAYY_ALT.")
+                        else:
+                            day90_alt= float(day90_alt)
+                            ae30_alt = alt_calculate(day90_alt, posty90_alt)
+                            st.write("30 Days AE CTCAE ALT",ae30_alt)
+
+                        day90_ast = get_variable_value(st.session_state.temp_mrn,"DAYY_AST")
+                        ae30_ast = 0
+                        if day90_ast in [None, "", " "]:  # Ensure it's valid before using
+                            st.error("Cannot calculate AE30_AST due to No data in DAYY_AST.")
+                        else:
+                            day90_ast= float(day90_ast)
+                            ae30_ast = ast_calculate(day90_ast, posty90_ast)
+                            st.write("30 Days AE CTCAE AST",ae30_ast)
+
+                        day90_alp = get_variable_value(st.session_state.temp_mrn,"DAYY_ALP")
+                        ae30_alp = 0
+                        if day90_alp in [None, "", " "]:  # Ensure it's valid before using
+                            st.error("Cannot calculate AE30_AST due to No data in DAYY_ALP.")
+                        else:
+                            day90_alp= float(day90_alp)
+                            ae30_alp = ast_calculate(day90_alp, posty90_alkaline_phosphatase)
+                            st.write("30 Days AE CTCAE  Alkaline Phosphatase",ae30_alp)
+                        
+                        ae30_plt = plt_calculate(posty90_platelets)
+                        st.write("30 Days AE CTCAE Platelets",ae30_plt)
+
                         ae30_otherft = st.text_input("AE30_OTHERFT",)
                         ae30_other = st.text_input("AE30_OTHER",)
-                        ae30_gradesum12 = st.text_input("AE30_GRADESUM12", )
-                        ae30_gradesum345 = st.text_input("AE30_GRADESUM345", )
 
+                        variables = [
+                                    DYAE_CTCAE_portal_htn, DYAE_CTCAE_Vascular_comp, DYAE_CTCAE_fatigue, DYAE_CTCAE_diarrhea,
+                                    DYAE_CTCAE_hypoalbuminemia_emr, DYAE_CTCAE_hyperbilirubinemia_emr, DYAE_CTCAE_Increase_creatinine_emr,
+                                    DYAE_CTCAE_abdominal_pain, DYAE_CTCAE_sepsis, DYAE_CTCAE_bacterial_peritonitis, DYAE_CTCAE_hemorrhage,
+                                    DYAE_CTCAE_anorexia, DYAE_CTCAE_intrahepatic_fistula, DYAE_CTCAE_constipation, DYAE_CTCAE_nausea,
+                                    DYAE_CTCAE_vomiting, DYAE_CTCAE_cholecystitis, DYAE_CTCAE_gastric_ulcers, DYAE_CTCAE_respiratory_failure,
+                                    DYAE_CTCAE_AKI, DYAE_CTCAE_Radiation_pneumonitis, DYAE_CTCAE_hyperkalemia, ae30_alt, ae30_ast, ae30_alp, ae30_plt
+                                ]
 
+                        # Count the occurrences of 1 or 2
+                        count = sum(1 for value in variables if value in ["1", "2",1,2])
+                        count1 = sum(1 for value in variables if value not in ["1", "2",1,2,"",None])
+
+                        ae30_gradesum12 = count
+                        ae30_gradesum345 = count1
 
                         DYAE_AE_other = st.text_area(
                             "30DY_AE_other",
@@ -2313,7 +2120,8 @@ def add_new_data():
                             
 
                         )
-                        ae90_gradesum12 = st.text_input("AE90_GRADESUM12")
+                        
+                        ae90_gradesum12 = st.text_input("AE90_GRADESUM12" )
                         ae90_gradesum345 = st.text_input("AE90_GRADESUM345")
                         dy_ae_hospitalization_3 = st.selectbox(
                             "90DY_AE_Hospitalization 3 months [Excel : AE90_HOSP3]\n\n Yes (1), No (0)",
@@ -2478,6 +2286,8 @@ def add_new_data():
                                 return "Grade 2"
                             else:
                                 return "Grade 3"
+                        k_ken_albipretareraw = 0
+                        k_ken_albipretaregrade = ""
                         try : 
                             prey90_bilirubin = get_variable_value(st.session_state.temp_mrn,"PREY_BILI")
                             prey90_albumin = get_variable_value(st.session_state.temp_mrn,"PREY_ALBUMIN")
@@ -2488,8 +2298,8 @@ def add_new_data():
                             st.write("K_ken_AlbiPreTAREGrade: ",k_ken_albipretaregrade)
                         except:
                             st.warning("Fill Pre Y90 Tab")
-                        #k_ken_albiposttareraw = 0
-                        #k_ken_albiposttaregrade =""
+                        k_ken_albiposttareraw = 0
+                        k_ken_albiposttaregrade =""
                         try :
                             posty90_bilirubin = get_variable_value(st.session_state.temp_mrn,"POST30_BILI")
                             posty90_albumin = get_variable_value(st.session_state.temp_mrn,"POST30_ALBUMIN")
@@ -4366,17 +4176,7 @@ def edit_existing_data():
                             )
                             Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_String = ", ".join(Cirrhosis_Dx_Complications_at_Time_of_Diagnosis)
 
-                            Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary = st.selectbox(
-                                "Cirrhosis_Dx_Complications at Time of Diagnosis Binary [ Excel : CIRDX_COMPLDXBIN ] ",
-                                options=["0","1"],
-                                format_func=lambda x: {
-                                    "1": " >1 ",
-                                    "0": "None",
-                                }[x],
-                                help="Provide details of Complications_at_Time_of_Diagnosis_Binary",
-                                index=["0","1"].index(df.iloc[0]["CIRDX_COMPLDXBIN"]) if df.iloc[0]["CIRDX_COMPLDXBIN"] else None, 
-                                placeholder="Choose an option",
-                            )
+                            Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary = 1 if Cirrhosis_Dx_Complications_at_Time_of_Diagnosis != "none" or Cirrhosis_Dx_Complications_at_Time_of_Diagnosis != None else 0
 
                             Cirrhosis_Dx_Complications_Free_Text =  st.text_area(
                                 "Cirrhosis_Dx_Complications Free Text",
@@ -4424,13 +4224,13 @@ def edit_existing_data():
                             ) 
                             def findascitesclass(score):
                                 if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
-                                    return 2
+                                    return 1
                                 elif score == "Symptomatic" or score == "moderate ascities/Symptomatic medical intervention":
-                                    return 3
+                                    return 2
                                 elif score == "Severe symptoms, invasive intervention indicated" or score == "Life Threatening: Urgent operation intervention indicated" :
                                     return 3
                             
-                            Cirrhosis_Dx_Ascites_Classification = 1 if Cirrhosis_Dx_Ascites_CTCAE == "none" else findascitesclass(Cirrhosis_Dx_Ascites_CTCAE)
+                            Cirrhosis_Dx_Ascites_Classification = 0 if Cirrhosis_Dx_Ascites_CTCAE == "none" else findascitesclass(Cirrhosis_Dx_Ascites_CTCAE)
                             st.write("Cirdx_AscitesCTCAEnumb ",Cirrhosis_Dx_Ascites_Classification)
                             Cirrhosis_Dx_Ascites_Free_Text = "NA" if Cirrhosis_Dx_Ascites_CTCAE == "none" else st.text_area(
                                 "Cirrhosis_Dx_Ascites Free Text",
@@ -4532,9 +4332,9 @@ def edit_existing_data():
                             ) 
                             def findascitesclass(score):
                                 if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
-                                    return 2
+                                    return 1
                                 elif score == "Symptomatic" or score == "moderate ascities/Symptomatic medical intervention":
-                                    return 3
+                                    return 2
                                 elif score == "Severe symptoms, invasive intervention indicated" or score == "Life Threatening: Urgent operation intervention indicated" :
                                     return 3
                             
@@ -4597,20 +4397,14 @@ def edit_existing_data():
                                 index=["LR-1", "LR-2", "LR-3", "LR-4", "LR-5", "LR-5V", "LR-M"].index(df.iloc[0]["HCCDX_LIRADS"]) if df.iloc[0]["HCCDX_LIRADS"] else None, 
                                 placeholder="Choose an option",
                             )
-                            hcc_dx_child_pugh_points_calc = calculatepoints(hcc_dx_bilirubin,hcc_dx_albumin,hcc_dx_inr,hcc_dx_ascites_CTCAE,hcc_dx_he_grade)
+                            hcc_dx_child_pugh_points_calc = calculatepoints(hcc_dx_bilirubin,hcc_dx_albumin,hcc_dx_inr,hCC_dx_ascites_classification,hcc_dx_he_grade)
                             st.write("HCCdx_CPcalc ",hcc_dx_child_pugh_points_calc)
                             hcc_dx_child_pugh_class_calc = calculate_class(hcc_dx_child_pugh_points_calc)
                             st.write("HCCdx_CPclass ",hcc_dx_child_pugh_class_calc)
-                            hcc_dx_meld_score_calc = (3.78*(int(hcc_dx_bilirubin)))+(11.2*(int(hcc_dx_inr)))+(9.57*(int(hcc_dx_creatinine)))+6.43
+                            hcc_dx_meld_score_calc = meld_calc(hcc_dx_creatinine,hcc_dx_bilirubin,hcc_dx_inr)
                             st.write("HCCdx_MELD ",hcc_dx_meld_score_calc)
                             hcc_dx_meld_na_score_calc = hcc_dx_meld_score_calc + 1.32*(137-int(hcc_dx_sodium)) - (0.033*hcc_dx_meld_score_calc*(137-int(hcc_dx_sodium)))
                             st.write("HCCdx_MELDNa ",hcc_dx_meld_na_score_calc)
-                            def albi_calc(a,b):
-                                a=int(a)*17.1
-                                b=int(b)
-                                t = math.log(a, 10)
-                                answer = round((t * 0.66) + (b * -0.085))
-                                return answer
                             
                             hcc_dx_albi_score_calc = albi_calc(hcc_dx_bilirubin, hcc_dx_albumin)
                             st.write("HCCdx_Albiscore ",hcc_dx_albi_score_calc)
@@ -4821,6 +4615,7 @@ def edit_existing_data():
                                     "1": "Yes ",
                                     "NA": "NA (not in chart)"
                                 }[x],
+                                help = "new HCC occurrence that has developed in a diff location in the liver, separate from the area that was previously tx",
                                 index=["0", "1", "NA"].index(df.iloc[0]["PTHER_NEWHCCOUT"]) if df.iloc[0]["PTHER_NEWHCCOUT"] else None,
                                 placeholder="Choose an option"
                             )   
@@ -4832,6 +4627,7 @@ def edit_existing_data():
                                     "1": "Yes ",
                                     "NA": "NA (not in chart)"
                                 }[x],
+                                help = "New HCC adjacent to previous treatment site: new HCC occurrence that has developed close to, but not directly in, the area that was previously treated",
                                 index=["0", "1", "NA"].index(df.iloc[0]["PTHER_NEWHCCADJ"]) if df.iloc[0]["PTHER_NEWHCCADJ"] else None,
                                 placeholder="Choose an option"
                             )   
@@ -5046,8 +4842,10 @@ def edit_existing_data():
                             ) 
                             def findascitesclass(score):
                                 if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
+                                    return 1
+                                elif score == "Symptomatic" or score == "moderate ascities/Symptomatic medical intervention":
                                     return 2
-                                else:
+                                elif score == "Severe symptoms, invasive intervention indicated" or score == "Life Threatening: Urgent operation intervention indicated" :
                                     return 3
                             
                             prey90_ascites_classification = 1 if prey90_ascites_ctcae == "none" else findascitesclass(prey90_ascites_ctcae)
@@ -5114,18 +4912,16 @@ def edit_existing_data():
                                 index=["0", "1", "2", "3", "4", "NA"].index(df.iloc[0]["PREY_ECOG"]) if df.iloc[0]["PREY_ECOG"] else None,  # No default selection
                                 placeholder="Choose an option",)
 
-                            prey90_child_pugh_points_calc = calculatepoints(prey90_bilirubin,prey90_albumin,prey90_inr,prey90_ascites_ctcae,prey90_he_grade)
+                            prey90_child_pugh_points_calc = calculatepoints(prey90_bilirubin,prey90_albumin,prey90_inr,prey90_ascites_classification,prey90_he_grade)
                             st.write("PREY90_CPcalc",prey90_child_pugh_points_calc)
                     
                             prey90_child_pugh_class_calc = calculate_class(prey90_child_pugh_points_calc)
                             st.write("PREY90_CPclass",prey90_child_pugh_class_calc)
-                    
-                            prey90_meld_score_calc = (3.78*(int(prey90_bilirubin)))+(11.2*(int(prey90_inr)))+(9.57*(int(prey90_creatinine)))+6.43
+                            prey90_meld_score_calc = meld_calc(prey90_creatinine,prey90_bilirubin,prey90_inr)
                             st.write("PREY90_MELD",prey90_meld_score_calc)
                     
                             prey90_meld_na_score_calc = prey90_meld_score_calc + 1.32*(137-int(prey90_sodium)) - (0.033*prey90_meld_score_calc*(137-int(prey90_sodium)))
                             st.write("PREY90_MELDNa",prey90_meld_na_score_calc)
-                    
                             prey90_albi_score_calc = albi_calc(prey90_bilirubin,prey90_albumin)
                             st.write("PREY90_Albiscore",prey90_albi_score_calc)
                             prey90_albi_grade = albi_class(prey90_albi_score_calc)
@@ -5211,7 +5007,7 @@ def edit_existing_data():
                                     numeric_value = int(value)
                                     return 1 if numeric_value < 200 else 2
                                 else:
-                                    return "Invalid Input"
+                                    return "Fill AFP"
 
                             dayy90_afp_prior_to_tare = process_input(dayy90_afp)
                             st.write("DAYY90_AFP Binary : ",dayy90_afp_prior_to_tare)
@@ -5252,8 +5048,10 @@ def edit_existing_data():
                             ) 
                             def findascitesclass(score):
                                 if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
+                                 return 1
+                                elif score == "Symptomatic" or score == "moderate ascities/Symptomatic medical intervention":
                                     return 2
-                                else:
+                                elif score == "Severe symptoms, invasive intervention indicated" or score == "Life Threatening: Urgent operation intervention indicated" :
                                     return 3
                             
                             dayy90_ascites_classification = 1 if dayy90_ascites_ctcae == "none" else findascitesclass(dayy90_ascites_ctcae)
@@ -5277,13 +5075,11 @@ def edit_existing_data():
                                 index=["0", "1", "2", "3", "4", "NA"].index(df.iloc[0]["DAYY_ECOG"]) if df.iloc[0]["DAYY_ECOG"] else None,  # No default selection
                                 placeholder="Choose an option",)
                             
-                            dayy90_child_pugh_points_calc = calculatepoints(dayy90_bilirubin,dayy90_albumin,dayy90_inr,dayy90_ascites_ctcae,dayy90_he_grade)
+                            dayy90_child_pugh_points_calc = calculatepoints(dayy90_bilirubin,dayy90_albumin,dayy90_inr,dayy90_ascites_classification,dayy90_he_grade)
                             st.write("DAYY90_CPcalc",dayy90_child_pugh_points_calc)
                             dayy90_child_pugh_class_calc = calculate_class(dayy90_child_pugh_points_calc)
-                            # Additional Calculated Fields
                             st.write("DAYY90_CPclass",dayy90_child_pugh_class_calc)
-                            #prey90_bclc_stage_calc = st.text_input("PREY90_BCLC Stage calc", help="Enter calculated BCLC stage")
-                            dayy90_meld_score_calc = (3.78*(int(dayy90_bilirubin)))+(11.2*(int(dayy90_inr)))+(9.57*(int(dayy90_creatinine)))+6.43
+                            dayy90_meld_score_calc = meld_calc(dayy90_creatinine,dayy90_bilirubin,dayy90_inr)
                             st.write("DAYY90_MELD",dayy90_meld_score_calc)
                             dayy90_meld_na_score_calc = dayy90_meld_score_calc + 1.32*(137-int(dayy90_sodium)) - (0.033*dayy90_meld_score_calc*(137-int(dayy90_sodium)))
                             st.write("DAYY90_MELDNa",dayy90_meld_na_score_calc)
@@ -5407,9 +5203,11 @@ def edit_existing_data():
                             ) 
                             def findascitesclass(score):
                                 if score == "Asymptomatic" or score== "Minimal ascities/Mild abd distension":
-                                        return 2
-                                else:
-                                        return 3
+                                 return 1
+                                elif score == "Symptomatic" or score == "moderate ascities/Symptomatic medical intervention":
+                                 return 2
+                                elif score == "Severe symptoms, invasive intervention indicated" or score == "Life Threatening: Urgent operation intervention indicated" :
+                                 return 3
                             
                             posty90_ascites_classification = 1 if posty90_ascites_ctcae == "none" else findascitesclass(posty90_ascites_ctcae)
                             st.write("30DY_AE_AscitesCTCAEnumb : ",posty90_ascites_classification)
@@ -5470,13 +5268,11 @@ def edit_existing_data():
                                 index=["0", "1", "2", "3", "4", "NA"].index(df.iloc[0]["POST30_ECOG"]) if df.iloc[0]["POST30_ECOG"] else None,
                                 placeholder="Choose an option",
                                 )
-                            posty90_child_pugh_points = calculatepoints(posty90_bilirubin,posty90_albumin,posty90_inr,posty90_ascites_ctcae,posty90_he_grade)
+                            posty90_child_pugh_points = calculatepoints(posty90_bilirubin,posty90_albumin,posty90_inr,posty90_ascites_classification,posty90_he_grade)
                             st.write("DAYY90_CPcalc",posty90_child_pugh_points)
                             posty90_child_pugh_class = calculate_class(posty90_child_pugh_points)
-                            # Additional Calculated Fields
                             st.write("DAYY90_CPclass",posty90_child_pugh_class)
-                            #prey90_bclc_stage_calc = st.text_input("PREY90_BCLC Stage calc", help="Enter calculated BCLC stage")
-                            posty90_meld = (3.78*(int(posty90_bilirubin)))+(11.2*(int(posty90_inr)))+(9.57*(int(posty90_creatinine)))+6.43
+                            posty90_meld = meld_calc(posty90_creatinine,posty90_bilirubin,posty90_inr)
                             st.write("DAYY90_MELD",posty90_meld)
                             posty90_meld_na = posty90_meld + 1.32*(137-int(posty90_sodium)) - (0.033*posty90_meld*(137-int(posty90_sodium)))
                             st.write("DAYY90_MELDNa",posty90_meld_na)
@@ -5536,18 +5332,28 @@ def edit_existing_data():
                             index=["0","1","2","3","4","5"].index(df.iloc[0]["AE30_DIAR"]) if df.iloc[0]["AE30_DIAR"] else None,
                             placeholder="Choose an option",
                             )
-                            DYAE_CTCAE_hypoalbuminemia_emr = st.text_input(
-                                "30DYAE_hypoalbuminemia CTCAE",
-                                value=df.iloc[0]["AE30_HYPOALBUM"]
-                            )
-                            DYAE_CTCAE_hyperbilirubinemia_emr = st.text_input(
-                                "30DYAE_hyperbilirubinemia CTCAE",
-                                value=df.iloc[0]["AE30_HYPERBILI"]
-                            )
-                            DYAE_CTCAE_Increase_creatinine_emr = st.text_input(
-                                "30DYAE_Increase_creatinine CTCAE",
-                                value=df.iloc[0]["AE30_INCREASECR"]
-                            )
+                            # Formula
+                            DYAE_CTCAE_hypoalbuminemia_emr = hypoalbuminemia(posty90_albumin)
+                            st.write("30 Days AE_hypoalbuminemia CTCAE : ",DYAE_CTCAE_hypoalbuminemia_emr)
+
+                            prey90_bili = df.iloc[0]["PREY_BILI"]
+                            DYAE_CTCAE_hyperbilirubinemia_emr = 0
+                            if prey90_bili in [None, "", " "]:  # Ensure it's valid before using
+                                st.error("Cannot calculate 30 Days AE_hyperbilirubinemia CTCAE due to No data in PREY_BILI.")
+                            else:
+                                prey90_bili= float(prey90_bili)
+                                DYAE_CTCAE_hyperbilirubinemia_emr = hyperbillirubine(prey90_bili,posty90_bilirubin)
+                                st.write("30 Days AE_hyperbilirubinemia CTCAE : ",DYAE_CTCAE_hyperbilirubinemia_emr)
+
+                            prey90_creatinine = df.iloc[0]["PREY_CREATININE"]
+                            DYAE_CTCAE_Increase_creatinine_emr = 0
+                            if prey90_creatinine in [None, "", " "]:  # Ensure it's valid before using
+                                st.error("Cannot calculate 30 Days AE_CTCAE_Increase creatinine CTCAE due to No data in PREY_CREATININE.")
+                            else:
+                                prey90_creatinine= float(prey90_creatinine)
+                                DYAE_CTCAE_Increase_creatinine_emr = Increasecreatine(prey90_creatinine,posty90_creatinine)
+                                st.write("30 Days AE_CTCAE_Increase creatinine CTCAE : ",DYAE_CTCAE_Increase_creatinine_emr)
+
                             DYAE_CTCAE_abdominal_pain = st.selectbox(
                                 "30DYAE_abdominal pain CTCAE [Excel : AE30_ABDPAIN]",
                                 options=["0","1","2","3"],
@@ -5639,16 +5445,56 @@ def edit_existing_data():
                             index=["0","1","2", "3", "4", "5"].index(df.iloc[0]["AE30_RADPNEUM"]) if df.iloc[0]["AE30_RADPNEUM"] else None,
                             placeholder="Choose an option",
                             )
-                            ae30_alt = st.text_input("AE30_ALT", value=df.iloc[0]["AE30_ALT"] if "AE30_ALT" in df.columns else "")
-                            ae30_ast = st.text_input("AE30_AST", value=df.iloc[0]["AE30_AST"] if "AE30_AST" in df.columns else "")
-                            ae30_alp = st.text_input("AE30_ALP", value=df.iloc[0]["AE30_ALP"] if "AE30_ALP" in df.columns else "")
-                            ae30_plt = st.text_input("AE30_PLT", value=df.iloc[0]["AE30_PLT"] if "AE30_PLT" in df.columns else "")
+                            DYAE_CTCAE_hyperkalemia = hyperkalemia(posty90_potassium)
+                            st.write("30 Days AE CTCAE Hyperkalemia",DYAE_CTCAE_hyperkalemia)
+                            day90_alt = df.iloc[0]["DAYY_ALT"]
+                            ae30_alt = 0
+                            if day90_alt in [None, "", " "]:  # Ensure it's valid before using
+                                st.error("Cannot calculate AE30_ALT due to No data in DAYY_ALT.")
+                            else:
+                                day90_alt= float(day90_alt)
+                                ae30_alt = alt_calculate(day90_alt, posty90_alt)
+                                st.write("30 Days AE CTCAE ALT",ae30_alt)
+
+                            day90_ast = df.iloc[0]["DAYY_AST"]
+                            ae30_ast = 0
+                            if day90_ast in [None, "", " "]:  # Ensure it's valid before using
+                                st.error("Cannot calculate AE30_AST due to No data in DAYY_AST.")
+                            else:
+                                day90_ast= float(day90_ast)
+                                ae30_ast = ast_calculate(day90_ast, posty90_ast)
+                                st.write("30 Days AE CTCAE AST",ae30_ast)
+
+                            day90_alp = df.iloc[0]["DAYY_ALP"]
+                            ae30_alp = 0
+                            if day90_alp in [None, "", " "]:  # Ensure it's valid before using
+                                st.error("Cannot calculate AE30_AST due to No data in DAYY_ALP.")
+                            else:
+                                day90_alp= float(day90_alp)
+                                ae30_alp = ast_calculate(day90_alp, posty90_alkaline_phosphatase)
+                                st.write("30 Days AE CTCAE  Alkaline Phosphatase",ae30_alp)
+                            
+                            ae30_plt = plt_calculate(posty90_platelets)
+                            st.write("30 Days AE CTCAE Platelets",ae30_plt)
+
                             ae30_otherft = st.text_input("AE30_OTHERFT", value=df.iloc[0]["AE30_OTHERFT"] if "AE30_OTHERFT" in df.columns else "")
                             ae30_other = st.text_input("AE30_OTHER", value=df.iloc[0]["AE30_OTHER"] if "AE30_OTHER" in df.columns else "")
-                            ae30_gradesum12 = st.text_input("AE30_GRADESUM12", value=df.iloc[0]["AE30_GRADESUM12"] if "AE30_GRADESUM12" in df.columns else "")
-                            ae30_gradesum345 = st.text_input("AE30_GRADESUM345", value=df.iloc[0]["AE30_GRADESUM345"] if "AE30_GRADESUM345" in df.columns else "")
 
+                            variables = [
+                                    DYAE_CTCAE_portal_htn, DYAE_CTCAE_Vascular_comp, DYAE_CTCAE_fatigue, DYAE_CTCAE_diarrhea,
+                                    DYAE_CTCAE_hypoalbuminemia_emr, DYAE_CTCAE_hyperbilirubinemia_emr, DYAE_CTCAE_Increase_creatinine_emr,
+                                    DYAE_CTCAE_abdominal_pain, DYAE_CTCAE_sepsis, DYAE_CTCAE_bacterial_peritonitis, DYAE_CTCAE_hemorrhage,
+                                    DYAE_CTCAE_anorexia, DYAE_CTCAE_intrahepatic_fistula, DYAE_CTCAE_constipation, DYAE_CTCAE_nausea,
+                                    DYAE_CTCAE_vomiting, DYAE_CTCAE_cholecystitis, DYAE_CTCAE_gastric_ulcers, DYAE_CTCAE_respiratory_failure,
+                                    DYAE_CTCAE_AKI, DYAE_CTCAE_Radiation_pneumonitis, DYAE_CTCAE_hyperkalemia, ae30_alt, ae30_ast, ae30_alp, ae30_plt
+                                ]
 
+                            # Count the occurrences of 1 or 2
+                            count = sum(1 for value in variables if value in ["1", "2",1,2])
+                            count1 = sum(1 for value in variables if value not in ["1", "2",1,2,"",None])
+
+                            ae30_gradesum12 = count
+                            ae30_gradesum345 = count1
 
                             DYAE_AE_other = st.text_area(
                                 "30DY_AE_other",
@@ -5666,6 +5512,7 @@ def edit_existing_data():
                                 value=df.iloc[0]["AE90_OTHERFT"]
 
                             )
+                            
                             ae90_gradesum12 = st.text_input("AE90_GRADESUM12", value=df.iloc[0]["AE90_GRADESUM12"] )
                             ae90_gradesum345 = st.text_input("AE90_GRADESUM345", value=df.iloc[0]["AE90_GRADESUM345"] )
                             dy_ae_hospitalization_3 = st.selectbox(
@@ -7288,12 +7135,16 @@ def edit_existing_data():
 if st.session_state.logged_in:
     # Navigation options
     st.sidebar.title("Navigation")
-    options = st.sidebar.radio("Select an option", ["Add New Data", "Edit Existing Data", "Logout"])
+    options = st.sidebar.radio("Select an option", ["Add New Data", "Edit Existing Data","Export Excel", "Logout"])
     
     if options == "Add New Data":
         add_new_data()
     elif options == "Edit Existing Data":
         edit_existing_data()
+    elif options == "Export Excel":
+        st.session_state.page = "home"
+        st.switch_page("pages/export_data.py")
+        
     elif options == "Logout":
         st.session_state.logged_in = False
         st.rerun()
