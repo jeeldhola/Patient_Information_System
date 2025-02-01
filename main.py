@@ -970,7 +970,7 @@ def add_new_data():
                 if "MRN" not in st.session_state.data:
                     st.warning("Please complete the Patient Information tab first.")
                 else:
-                    #try:
+                    try:
                         hcc_dx_hcc_diagnosis_date = st.date_input("HCC_Dx_HCC Diagnosis Date", help="Enter the HCC diagnosis date")
 
                         hcc_dx_method_of_diagnosis = st.selectbox(
@@ -1144,8 +1144,8 @@ def add_new_data():
                                     df=fetch_data_from_google_sheet()
                                 else:
                                     st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
-                    #except:
-                     #   st.warning("Please Fill Patient Information Page")
+                    except:
+                        st.warning("Please Fill Patient Information Page")
 
         elif st.session_state.selected_tab == "Previous Therapy for HCC":
             st.subheader("Previous Therapy for HCC")
@@ -1840,7 +1840,6 @@ def add_new_data():
                                     }[x],
                             index= None,
                             placeholder="Choose an option",
-            
                         )
                         posty90_ascites_paracentesis = st.selectbox(
                             "30DY_AE_Ascitesparacentesis[Excel : POST30_ASCITPARA]\n\n Yes (1), No (0)",
@@ -1851,7 +1850,6 @@ def add_new_data():
                                     }[x],
                             index=  None,
                             placeholder="Choose an option",
-            
                         )
                         posty90_ascites_hospitalization = st.selectbox(
                             "30DY_AE_Asciteshospitalization[Excel : POST30_ASCITHOSP]\n\n Yes (1), No (0)",
@@ -1862,7 +1860,6 @@ def add_new_data():
                                     }[x],
                             index=None,
                             placeholder="Choose an option",
-            
                         )
                         posty90_he_grade = st.selectbox(
                             "30DY_AE_HE Grade [Excel : POST30_HEGRADE]\n\n(1) None, (2) Grade 1-2, (3) Grade 3-4",
@@ -1871,8 +1868,7 @@ def add_new_data():
                             1: "None",
                             2: "Grade 1-2",
                             3: "Grade 3-4",
-                            
-                        }[x],
+                            }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
@@ -1881,12 +1877,10 @@ def add_new_data():
                             "30DY_AE_ascities_freetext",
 
                         )
-
                         posty90_ecog = st.selectbox("POSTY90_30DY_ECOG [Excel : POST30_ECOG]", options=["0", "1", "2", "3", "4", "NA"],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                             )
-                        
                         posty90_child_pugh_points = calculatepoints(posty90_bilirubin,posty90_albumin,posty90_inr,posty90_ascites_classification,posty90_he_grade)
                         st.write("DAYY90_CPcalc",posty90_child_pugh_points)
                         posty90_child_pugh_class = calculate_class(posty90_child_pugh_points)
@@ -1900,7 +1894,6 @@ def add_new_data():
                         st.write("DAYY90_Albiscore",posty90_albi_score)
                         posty90_albi_grade = albi_class(posty90_albi_score)
                         st.write("DAYY90_Albigrade",posty90_albi_grade)
-
                         posty90_bclc = st.selectbox("PREY90_BCLC Stage calc [ Excel : POST30_BCLC ]\n\n(NA) Not in chart, (0) Stage 0, (1) Stage A, (2) Stage B, (3) Stage C, (4) Stage D   ",
                             options=["NA", "0", "1", "2", "3", "4"],
                             format_func=lambda x: {
@@ -1920,7 +1913,6 @@ def add_new_data():
                             help="Enter BCLC Stage Post-90",
                           
                         )
-
                         ken_meld_stage_post90 = st.text_input(
                             "Ken_MELD_Stagepost90",
                             help="Enter MELD Score Pre-TARE",
@@ -7160,7 +7152,7 @@ if st.session_state.logged_in:
         edit_existing_data()
     elif options == "Export Excel":
         st.session_state.page = "home"
-        st.switch_page("pages/export_data.py")
+        st.switch_page("pages/home1.py")
         
     elif options == "Logout":
         st.session_state.logged_in = False
