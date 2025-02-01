@@ -4,6 +4,7 @@ import math
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import json
+from math import pi
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -487,6 +488,140 @@ def albi_class(AB):
         except ValueError:
             return "NA"
 
+def calculate_target_lestion_vol(L, M, N):
+    # Check for blank values, "NA", or 0
+    if any(x in (None, "", "NA", 0) for x in (L, M, N)):
+        return 0
+    else :
+        return L * M * N * (4/3) * pi
+
+def calculate_value_v2(N, O, P, Q):
+    # Check if any value is "NA"
+    if any(x in (None, "", "NA", 0) for x in (N, O, P, Q)):
+        return "NA"
+    else:
+        return O * P * Q * (4/3) * pi
+
+def mrecist_local(BC):
+    if BC >= 100:
+        return "CR"
+    elif BC >= 30:
+        return "PR"
+    elif -20 <= BC < 30:
+        return "SD"
+    else:
+        return "PD"
+
+def mrecist_calc(CE, BR, AP):
+    if CE == "":
+        return ""
+    elif BR > AP:
+        return "PD"
+    elif CE >= 100:
+        return "CR"
+    elif CE >= 30:
+        return "PR"
+    elif -20 <= CE < 30:
+        return "SD"
+    else:
+        return "PD"   
+
+def mrecist_overall(AX, AY, BB, BC):
+    if AX == "1" or AY == "1" or BB < 0:
+        return "PD"
+    elif BC >= 100:
+        return "CR"
+    elif BC >= 30:
+        return "PR"
+    elif -20 <= BC < 30:
+        return "SD"
+    else:
+        return "PD"
+
+def detect_first_progression(BD, CG, DJ, EM, FD, BI, CL, DO, EP):
+    
+
+    # Mapping follow-up responses to their corresponding imaging dates
+    follow_ups = [(CG, BI), (DJ, CL), (EM, DO), (FD, EP)]
+    
+    # Progression rules based on BD
+    progression_criteria = {
+        "CR": {"PR", "SD", "PD"},
+        "PR": {"SD", "PD"},
+        "SD": {"PD"},
+    }
+    
+    # Check for progression based on the initial BD value
+    if BD in progression_criteria:
+        for response, date in follow_ups:
+            if response in progression_criteria[BD]:
+                return date  # Return the first imaging date of progression
+    
+    return "No Progression"
+
+def detect_overall_progression(BG, BH, CJ, CK, DM, DN, EP, EQ, FG, FH, AH, BL, CO, DR, ES):
+    
+    # If both BG and BH start as PD, return No Progression
+    if BG == "PD" and BH == "PD":
+        return "No Progression"
+    
+    # First Follow-Up Progression Check
+    if BG != "PD" or BH != "PD":
+        return AH
+    
+    # Mapping follow-up responses to their corresponding imaging dates
+    follow_ups = [(CJ, CK, BL), (DM, DN, CO), (EP, EQ, DR), (FG, FH, ES)]
+    
+    # Check for progression in subsequent follow-ups
+    for loc, overall, date in follow_ups:
+        if loc != "PD" or overall != "PD":
+            return date  # Return the first imaging date where progression occurs
+
+    return "No Progression"
+
+def determine_bestmrecist(BE, CH, DK, EN, FE):
+
+    responses = [BE, CH, DK, EN, FE]
+
+    # Check for "CR"
+    if "CR" in responses:
+        return "CR"
+
+    # Check for "PR"
+    if "PR" in responses:
+        return "PR"
+
+    # Check for "SD" (excluding FE since it's not checked for "SD" in the formula)
+    if any(resp == "SD" for resp in [BE, CH, DK, EN]):
+        return "SD"
+
+    # Check for "PD" (excluding FE since it's not checked for "PD" in the formula)
+    if any(resp == "PD" for resp in [BE, CH, DK, EN]):
+        return "PD"
+
+    # Default case
+    return "No Response"
+
+def determine_bestmrecist_date(fz, bf, ci, dl, en, fe, ah, bj, cm, dp, eq):
+    
+    response_map = {
+        "CR": [bf, ci, dl, en, fe],
+        "PR": [bf, ci, dl, en, fe],
+        "SD": [bf, ci, dl, en, fe],
+        "PD": [bf, ci, dl, en, fe]
+    }
+
+    date_map = [ah, bj, cm, dp, eq]
+
+    # Check if fz exists in the map
+    if fz in response_map:
+        for idx, val in enumerate(response_map[fz]):
+            if val == fz:
+                return date_map[idx]  # Return corresponding date
+    
+    return "No Date"
+
+
 def add_new_data():
     st.title("Patient Information System")
     df=fetch_data_from_google_sheet()
@@ -574,7 +709,7 @@ def add_new_data():
                 submit_tab1 = st.form_submit_button("Submit")
                 if submit_tab1:
                         #df = fetch_data_from_google_sheet()
-                        if not df.empty and mrn in df['MRN'].values:
+                        if not df.empty and str(mrn) in df['MRN'].values:
                             st.error(f"MRN {mrn} already exists. Please enter a unique MRN.")
                         else:
                             if hasattr(st.session_state, 'temp_mrn'):
@@ -970,7 +1105,7 @@ def add_new_data():
                 if "MRN" not in st.session_state.data:
                     st.warning("Please complete the Patient Information tab first.")
                 else:
-                    try:
+                    #try:
                         hcc_dx_hcc_diagnosis_date = st.date_input("HCC_Dx_HCC Diagnosis Date", help="Enter the HCC diagnosis date")
 
                         hcc_dx_method_of_diagnosis = st.selectbox(
@@ -1144,8 +1279,8 @@ def add_new_data():
                                     df=fetch_data_from_google_sheet()
                                 else:
                                     st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
-                    except:
-                        st.warning("Please Fill Patient Information Page")
+                    #except:
+                     #   st.warning("Please Fill Patient Information Page")
 
         elif st.session_state.selected_tab == "Previous Therapy for HCC":
             st.subheader("Previous Therapy for HCC")
@@ -1840,6 +1975,7 @@ def add_new_data():
                                     }[x],
                             index= None,
                             placeholder="Choose an option",
+            
                         )
                         posty90_ascites_paracentesis = st.selectbox(
                             "30DY_AE_Ascitesparacentesis[Excel : POST30_ASCITPARA]\n\n Yes (1), No (0)",
@@ -1850,6 +1986,7 @@ def add_new_data():
                                     }[x],
                             index=  None,
                             placeholder="Choose an option",
+            
                         )
                         posty90_ascites_hospitalization = st.selectbox(
                             "30DY_AE_Asciteshospitalization[Excel : POST30_ASCITHOSP]\n\n Yes (1), No (0)",
@@ -1860,6 +1997,7 @@ def add_new_data():
                                     }[x],
                             index=None,
                             placeholder="Choose an option",
+            
                         )
                         posty90_he_grade = st.selectbox(
                             "30DY_AE_HE Grade [Excel : POST30_HEGRADE]\n\n(1) None, (2) Grade 1-2, (3) Grade 3-4",
@@ -1868,7 +2006,8 @@ def add_new_data():
                             1: "None",
                             2: "Grade 1-2",
                             3: "Grade 3-4",
-                            }[x],
+                            
+                        }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
@@ -1877,10 +2016,12 @@ def add_new_data():
                             "30DY_AE_ascities_freetext",
 
                         )
+
                         posty90_ecog = st.selectbox("POSTY90_30DY_ECOG [Excel : POST30_ECOG]", options=["0", "1", "2", "3", "4", "NA"],
                             index=None,  # No default selection
                             placeholder="Choose an option",
                             )
+                        
                         posty90_child_pugh_points = calculatepoints(posty90_bilirubin,posty90_albumin,posty90_inr,posty90_ascites_classification,posty90_he_grade)
                         st.write("DAYY90_CPcalc",posty90_child_pugh_points)
                         posty90_child_pugh_class = calculate_class(posty90_child_pugh_points)
@@ -1894,6 +2035,7 @@ def add_new_data():
                         st.write("DAYY90_Albiscore",posty90_albi_score)
                         posty90_albi_grade = albi_class(posty90_albi_score)
                         st.write("DAYY90_Albigrade",posty90_albi_grade)
+
                         posty90_bclc = st.selectbox("PREY90_BCLC Stage calc [ Excel : POST30_BCLC ]\n\n(NA) Not in chart, (0) Stage 0, (1) Stage A, (2) Stage B, (3) Stage C, (4) Stage D   ",
                             options=["NA", "0", "1", "2", "3", "4"],
                             format_func=lambda x: {
@@ -2346,7 +2488,7 @@ def add_new_data():
         elif st.session_state.selected_tab == "Imaging Date":
             st.subheader("Imaging Date")
             with st.form("imaging_date_form"):
-                try:
+                #try:
                     if "MRN" not in st.session_state.data:
                         st.warning("Please complete the Patient Information tab first.")
                     else:
@@ -2405,8 +2547,10 @@ def add_new_data():
                             "PREY90_Target Lesion 1 CCD",
                             step=0.1
                         )
-                        PREY90_Target_Lesion_1_VOL = 4/3*3.14*(PREY90_Target_Lesion_1_PAD)*(PREY90_TL1_LAD)*PREY90_Target_Lesion_1_CCD
+                        
+                        PREY90_Target_Lesion_1_VOL = calculate_target_lestion_vol(PREY90_Target_Lesion_1_PAD, PREY90_TL1_LAD, PREY90_Target_Lesion_1_CCD)
                         st.write("PREY90_Target Lesion 1 VOL",PREY90_Target_Lesion_1_VOL)
+
                         PREY90_Target_Lesion_2_segments = st.selectbox(
                                 "PREY90_Target_Lesion_2_segments [Excel : PREY_TL2SEG]",
                                 options=["1","2","3","4a","4b","5","6","7","8","NA"],
@@ -2426,9 +2570,11 @@ def add_new_data():
                             "PREY90_Target Lesion 2 CCD",
                             step=0.1
                         )
-                        PREY90_Target_Lesion_2_VOL = 4/3*3.14*(PREY90_Target_Lesion_2_PAD)*(PREY90_Target_Lesion_2_LAD)*PREY90_Target_Lesion_2_CCD
+                       
+                        PREY90_Target_Lesion_2_VOL = calculate_value_v2(PREY90_Target_Lesion_2_segments, PREY90_Target_Lesion_2_LAD, PREY90_Target_Lesion_2_PAD, PREY90_Target_Lesion_2_CCD)
                         st.write("PREY90_Target Lesion 2 VOL",PREY90_Target_Lesion_2_VOL)
-                        PREY90_pretx_targeted_Lesion_Dia_Sum = max(PREY90_TL1_LAD,PREY90_Target_Lesion_1_PAD,PREY90_Target_Lesion_1_CCD)+max(PREY90_Target_Lesion_2_PAD,PREY90_Target_Lesion_2_LAD,PREY90_Target_Lesion_2_CCD)
+
+                        PREY90_pretx_targeted_Lesion_Dia_Sum = max(PREY90_TL1_LAD,PREY90_Target_Lesion_1_PAD,PREY90_Target_Lesion_1_CCD) + max(PREY90_Target_Lesion_2_PAD,PREY90_Target_Lesion_2_LAD,PREY90_Target_Lesion_2_CCD)
                         st.write("PREY90_ pretx targeted Lesion Dia Sum",PREY90_pretx_targeted_Lesion_Dia_Sum)
                         PREY90_Non_Target_Lesion_Location = st.selectbox( "PREY90_Non-Target Lesion Location [Excel : PREY_NTLOC]" , options=["1","2","3","4a","4b","5","6","7","8","NA"],
                         index=None,  # No default selection
@@ -2447,7 +2593,7 @@ def add_new_data():
                             "PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc",
                             step=0.1
                         )
-                        PREY90_Non_targeted_Lesion_Dia_Sum = max(PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc)
+                        PREY90_Non_targeted_Lesion_Dia_Sum = "NA" if PREY90_Non_Target_Lesion_Location == 'NA' else max(PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc)
                         st.write("PREY90_Non-targeted Lesion Dia Sum",PREY90_Non_targeted_Lesion_Dia_Sum)
                         PREY90_Reviewers_Initials = st.text_input(
                             "PREY90_Reviewers Initials",
@@ -2649,12 +2795,16 @@ def add_new_data():
 
                         FU_NEW_Extrahepatic_Dz_Date = st.date_input("1st_FU_NEW Extrahepatic Dz Date")
 
-                        FU_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU_Non_targeted_Lesion_Dia_Sum)/max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
+                        FU_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == "NA" else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU_Non_targeted_Lesion_Dia_Sum)/max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
                         st.write("1st_FU_% change for non target lesion",FU_change_non_target_lesion)
                         FU_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU_Follow_up_1_targeted_Lesion_Dia_Sum)/max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
                         st.write("1st_FU_% Change Target Dia",FU_change_target_lesion)
-                        first_fu_mrecist_localized = st.text_input("1st_FU_mRECIST LOCALIZED")
-                        first_fu_mrecist_overall = st.text_input("1st_FU_mRECIST Overall")
+                        first_fu_mrecist_localized = mrecist_local(FU_change_target_lesion)
+                        st.write("1st_FU_mRECIST LOCALIZED",first_fu_mrecist_localized)
+                        
+                        first_fu_mrecist_overall = mrecist_overall(FU_New_Lesions, FU_NEW_Extrahepatic_Disease, FU_change_non_target_lesion, FU_change_target_lesion)
+                        st.write("1st_FU_mRECIST Overall",first_fu_mrecist_overall)
+                        
                         FU_Free_Text = st.text_area(
                             "1st_FU_Free Text",
                             help="Free text"
@@ -2805,13 +2955,17 @@ def add_new_data():
 
                         FU2_NEW_Extrahepatic_Dz_Date = st.date_input("2nd_FU_NEW Extrahepatic Dz Date")
 
-                        FU2_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU2_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                        FU2_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == "NA" else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU2_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
                         st.write("2nd_FU_% change for non target lesion",FU2_change_non_target_lesion)
                         FU2_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU2_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
                         st.write("2nd_FU_% Change Target Dia",FU2_change_target_lesion)
-                        second_fu_mrecist_calc = st.text_input("2nd_FU_mRECIST Calc")
-                        second_fu_mrecist_localized = st.text_input("2nd_FU_mRECIST LOCALIZED")
-                        second_fu_mrecist_overall = st.text_input("2nd_FU_mRECIST Overall")
+                        
+                        second_fu_mrecist_calc = mrecist_local(FU2_change_target_lesion)
+                        st.write("2nd_FU_mRECIST Calc", second_fu_mrecist_calc)
+                        second_fu_mrecist_localized = mrecist_calc(FU2_change_target_lesion, FU2_Follow_up_2_targeted_Lesion_Dia_Sum, FU_Follow_up_1_targeted_Lesion_Dia_Sum)
+                        st.write("2nd_FU_mRECIST LOCALIZED", second_fu_mrecist_localized)
+                        second_fu_mrecist_overall = mrecist_overall(FU2_New_Lesions, FU2_NEW_Extrahepatic_Disease, FU2_change_non_target_lesion, FU2_change_target_lesion)
+                        st.write("2nd_FU_mRECIST Overall", second_fu_mrecist_overall)
                         FU2_Free_Text = st.text_area(
                             "2nd_FU_Free Text",
                             help="Free text"
@@ -2958,13 +3112,17 @@ def add_new_data():
                             help="Free text"
                         )
                         FU3_NEW_Extrahepatic_Dz_Date = st.date_input("3rd_FU_NEW Extrahepatic Dz Date")
-                        FU3_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU3_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                        FU3_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == 'NA' else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU3_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
                         st.write("3rd_FU_% change for non target lesion",FU3_change_non_target_lesion)
                         FU3_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU3_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
                         st.write("3rd_FU_% Change Target Dia",FU3_change_target_lesion)
-                        third_fu_mrecist_calc = st.text_input("3rd_FU_mRECIST Calc")
-                        third_fu_mrecist_localized = st.text_input("3rd_FU_mRECIST LOCALIZED")
-                        third_fu_mrecist_overall = st.text_input("3rd_FU_mRECIST Overall")
+                        third_fu_mrecist_calc = mrecist_local(FU3_change_target_lesion)
+                        st.write("3rd_FU_mRECIST Calc",third_fu_mrecist_calc)
+
+                        third_fu_mrecist_localized = mrecist_calc(FU3_change_target_lesion, FU3_Follow_up_2_targeted_Lesion_Dia_Sum, FU_Follow_up_1_targeted_Lesion_Dia_Sum)
+                        st.write("3rd_FU_mRECIST LOCALIZED",third_fu_mrecist_localized)
+                        third_fu_mrecist_overall = mrecist_overall (FU3_New_Lesions, FU3_NEW_Extrahepatic_Disease, FU3_change_non_target_lesion, FU3_change_target_lesion)
+                        st.write("3rd_FU_mRECIST Overall", third_fu_mrecist_overall)
                         FU3_Free_Text = st.text_area(
                             "3rd_FU_Free Text",
                             help="Free text"
@@ -3115,13 +3273,17 @@ def add_new_data():
                         )
 
                         FU4_NEW_Extrahepatic_Dz_Date = st.date_input("4th_FU_NEW Extrahepatic Dz Date")
-                        FU4_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU4_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                        FU4_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == "NA" else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU4_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
                         st.write("4th_FU_% change non target lesion",FU4_change_non_target_lesion)
                         FU4_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU4_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
                         st.write("4th_FU_% Change target dia",FU4_change_target_lesion)
-                        fourth_fu_mrecist_calc = st.text_input("4th_FU_mRECIST Calc")
-                        fourth_fu_mrecist_localized = st.text_input("4th_FU_mRECIST LOCALIZED")
-                        fourth_fu_mrecist_overall = st.text_input("4th_FU_mRECIST Overall")
+                        fourth_fu_mrecist_calc = mrecist_local(FU4_change_target_lesion)
+                        st.write("4th_FU_mRECIST Calc",fourth_fu_mrecist_calc)
+                        fourth_fu_mrecist_localized = mrecist_calc(FU4_change_target_lesion, FU4_Follow_up_2_targeted_Lesion_Dia_Sum, FU_Follow_up_1_targeted_Lesion_Dia_Sum)
+                        st.write("4th_FU_mRECIST LOCALIZED",fourth_fu_mrecist_localized)
+                        fourth_fu_mrecist_overall = mrecist_overall (FU4_New_Lesions, FU4_NEW_Extrahepatic_Disease, FU4_change_non_target_lesion, FU4_change_target_lesion)
+                        st.write("4th_FU_mRECIST Overall", fourth_fu_mrecist_overall)
+                        
                         FU4_Free_Text = st.text_area(
                             "4th_FU_Free Text",
                             help="Free text"
@@ -3208,11 +3370,16 @@ def add_new_data():
 
                         FU5_NEW_Extrahepatic_Dz_Date = st.date_input("5th_FU_NEW Extrahepatic Dz Date")
 
-                        FU5_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU5_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                        FU5_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == 'NA' else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU5_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
                         st.write("5th_FU_% change non target lesion ",FU5_change_non_target_lesion)
-                        fifth_fu_mrecist_calc = st.text_input("5th_FU_mRECIST Calc")
-                        fifth_fu_mrecist_localized = st.text_input("5th_FU_mRECIST LOCALIZED")
-                        fifth_fu_mrecist_overall = st.text_input("5th_FU_mRECIST Overall")
+                        fifth_fu_mrecist_calc = mrecist_local(FU5_change_non_target_lesion)
+                        st.write("5th_FU_mRECIST Calc",fifth_fu_mrecist_calc)
+
+                        fifth_fu_mrecist_localized = mrecist_calc(FU5_change_non_target_lesion, FU5_Non_targeted_Lesion_Dia_Sum, FU_Follow_up_1_targeted_Lesion_Dia_Sum)
+                        st.write("5th_FU_mRECIST LOCALIZED",fifth_fu_mrecist_localized)
+                        fifth_fu_mrecist_overall = mrecist_overall (FU5_New_Lesions, FU5_NEW_Extrahepatic_Disease, FU5_change_non_target_lesion, FU4_change_target_lesion)
+                        st.write("5th_FU_mRECIST Overall", fifth_fu_mrecist_overall)
+                        
                         FU5_Free_Text = st.text_area(
                             "5th_FU_Free Text",
                             help="Free text"
@@ -3222,70 +3389,116 @@ def add_new_data():
 
                         dead = st.selectbox(
                                 "Dead [Excel : Dead]\n\n Yes (1), No (0)",
-                                options=["0", "1"],
+                                options=[0, 1],
                                 format_func=lambda x:{
-                                        "0":"No",
-                                        "1":"Yes"
+                                        0:"No",
+                                        1:"Yes"
                                 }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
 
-                        Date_of_Death = 'NA' if dead == 0 else st.date_input("Date of Death")
-                        Time_to_Death = 'NA' if dead == 0 else relativedelta(Date_of_Death, fetch_date).months
+                        Date_of_Death = st.date_input("Date of Death")
+                        Time_to_Death = None
+                        if dead == 0:
+                            Date_of_Death = 'NA'
+                            Time_to_Death = 'NA'
+                        else :
+                            Time_to_Death = relativedelta(Date_of_Death, fetch_date).months
                         st.write("Time to Death",Time_to_Death)
+
                         OLT = st.selectbox(
                                 "OLT [Excel : OLT]\n\n Yes (1), No (0)",
-                                options=["0", "1"],
+                                options=[0, 1],
                                 format_func=lambda x:{
-                                        "0":"No",
-                                        "1":"Yes"
+                                        0:"No",
+                                        1:"Yes"
                                 }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
 
-                        Date_of_OLT = 'NA' if OLT == 0 else st.date_input("Date of OLT")
-                        Time_to_OLT = 'NA' if OLT == 0 else relativedelta(Date_of_Death, fetch_date).months
+                        Date_of_OLT = st.date_input("Date of OLT")
+                        Time_to_OLT = None
+                        if OLT == 0:
+                            Date_of_OLT = 'NA'
+                            Time_to_OLT = 'NA'
+                        else:
+                            Time_to_OLT = relativedelta(Date_of_OLT, fetch_date).months
                         st.write("Time to OLT",Time_to_OLT)
+
                         Repeat_tx_post_Y90 = st.selectbox(
                                 "Repeat tx post Y90 [Excel : Repeat tx post Y90]\n\n Yes (1), No (0)",
-                                options=["0", "1"],
+                                options=[0, 1],
                                 format_func=lambda x:{
-                                        "0":"No",
-                                        "1":"Yes"
+                                        0:"No",
+                                        1:"Yes"
                                 }[x],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
 
-                        Date_of_Repeat_tx_Post_Y90 = 'NA' if Repeat_tx_post_Y90 == 0 else st.date_input("Date of Repeat tx Post Y90")
-                        Time_to_Repeat_Tx_Post_Y90 = 'NA' if Repeat_tx_post_Y90 == 0 else relativedelta(Date_of_Death, fetch_date).months
+                        Date_of_Repeat_tx_Post_Y90 = st.date_input("Date of Repeat tx Post Y90")
+                        if Repeat_tx_post_Y90 == 0:
+                                Date_of_Repeat_tx_Post_Y90 = 'NA'
+                                Time_to_Repeat_Tx_Post_Y90 = 'NA'
+                        else:
+                            Time_to_Repeat_Tx_Post_Y90 = relativedelta(Date_of_Repeat_tx_Post_Y90, fetch_date).months
                         st.write("Time to Repeat Tx Post Y90",Time_to_Repeat_Tx_Post_Y90)
-                        Date_of_Localized_Progression = st.text_input("Date of Localized Progression")
 
+                        Date_of_Localized_Progression = detect_first_progression(first_fu_mrecist_localized, second_fu_mrecist_localized, third_fu_mrecist_localized, fourth_fu_mrecist_localized, fifth_fu_mrecist_localized, FU2_Imaging_Date, FU3_Imaging_Date, FU4_Imaging_Date, FU5_Imaging_Date)
+                        st.write("Date of Localized Progression",Date_of_Localized_Progression)
+                        Time_to_localized_progression = None
                         if Date_of_Localized_Progression == "No Progression":
                                 Time_to_localized_progression = 'NA'
                         else:
-                                Time_to_Localized_Progression = relativedelta(Date_of_Localized_Progression, fetch_date).years
-                        st.write("Time to localized progression",Time_to_Localized_Progression)
-                        Date_of_Overall_Progression = st.text_input("Date of Overall Progression")
-                        Time_to_overall_progression = ''
+                                Time_to_localized_progression = relativedelta(Date_of_Localized_Progression, fetch_date).years
+                        st.write("Time to localized progression",Time_to_localized_progression)
+
+                        Date_of_Overall_Progression = detect_overall_progression(first_fu_mrecist_localized, first_fu_mrecist_overall, second_fu_mrecist_localized, second_fu_mrecist_overall, third_fu_mrecist_localized, third_fu_mrecist_overall, fourth_fu_mrecist_localized, fourth_fu_mrecist_overall, fifth_fu_mrecist_localized, fifth_fu_mrecist_overall, FU_Imaging_Date, FU2_Imaging_Date, FU3_Imaging_Date, FU4_Imaging_Date, FU5_Imaging_Date)
+                        st.write("Date of Overall Progression", Date_of_Overall_Progression)
+                        Time_to_overall_progression = None
                         if Date_of_Overall_Progression == "No Progression":
                                 Time_to_overall_progression = 'NA'
                         else:
-                                Time_to_overall_Progression = relativedelta(Date_of_Overall_Progression, fetch_date).years
-                        st.write("Time to Overall (Local or systemic) Progression",Time_to_overall_Progression)
-                        Date_of_Last_Follow_up_last_imaging_date = 'NA' if dead == 1 and OLT == 1 else st.date_input("Date of Last Follow-up/last imaging date")
+                                Time_to_overall_progression = relativedelta(Date_of_Overall_Progression, fetch_date).years
+                        st.write("Time to Overall (Local or systemic) Progression",Time_to_overall_progression)
 
-                        Time_to_Last_Follow_up_last_imaging_date = 'NA' if dead == 1 and OLT == 1 else relativedelta(Date_of_Last_Follow_up_last_imaging_date, fetch_date).years 
+                        Date_of_Last_Follow_up_last_imaging_date = st.date_input("Date of Last Follow-up/last imaging date")
+                        Time_to_Last_Follow_up_last_imaging_date = None
+                        if dead == 1 and OLT == 1 and Repeat_tx_post_Y90 == 1 :
+                            Date_of_Last_Follow_up_last_imaging_date = 'NA'
+                            Time_to_Last_Follow_up_last_imaging_date = "NA"
+                        else:
+                            Time_to_Last_Follow_up_last_imaging_date = relativedelta(Date_of_Last_Follow_up_last_imaging_date, fetch_date).years
                         st.write("Time to Last follow up",Time_to_Last_Follow_up_last_imaging_date)
+
                         notes_free_text = st.text_input("Notes Free Text")
-                        bestm_recist = st.text_input("BestmRECIST")
-                        date_bestm_recist = st.text_input("Date BestmRECIST")
-                        time_to_bestm_recist = st.text_input("Timeto_bestmRECIST")
-                        bestm_recist_cr_vs_non_cr = st.text_input("BestmRECISTCRvsNonCR")
-                        bestm_recist_r_vs_nr = st.text_input("BestmRECISTRvsNR")
+
+                        bestm_recist = determine_bestmrecist(first_fu_mrecist_localized, second_fu_mrecist_localized, third_fu_mrecist_localized, fourth_fu_mrecist_localized, fifth_fu_mrecist_localized)
+                        st.write("BestmRECIST", bestm_recist)
+                        date_bestm_recist = determine_bestmrecist_date(fifth_fu_mrecist_overall, first_fu_mrecist_overall, second_fu_mrecist_overall, third_fu_mrecist_overall, fourth_fu_mrecist_overall, fifth_fu_mrecist_localized, FU_Imaging_Date, FU2_Imaging_Date, FU3_Imaging_Date, FU4_Imaging_Date, FU5_Imaging_Date)
+                        st.write("Date BestmRECIST",date_bestm_recist)
+                        time_to_bestm_recist = "No Time" if date_bestm_recist == "No Date" else relativedelta(date_bestm_recist, fetch_date).months
+                        st.write("Timeto_bestmRECIST", time_to_bestm_recist)
+                        def best_cr_noncr(value):
+                            if value == "CR":
+                                    return 1
+                            elif value in ["PR", "PD", "SD"]:
+                                return 2
+                            else:
+                                return ""
+                        bestm_recist_cr_vs_non_cr = best_cr_noncr(bestm_recist)
+                        st.write("BestmRECISTCRvsNonCR", bestm_recist_cr_vs_non_cr)
+                        def best_responce(value):
+                            if value in ["CR", "PR"]:
+                                return 1
+                            elif value in ["SD", "PD"]:
+                                return 2
+                            else:
+                                return ""
+                        bestm_recist_r_vs_nr = best_responce(bestm_recist)
+                        st.write("BestmRECISTRvsNR" ,bestm_recist_r_vs_nr)
                         submit_tab10 = st.form_submit_button("Submit")
 
                         if submit_tab10:
@@ -3457,17 +3670,15 @@ def add_new_data():
                                     "Repeat tx post Y90": Repeat_tx_post_Y90,
                                     "Date of Repeat tx Post Y90": Date_of_Repeat_tx_Post_Y90.strftime("%Y-%m-%d") if Date_of_Repeat_tx_Post_Y90 != 'NA' else Date_of_Repeat_tx_Post_Y90,
                                     "Time to Repeat Tx Post Y90": Time_to_Repeat_Tx_Post_Y90,
-                                    "Date of Localized Progression": Date_of_Localized_Progression,
-                                    "Time to Repeat Tx Post Y90": Time_to_Repeat_Tx_Post_Y90,
-                                    "Date of Localized Progression": Date_of_Localized_Progression,
-                                    "Time to localized progression" : Time_to_Localized_Progression,
-                                    "Date of Overall (Local or systemic) Progression" :Date_of_Overall_Progression,
+                                    "Date of Localized Progression": Date_of_Localized_Progression.strftime("%Y-%m-%d") if Date_of_Localized_Progression != "No Progression" else Date_of_Localized_Progression,
+                                    "Time to localized progression" : Time_to_localized_progression,
+                                    "Date of Overall (Local or systemic) Progression" :Date_of_Overall_Progression.strftime("%Y-%m-%d") if Date_of_Overall_Progression != "No Progression" else Date_of_Overall_Progression,
                                     "Time to Overall (Local or systemic) Progression" :Time_to_overall_progression,
-                                    "Date of Last Follow up or last imaging date (if not OLT, Death, Repeat tx)": Date_of_Last_Follow_up_last_imaging_date.strftime("%Y-%m-%d"),
+                                    "Date of Last Follow up or last imaging date (if not OLT, Death, Repeat tx)": Date_of_Last_Follow_up_last_imaging_date.strftime("%Y-%m-%d") if Date_of_Last_Follow_up_last_imaging_date != 'NA' else Date_of_Last_Follow_up_last_imaging_date,
                                     "Time to Last follow up": Time_to_Last_Follow_up_last_imaging_date,
                                     "Notes Free text" : notes_free_text,
                                     "BestmRECIST" :bestm_recist,
-                                    "Date BestmRECIST":date_bestm_recist,
+                                    "Date BestmRECIST":date_bestm_recist.strftime("%Y-%m-%d") if date_bestm_recist != "No Date" else date_bestm_recist,
                                     "Timeto_bestmRECIST":time_to_bestm_recist,
                                     "BestmRECISTCRvsNonCR":bestm_recist_cr_vs_non_cr,
                                     "BestmRECISTRvsNR":bestm_recist_r_vs_nr,
@@ -3478,8 +3689,8 @@ def add_new_data():
                             else:
                                 st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
                             
-                except:
-                    st.warning("Please Fill Patient Information Page")
+                #except:
+                 #   st.warning("Please Fill Patient Information Page")
     
         elif st.session_state.selected_tab == "Dosimetry Data":
             st.subheader("Dosimetry Data")
@@ -5776,10 +5987,13 @@ def edit_existing_data():
                                 )
                                 PREY90_Target_Lesion_1_CCD = st.number_input(
                                     "PREY90_Target Lesion 1 CCD",step=0.1,
-                                     value = float(df.iloc[0]["PREY_TL1CCD"]) if pd.notnull(df.iloc[0]["PREY_TL1CCD"]) and df.iloc[0]["PREY_TL1CCD"] != "" else 0.0
+                                    value = float(df.iloc[0]["PREY_TL1CCD"]) if pd.notnull(df.iloc[0]["PREY_TL1CCD"]) and df.iloc[0]["PREY_TL1CCD"] != "" else 0.0
                                 )
-                                PREY90_Target_Lesion_1_VOL = 4/3*3.14*(PREY90_Target_Lesion_1_PAD)*(PREY90_TL1_LAD)*PREY90_Target_Lesion_1_CCD
+                                
+                               
+                                PREY90_Target_Lesion_1_VOL = calculate_target_lestion_vol(PREY90_Target_Lesion_1_PAD, PREY90_TL1_LAD, PREY90_Target_Lesion_1_CCD)
                                 st.write("PREY90_Target Lesion 1 VOL",PREY90_Target_Lesion_1_VOL)
+                                
                                 PREY90_Target_Lesion_2_segments = st.selectbox(
                                         "PREY90_Target_Lesion_2_segments [Excel : PREY_TL2SEG]",
                                         options=["1","2","3","4a","4b","5","6","7","8","NA"],
@@ -5798,8 +6012,10 @@ def edit_existing_data():
                                     "PREY90_Target Lesion 2 CCD",
                                     step=0.1,value = float(df.iloc[0]["PREY_TL2CCD"]) if pd.notnull(df.iloc[0]["PREY_TL2CCD"]) and df.iloc[0]["PREY_TL2CCD"] != "" else 0.0
                                 )
-                                PREY90_Target_Lesion_2_VOL = 4/3*3.14*(PREY90_Target_Lesion_2_PAD)*(PREY90_Target_Lesion_2_LAD)*PREY90_Target_Lesion_2_CCD
+                        
+                                PREY90_Target_Lesion_2_VOL = calculate_value_v2(PREY90_Target_Lesion_2_segments, PREY90_Target_Lesion_2_LAD, PREY90_Target_Lesion_2_PAD, PREY90_Target_Lesion_2_CCD)
                                 st.write("PREY90_Target Lesion 2 VOL",PREY90_Target_Lesion_2_VOL)
+                                
                                 PREY90_pretx_targeted_Lesion_Dia_Sum = max(PREY90_TL1_LAD,PREY90_Target_Lesion_1_PAD,PREY90_Target_Lesion_1_CCD)+max(PREY90_Target_Lesion_2_PAD,PREY90_Target_Lesion_2_LAD,PREY90_Target_Lesion_2_CCD)
                                 st.write("PREY90_ pretx targeted Lesion Dia Sum",PREY90_pretx_targeted_Lesion_Dia_Sum)
                                 PREY90_Non_Target_Lesion_Location = st.selectbox( 
@@ -5819,7 +6035,7 @@ def edit_existing_data():
                                     "PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc",
                                     step=0.1,value = float(df.iloc[0]["PREY_NTL1CCD"]) if pd.notnull(df.iloc[0]["PREY_NTL1CCD"]) and df.iloc[0]["PREY_NTL1CCD"] != "" else 0.0
                                 )
-                                PREY90_Non_targeted_Lesion_Dia_Sum = max(PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc)
+                                PREY90_Non_targeted_Lesion_Dia_Sum = 'NA' if PREY90_Non_Target_Lesion_Location == 'NA' or PREY90_Non_Target_Lesion_Location == None else max(PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc)
                                 st.write("PREY90_Non-targeted Lesion Dia Sum",PREY90_Non_targeted_Lesion_Dia_Sum)
                                 PREY90_Reviewers_Initials = st.text_input(
                                     "PREY90_Reviewers Initials",
@@ -5995,19 +6211,23 @@ def edit_existing_data():
                                     value=df.iloc[0]["FU1_EHDLOC"]
                                 )
                                 FU_NEW_Extrahepatic_Dz_Date = st.date_input("1st_FU_NEW Extrahepatic Dz Date",value = datetime.strptime(df.iloc[0]["FU1_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU1_EHDDATE"] else None)
-                                FU_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU_Non_targeted_Lesion_Dia_Sum)/max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
+                                
+                                FU_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == "NA" else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU_Non_targeted_Lesion_Dia_Sum)/max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
                                 st.write("1st_FU_% change for non target lesion",FU_change_non_target_lesion)
                                 FU_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU_Follow_up_1_targeted_Lesion_Dia_Sum)/max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
                                 st.write("1st_FU_% Change Target Dia",FU_change_target_lesion)
-                                first_fu_mrecist_localized = st.text_input("1st_FU_mRECIST LOCALIZED",value=df.iloc[0]["FU1_MREC_LOCAL"])
-                                first_fu_mrecist_overall = st.text_input("1st_FU_mRECIST Overall",value=df.iloc[0]["FU1_MREC_OVERALL"])
+                                first_fu_mrecist_localized = mrecist_local(FU_change_target_lesion)
+                                st.write("1st_FU_mRECIST LOCALIZED",first_fu_mrecist_localized)
+                                
+                                first_fu_mrecist_overall = mrecist_overall(FU_New_Lesions, FU_NEW_Extrahepatic_Disease, FU_change_non_target_lesion, FU_change_target_lesion)
+                                st.write("1st_FU_mRECIST Overall",first_fu_mrecist_overall)
+
                                 FU_Free_Text = st.text_area(
                                     "1st_FU_Free Text",
                                     help="Free text",
                                     value = df.iloc[0]["FU1_FT"]
                                 )
                                 st.subheader("Imaging_2nd_Followup")
-
                                
                                 FU2_Scan_Modality = st.selectbox(
                                     "2nd_FU_Scan Modality Excel : FU2_MOD]\n\n(1) CT, (2) MRI",
@@ -6169,14 +6389,18 @@ def edit_existing_data():
                                     value=datetime.strptime(df.iloc[0]["FU2_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU2_EHDDATE"] else None,
                                 )
 
-                                FU2_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU2_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                                FU2_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == "NA" else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU2_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
                                 st.write("2nd_FU_% change for non target lesion",FU2_change_non_target_lesion)
                                 FU2_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU2_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
                                 st.write("2nd_FU_% Change Target Dia",FU2_change_target_lesion)
+                                
+                                second_fu_mrecist_calc = mrecist_local(FU2_change_target_lesion)
+                                st.write("2nd_FU_mRECIST Calc", second_fu_mrecist_calc)
+                                second_fu_mrecist_localized = mrecist_calc(FU2_change_target_lesion, FU2_Follow_up_2_targeted_Lesion_Dia_Sum, FU_Follow_up_1_targeted_Lesion_Dia_Sum)
+                                st.write("2nd_FU_mRECIST LOCALIZED", second_fu_mrecist_localized)
+                                second_fu_mrecist_overall = mrecist_overall(FU2_New_Lesions, FU2_NEW_Extrahepatic_Disease, FU2_change_non_target_lesion, FU2_change_target_lesion)
+                                st.write("2nd_FU_mRECIST Overall", second_fu_mrecist_overall)
 
-                                second_fu_mrecist_calc = st.text_input("2nd_FU_mRECIST Calc",value=df.iloc[0]["FU2_MREC_CALC"])
-                                second_fu_mrecist_localized = st.text_input("2nd_FU_mRECIST LOCALIZED",value=df.iloc[0]["FU2_MREC_LOCAL"])
-                                second_fu_mrecist_overall = st.text_input("2nd_FU_mRECIST Overall",value=df.iloc[0]["FU2_MREC_OVERALL"])
                                 FU2_Free_Text = st.text_area(
                                     "2nd_FU_Free Text",
                                     help="Free text",
@@ -6346,15 +6570,17 @@ def edit_existing_data():
                                     value=datetime.strptime(df.iloc[0]["FU3_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU3_EHDDATE"] else None
                                 )
 
-                                FU3_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU3_Non_targeted_Lesion_Dia_Sum) / max(1, PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
-                                st.write("3rd_FU_% change for non target lesion", FU3_change_non_target_lesion)
+                                FU3_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == 'NA' else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU3_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
+                                st.write("3rd_FU_% change for non target lesion",FU3_change_non_target_lesion)
+                                FU3_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU3_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                                st.write("3rd_FU_% Change Target Dia",FU3_change_target_lesion)
+                                third_fu_mrecist_calc = mrecist_local(FU3_change_target_lesion)
+                                st.write("3rd_FU_mRECIST Calc",third_fu_mrecist_calc)
 
-                                FU3_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU3_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1, PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
-                                st.write("3rd_FU_% Change Target Dia", FU3_change_target_lesion)
-
-                                third_fu_mrecist_calc = st.text_input("3rd_FU_mRECIST Calc", value=df.iloc[0]["FU3_MREC_CALC"])
-                                third_fu_mrecist_localized = st.text_input("3rd_FU_mRECIST LOCALIZED", value=df.iloc[0]["FU3_MREC_LOCAL"])
-                                third_fu_mrecist_overall = st.text_input("3rd_FU_mRECIST Overall", value=df.iloc[0]["FU3_MREC_OVERALL"])
+                                third_fu_mrecist_localized = mrecist_calc(FU3_change_target_lesion, FU3_Follow_up_2_targeted_Lesion_Dia_Sum, FU_Follow_up_1_targeted_Lesion_Dia_Sum)
+                                st.write("3rd_FU_mRECIST LOCALIZED",third_fu_mrecist_localized)
+                                third_fu_mrecist_overall = mrecist_overall (FU3_New_Lesions, FU3_NEW_Extrahepatic_Disease, FU3_change_non_target_lesion, FU3_change_target_lesion)
+                                st.write("3rd_FU_mRECIST Overall", third_fu_mrecist_overall)
 
                                 FU3_Free_Text = st.text_area(
                                     "3rd_FU_Free Text",
@@ -6502,13 +6728,17 @@ def edit_existing_data():
 
                                 FU4_NEW_Extrahepatic_Dz_Date = st.date_input("4th_FU_NEW Extrahepatic Dz Date",value = datetime.strptime(df.iloc[0]["4th_FU_NEW Extrahepatic Dz Date"], "%Y-%m-%d").date() if df.iloc[0]["4th_FU_NEW Extrahepatic Dz Date"] else None)
 
-                                FU4_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU4_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                                FU4_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == "NA" else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU4_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
                                 st.write("4th_FU_% change non target lesion",FU4_change_non_target_lesion)
                                 FU4_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU4_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
                                 st.write("4th_FU_% Change target dia",FU4_change_target_lesion)
-                                fourth_fu_mrecist_calc = st.text_input("4th_FU_mRECIST Calc",value=df.iloc[0]["4th_FU_mRECIST Calc"])
-                                fourth_fu_mrecist_localized = st.text_input("4th_FU_mRECIST LOCALIZED",value=df.iloc[0]["4th_FU_mRECIST LOCALIZED"])
-                                fourth_fu_mrecist_overall = st.text_input("4th_FU_mRECIST Overall",value=df.iloc[0]["4th_FU_mRECIST Overall"])
+                                fourth_fu_mrecist_calc = mrecist_local(FU4_change_target_lesion)
+                                st.write("4th_FU_mRECIST Calc",fourth_fu_mrecist_calc)
+                                fourth_fu_mrecist_localized = mrecist_calc(FU4_change_target_lesion, FU4_Follow_up_2_targeted_Lesion_Dia_Sum, FU_Follow_up_1_targeted_Lesion_Dia_Sum)
+                                st.write("4th_FU_mRECIST LOCALIZED",fourth_fu_mrecist_localized)
+                                fourth_fu_mrecist_overall = mrecist_overall (FU4_New_Lesions, FU4_NEW_Extrahepatic_Disease, FU4_change_non_target_lesion, FU4_change_target_lesion)
+                                st.write("4th_FU_mRECIST Overall", fourth_fu_mrecist_overall)
+                                
                                 FU4_Free_Text = st.text_area(
                                     "4th_FU_Free Text",
                                     help="Free text", value = df.iloc[0]["4th_FU_Free Text"]
@@ -6595,86 +6825,132 @@ def edit_existing_data():
 
                                 FU5_NEW_Extrahepatic_Dz_Date = st.date_input("5th_FU_NEW Extrahepatic Dz Date",value = datetime.strptime(df.iloc[0]["5th_FU_NEW Extrahepatic Dz Date"], "%Y-%m-%d").date() if df.iloc[0]["5th_FU_NEW Extrahepatic Dz Date"] else None)
 
-                                FU5_change_non_target_lesion = ((PREY90_Non_targeted_Lesion_Dia_Sum - FU5_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                                FU5_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == 'NA' else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU5_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
                                 st.write("5th_FU_% change non target lesion ",FU5_change_non_target_lesion)
-                                fifth_fu_mrecist_calc = st.text_input("5th_FU_mRECIST Calc",value = df.iloc[0]["5th_FU_mRECIST Calc"])
-                                fifth_fu_mrecist_localized = st.text_input("5th_FU_mRECIST LOCALIZED",value = df.iloc[0]["5th_FU_mRECIST LOCALIZED"])
-                                fifth_fu_mrecist_overall = st.text_input("5th_FU_mRECIST Overall",value = df.iloc[0]["5th_FU_mRECIST Overall"])
+                                fifth_fu_mrecist_calc = mrecist_local(FU5_change_non_target_lesion)
+                                st.write("5th_FU_mRECIST Calc",fifth_fu_mrecist_calc)
 
-                                FU5_Free_Text = st.text_area(
-                                    "5th_FU_mRECIST Overall",
-                                    help="Free text",
-                                    value = df.iloc[0]["5th_FU_mRECIST Overall"],
-                                )
-
+                                fifth_fu_mrecist_localized = mrecist_calc(FU5_change_non_target_lesion, FU5_Non_targeted_Lesion_Dia_Sum, FU_Follow_up_1_targeted_Lesion_Dia_Sum)
+                                st.write("5th_FU_mRECIST LOCALIZED",fifth_fu_mrecist_localized)
+                                fifth_fu_mrecist_overall = mrecist_overall (FU5_New_Lesions, FU5_NEW_Extrahepatic_Disease, FU5_change_non_target_lesion, FU4_change_target_lesion)
+                                st.write("5th_FU_mRECIST Overall", fifth_fu_mrecist_overall)
+                               
                                 st.subheader("Imaging_Dates for OS or PFS")
 
                                 dead = st.selectbox(
                                         "Dead [Excel : Dead]\n\n Yes (1), No (0)",
-                                options=["0", "1"],
+                                options=[0, 1],
                                 format_func=lambda x:{
-                                        "0":"No",
-                                        "1":"Yes"
+                                        0:"No",
+                                        1:"Yes"
                                 }[x],
-                                        index=["0", "1"].index(df.iloc[0]["Dead"]) if df.iloc[0]["Dead"] else None,
+                                        index=[0, 1].index(int(df.iloc[0]["Dead"])) if df.iloc[0]["Dead"] else None,
                                         placeholder="Choose an option",
                                 )
 
-                                Date_of_Death = 'NA' if dead == 0 else st.date_input("Date of Death",value = datetime.strptime(df.iloc[0]["Date of Death"], "%Y-%m-%d").date() if df.iloc[0]["Date of Death"] else None)
-                                Time_to_Death = 'NA' if dead == 0 else relativedelta(Date_of_Death, fetch_date).months
+                                Date_of_Death = st.date_input("Date of Death",value = datetime.strptime(df.iloc[0]["Date of Death"], "%Y-%m-%d").date() if df.iloc[0]["Date of Death"] != "NA" and df.iloc[0]["Date of Death"] != "" else None)
+                                Time_to_Death = None
+                                if dead == 0:
+                                    Date_of_Death = 'NA'
+                                    Time_to_Death = 'NA'
+                                else :
+                                    Time_to_Death = relativedelta(Date_of_Death, fetch_date).months
                                 st.write("Time to Death",Time_to_Death)
+
                                 OLT = st.selectbox(
                                         "OLT [Excel : OLT]\n\n Yes (1), No (0)",
-                                options=["0", "1"],
+                                options=[0, 1],
                                 format_func=lambda x:{
-                                        "0":"No",
-                                        "1":"Yes"
+                                        0:"No",
+                                        1:"Yes"
                                 }[x],
-                                        index=["0", "1"].index(df.iloc[0]["OLT"]) if df.iloc[0]["OLT"] else None, 
+                                        index=[0, 1].index(int(df.iloc[0]["OLT"])) if df.iloc[0]["OLT"] else None, 
                                         placeholder="Choose an option",
                                 )
 
-                                Date_of_OLT = 'NA' if OLT == 0 else st.date_input("Date of OLT",value = datetime.strptime(df.iloc[0]["Date of OLT"], "%Y-%m-%d").date() if df.iloc[0]["Date of OLT"] else None)
-                                Time_to_OLT = 'NA' if OLT == 0 else relativedelta(Date_of_Death, fetch_date).months
+                                Date_of_OLT = st.date_input("Date of OLT",value = datetime.strptime(df.iloc[0]["Date of OLT"], "%Y-%m-%d").date() if df.iloc[0]["Date of OLT"] != "NA" and df.iloc[0]["Date of OLT"] != "" else None)
+                                Time_to_OLT = None
+                                if OLT == 0:
+                                    Date_of_OLT = 'NA'
+                                    Time_to_OLT = 'NA'
+                                else:
+                                    Time_to_OLT = relativedelta(Date_of_OLT, fetch_date).months
                                 st.write("Time to OLT",Time_to_OLT)
+
                                 Repeat_tx_post_Y90 = st.selectbox(
                                         "Repeat tx post Y90 [Excel : Repeat tx post Y90]\n\n Yes (1), No (0)",
-                                options=["0", "1"],
+                                options=[0, 1],
                                 format_func=lambda x:{
-                                        "0":"No",
-                                        "1":"Yes"
+                                        0:"No",
+                                        1:"Yes"
                                 }[x],
-                                        index=["0", "1"].index(df.iloc[0]["Repeat tx post Y90"]) if df.iloc[0]["Repeat tx post Y90"] else None,  # No default selection
+                                        index=[0, 1].index(int(df.iloc[0]["Repeat tx post Y90"])) if df.iloc[0]["Repeat tx post Y90"] else None,  # No default selection
                                         placeholder="Choose an option",
                                 )
 
-                                Date_of_Repeat_tx_Post_Y90 = 'NA' if Repeat_tx_post_Y90 == 0 else st.date_input("Date of Repeat tx Post Y90",value = datetime.strptime(df.iloc[0]["Date of Repeat tx Post Y90"], "%Y-%m-%d").date() if df.iloc[0]["Date of Repeat tx Post Y90"] else None)
-                                Time_to_Repeat_Tx_Post_Y90 = 'NA' if Repeat_tx_post_Y90 == 0 else relativedelta(Date_of_Death, fetch_date).months
+                                Date_of_Repeat_tx_Post_Y90 = st.date_input("Date of Repeat tx Post Y90",value = datetime.strptime(df.iloc[0]["Date of Repeat tx Post Y90"], "%Y-%m-%d").date() if df.iloc[0]["Date of Repeat tx Post Y90"] != "NA" and df.iloc[0]["Date of Repeat tx Post Y90"] != "" else None)
+                                Time_to_Repeat_Tx_Post_Y90 = None
+                                if Repeat_tx_post_Y90 == 0:
+                                    Date_of_Repeat_tx_Post_Y90 = 'NA'
+                                    Time_to_Repeat_Tx_Post_Y90 = 'NA'
+                                else:
+                                    Time_to_Repeat_Tx_Post_Y90 = relativedelta(Date_of_Repeat_tx_Post_Y90, fetch_date).months
                                 st.write("Time to Repeat Tx Post Y90",Time_to_Repeat_Tx_Post_Y90)
-                                Date_of_Localized_Progression = st.text_input("Date of Localized Progression",value = df.iloc[0]["Date of Localized Progression"])
 
+                                Date_of_Localized_Progression = detect_first_progression(first_fu_mrecist_localized, second_fu_mrecist_localized, third_fu_mrecist_localized, fourth_fu_mrecist_localized, fifth_fu_mrecist_localized, FU2_Imaging_Date, FU3_Imaging_Date, FU4_Imaging_Date, FU5_Imaging_Date)
+                                st.write("Date of Localized Progression",Date_of_Localized_Progression)
+                                Time_to_localized_progression = None
                                 if Date_of_Localized_Progression == "No Progression":
                                         Time_to_localized_progression = 'NA'
                                 else:
-                                        Time_to_Localized_Progression = relativedelta(Date_of_Localized_Progression, fetch_date).years
-                                st.write("Time to localized progression",Time_to_Localized_Progression)
-                                Date_of_Overall_Progression = st.text_input("Date of Overall Progression",value = df.iloc[0]["Date of Overall (Local or systemic) Progression"])
-                                Time_to_overall_progression =""
+                                        Time_to_localized_progression = relativedelta(Date_of_Localized_Progression, fetch_date).years
+                                st.write("Time to localized progression",Time_to_localized_progression)
+
+                                Date_of_Overall_Progression = detect_overall_progression(first_fu_mrecist_localized, first_fu_mrecist_overall, second_fu_mrecist_localized, second_fu_mrecist_overall, third_fu_mrecist_localized, third_fu_mrecist_overall, fourth_fu_mrecist_localized, fourth_fu_mrecist_overall, fifth_fu_mrecist_localized, fifth_fu_mrecist_overall, FU_Imaging_Date, FU2_Imaging_Date, FU3_Imaging_Date, FU4_Imaging_Date, FU5_Imaging_Date)
+                                st.write("Date of Overall Progression", Date_of_Overall_Progression)
+                                Time_to_overall_progression = None
                                 if Date_of_Overall_Progression == "No Progression":
                                         Time_to_overall_progression = 'NA'
                                 else:
-                                        Time_to_overall_Progression = relativedelta(Date_of_Overall_Progression, fetch_date).years
-                                st.write("Time to Overall (Local or systemic) Progression",Time_to_overall_Progression)
-                                Date_of_Last_Follow_up_last_imaging_date = 'NA' if dead == 1 and OLT == 1 else st.date_input("Date of Last Follow-up/last imaging date",value = datetime.strptime(df.iloc[0]["Date of Last Follow up or last imaging date (if not OLT, Death, Repeat tx)"], "%Y-%m-%d").date() if df.iloc[0]["Date of Last Follow up or last imaging date (if not OLT, Death, Repeat tx)"] else None)
+                                        Time_to_overall_progression = relativedelta(Date_of_Overall_Progression, fetch_date).years
+                                st.write("Time to Overall (Local or systemic) Progression",Time_to_overall_progression)
 
-                                Time_to_Last_Follow_up_last_imaging_date = 'NA' if dead == 1 and OLT == 1 else relativedelta(Date_of_Last_Follow_up_last_imaging_date, fetch_date).years 
+                                Date_of_Last_Follow_up_last_imaging_date = st.date_input("Date of Last Follow-up/last imaging date",value = datetime.strptime(df.iloc[0]["Date of Last Follow up or last imaging date (if not OLT, Death, Repeat tx)"], "%Y-%m-%d").date() if df.iloc[0]["Date of Last Follow up or last imaging date (if not OLT, Death, Repeat tx)"] != "NA" and df.iloc[0]["Date of Last Follow up or last imaging date (if not OLT, Death, Repeat tx)"] != ""else None)
+                                Time_to_Last_Follow_up_last_imaging_date = None
+                                if dead == 1 and OLT == 1 and Repeat_tx_post_Y90 == 1:
+                                    Date_of_Last_Follow_up_last_imaging_date = 'NA'
+                                    Time_to_Last_Follow_up_last_imaging_date = "NA"
+                                else:
+                                    Time_to_Last_Follow_up_last_imaging_date = relativedelta(Date_of_Last_Follow_up_last_imaging_date, fetch_date).years 
+
                                 st.write("Time to Last follow up",Time_to_Last_Follow_up_last_imaging_date)
                                 notes_free_text = st.text_input("Notes Free Text",value=df.iloc[0]["Notes Free text"])
-                                bestm_recist = st.text_input("BestmRECIST",value=df.iloc[0]["BestmRECIST"])
-                                date_bestm_recist = st.text_input("Date BestmRECIST",value=df.iloc[0]["Date BestmRECIST"])
-                                time_to_bestm_recist = st.text_input("Timeto_bestmRECIST",value=df.iloc[0]["Timeto_bestmRECIST"])
-                                bestm_recist_cr_vs_non_cr = st.text_input("BestmRECISTCRvsNonCR",value=df.iloc[0]["BestmRECISTCRvsNonCR"])
-                                bestm_recist_r_vs_nr = st.text_input("BestmRECISTRvsNR",value=df.iloc[0]["BestmRECISTRvsNR"])
+
+                                bestm_recist = determine_bestmrecist(first_fu_mrecist_localized, second_fu_mrecist_localized, third_fu_mrecist_localized, fourth_fu_mrecist_localized, fifth_fu_mrecist_localized)
+                                st.write("BestmRECIST", bestm_recist)
+                                date_bestm_recist = determine_bestmrecist_date(fifth_fu_mrecist_overall, first_fu_mrecist_overall, second_fu_mrecist_overall, third_fu_mrecist_overall, fourth_fu_mrecist_overall, fifth_fu_mrecist_localized, FU_Imaging_Date, FU2_Imaging_Date, FU3_Imaging_Date, FU4_Imaging_Date, FU5_Imaging_Date)
+                                st.write("Date BestmRECIST",date_bestm_recist)
+                                time_to_bestm_recist = "No Time" if date_bestm_recist == "No Date" else relativedelta(date_bestm_recist, fetch_date).months
+                                st.write("Timeto_bestmRECIST", time_to_bestm_recist)
+                                def best_cr_noncr(value):
+                                    if value == "CR":
+                                            return 1
+                                    elif value in ["PR", "PD", "SD"]:
+                                        return 2
+                                    else:
+                                        return ""
+                                bestm_recist_cr_vs_non_cr = best_cr_noncr(bestm_recist)
+                                st.write("BestmRECISTCRvsNonCR", bestm_recist_cr_vs_non_cr)
+                                def best_responce(value):
+                                    if value in ["CR", "PR"]:
+                                        return 1
+                                    elif value in ["SD", "PD"]:
+                                        return 2
+                                    else:
+                                        return ""
+                                bestm_recist_r_vs_nr = best_responce(bestm_recist)
+                                st.write("BestmRECISTRvsNR" ,bestm_recist_r_vs_nr)
+
                                 PREY90_Imaging_Date = (
                                 PREY90_Imaging_Date.strftime("%Y-%m-%d")
                                 if PREY90_Imaging_Date is not None
@@ -6738,7 +7014,13 @@ def edit_existing_data():
                                     Date_of_Death = Date_of_Death.strftime("%Y-%m-%d")
                                 if Date_of_Last_Follow_up_last_imaging_date != None and Date_of_Last_Follow_up_last_imaging_date != "NA" :
                                     Date_of_Last_Follow_up_last_imaging_date = Date_of_Last_Follow_up_last_imaging_date.strftime("%Y-%m-%d")
-                                    
+                                if Date_of_Overall_Progression != None and Date_of_Overall_Progression != "No Progression" :
+                                    Date_of_Overall_Progression = Date_of_Overall_Progression.strftime("%Y-%m-%d")
+                                if Date_of_Localized_Progression != None and Date_of_Localized_Progression != "No Progression" :
+                                    Date_of_Localized_Progression = Date_of_Localized_Progression.strftime("%Y-%m-%d")
+                                if date_bestm_recist != None and date_bestm_recist != "No Date" :
+                                    date_bestm_recist = date_bestm_recist.strftime("%Y-%m-%d")
+
                                 submit_tab10 = st.form_submit_button("Submit")
 
                                 if submit_tab10:
@@ -6901,7 +7183,7 @@ def edit_existing_data():
                                     "5th_FU_mRECIST Calc": fifth_fu_mrecist_calc,
                                     "5th_FU_mRECIST LOCALIZED": fifth_fu_mrecist_localized,
                                     "5th_FU_mRECIST Overall": fifth_fu_mrecist_overall,
-                                    "5th_FU_mRECIST Overall" : FU5_Free_Text,
+                                    
                                     "Dead": dead,
                                     "Date of Death": Date_of_Death if Date_of_Death != "NA" else Date_of_Death,
                                     "Time to Death": Time_to_Death,
@@ -6912,7 +7194,7 @@ def edit_existing_data():
                                     "Date of Repeat tx Post Y90": Date_of_Repeat_tx_Post_Y90 if Date_of_Repeat_tx_Post_Y90 != 'NA' else Date_of_Repeat_tx_Post_Y90,
                                     "Time to Repeat Tx Post Y90": Time_to_Repeat_Tx_Post_Y90,
                                     "Date of Localized Progression": Date_of_Localized_Progression,
-                                    "Time to localized progression" : Time_to_Localized_Progression,
+                                    "Time to localized progression" : Time_to_localized_progression,
                                     "Date of Overall (Local or systemic) Progression" :Date_of_Overall_Progression,
                                     "Time to Overall (Local or systemic) Progression" :Time_to_overall_progression,
                                     "Date of Last Follow up or last imaging date (if not OLT, Death, Repeat tx)": Date_of_Last_Follow_up_last_imaging_date,
