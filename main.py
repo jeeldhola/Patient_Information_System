@@ -6768,17 +6768,14 @@ def edit_existing_data():
                                     "5th_FU_Non-Target Lesion 1 LAD Art Enhanc",
                                     step=0.1,value = float(df.iloc[0]["5th_FU_Non-Target Lesion 1 LAD Art Enhanc"]) if pd.notnull(df.iloc[0]["5th_FU_Non-Target Lesion 1 LAD Art Enhanc"]) and df.iloc[0]["5th_FU_Non-Target Lesion 1 LAD Art Enhanc"] !="" else 0.0
                                 )
-
                                 FU5_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
                                     "5th_FU_Non-Target Lesion 1 PAD Art Enhanc",
                                     step=0.1,value = float(df.iloc[0]["5th_FU_Non-Target Lesion 1 PAD Art Enhanc"]) if pd.notnull(df.iloc[0]["5th_FU_Non-Target Lesion 1 PAD Art Enhanc"]) and df.iloc[0]["5th_FU_Non-Target Lesion 1 PAD Art Enhanc"] !="" else 0.0
                                 )
-
                                 FU5_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
                                     "5th_FU_Non-Target Lesion 1 CCD Art Enhanc",
                                     step=0.1,value = float(df.iloc[0]["5th_FU_Non-Target Lesion 1 CCD Art Enhanc"]) if pd.notnull(df.iloc[0]["5th_FU_Non-Target Lesion 1 CCD Art Enhanc"]) and df.iloc[0]["5th_FU_Non-Target Lesion 1 CCD Art Enhanc"] !="" else 0.0
                                 )
-
                                 FU5_Non_targeted_Lesion_Dia_Sum = max(FU5_Non_Target_Lesion_1_LAD_Art_Enhanc, FU5_Non_Target_Lesion_1_PAD_Art_Enhanc, FU5_Non_Target_Lesion_1_CCD_Art_Enhanc)
                                 st.write("5th_FU_Non-targeted Lesion Dia Sum",FU5_Non_targeted_Lesion_Dia_Sum)
                                 FU5_Non_target_lesion_response = st.selectbox(
