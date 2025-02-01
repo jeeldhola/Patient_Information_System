@@ -7152,7 +7152,7 @@ if st.session_state.logged_in:
         edit_existing_data()
     elif options == "Export Excel":
         st.session_state.page = "home"
-        st.switch_page("pages/home1.py")
+        st.switch_page("pages/export_data.py")
         
     elif options == "Logout":
         st.session_state.logged_in = False
