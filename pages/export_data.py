@@ -91,16 +91,14 @@ if __name__ == "__main__":
         }
         .stColumn.st-emotion-cache-1vj2wxa.eiemyj2 .st-emotion-cache-b95f0i.eiemyj4>div div:nth-child(2) .st-emotion-cache-b95f0i.eiemyj4{
             overflow-y: auto;
-            height: 350px;
+            height: 300px;
             overflow-x: hidden;
         }
         .st-emotion-cache-j7qwjs.e1dbuyne3{
             display: none !important;
         }
-       
         .stSidebar  {display: none !important;}
         .st-emotion-cache-1i55tjj.e1obcldf18 {display: none !important;}
-        
         </style>
         """,
         unsafe_allow_html=True,

@@ -153,7 +153,14 @@ st.markdown(
     }
     .st-emotion-cache-j7qwjs.e1dbuyne3 {display: none !important;}
     .st-emotion-cache-kgpedg.e1dbuyne10 {height : 0px;}
-    
+    .stSidebar.st-emotion-cache-vmpjyt.e1dbuyne0 { 
+    min-width: 210px;
+    max-width: 210px;
+    }
+    .stForm.st-emotion-cache-4uzi61.e2juff41 {
+    height: 500px;
+    margin-bottom : 20px;
+    overflow-y: auto;}
     </style>
     """,
     
@@ -1783,7 +1790,7 @@ def add_new_data():
                 if "MRN" not in st.session_state.data:
                     st.warning("Please complete the Patient Information tab first.")
                 else:
-                    #try:
+                    try:
                         posty90_date_labs = st.date_input("POSTY90_30DY_date_labs", help="Enter the date of lab tests")
                         posty90_afp = st.text_input("POSTY90_30DY_afp", help="Enter AFP value in ng/dl or NA")
                         posty90_afp_date = st.date_input("POSTY90_30DY_afp DATE", help="Enter the date for AFP")
@@ -1948,23 +1955,28 @@ def add_new_data():
                         #Formula
                         DYAE_CTCAE_hypoalbuminemia_emr = hypoalbuminemia(posty90_albumin)
                         st.write("30 Days AE_hypoalbuminemia CTCAE : ",DYAE_CTCAE_hypoalbuminemia_emr)
-                        prey90_bili = get_variable_value(st.session_state.temp_mrn,"PREY_BILI")
                         DYAE_CTCAE_hyperbilirubinemia_emr = 0
-                        if prey90_bili in [None, "", " "]:  # Ensure it's valid before using
-                            st.error("Cannot calculate 30 Days AE_hyperbilirubinemia CTCAE due to No data in PREY_BILI.")
-                        else:
-                            prey90_bili= float(prey90_bili)
-                            DYAE_CTCAE_hyperbilirubinemia_emr = hyperbillirubine(prey90_bili,posty90_bilirubin)
-                            st.write("30 Days AE_hyperbilirubinemia CTCAE : ",DYAE_CTCAE_hyperbilirubinemia_emr)
-
-                        prey90_creatinine = get_variable_value(st.session_state.temp_mrn,"PREY_CREATININE")
                         DYAE_CTCAE_Increase_creatinine_emr = 0
-                        if prey90_creatinine in [None, "", " "]:  # Ensure it's valid before using
-                            st.error("Cannot calculate 30 Days AE_CTCAE_Increase creatinine CTCAE due to No data in PREY_CREATININE.")
-                        else:
-                            prey90_creatinine= float(prey90_creatinine)
-                            DYAE_CTCAE_Increase_creatinine_emr = Increasecreatine(prey90_creatinine,posty90_creatinine)
-                            st.write("30 Days AE_CTCAE_Increase creatinine CTCAE : ",DYAE_CTCAE_Increase_creatinine_emr)
+                        try:
+                            prey90_bili = get_variable_value(st.session_state.temp_mrn,"PREY_BILI")
+                           
+                            if prey90_bili in [None, "", " "]:  # Ensure it's valid before using
+                                st.error("Cannot calculate 30 Days AE_hyperbilirubinemia CTCAE due to No data in PREY_BILI.")
+                            else:
+                                prey90_bili= float(prey90_bili)
+                                DYAE_CTCAE_hyperbilirubinemia_emr = hyperbillirubine(prey90_bili,posty90_bilirubin)
+                                st.write("30 Days AE_hyperbilirubinemia CTCAE : ",DYAE_CTCAE_hyperbilirubinemia_emr)
+
+                            prey90_creatinine = get_variable_value(st.session_state.temp_mrn,"PREY_CREATININE")
+                            
+                            if prey90_creatinine in [None, "", " "]:  # Ensure it's valid before using
+                                st.error("Cannot calculate 30 Days AE_CTCAE_Increase creatinine CTCAE due to No data in PREY_CREATININE.")
+                            else:
+                                prey90_creatinine= float(prey90_creatinine)
+                                DYAE_CTCAE_Increase_creatinine_emr = Increasecreatine(prey90_creatinine,posty90_creatinine)
+                                st.write("30 Days AE_CTCAE_Increase creatinine CTCAE : ",DYAE_CTCAE_Increase_creatinine_emr)
+                        except:
+                            st.warning("Fill Patient Info")
 
                         DYAE_CTCAE_abdominal_pain = st.selectbox(
                             "30DYAE_abdominal pain CTCAE [Excel : AE30_ABDPAIN]",
@@ -2055,33 +2067,38 @@ def add_new_data():
 
                         DYAE_CTCAE_hyperkalemia = hyperkalemia(posty90_potassium)
                         st.write("30 Days AE CTCAE Hyperkalemia",DYAE_CTCAE_hyperkalemia)
-                        day90_alt = get_variable_value(st.session_state.temp_mrn, "DAYY_ALT")
                         ae30_alt = 0
-                        if day90_alt in [None, "", " "]:  # Ensure it's valid before using
-                            st.error("Cannot calculate AE30_ALT due to No data in DAYY_ALT.")
-                        else:
-                            day90_alt= float(day90_alt)
-                            ae30_alt = alt_calculate(day90_alt, posty90_alt)
-                            st.write("30 Days AE CTCAE ALT",ae30_alt)
-
-                        day90_ast = get_variable_value(st.session_state.temp_mrn,"DAYY_AST")
                         ae30_ast = 0
-                        if day90_ast in [None, "", " "]:  # Ensure it's valid before using
-                            st.error("Cannot calculate AE30_AST due to No data in DAYY_AST.")
-                        else:
-                            day90_ast= float(day90_ast)
-                            ae30_ast = ast_calculate(day90_ast, posty90_ast)
-                            st.write("30 Days AE CTCAE AST",ae30_ast)
-
-                        day90_alp = get_variable_value(st.session_state.temp_mrn,"DAYY_ALP")
                         ae30_alp = 0
-                        if day90_alp in [None, "", " "]:  # Ensure it's valid before using
-                            st.error("Cannot calculate AE30_AST due to No data in DAYY_ALP.")
-                        else:
-                            day90_alp= float(day90_alp)
-                            ae30_alp = ast_calculate(day90_alp, posty90_alkaline_phosphatase)
-                            st.write("30 Days AE CTCAE  Alkaline Phosphatase",ae30_alp)
-                        
+                        try:
+                            day90_alt = get_variable_value(st.session_state.temp_mrn, "DAYY_ALT")
+                            
+                            if day90_alt in [None, "", " "]:  # Ensure it's valid before using
+                                st.error("Cannot calculate AE30_ALT due to No data in DAYY_ALT.")
+                            else:
+                                day90_alt= float(day90_alt)
+                                ae30_alt = alt_calculate(day90_alt, posty90_alt)
+                                st.write("30 Days AE CTCAE ALT",ae30_alt)
+
+                            day90_ast = get_variable_value(st.session_state.temp_mrn,"DAYY_AST")
+                            
+                            if day90_ast in [None, "", " "]:  # Ensure it's valid before using
+                                st.error("Cannot calculate AE30_AST due to No data in DAYY_AST.")
+                            else:
+                                day90_ast= float(day90_ast)
+                                ae30_ast = ast_calculate(day90_ast, posty90_ast)
+                                st.write("30 Days AE CTCAE AST",ae30_ast)
+
+                            day90_alp = get_variable_value(st.session_state.temp_mrn,"DAYY_ALP")
+                            
+                            if day90_alp in [None, "", " "]:  # Ensure it's valid before using
+                                st.error("Cannot calculate AE30_AST due to No data in DAYY_ALP.")
+                            else:
+                                day90_alp= float(day90_alp)
+                                ae30_alp = ast_calculate(day90_alp, posty90_alkaline_phosphatase)
+                                st.write("30 Days AE CTCAE  Alkaline Phosphatase",ae30_alp)
+                        except:
+                            st.warning("Fill Patient Info.")
                         ae30_plt = plt_calculate(posty90_platelets)
                         st.write("30 Days AE CTCAE Platelets",ae30_plt)
 
@@ -2251,8 +2268,8 @@ def add_new_data():
                                     update_google_sheet(data8, st.session_state.temp_mrn)
                                 else:
                                     st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
-                    #except:
-                     #   st.warning("Please Fill Patient Information Page")
+                    except:
+                        st.warning("Please Fill Patient Information Page")
         
         elif st.session_state.selected_tab == "Other Post Tare":
             st.subheader("Other_post_TARE")
@@ -2260,7 +2277,7 @@ def add_new_data():
                 if "MRN" not in st.session_state.data:
                     st.warning("Please complete the Patient Information tab first.")
                 else:
-                    #try:
+                    try:
                         oc_liver_transplant = st.radio("OC_Liver_transplant", options=["Yes", "No"])
                         oc_liver_transplant_date = st.date_input("OC_Liver_transplant_date")
 
@@ -2331,13 +2348,13 @@ def add_new_data():
                                 update_google_sheet(data9, st.session_state.temp_mrn)
                             else:
                                 st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
-                    #except:
-                     #      st.warning("Please Fill Patient Information Page")
+                    except:
+                        st.warning("Please Fill Patient Information Page")
         
         elif st.session_state.selected_tab == "Imaging Date":
             st.subheader("Imaging Date")
             with st.form("imaging_date_form"):
-                #try:
+                try:
                     if "MRN" not in st.session_state.data:
                         st.warning("Please complete the Patient Information tab first.")
                     else:
@@ -3469,8 +3486,8 @@ def add_new_data():
                             else:
                                 st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
                             
-                #except:
-                 #   st.warning("Please Fill Patient Information Page")
+                except:
+                    st.warning("Please Fill Patient Information Page")
     
         elif st.session_state.selected_tab == "Dosimetry Data":
             st.subheader("Dosimetry Data")
@@ -3478,7 +3495,7 @@ def add_new_data():
                 if "MRN" not in st.session_state.data:
                     st.warning("Please complete the Patient Information tab first.")
                 else:
-                    #try:
+                    try:
                         trlnkid = st.selectbox(
                                 "TRLNKID [Excel : TRLNKID]\n\n Tumor 1 (1), Tumor 2 (2)",
                                     options=["1", "2"],
@@ -3581,8 +3598,8 @@ def add_new_data():
                                 update_google_sheet(data11, st.session_state.temp_mrn)
                             else:
                                 st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
-                    #except:
-                     #   st.warning("Please Fill Patient Information Page")
+                    except:
+                        st.warning("Please Fill Patient Information Page")
     
         elif st.session_state.selected_tab == "AFP":
             st.subheader("Dosimetry Data")
