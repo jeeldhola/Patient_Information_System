@@ -845,7 +845,7 @@ def add_new_data():
                             else:
                                 st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
                     except:
-                        st.write("Please Fill Patient Information Page")
+                        st.warning("Please Fill Patient Information Page")
                            
         elif st.session_state.selected_tab == "Cirrhosis PMH":
             st.subheader("Cirrhosis PMH")
@@ -1099,7 +1099,7 @@ def add_new_data():
                             else:
                                 st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
                     except:
-                        st.write("Please Fill Patient Information Page")
+                        st.warning("Please Fill Patient Information Page")
 
         elif st.session_state.selected_tab == "HCC Diagnosis":
             st.subheader("HCC Diagnosis")
@@ -2432,13 +2432,6 @@ def add_new_data():
                         else:
                             k_ken_toxgtg2 =0
 
-                        def albigrade(intx):
-                            if intx <= -2.60:
-                                return "Grade 1"
-                            elif -2.60 < intx <= -1.39:
-                                return "Grade 2"
-                            else:
-                                return "Grade 3"
                         k_ken_albipretareraw = 0
                         k_ken_albipretaregrade = ""
                         try : 
@@ -2447,7 +2440,7 @@ def add_new_data():
                                     
                             k_ken_albipretareraw = albi_calc(prey90_bilirubin,prey90_albumin)
                             st.write("K_ken_AlbiPreTARERaw : ", k_ken_albipretareraw)
-                            k_ken_albipretaregrade = albigrade(k_ken_albipretareraw)
+                            k_ken_albipretaregrade = albi_class(k_ken_albipretareraw)
                             st.write("K_ken_AlbiPreTAREGrade: ",k_ken_albipretaregrade)
                         except:
                             st.warning("Fill Pre Y90 Tab")
@@ -2459,7 +2452,7 @@ def add_new_data():
                             
                             k_ken_albiposttareraw = albi_calc(posty90_bilirubin,posty90_albumin)
                             st.write("K_ken_AlbiPostTARERaw : ", k_ken_albiposttareraw)
-                            k_ken_albiposttaregrade = albigrade(k_ken_albiposttareraw)
+                            k_ken_albiposttaregrade = albi_class(k_ken_albiposttareraw)
                             st.write("K_ken_AliPostTAREGrade : ", k_ken_albiposttaregrade)
                         except :
                             st.warning("Fill Post 90 Form")
@@ -3932,26 +3925,6 @@ def add_new_data():
                         st.warning("Please Fill Patient Information Page")
     
 def edit_existing_data():
-      
-        
-        def calculate_class(poin):
-                            if 5 <= poin <= 6:
-                                return 'A'
-                            elif 7 <= poin <= 9:
-                                return 'B'
-                            elif 10 <= poin <= 15:
-                                return 'C'
-                            else:
-                                return "Invalid points: must be between 5 and 15."
-      
-        
-        def albi_class(albi_score):
-            if albi_score <= -2.60:
-                return "Grade 1"
-            elif albi_score > -2.60 and albi_score <= -1.39:
-                return "Grade 2"
-            else:
-                return "Grade 3"
 
         def process_input(value):
                             
@@ -5835,19 +5808,13 @@ def edit_existing_data():
                             else:
                                 k_ken_toxgtg2 =0
 
-                            def albigrade(intx):
-                                if intx <= -2.60:
-                                    return "Grade 1"
-                                elif -2.60 < intx <= -1.39:
-                                    return "Grade 2"
-                                else:
-                                    return "Grade 3"
+                            
                             try : 
                                 prey90_bilirubin = df.iloc[0]['PREY_BILI']
                                 prey90_albumin = df.iloc[0]['PREY_ALBUMIN']
                                 k_ken_albipretareraw = albi_calc(prey90_bilirubin,prey90_albumin)
                                 st.write("K_ken_AlbiPreTARERaw : ", k_ken_albipretareraw)
-                                k_ken_albipretaregrade = albigrade(k_ken_albipretareraw)
+                                k_ken_albipretaregrade = albi_class(k_ken_albipretareraw)
                                 st.write("K_ken_AlbiPreTAREGrade: ",k_ken_albipretaregrade)
                             except:
                                 st.warning("Fill Pre Y90 Tab")
@@ -5856,11 +5823,11 @@ def edit_existing_data():
                                 posty90_albumin = df.iloc[0]['POST30_ALBUMIN']
                                 k_ken_albiposttareraw = albi_calc(posty90_bilirubin,posty90_albumin)
                                 st.write("K_ken_AlbiPostTARERaw : ", k_ken_albiposttareraw)
-                                k_ken_albiposttaregrade = albigrade(k_ken_albiposttareraw)
+                                k_ken_albiposttaregrade = albi_class(k_ken_albiposttareraw)
                                 st.write("K_ken_AliPostTAREGrade : ", k_ken_albiposttaregrade)
                             except :
                                 st.warning("Fill Post 90 Form")
-                            oc_liver_transplant_date
+                            
                             oc_liver_transplant_date = (
                                 oc_liver_transplant_date.strftime("%Y-%m-%d")
                                 if oc_liver_transplant_date is not None
