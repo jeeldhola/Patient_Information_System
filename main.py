@@ -741,7 +741,7 @@ def add_new_data():
                 if "MRN" not in st.session_state.data:
                     st.warning("Please complete the Patient Information tab first.")
                 else:
-                    #try:
+                    try:
                         gender = st.selectbox(
                             "Gender     [Excel : GENDER]\n\nMale (1) , Female (2)",
                             options=["1", "2"],
@@ -844,7 +844,9 @@ def add_new_data():
                                 update_google_sheet(data1, int(st.session_state.temp_mrn))
                             else:
                                 st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
-                       
+                    except:
+                        st.write("Please Fill Patient Information Page")
+                           
         elif st.session_state.selected_tab == "Cirrhosis PMH":
             st.subheader("Cirrhosis PMH")
             with st.form("cirrhosis_pmh_form"):
@@ -1105,7 +1107,7 @@ def add_new_data():
                 if "MRN" not in st.session_state.data:
                     st.warning("Please complete the Patient Information tab first.")
                 else:
-                    #try:
+                    try:
                         hcc_dx_hcc_diagnosis_date = st.date_input("HCC_Dx_HCC Diagnosis Date", help="Enter the HCC diagnosis date")
 
                         hcc_dx_method_of_diagnosis = st.selectbox(
@@ -1279,8 +1281,8 @@ def add_new_data():
                                     df=fetch_data_from_google_sheet()
                                 else:
                                     st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
-                    #except:
-                     #   st.warning("Please Fill Patient Information Page")
+                    except:
+                        st.warning("Please Fill Patient Information Page")
 
         elif st.session_state.selected_tab == "Previous Therapy for HCC":
             st.subheader("Previous Therapy for HCC")
@@ -2488,7 +2490,7 @@ def add_new_data():
         elif st.session_state.selected_tab == "Imaging Date":
             st.subheader("Imaging Date")
             with st.form("imaging_date_form"):
-                #try:
+                try:
                     if "MRN" not in st.session_state.data:
                         st.warning("Please complete the Patient Information tab first.")
                     else:
@@ -3689,8 +3691,8 @@ def add_new_data():
                             else:
                                 st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
                             
-                #except:
-                 #   st.warning("Please Fill Patient Information Page")
+                except:
+                    st.warning("Please Fill Patient Information Page")
     
         elif st.session_state.selected_tab == "Dosimetry Data":
             st.subheader("Dosimetry Data")
@@ -3715,7 +3717,7 @@ def add_new_data():
                         input_Liver_Vol_Mean_dose = st.text_input("Liver Vol Mean dose")
                         input_Healthy_Liver_mean_dose = st.text_input("Healthy Liver mean dose")
                         input_GTV_Vol = st.number_input("GTV Vol",step=0.1)
-                        input_Tx_vol = st.text_input("Tx vol")
+                        input_Tx_vol = st.number_input("Tx vol",step=0.1)
                         input_Liver_vol = st.number_input("Liver vol",min_value=0.1,step=0.1)
                         input_Healthy_Liver_Vol = st.text_input("Healthy Liver Vol")
                         input_GTV_Liver = (input_GTV_Vol)/(input_Liver_vol)*100
@@ -3729,10 +3731,13 @@ def add_new_data():
                         input_V200 = st.text_input("V200")
                         input_V300 = st.text_input("V300")
                         input_V400 = st.text_input("V400")
-                        input_ActivityBq = st.text_input("ActivityBq")
-                        input_ActivityCi = st.text_input("ActivityCi")
-                        input_Tx_vol_Activity_Density = st.text_input("Tx vol Activity Density")
-                        input_NEW = st.text_input("NEW")
+                        input_ActivityBq = st.number_input("ActivityBq",step=0.1)
+                        input_ActivityCi = (input_ActivityBq/37000000000.0)
+                        input_Tx_vol_Activity_Density = (input_ActivityCi/max(0.1,input_Tx_vol))
+                        input_ActivityCi = format(input_ActivityCi, ".5E")
+                        st.write("ActivityCi", input_ActivityCi)
+                        input_Tx_vol_Activity_Density = format(input_Tx_vol_Activity_Density, ".5E")
+                        st.write("Tx vol Activity Density",input_Tx_vol_Activity_Density)
                         input_GTV_less_D95_Vol_ml = st.text_input("GTV < D95 Vol_ml")
                         input_GTV_less_D95_Mean_Dose = st.text_input("GTV < D95 Mean Dose")
                         input_GTV_less_D95_Mx_Dose = st.text_input("GTV < D95 Max Dose",value = df.iloc[0]["GTVLT_D95MAX"])
@@ -3928,50 +3933,6 @@ def add_new_data():
     
 def edit_existing_data():
       
-        def calculatepoints(bilirubin, albumin, inr, ascites, encephalopathy):
-                            if bilirubin < 2:
-                                bilirubin_points = 1
-                            elif 2 <= bilirubin <= 3:
-                                bilirubin_points = 2
-                            else:
-                                bilirubin_points = 3
-
-                            if albumin > 3.5:
-                                albumin_points = 1
-                            elif 2.8 <= albumin <= 3.5:
-                                albumin_points = 2
-                            else:
-                                albumin_points = 3
-
-                            if inr < 1.7:
-                                inr_points = 1
-                            elif 1.7 <= inr <= 2.3:
-                                inr_points = 2
-                            else:
-                                inr_points = 3
-
-                # Points for Ascites
-                            if ascites == 'none':
-                                ascites_points = 1
-                            elif ascites == 'Asymptomatic' or ascites == 'Minimal ascities/Mild abd distension, no sx' or ascites == "Symptomatic" :
-                                ascites_points = 2
-                            else:  # 'moderate/severe'
-                                ascites_points = 3
-
-                # Points for Hepatic Encephalopathy
-                            if encephalopathy == 'No':
-                                encephalopathy_points = 1
-                            elif encephalopathy == 'Yes':
-                                encephalopathy_points = 2
-                            else:  # 'grade iii-iv'
-                                encephalopathy_points = 3
-
-                # Total Child-Pugh score
-                            total_score = (
-                                bilirubin_points + albumin_points + inr_points + ascites_points + encephalopathy_points
-                            )
-
-                            return total_score
         
         def calculate_class(poin):
                             if 5 <= poin <= 6:
@@ -3982,13 +3943,7 @@ def edit_existing_data():
                                 return 'C'
                             else:
                                 return "Invalid points: must be between 5 and 15."
-        
-        def albi_calc(a,b):
-                            a=int(a)
-                            b=int(b)
-                            t = math.log(a, 10)
-                            answer = (t * 0.66) + (b * -0.085)
-                            return answer
+      
         
         def albi_class(albi_score):
             if albi_score <= -2.60:
@@ -5384,7 +5339,7 @@ def edit_existing_data():
                                     "KEN_MELDPRE": ken_meldpretare
                                     }
                                 update_google_sheet(data7, mrn)
-                
+
                     elif st.session_state.selected_tab == "Post Y90 Within 30 Days Labs":
                         st.subheader("Post Y90 Within 30 Days Labs")
                         with st.form("post_y90_form"):
@@ -5640,12 +5595,7 @@ def edit_existing_data():
                             index=["0","1","2", "3", "4", "5"].index(df.iloc[0]["AE30_GULCER"]) if df.iloc[0]["AE30_GULCER"] else None,
                             placeholder="Choose an option",
                             )
-                            DYAE_CTCAE_hyperkalemia = st.selectbox(
-                                "30DYAE_CTCAE_hyperkalemia [Excel : AE30_HYPERKAL]",
-                                options=["NA"],
-                            index=["NA"].index(df.iloc[0]["AE30_HYPERKAL"]) if df.iloc[0]["AE30_HYPERKAL"] else None,
-                            placeholder="Choose an option",
-                            )
+                           
                             DYAE_CTCAE_respiratory_failure = st.selectbox(
                                 "30DYAE_CTCAE_respiratory_failure [Excel : AE30_RESPFAIL]",
                                 options=["0", "4", "5"],
@@ -5893,8 +5843,8 @@ def edit_existing_data():
                                 else:
                                     return "Grade 3"
                             try : 
-                                prey90_bilirubin = df.loc[df["MRN"] == mrn,'PREY_BILI']
-                                prey90_albumin = df.loc[df["MRN"] == mrn,'PREY_ALBUMIN']
+                                prey90_bilirubin = df.iloc[0]['PREY_BILI']
+                                prey90_albumin = df.iloc[0]['PREY_ALBUMIN']
                                 k_ken_albipretareraw = albi_calc(prey90_bilirubin,prey90_albumin)
                                 st.write("K_ken_AlbiPreTARERaw : ", k_ken_albipretareraw)
                                 k_ken_albipretaregrade = albigrade(k_ken_albipretareraw)
@@ -5902,8 +5852,8 @@ def edit_existing_data():
                             except:
                                 st.warning("Fill Pre Y90 Tab")
                             try :
-                                posty90_bilirubin = df.loc[df["MRN"] == mrn,'POST30_BILI']
-                                posty90_albumin = df.loc[df["MRN"] == mrn,'POST30_ALBUMIN']
+                                posty90_bilirubin = df.iloc[0]['POST30_BILI']
+                                posty90_albumin = df.iloc[0]['POST30_ALBUMIN']
                                 k_ken_albiposttareraw = albi_calc(posty90_bilirubin,posty90_albumin)
                                 st.write("K_ken_AlbiPostTARERaw : ", k_ken_albiposttareraw)
                                 k_ken_albiposttaregrade = albigrade(k_ken_albiposttareraw)
@@ -7223,9 +7173,9 @@ def edit_existing_data():
                             input_Tx_vol_mean_dose = st.text_input("Tx vol mean dose",value = df.iloc[0]["TXVOL_MEANDOSE"])
                             input_Liver_Vol_Mean_dose = st.text_input("Liver Vol Mean dose",value = df.iloc[0]["LIVVOL__MEANDOSE"])
                             input_Healthy_Liver_mean_dose = st.text_input("Healthy Liver mean dose",value = df.iloc[0]["HEALTHYLIV_MEANDOSE"])
-                            input_GTV_Vol = st.number_input("GTV Vol",step=0.1,value = float(df.iloc[0]["GTV_VOL"]) if pd.notnull(df.iloc[0]["GTV_VOL"]) and str(df.iloc[0]["GTV_VOL"]).isdigit() else 0.0)
-                            input_Tx_vol = st.text_input("Tx vol",value = df.iloc[0]["TX_VOL"])
-                            input_Liver_vol = st.number_input("Liver vol",step=0.1, min_value=0.1,value = float(df.iloc[0]["LIVER_VOL"]) if pd.notnull(df.iloc[0]["LIVER_VOL"]) and str(df.iloc[0]["LIVER_VOL"]).isdigit() else 0.1)
+                            input_GTV_Vol = st.number_input("GTV Vol",step=0.1,value = float(df.iloc[0]["GTV_VOL"]) if pd.notnull(df.iloc[0]["GTV_VOL"]) and df.iloc[0]["GTV_VOL"] != "" else 0.0 )
+                            input_Tx_vol = st.number_input("Tx vol",step=0.1,value = float(df.iloc[0]["TX_VOL"]) if pd.notnull(df.iloc[0]["TX_VOL"]) and df.iloc[0]["TX_VOL"] != "" else 0.0)
+                            input_Liver_vol = st.number_input("Liver vol",step=0.1, min_value=0.1,value = float(df.iloc[0]["LIVER_VOL"]) if pd.notnull(df.iloc[0]["LIVER_VOL"]) and df.iloc[0]["LIVER_VOL"] != "" else 0.10)
                             input_Healthy_Liver_Vol = st.text_input("Healthy Liver Vol",value = df.iloc[0]["HEALTHYLIV_VOL"])
                             input_GTV_Liver = (input_GTV_Vol)/(input_Liver_vol)*100
                             st.write("GTV/Liver ",input_GTV_Liver)
@@ -7238,9 +7188,13 @@ def edit_existing_data():
                             input_V200 = st.text_input("V200",value = df.iloc[0]["V200"])
                             input_V300 = st.text_input("V300",value = df.iloc[0]["V300"])
                             input_V400 = st.text_input("V400",value = df.iloc[0]["V400"])
-                            input_ActivityBq = st.text_input("ActivityBq",value = df.iloc[0]["ACTIVITYBQ"])
-                            input_ActivityCi = st.text_input("ActivityCi",value = df.iloc[0]["ACTIVITYCI"])
-                            input_Tx_vol_Activity_Density = st.text_input("Tx vol Activity Density",value = df.iloc[0]["ACTIVITY_TXVOL"])
+                            input_ActivityBq = st.number_input("ActivityBq",step=0.1, value = float(df.iloc[0]["ACTIVITYBQ"]) if pd.notnull(df.iloc[0]["ACTIVITYBQ"]) and df.iloc[0]["ACTIVITYBQ"] != "" else 0.0)
+                            input_ActivityCi = (input_ActivityBq/37000000000.0)
+                            input_Tx_vol_Activity_Density = (input_ActivityCi/max(0.10,input_Tx_vol))
+                            input_ActivityCi = format(input_ActivityCi, ".5E")
+                            st.write("ActivityCi", input_ActivityCi)
+                            input_Tx_vol_Activity_Density = format(input_Tx_vol_Activity_Density, ".5E")
+                            st.write("Tx vol Activity Density",input_Tx_vol_Activity_Density)
                             input_GTV_less_D95_Vol_ml = st.text_input("GTV < D95 Vol_ml",value = df.iloc[0]["GTVLT_D95VOL"])
                             input_GTV_less_D95_Mean_Dose = st.text_input("GTV < D95 Mean Dose",value = df.iloc[0]["GTVLT_D95MEAN"])
                             input_GTV_less_D95_Mx_Dose = st.text_input("GTV < D95 Max Dose",value = df.iloc[0]["GTVLT_D95MAX"])
