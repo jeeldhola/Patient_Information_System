@@ -6914,12 +6914,10 @@ def edit_existing_data():
                                     help="Free text",
                                     value=df.iloc[0]["FU5_EHDLOC"]
                                 )
-
                                 FU5_NEW_Extrahepatic_Dz_Date = st.date_input(
                                     "5th_FU_NEW Extrahepatic Dz Date",
                                     value=datetime.strptime(df.iloc[0]["FU5_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU5_EHDDATE"] else None
                                 )
-
                                 FU5_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == 'NA' else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU5_Non_targeted_Lesion_Dia_Sum) / max(0.1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
                                 st.write("5th_FU_% change non target lesion ",FU5_change_non_target_lesion)
                                 FU5_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU5_Follow_up_2_targeted_Lesion_Dia_Sum) / max(0.1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
@@ -6949,7 +6947,6 @@ def edit_existing_data():
                                         index=[0, 1].index(int(df.iloc[0]["DEAD"])) if df.iloc[0]["DEAD"] else None,
                                         placeholder="Choose an option",
                                 )
-
                                 Date_of_Death = st.date_input("Date of Death",value = datetime.strptime(df.iloc[0]["DATE_DEAD"], "%Y-%m-%d").date() if df.iloc[0]["DATE_DEAD"] != "NA" and df.iloc[0]["DATE_DEAD"] != "" else None)
                                 Time_to_Death = None
                                 if dead == 0:
@@ -6958,7 +6955,6 @@ def edit_existing_data():
                                 else :
                                     Time_to_Death = relativedelta(Date_of_Death, fetch_date).months
                                 st.write("Time to Death",Time_to_Death)
-
                                 OLT = st.selectbox(
                                         "OLT [Excel : OLT]\n\n Yes (1), No (0)",
                                 options=[0, 1],
@@ -6969,7 +6965,6 @@ def edit_existing_data():
                                         index=[0, 1].index(int(df.iloc[0]["OLT"])) if df.iloc[0]["OLT"] else None, 
                                         placeholder="Choose an option",
                                 )
-
                                 Date_of_OLT = st.date_input("Date of OLT",value = datetime.strptime(df.iloc[0]["DATE_OLT"], "%Y-%m-%d").date() if df.iloc[0]["DATE_OLT"] != "NA" and df.iloc[0]["DATE_OLT"] != "" else None)
                                 Time_to_OLT = None
                                 if OLT == 0:
@@ -6989,7 +6984,6 @@ def edit_existing_data():
                                         index=[0, 1].index(int(df.iloc[0]["RTX"])) if df.iloc[0]["RTX"] else None,  # No default selection
                                         placeholder="Choose an option",
                                 )
-
                                 Date_of_Repeat_tx_Post_Y90 = st.date_input("Date of Repeat tx Post Y90",value = datetime.strptime(df.iloc[0]["DATE_RTX"], "%Y-%m-%d").date() if df.iloc[0]["DATE_RTX"] != "NA" and df.iloc[0]["DATE_RTX"] != "" else None)
                                 Time_to_Repeat_Tx_Post_Y90 = None
                                 if Repeat_tx_post_Y90 == 0:
@@ -7374,7 +7368,6 @@ def edit_existing_data():
                                     "FU5_MREC_LOCAL": fifth_fu_mrecist_localized,
                                     "FU5_MREC_OVERALL": fifth_fu_mrecist_overall,
                                     "FU5_FT": FU5_Free_Text,
-                                    
                                     "DEAD": dead,
                                     "DATE_DEAD": Date_of_Death if Date_of_Death != "NA" else Date_of_Death,
                                     "TIME_DEAD": Time_to_Death,
