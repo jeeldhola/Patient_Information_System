@@ -621,7 +621,6 @@ def determine_bestmrecist_date(fz, bf, ci, dl, en, fe, ah, bj, cm, dp, eq):
     
     return "No Date"
 
-
 def add_new_data():
     st.title("Patient Information System")
     df=fetch_data_from_google_sheet()
@@ -669,12 +668,12 @@ def add_new_data():
             with st.form("patient_info_form"):
                 # Patient Info Section
                 col1, col2 = st.columns(2)
-                first_name = col1.text_input("First Name")
+                first_name = col1.text_input("First Name [Excel : FIRST]")
                 first_name = first_name.capitalize()
-                last_name = col2.text_input("Last Name")
+                last_name = col2.text_input("Last Name [Excel : LAST]")
                 last_name = last_name.capitalize()
                 
-                mrn = st.number_input("MRN",step=1)
+                mrn = st.number_input("MRN [Excel : MRN]",step=1)
                 id=""
                 
                 if first_name and last_name:
@@ -694,7 +693,7 @@ def add_new_data():
                 else:
                      duplicate_procedure_check = "Duplicate"
                 
-                tare_date = st.date_input("TARE Tx Date", help="Select the treatment date")
+                tare_date = st.date_input("TARE Tx Date [Excel : TAREDATE]", help="Select the treatment date")
                 procedure_technique = st.selectbox(
                 "Procedure Technique    [Excel : PROTYPE]\n\nLobar (1), Segmental (2)",
                 options=["1", "2"],
@@ -705,7 +704,7 @@ def add_new_data():
                 index=None,  # No default selection
                 placeholder="Choose an option",
                 )
-                age = st.number_input("Age at time of TARE", min_value=0, max_value=150, step=1)
+                age = st.number_input("Age at time of TARE [Excel : TAREAGE]", min_value=0, max_value=150, step=1)
                 submit_tab1 = st.form_submit_button("Submit")
                 if submit_tab1:
                         #df = fetch_data_from_google_sheet()
@@ -870,7 +869,7 @@ def add_new_data():
                         )
 
                         cir_pmh_hbv_free_text = "0" if cir_pmh_hbv_status == "No" else st.text_input(
-                            "Cir PMH HBV Free Text"
+                            "Cir PMH HBV Free Text [ Excel : CIRPMH_HBVFT ]"
                         )
                         
                         cir_pmh_hbv_art = "0" if cir_pmh_hbv_status == "No" else st.selectbox(
@@ -897,7 +896,7 @@ def add_new_data():
                         )
 
                         cir_pmh_hcv_free_text = "No" if cir_pmh_hcv_status == "No" else st.text_input(
-                            "Cir_PMH_HCV Free Text",
+                            "Cir_PMH_HCV Free Text [ Excel : CIRPMH_HCVFT ]",
                             help="Provide additional details for HCV Status",
                         )
 
@@ -929,7 +928,7 @@ def add_new_data():
                         )
 
                         cir_pmh_alcohol_free_text = "0" if cir_pmh_alcohol_use_disorder == "No" else st.text_input(
-                            "Cir_PMH_Alcohol Free Text",
+                            "Cir_PMH_Alcohol Free Text [ Excel : CIRPMH_AUDFT ]",
                             help="Provide additional details for Alcohol Disorder",
                         )
 
@@ -947,7 +946,7 @@ def add_new_data():
                         )
 
                         cir_pmh_ivdu_free_text = "0" if cir_pmh_ivdu_status == "No" else st.text_input(
-                            "Cir_PMH_IVDU Free Text",
+                            "Cir_PMH_IVDU Free Text [ Excel : CIRPMH_IVDUFT ]",
                             help="Provide additional details for IVDU"
                     
                         )
@@ -969,7 +968,7 @@ def add_new_data():
                         )
                 
                         st.subheader("Cirrhosis Dx")
-                        Cirrhosis_Dx_Diagnosis_Date = st.date_input("Cirrhosis Dx Diagnosis Date",help="Select Diagnosis date")
+                        Cirrhosis_Dx_Diagnosis_Date = st.date_input("Cirrhosis Dx Diagnosis Date [ Excel : CIRDX_DATE ]",help="Select Diagnosis date")
 
                         Cirrhosis_Dx_Diagnosis_Method = st.selectbox(
                             "Cirrhosis_Dx_Diagnosis Method [ Excel : CIRDX_METHOD ]\n\n(1) Biopsy, (2) Imaging  ",
@@ -982,11 +981,11 @@ def add_new_data():
                             placeholder="Choose an option",
                         ) 
                         Cirrhosis_Dx_HPI_EMR_Note_Free_Text = st.text_area(
-                            "Cirrhosis_Dx_HPI EMR Note Free Text",
+                            "Cirrhosis_Dx_HPI EMR Note Free Text [ Excel : CIRDX_HPIFT ]",
                             help="Provide details of HPI EMR"
                         )
                         Cirrhosis_Dx_Imaging_Findings_EMR_Note_Free_Text = st.text_area(
-                            "Cirrhosis_Dx_Imaging Findings EMR Note Free Text",
+                            "Cirrhosis_Dx_Imaging Findings EMR Note Free Text [ Excel : CIRDX_IMAGEFT ]",
                             help="Provide details of Imaging Findings"
                         )
 
@@ -1009,23 +1008,23 @@ def add_new_data():
                         Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary = 1 if Cirrhosis_Dx_Complications_at_Time_of_Diagnosis != "none" or Cirrhosis_Dx_Complications_at_Time_of_Diagnosis != None else 0
 
                         Cirrhosis_Dx_Complications_Free_Text =  st.text_area(
-                            "Cirrhosis_Dx_Complications Free Text",
+                            "Cirrhosis_Dx_Complications Free Text [ Excel : CIRDX_COMPLFT ]",
                             help="Provide details of Complications"
                         )
 
-                        Cirrhosis_Dx_Date_of_Labs_in_Window = st.date_input(" Cirrhosis_Dx_Date of Labs in Window",help="Select the date of lab test")
+                        Cirrhosis_Dx_Date_of_Labs_in_Window = st.date_input(" Cirrhosis_Dx_Date of Labs in Window [ Excel : CIRDX_DATELABS ]",help="Select the date of lab test")
 
                         Cirrhosis_Dx_AFP = st.text_input(
-                            "Cirrhosis_Dx_AFP",
+                            "Cirrhosis_Dx_AFP [ Excel : CIRDX_AFP ]",
                             help="Enter AFP value in ng/dl"
                         )
 
                         Cirrhosis_Dx_AFP_L3 = st.text_input(
-                            "Cirrhosis_Dx_AFP L3",
+                            "Cirrhosis_Dx_AFP L3 [ Excel : CIRDX_AFPL3 ]",
                             help="Enter AFP_L3 value in ng/dl"
                             
                         )
-                        Cirrhosis_Dx_AFP_L3_Date_Free_Text = st.text_area("Cirrhosis_Dx_AFP L3 Date Free Text")
+                        Cirrhosis_Dx_AFP_L3_Date_Free_Text = st.text_area("Cirrhosis_Dx_AFP L3 Date Free Text [ Excel : CIRDX_AFPL3DATEFT ]")
 
                         Cirrhosis_Dx_Ascites_CTCAE = st.selectbox (
                             "Cirrhosis_Dx_Ascites CTCAE [ Excel : CIRDX_ASCITCTCAE ] ",
@@ -1055,7 +1054,7 @@ def add_new_data():
                         Cirrhosis_Dx_Ascites_Classification = 1 if Cirrhosis_Dx_Ascites_CTCAE == "none" else findascitesclass(Cirrhosis_Dx_Ascites_CTCAE)
                         st.write("Cirrhosis_Dx_Ascites Classification ",Cirrhosis_Dx_Ascites_Classification)
                         Cirrhosis_Dx_Ascites_Free_Text = "NA" if Cirrhosis_Dx_Ascites_CTCAE == "none" else st.text_area(
-                            "Cirrhosis_Dx_Ascites Free Text",
+                            "Cirrhosis_Dx_Ascites Free Text [ Excel : CIRDX_ASCITFT ]",
                             
                         
                         )
@@ -4150,9 +4149,9 @@ def edit_existing_data():
                             #try:
                             # Patient Info Section
                                 col1, col2 = st.columns(2)
-                                first_name = col1.text_input("First Name",value=df.iloc[0]["FIRST"])
+                                first_name = col1.text_input("First Name [Excel : FIRST]",value=df.iloc[0]["FIRST"])
                                 first_name = first_name.capitalize()
-                                last_name = col2.text_input("Last Name",value=df.iloc[0]["LAST"])
+                                last_name = col2.text_input("Last Name [Excel : LAST]",value=df.iloc[0]["LAST"])
                                 last_name = last_name.capitalize()
                                 st.write(mrn)
                                 id=df.iloc[0]["ID"]
@@ -4174,7 +4173,7 @@ def edit_existing_data():
                                 else:
                                     duplicate_procedure_check = "Duplicate"
                                 
-                                tare_date = st.date_input("TARE Tx Date", help="Select the treatment date",value=datetime.strptime(df.iloc[0]["TAREDATE"], "%Y-%m-%d").date())
+                                tare_date = st.date_input("TARE Tx Date [Excel : TAREDATE]", help="Select the treatment date",value=datetime.strptime(df.iloc[0]["TAREDATE"], "%Y-%m-%d").date())
                                 
                                 procedure_technique = st.selectbox(
                                 "Procedure Technique    [Excel : PROTYPE]\n\nLobar (1), Segmental (2)",
@@ -4188,7 +4187,7 @@ def edit_existing_data():
                                 placeholder="Choose an option",
                                 )
 
-                                age = st.number_input("Age at time of TARE", value=int(df.iloc[0]["TAREAGE"]) ,min_value=0, max_value=150, step=1, format="%d")
+                                age = st.number_input("Age at time of TARE [Excel : TAREAGE]", value=int(df.iloc[0]["TAREAGE"]) ,min_value=0, max_value=150, step=1, format="%d")
                             
                                 submit_tab1 = st.form_submit_button("Submit")
                                 if submit_tab1:
@@ -4321,7 +4320,7 @@ def edit_existing_data():
                             )
 
                             cir_pmh_hbv_free_text = "0" if cir_pmh_hbv_status == "No" else st.text_input(
-                                "Cir PMH HBV Free Text",
+                                "Cir PMH HBV Free Text [ Excel : CIRPMH_HBVFT ]",
                                 value = df.iloc[0]["CIRPMH_HBVFT"],
                             )
                             
@@ -4349,7 +4348,7 @@ def edit_existing_data():
                             )
 
                             cir_pmh_hcv_free_text = "No" if cir_pmh_hcv_status == "No" else st.text_input(
-                                "Cir_PMH_HCV Free Text",
+                                "Cir_PMH_HCV Free Text [ Excel : CIRPMH_HCVFT ]",
                                 value = df.iloc[0]["CIRPMH_HCVFT"],
                                 help="Provide additional details for HCV Status",
                             )
@@ -4382,7 +4381,7 @@ def edit_existing_data():
                             )
 
                             cir_pmh_alcohol_free_text = "0" if cir_pmh_alcohol_use_disorder == "No" else st.text_input(
-                                "Cir_PMH_Alcohol Free Text",
+                                "Cir_PMH_Alcohol Free Text [ Excel : CIRPMH_AUDFT ]",
                                 value = df.iloc[0]["CIRPMH_AUDFT"],
                                 help="Provide additional details for Alcohol Disorder",
                             )
@@ -4400,7 +4399,7 @@ def edit_existing_data():
                             )
 
                             cir_pmh_ivdu_free_text = "0" if cir_pmh_ivdu_status == "No" else st.text_input(
-                                "Cir_PMH_IVDU Free Text",
+                                "Cir_PMH_IVDU Free Text [ Excel : CIRPMH_IVDUFT ]",
                                 value = df.iloc[0]["CIRPMH_IVDUFT"],
                                 help="Provide additional details for IVDU"
                         
@@ -4427,7 +4426,7 @@ def edit_existing_data():
                                 Cirdx_Value = datetime.strptime(df.iloc[0]["CIRDX_DATE"], "%Y-%m-%d").date()
                             else:
                                 Cirdx_Value = None
-                            Cirrhosis_Dx_Diagnosis_Date = st.date_input("Cirrhosis Dx Diagnosis Date", value = Cirdx_Value)
+                            Cirrhosis_Dx_Diagnosis_Date = st.date_input("Cirrhosis Dx Diagnosis Date [ Excel : CIRDX_DATE ]", value = Cirdx_Value)
 
                             Cirrhosis_Dx_Diagnosis_Method = st.selectbox(
                                 "Cirrhosis_Dx_Diagnosis Method [ Excel : CIRDX_METHOD ]\n\n(1) Biopsy, (2) Imaging  ",
@@ -4441,12 +4440,12 @@ def edit_existing_data():
                                 placeholder="Choose an option",
                             ) 
                             Cirrhosis_Dx_HPI_EMR_Note_Free_Text = st.text_area(
-                                "Cirrhosis_Dx_HPI EMR Note Free Text",
+                                "Cirrhosis_Dx_HPI EMR Note Free Text [ Excel : CIRDX_HPIFT ]",
                                 value = df.iloc[0]["CIRDX_HPIFT"],
                                 help="Provide details of HPI EMR"
                             )
                             Cirrhosis_Dx_Imaging_Findings_EMR_Note_Free_Text = st.text_area(
-                                "Cirrhosis_Dx_Imaging Findings EMR Note Free Text",
+                                "Cirrhosis_Dx_Imaging Findings EMR Note Free Text [ Excel : CIRDX_IMAGEFT ]",
                                 value = df.iloc[0]["CIRDX_IMAGEFT"],
                                 help="Provide details of Imaging Findings"
                             )
@@ -4482,7 +4481,7 @@ def edit_existing_data():
                             Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary = 1 if Cirrhosis_Dx_Complications_at_Time_of_Diagnosis != "none" or Cirrhosis_Dx_Complications_at_Time_of_Diagnosis != None else 0
 
                             Cirrhosis_Dx_Complications_Free_Text =  st.text_area(
-                                "Cirrhosis_Dx_Complications Free Text",
+                                "Cirrhosis_Dx_Complications Free Text [ Excel : CIRDX_COMPLFT ]",
                                 value = df.iloc[0]["CIRDX_COMPLFT"],
                                 help="Provide details of Complications"
                             )
@@ -4491,22 +4490,22 @@ def edit_existing_data():
                             else:
                                 Cirdx_Dxdate_value = None 
 
-                            Cirrhosis_Dx_Date_of_Labs_in_Window = st.date_input(" Cirrhosis_Dx_Date of Labs in Window", value =Cirdx_Dxdate_value)
+                            Cirrhosis_Dx_Date_of_Labs_in_Window = st.date_input(" Cirrhosis_Dx_Date of Labs in Window [ Excel : CIRDX_DATELABS ]", value =Cirdx_Dxdate_value)
 
                             Cirrhosis_Dx_AFP = st.text_input(
-                                "Cirrhosis_Dx_AFP",
+                                "Cirrhosis_Dx_AFP [ Excel : CIRDX_AFP ]",
                                 value = df.iloc[0]["CIRDX_AFP"],
                                 help="Enter AFP value in ng/dl"
                                 
                             )
 
                             Cirrhosis_Dx_AFP_L3 = st.text_input(
-                                "Cirrhosis_Dx_AFP L3",
+                                "Cirrhosis_Dx_AFP L3 [ Excel : CIRDX_AFPL3 ]",
                                 value = df.iloc[0]["CIRDX_AFPL3"],
                                 help="Enter AFP_L3 value in ng/dl"
                                 
                             )
-                            Cirrhosis_Dx_AFP_L3_Date_Free_Text = st.text_area("Cirrhosis_Dx_AFP L3 Date Free Text",value = df.iloc[0]["CIRDX_AFPL3DATEFT"])
+                            Cirrhosis_Dx_AFP_L3_Date_Free_Text = st.text_area("Cirrhosis_Dx_AFP L3 Date Free Text [ Excel : CIRDX_AFPL3DATEFT ]",value = df.iloc[0]["CIRDX_AFPL3DATEFT"])
 
                             Cirrhosis_Dx_Ascites_CTCAE = st.selectbox (
                                 "Cirrhosis_Dx_Ascites CTCAE [ Excel : CIRDX_ASCITCTCAE ]",
@@ -4536,7 +4535,7 @@ def edit_existing_data():
                             Cirrhosis_Dx_Ascites_Classification = 0 if Cirrhosis_Dx_Ascites_CTCAE == "none" else findascitesclass(Cirrhosis_Dx_Ascites_CTCAE)
                             st.write("Cirdx_AscitesCTCAEnumb ",Cirrhosis_Dx_Ascites_Classification)
                             Cirrhosis_Dx_Ascites_Free_Text = "NA" if Cirrhosis_Dx_Ascites_CTCAE == "none" else st.text_area(
-                                "Cirrhosis_Dx_Ascites Free Text",
+                                "Cirrhosis_Dx_Ascites Free Text [ Excel : CIRDX_ASCITFT ]",
                                 value = df.iloc[0]["CIRDX_ASCITFT"]
                             
                             )
@@ -6914,10 +6913,12 @@ def edit_existing_data():
                                     help="Free text",
                                     value=df.iloc[0]["FU5_EHDLOC"]
                                 )
+
                                 FU5_NEW_Extrahepatic_Dz_Date = st.date_input(
                                     "5th_FU_NEW Extrahepatic Dz Date",
                                     value=datetime.strptime(df.iloc[0]["FU5_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU5_EHDDATE"] else None
                                 )
+
                                 FU5_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == 'NA' else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU5_Non_targeted_Lesion_Dia_Sum) / max(0.1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
                                 st.write("5th_FU_% change non target lesion ",FU5_change_non_target_lesion)
                                 FU5_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU5_Follow_up_2_targeted_Lesion_Dia_Sum) / max(0.1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
@@ -6947,6 +6948,7 @@ def edit_existing_data():
                                         index=[0, 1].index(int(df.iloc[0]["DEAD"])) if df.iloc[0]["DEAD"] else None,
                                         placeholder="Choose an option",
                                 )
+
                                 Date_of_Death = st.date_input("Date of Death",value = datetime.strptime(df.iloc[0]["DATE_DEAD"], "%Y-%m-%d").date() if df.iloc[0]["DATE_DEAD"] != "NA" and df.iloc[0]["DATE_DEAD"] != "" else None)
                                 Time_to_Death = None
                                 if dead == 0:
@@ -6955,6 +6957,7 @@ def edit_existing_data():
                                 else :
                                     Time_to_Death = relativedelta(Date_of_Death, fetch_date).months
                                 st.write("Time to Death",Time_to_Death)
+
                                 OLT = st.selectbox(
                                         "OLT [Excel : OLT]\n\n Yes (1), No (0)",
                                 options=[0, 1],
@@ -6965,6 +6968,7 @@ def edit_existing_data():
                                         index=[0, 1].index(int(df.iloc[0]["OLT"])) if df.iloc[0]["OLT"] else None, 
                                         placeholder="Choose an option",
                                 )
+
                                 Date_of_OLT = st.date_input("Date of OLT",value = datetime.strptime(df.iloc[0]["DATE_OLT"], "%Y-%m-%d").date() if df.iloc[0]["DATE_OLT"] != "NA" and df.iloc[0]["DATE_OLT"] != "" else None)
                                 Time_to_OLT = None
                                 if OLT == 0:
@@ -6984,6 +6988,7 @@ def edit_existing_data():
                                         index=[0, 1].index(int(df.iloc[0]["RTX"])) if df.iloc[0]["RTX"] else None,  # No default selection
                                         placeholder="Choose an option",
                                 )
+
                                 Date_of_Repeat_tx_Post_Y90 = st.date_input("Date of Repeat tx Post Y90",value = datetime.strptime(df.iloc[0]["DATE_RTX"], "%Y-%m-%d").date() if df.iloc[0]["DATE_RTX"] != "NA" and df.iloc[0]["DATE_RTX"] != "" else None)
                                 Time_to_Repeat_Tx_Post_Y90 = None
                                 if Repeat_tx_post_Y90 == 0:
@@ -7368,6 +7373,7 @@ def edit_existing_data():
                                     "FU5_MREC_LOCAL": fifth_fu_mrecist_localized,
                                     "FU5_MREC_OVERALL": fifth_fu_mrecist_overall,
                                     "FU5_FT": FU5_Free_Text,
+                                    
                                     "DEAD": dead,
                                     "DATE_DEAD": Date_of_Death if Date_of_Death != "NA" else Date_of_Death,
                                     "TIME_DEAD": Time_to_Death,
