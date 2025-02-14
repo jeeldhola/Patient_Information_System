@@ -5,7 +5,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import json
 from math import pi
-
+from datetime import date
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
@@ -207,7 +207,9 @@ if "data" not in st.session_state:
     )
 # List of 11 tabs
 def hypoalbuminemia(b2):
-    if b2 >= 3:
+    if b2 == None:
+        return None
+    elif b2 >= 3:
         return 0
     elif b2 >= 2:
         return 1
@@ -219,7 +221,9 @@ def hypoalbuminemia(b2):
         return 4
 
 def hyperbillirubine(e3, f3, d1=1.2):
-    if e3 <= d1:
+    if e3 == None or f3 == None:
+        return None
+    elif e3 <= d1:
         if f3 <= d1:
             return 0
         elif f3 <= 1.5 * d1:
@@ -243,7 +247,9 @@ def hyperbillirubine(e3, f3, d1=1.2):
             return 4
 
 def Increasecreatine(i2, j2, h1=1):
-    if i2 <= h1:
+    if i2 == None or j2 == None:
+        return None
+    elif i2 <= h1:
         if j2 <= h1:
             return 0
         elif j2 <= 1.5 * h1:
@@ -267,7 +273,9 @@ def Increasecreatine(i2, j2, h1=1):
             return 4
 
 def hyperkalemia(n2, l1=5):
-    if n2 <= l1:
+    if n2 == None:
+        return None
+    elif n2 <= l1:
         return 0
     elif n2 <= 5.5:
         return 1
@@ -279,7 +287,9 @@ def hyperkalemia(n2, l1=5):
         return 4
 
 def alt_calculate(q2, r2, p1=40.0):
-    if q2 <= p1:
+    if q2 == None or r2 == None:
+        return None
+    elif q2 <= p1:
         if r2 <= p1:
             return 0
         elif r2 <= 3 * p1:
@@ -305,7 +315,9 @@ def alt_calculate(q2, r2, p1=40.0):
             return 5
 
 def ast_calculate(u2, v2, t1=40):
-    if u2 <= t1:
+    if u2 == None or v2 == None:
+        return None
+    elif u2 <= t1:
         if v2 <= t1:
             return 0
         elif v2 <= 3 * t1:
@@ -355,7 +367,9 @@ def alp_calculate(y2, z2, x1=147):
             return 4
 
 def plt_calculate(ag2, ae1=150):
-    if ag2 >= ae1:
+    if ag2 == None:
+        return None
+    elif ag2 >= ae1:
         return 0
     elif ag2 >= 75:
         return 1
@@ -491,7 +505,7 @@ def albi_class(AB):
 def calculate_target_lestion_vol(L, M, N):
     # Check for blank values, "NA", or 0
     if any(x in (None, "", "NA", 0) for x in (L, M, N)):
-        return 0
+        return "NA"
     else :
         return L * M * N * (4/3) * pi
 
@@ -503,7 +517,9 @@ def calculate_value_v2(N, O, P, Q):
         return O * P * Q * (4/3) * pi
 
 def mrecist_local(BC):
-    if BC >= 100:
+    if BC in ["NA", None, ""]:
+        return ""
+    elif BC >= 100:
         return "CR"
     elif BC >= 30:
         return "PR"
@@ -527,7 +543,9 @@ def mrecist_calc(CE, BR, AP):
         return "PD"   
 
 def mrecist_overall(AX, AY, BB, BC):
-    if AX == "1" or AY == "1" or BB < 0:
+    if BC in ["NA", None, ""]:
+        return ""
+    elif AX == "1" or AY == "1" or BB < 0:
         return "PD"
     elif BC >= 100:
         return "CR"
@@ -621,6 +639,39 @@ def determine_bestmrecist_date(fz, bf, ci, dl, en, fe, ah, bj, cm, dp, eq):
     
     return "No Date"
 
+def calculate_targeted_dia_sum(a,b,c,d,e,f):
+    # Replace NA, None, or "" with 0 for L2, M2, N2
+    a = 0.0 if a in [None, "", "NA"] else a
+    b = 0.0 if b in [None, "", "NA"] else b
+    c = 0.0 if c in [None, "", "NA"] else c
+
+    # Find the maximum of L2, M2, and N2
+    max_LMN = max(a, b, c)
+
+    # Check if Q2, R2, and S2 are all non-empty (not None or empty strings)
+    if all(x not in [None, "", "NA"] for x in [d, e, f]):
+        return max_LMN + max(d, e, f)
+    
+    return max_LMN
+
+def calculate_nontargeted_dia_sum(a,b,c):
+    a = 0 if a in [None, "", "NA"] else a
+    b = 0 if b in [None, "", "NA"] else b
+    c = 0 if c in [None, "", "NA"] else c
+
+    return max(a, b, c)
+
+def months_difference(end_date, start_date):
+    delta = relativedelta(end_date, start_date)
+    full_months = delta.years * 12 + delta.months
+    extra_days = delta.days
+    
+    # Approximate fraction using 30-day month convention (similar to Excel's YEARFRAC)
+    fraction = extra_days / 30  # Excel assumes a 30-day month convention
+    
+    return round(full_months + fraction, 1)
+
+
 def add_new_data():
     st.title("Patient Information System")
     df=fetch_data_from_google_sheet()
@@ -693,7 +744,7 @@ def add_new_data():
                 else:
                      duplicate_procedure_check = "Duplicate"
                 
-                tare_date = st.date_input("TARE Tx Date [Excel : TAREDATE]", help="Select the treatment date")
+                tare_date = st.date_input("TARE Tx Date [Excel : TAREDATE]", min_value=date(1900, 1, 1),help="Select the treatment date")
                 procedure_technique = st.selectbox(
                 "Procedure Technique    [Excel : PROTYPE]\n\nLobar (1), Segmental (2)",
                 options=["1", "2"],
@@ -704,7 +755,7 @@ def add_new_data():
                 index=None,  # No default selection
                 placeholder="Choose an option",
                 )
-                age = st.number_input("Age at time of TARE [Excel : TAREAGE]", min_value=0, max_value=150, step=1)
+                age = st.number_input("Age at time of TARE [Excel : TAREAGE]", value = None, min_value=0, max_value=150, step=1)
                 submit_tab1 = st.form_submit_button("Submit")
                 if submit_tab1:
                         #df = fetch_data_from_google_sheet()
@@ -968,7 +1019,7 @@ def add_new_data():
                         )
                 
                         st.subheader("Cirrhosis Dx")
-                        Cirrhosis_Dx_Diagnosis_Date = st.date_input("Cirrhosis Dx Diagnosis Date [ Excel : CIRDX_DATE ]",help="Select Diagnosis date")
+                        Cirrhosis_Dx_Diagnosis_Date = st.date_input("Cirrhosis Dx Diagnosis Date [ Excel : CIRDX_DATE ]",min_value=date(1900, 1, 1),help="Select Diagnosis date")
 
                         Cirrhosis_Dx_Diagnosis_Method = st.selectbox(
                             "Cirrhosis_Dx_Diagnosis Method [ Excel : CIRDX_METHOD ]\n\n(1) Biopsy, (2) Imaging  ",
@@ -1012,7 +1063,7 @@ def add_new_data():
                             help="Provide details of Complications"
                         )
 
-                        Cirrhosis_Dx_Date_of_Labs_in_Window = st.date_input(" Cirrhosis_Dx_Date of Labs in Window [ Excel : CIRDX_DATELABS ]",help="Select the date of lab test")
+                        Cirrhosis_Dx_Date_of_Labs_in_Window = st.date_input(" Cirrhosis_Dx_Date of Labs in Window [ Excel : CIRDX_DATELABS ]",min_value=date(1900, 1, 1),help="Select the date of lab test")
 
                         Cirrhosis_Dx_AFP = st.text_input(
                             "Cirrhosis_Dx_AFP [ Excel : CIRDX_AFP ]",
@@ -1107,7 +1158,7 @@ def add_new_data():
                     st.warning("Please complete the Patient Information tab first.")
                 else:
                     try:
-                        hcc_dx_hcc_diagnosis_date = st.date_input("HCC_Dx_HCC Diagnosis Date", help="Enter the HCC diagnosis date")
+                        hcc_dx_hcc_diagnosis_date = st.date_input("HCC_Dx_HCC Diagnosis Date [ Excel : HCCDX_DATEDX ]  ", min_value=date(1900, 1, 1),help="Enter the HCC diagnosis date")
 
                         hcc_dx_method_of_diagnosis = st.selectbox(
                             "HCC_Dx_Method of Diagnosis [ Excel : HCCDX_METHODDX ]\n\n(1) Biopsy, (2) Imaging, (NA) Unknown  ",   
@@ -1122,17 +1173,17 @@ def add_new_data():
                             
                         )
 
-                        hcc_dx_date_of_labs = st.date_input("HCC_Dx_Date of Labs in Window")
+                        hcc_dx_date_of_labs = st.date_input("HCC_Dx_Date of Labs in Window [ Excel : HCCDX_LABSDATE ]",min_value=date(1900, 1, 1),)
 
-                        hcc_dx_afp = st.number_input("HCC_Dx_AFP", help="Enter AFP value in ng/dl", step=0.1)
-                        hcc_dx_afp_l3 = st.number_input("HCC_Dx_AFP L3", help="Enter AFP L3 and date details",step=0.1)
-                        hcc_dx_afp_l3_date_free_text = st.text_area("HCC_Dx_AFP L3 Date Free Text")
+                        hcc_dx_afp = st.number_input("HCC_Dx_AFP [ Excel : HCCDX_AFP ]  ",value = None, help="Enter AFP value in ng/dl", step=0.1)
+                        hcc_dx_afp_l3 = st.number_input("HCC_Dx_AFP L3 [ Excel : HCCDX_AFPL3 ]  ",value = None, help="Enter AFP L3 and date details",step=0.1)
+                        hcc_dx_afp_l3_date_free_text = st.text_area("HCC_Dx_AFP L3 Date Free Text [ Excel : HCCdx_AFPL3dateFT ]  ",value = None,)
 
-                        hcc_dx_bilirubin = st.number_input("HCC_Dx_Bilirubin", help="Enter the bilirubin value in mg/dl", min_value=1.0,step=0.1)
-                        hcc_dx_albumin = st.number_input("HCC_Dx_Albumin", help="Enter the albumin value in g/dl",step=0.1)
-                        hcc_dx_inr = st.number_input("HCC_Dx_INR", help="Enter the INR value",step=0.1)
-                        hcc_dx_creatinine = st.number_input("HCC_Dx_Creatinine", help="Enter the creatinine value in mg/dl",step=0.1)
-                        hcc_dx_sodium = st.number_input("HCC_Dx_Sodium", help="Enter the sodium value in mmol/L",step=0.1)
+                        hcc_dx_bilirubin = st.number_input("HCC_Dx_Bilirubin [ Excel : HCCDX_BILI ]  ",value = None, help="Enter the bilirubin value in mg/dl", min_value=0.1,step=0.1)
+                        hcc_dx_albumin = st.number_input("HCC_Dx_Albumin [ Excel : HCCDX_ALBUMIN ]  ",value = None, help="Enter the albumin value in g/dl",step=0.1)
+                        hcc_dx_inr = st.number_input("HCC_Dx_INR [ Excel : HCCDX_INR ]  ",value = None, help="Enter the INR value",step=0.1)
+                        hcc_dx_creatinine = st.number_input("HCC_Dx_Creatinine [ Excel : HCCDX_CREATININE ]",value = None, help="Enter the creatinine value in mg/dl",step=0.1)
+                        hcc_dx_sodium = st.number_input("HCC_Dx_Sodium [ Excel : HCCDX_SODIUM ]  ",value = None, help="Enter the sodium value in mmol/L",step=0.1)
 
                         hcc_dx_ascites_CTCAE = st.selectbox (
                             "HCC_Dx_Ascites CTCAE [ Excel : HCCDX_ASCITCTCAE ] ",
@@ -1224,8 +1275,9 @@ def add_new_data():
                         st.write("HCC_Dx_Child-Pugh Class calc",hcc_dx_child_pugh_class_calc)
                         st.write("HCC_Dx_Child-Pugh Points calc", hcc_dx_child_pugh_points_calc)
                         hcc_dx_meld_score_calc = meld_calc(hcc_dx_creatinine,hcc_dx_bilirubin,hcc_dx_inr)
-                        hcc_dx_meld_na_score_calc = hcc_dx_meld_score_calc + 1.32*(137-int(hcc_dx_sodium)) - (0.033*hcc_dx_meld_score_calc*(137-int(hcc_dx_sodium)))
-                        st.write("HCC_Dx_MELD Score calc",hcc_dx_meld_score_calc)                        
+                        # hcc_dx_meld_na_score_calc = hcc_dx_meld_score_calc + 1.32*(137-int(hcc_dx_sodium)) - (0.033*hcc_dx_meld_score_calc*(137-int(hcc_dx_sodium)))
+                        # st.write("HCC_Dx_MELD Score calc",hcc_dx_meld_score_calc)                        
+                        hcc_dx_meld_na_score_calc = None
                         hcc_dx_albi_score_calc = albi_calc(hcc_dx_bilirubin, hcc_dx_albumin)
                         hcc_dx_albi_grade = albi_class(hcc_dx_albi_score_calc)
                         st.write("HCC_Dx_ALBI Score calc : ",hcc_dx_albi_score_calc)
@@ -1314,7 +1366,7 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        PRVTHER_Prior_RFA_Date = 0 if PRVTHER_Prior_RFA_Therapy == '0' else st.date_input("PRVTHER_Prior RFA Date")
+                        PRVTHER_Prior_RFA_Date = 0 if PRVTHER_Prior_RFA_Therapy == '0' else st.date_input("PRVTHER_Prior RFA Date [ Excel : PTHER_RFADATE ]  ",min_value=date(1900, 1, 1),)
 
                     
                         PRVTHER_Prior_TARE_Therapy = st.selectbox(
@@ -1329,7 +1381,7 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        PRVTHER_Prior_TARE_Date = 0 if PRVTHER_Prior_TARE_Therapy == '0' else st.date_input("PRVTHER_Prior TARE Date")
+                        PRVTHER_Prior_TARE_Date = 0 if PRVTHER_Prior_TARE_Therapy == '0' else st.date_input("PRVTHER_Prior TARE Date [ Excel : PTHER_TAREDATE ]  ",min_value=date(1900, 1, 1),)
                     
                         PRVTHER_Prior_SBRT_Therapy = st.selectbox(
                             "PRVTHER_Prior SBRT Therapy [ Excel : PTHER_SBRT ]\n\nNo (0), Yes (1), NA",
@@ -1344,7 +1396,7 @@ def add_new_data():
                             placeholder="Choose an option",
                         )
                         
-                        PRVTHER_Prior_SBRT_Date = 0 if PRVTHER_Prior_SBRT_Therapy == '0' else st.date_input("PRVTHER_Prior SBRT Date")
+                        PRVTHER_Prior_SBRT_Date = 0 if PRVTHER_Prior_SBRT_Therapy == '0' else st.date_input("PRVTHER_Prior SBRT Date ",min_value=date(1900, 1, 1),)
                         PRVTHER_Prior_TACE_Therapy = st.selectbox(
                             "PRVTHER_Prior TACE Therapy [ Excel : PTHER_TACE ]\n\nNo (0), Yes (1), NA ",
                             options=["0", "1", "NA"], 
@@ -1357,7 +1409,7 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        PRVTHER_Prior_TACE_Date = 0 if PRVTHER_Prior_TACE_Therapy == '0' else st.date_input("PRVTHER_Prior TACE Date")
+                        PRVTHER_Prior_TACE_Date = 0 if PRVTHER_Prior_TACE_Therapy == '0' else st.date_input("PRVTHER_Prior TACE Date [ Excel : PTHER_TACEDATE ] ",min_value=date(1900, 1, 1))
 
                         PRVTHER_Prior_MWA_Therapy = st.selectbox(
                             "PRVTHER_Prior MWA Therapy [ Excel : PTHER_MWA ]\n\nNo (0), Yes (1), NA",
@@ -1371,7 +1423,7 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        PRVTHER_Prior_MWA_Date = 0 if PRVTHER_Prior_MWA_Therapy == '0' else st.date_input("PRVTHER_Prior MWA Date")
+                        PRVTHER_Prior_MWA_Date = 0 if PRVTHER_Prior_MWA_Therapy == '0' else st.date_input("PRVTHER_Prior MWA Date [ Excel : PTHER_MWADATE ]  ",min_value=date(1900, 1, 1))
 
                         PRVTHER_Resection = st.selectbox(
                             "PRVTHER_Resection [ Excel : PTHER_RESECTION ]\n\nNo (0), Yes (1), NA ",
@@ -1385,26 +1437,18 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        PRVTHER_Resection_Date = 0 if PRVTHER_Resection == '0' else st.date_input("PRVTHER_Resection Date")
-
-
-                        list1=[PRVTHER_Prior_LDT_Therapy, PRVTHER_Prior_RFA_Therapy, PRVTHER_Prior_TARE_Therapy, PRVTHER_Prior_SBRT_Therapy, PRVTHER_Prior_TACE_Therapy, PRVTHER_Prior_MWA_Therapy, PRVTHER_Resection ]
-                        total_sum=0
-                        for item in list1:
-                            if item == "Yes" :
-                                total_sum+=1
-                            else:
-                                continue
-                        
-                        PRVTHER_Previous_Therapy_Sum = total_sum
+                        PRVTHER_Resection_Date = 0 if PRVTHER_Resection == '0' else st.date_input("PRVTHER_Resection Date [ Excel : PTHER_RESECTIONDATE ]",min_value=date(1900, 1, 1))
+                        def count_previous_therapies(*therapies):
+                            return sum(1 for therapy in therapies if therapy == "1")
+                        PRVTHER_Previous_Therapy_Sum = count_previous_therapies(PRVTHER_Prior_LDT_Therapy, PRVTHER_Prior_RFA_Therapy, PRVTHER_Prior_TARE_Therapy, PRVTHER_Prior_SBRT_Therapy, PRVTHER_Prior_TACE_Therapy, PRVTHER_Prior_MWA_Therapy, PRVTHER_Resection)
                         st.write("PRVTHER_Prevtxsum ",PRVTHER_Previous_Therapy_Sum)
                    
                         PRVTHER_NotesFT = st.text_area(
-                        "PRVTHER_NotesFT",
+                        "PRVTHER_NotesFT [ Excel : PTHER_NOTESFT ] ",
                         )
 
                         PRVTHER_Total_Recurrences_HCC = st.text_area(
-                            "PRVTHER_Total Recurrences HCC",
+                            "PRVTHER_Total Recurrences HCC [ Excel : PTHER_TOTRECUR ] ",
                         )
                         PRVTHER_Location_of_Previous_Treatment_segments = st.selectbox(
                             "PRVTHER_Location of Previous Treatment Segments [ Excel : PTHER_PREVSEGMENT ]",
@@ -1413,7 +1457,7 @@ def add_new_data():
                             placeholder="Choose an option"
                         )
                         PRVTHER_Location_of_Previous_Tx_segments_ft = st.text_area(
-                            "PRVTHER_Location of Previous Tx Segments FT",
+                            "PRVTHER_Location of Previous Tx Segments FT [ Excel : PTHER_PREVSEGMENTFT ]  ",
                           
                         )
                         PRVTHER_recurrence_location_note = st.selectbox(
@@ -1423,11 +1467,11 @@ def add_new_data():
                             placeholder="Choose an option"
                         )
                         PRVTHER_recurrence_date = st.text_area(
-                            "PRVTHER_Recurrence Date",
+                            "PRVTHER_Recurrence Date [ Excel : PTHER_RECURDATE ]  ",
                           
                         )
                         PRVTHER_recurrence_seg =  st.text_input(
-                             "PRVTHER_Recurrence Seg"
+                             "PRVTHER_Recurrence Seg [ Excel : PTHER_RECURSEGMENT ] "
                         )
                         PRVTHER_New_HCC_Outside_Previous_Treatment_Site = st.selectbox(
                             "PRVTHER_New HCC Outside Previous Treatment Site [ Excel : PTHER_NEWHCCOUT ]\n\nNo (0), Yes (1), NA",
@@ -1452,7 +1496,7 @@ def add_new_data():
                             placeholder="Choose an option"
                         )   
                         PRVTHER_Residual_HCC_Note = st.text_area(
-                            "PRVTHER_Residual HCC Note",
+                            "PRVTHER_Residual HCC Note [ Excel : PTHER_RESIDUALHCCFT ]",
                             help="Provide information of Residual HCC"
                         ) 
                         PRVTHER_Residual_HCC = st.selectbox(
@@ -1480,12 +1524,12 @@ def add_new_data():
                         )
 
                         PRVTHER_Date_of_Labs_in_Window = st.date_input(
-                            "PRVTHER_Date of Labs for AFP",
-                            help="select date of labs in window"
+                            "PRVTHER_Date of Labs for AFP [ Excel : PTHER_AFPDATE ]",
+                            help="select date of labs in window",min_value=date(1900, 1, 1)
                         )
 
                         PRVTHER_AFP = st.number_input(
-                            "PRVTHER_AFP",
+                            "PRVTHER_AFP [ Excel : PTHER_AFP ]",value = None,
                             help="Enter AFP value in ng/dl or NA",step=0.1
                         )
 
@@ -1554,8 +1598,8 @@ def add_new_data():
                         )
                         prey90_symptoms = ", ".join(prey90_symptoms)
                         
-                        prey90_date_of_labs = st.date_input("PREY90_date of labs in window", help="Enter the date of lab tests")
-                        prey90_afp = st.text_input("PREY90_AFP", help="Enter AFP value in ng/dl or NA")
+                        prey90_date_of_labs = st.date_input("PREY90_date of labs in window [ Excel : PREY_DATELABS ] ",min_value=date(1900, 1, 1), help="Enter the date of lab tests")
+                        prey90_afp = st.text_input("PREY90_AFP [ Excel : PREY_AFP ] ", help="Enter AFP value in ng/dl or NA")
                         
                         def process_input(value):
                             
@@ -1571,15 +1615,15 @@ def add_new_data():
                     
                         prey90_afp_prior_to_tare = process_input(prey90_afp)
                         
-                        prey90_bilirubin = st.number_input("PREY90_Bilirubin", help="Enter the bilirubin value in mg/dl",min_value=1.0,step=0.1)
-                        prey90_albumin = st.number_input("PREY90_Albumin", help="Enter the albumin value in g/dl",step=0.1)
-                        prey90_inr = st.number_input("PREY90_inr", help="Enter the INR value",step=0.1)
-                        prey90_creatinine = st.number_input("PREY90_creatinine", help="Enter the creatinine value in mg/dl",step=0.1)
-                        prey90_sodium = st.number_input("PREY90_sodium", help="Enter the sodium value in mmol/L",step=0.1)
-                        prey90_ast = st.number_input("PREY90_AST", help="Enter AST value in U/L",step=0.1)
-                        prey90_alt = st.number_input("PREY90_ALT", help="Enter ALT value in U/L",step=0.1)
-                        prey90_alkaline_phosphatase = st.number_input("PREY90_Alkaline Phosphatase", help="Enter Alkaline Phosphatase value in U/L",step=0.1)
-                        prey90_potassium = st.number_input("PREY90_potassium", help="Enter the potassium value in mmol/L",step=0.1)
+                        prey90_bilirubin = st.number_input("PREY90_Bilirubin [ Excel : PREY_BILI ]",value = None, help="Enter the bilirubin value in mg/dl",min_value=1.0,step=0.1)
+                        prey90_albumin = st.number_input("PREY90_Albumin [ Excel : PREY_ALBUMIN ]",value = None, help="Enter the albumin value in g/dl",step=0.1)
+                        prey90_inr = st.number_input("PREY90_inr [ Excel : PREY_INR ]",value = None, help="Enter the INR value",step=0.1)
+                        prey90_creatinine = st.number_input("PREY90_creatinine [ Excel : PREY_CREATININE ] ",value = None, help="Enter the creatinine value in mg/dl",step=0.1)
+                        prey90_sodium = st.number_input("PREY90_sodium [ Excel : PREY_SODIUM ]",value = None, help="Enter the sodium value in mmol/L",step=0.1)
+                        prey90_ast = st.number_input("PREY90_AST [ Excel : PREY_AST ]  ",value = None, help="Enter AST value in U/L",step=0.1)
+                        prey90_alt = st.number_input("PREY90_ALT [ Excel : PREY_ALT ] ",value = None, help="Enter ALT value in U/L",step=0.1)
+                        prey90_alkaline_phosphatase = st.number_input("PREY90_Alkaline Phosphatase [ Excel : PREY_ALP ] ",value = None, help="Enter Alkaline Phosphatase value in U/L",step=0.1)
+                        prey90_potassium = st.number_input("PREY90_potassium [ Excel : PREY_POTAS ] ",value = None, help="Enter the potassium value in mmol/L",step=0.1)
                         
                         prey90_ascites_ctcae = st.selectbox (
                             "PREY90_Ascites CTCAE [Excel : PREY_ASCITCTCAE]",
@@ -1609,7 +1653,7 @@ def add_new_data():
                         prey90_ascites_classification = 1 if prey90_ascites_ctcae == "none" else findascitesclass(prey90_ascites_ctcae)
                         st.write("PREY90_AscitesCTCAEnumb ",prey90_ascites_classification)
                         prey90_ascites_free_text = st.text_area(
-                            "PREY90_Ascites Free Text",
+                            "PREY90_Ascites Free Text [ Excel : PREY_ASCITFT ] ",
                         
                         )
 
@@ -1676,8 +1720,9 @@ def add_new_data():
                         st.write("PREY90_CPclass",prey90_child_pugh_class_calc)
                         prey90_meld_score_calc = meld_calc(prey90_creatinine,prey90_bilirubin,prey90_inr)
                         st.write("PREY90_MELD",prey90_meld_score_calc)
-                        prey90_meld_na_score_calc = prey90_meld_score_calc + 1.32*(137-int(prey90_sodium)) - (0.033*prey90_meld_score_calc*(137-int(prey90_sodium)))
-                        st.write("PREY90_MELDNa",prey90_meld_na_score_calc)
+                        # prey90_meld_na_score_calc = prey90_meld_score_calc + 1.32*(137-int(prey90_sodium)) - (0.033*prey90_meld_score_calc*(137-int(prey90_sodium)))
+                        # st.write("PREY90_MELDNa",prey90_meld_na_score_calc)
+                        prey90_meld_na_score_calc = None
                         prey90_albi_score_calc = albi_calc(prey90_bilirubin,prey90_albumin)
                         st.write("PREY90_Albiscore",prey90_albi_score_calc)
                         prey90_albi_grade = albi_class(prey90_albi_score_calc)
@@ -1697,8 +1742,8 @@ def add_new_data():
                             )
                     
                         st.subheader("Mapping Y90")
-                        my90_date = st.date_input("MY90_date", help="Enter the date")
-                        my90_lung_shunt = st.number_input("MY90_Lung_shunt", min_value=0.0, step=0.1, help="Enter the lung shunt value")
+                        my90_date = st.date_input("MY90_date [ Excel : MY_DATE ]",min_value=date(1900, 1, 1), help="Enter the date")
+                        my90_lung_shunt = st.number_input("MY90_Lung_shunt [ Excel : MY_LUNGSHU ]  ",value = None, min_value=0.0, step=0.1, help="Enter the lung shunt value")
 
                         submit_tab6 = st.form_submit_button("Submit")
 
@@ -1753,7 +1798,7 @@ def add_new_data():
                     st.warning("Please complete the Patient Information tab first.")
                 else:
                     try:
-                        dayy90_afp = st.text_input("DAYY90_AFP")
+                        dayy90_afp = st.text_input("DAYY90_AFP [Excel : DAYY_AFP] ")
                         def process_input(value):
                             
                 # Handle the 'NA' case
@@ -1768,19 +1813,19 @@ def add_new_data():
                         #df.loc[df["MRN"] == mrn, "PREY_AFPBINARY"].values[0]
                         dayy90_afp_prior_to_tare = process_input(dayy90_afp)
                         st.write("DAYY90_AFP Binary : ",dayy90_afp_prior_to_tare)
-                        dayy90_sodium = st.number_input("DAYY90_sodium",step=0.1)
-                        dayy90_creatinine = st.number_input("DAYY90_creatinine",step=0.1)
-                        dayy90_inr = st.number_input("DAYY90_inr",step=0.1)
-                        dayy90_albumin = st.number_input("DAYY90_albumin",step=0.1)
-                        dayy90_bilirubin = st.number_input("DAYY90_bilirubin",min_value=1.0,step=0.1)
-                        dayy90_ast = st.number_input("DAYY90_AST",step=0.1)
-                        dayy90_alt = st.number_input("DAYY90_ALT",step=0.1)
+                        dayy90_sodium = st.number_input("DAYY90_sodium [Excel : DAYY_SODIUM] ",value = None,step=0.1)
+                        dayy90_creatinine = st.number_input("DAYY90_creatinine [Excel : DAYY_CREATININE] ",value = None,step=0.1)
+                        dayy90_inr = st.number_input("DAYY90_inr [Excel : DAYY_INR]  ",value = None,step=0.1)
+                        dayy90_albumin = st.number_input("DAYY90_albumin [Excel : DAYY_ALBUMIN]  ",value = None,step=0.1)
+                        dayy90_bilirubin = st.number_input("DAYY90_bilirubin [Excel : DAYY_BILI] ",value = None,min_value=0.1,step=0.1)
+                        dayy90_ast = st.number_input("DAYY90_AST [Excel : DAYY_AST] ",value = None,step=0.1)
+                        dayy90_alt = st.number_input("DAYY90_ALT [Excel : DAYY_ALT]",value = None,step=0.1)
                         dayy90_alkaline_phosphatase = st.number_input(
-                            "DAYY90_Alkaline Phosphatase",step=0.1
+                            "DAYY90_Alkaline Phosphatase [Excel : DAYY_ALP] ",value = None,step=0.1
                         )
-                        dayy90_leukocytes = st.number_input("DAYY90_leukocytes",step=0.1)
-                        dayy90_platelets = st.number_input("DAYY90_platelets",step=0.1)
-                        dayy90_potassium = st.number_input("DAY90_Potassium",step=0.1)
+                        dayy90_leukocytes = st.number_input("DAYY90_leukocytes [Excel : DAYY_LEUK]",value = None,step=0.1)
+                        dayy90_platelets = st.number_input("DAYY90_platelets [Excel : DAYY_PLT]",value = None,step=0.1)
+                        dayy90_potassium = st.number_input("DAY90_Potassium [Excel : DAYY_POTAS]",value = None,step=0.1)
 
                         dayy90_ascites_ctcae = st.selectbox (
                             "DAYY90_Ascites CTCAE [Excel : DAYY_ASCITCTCAE]  ",
@@ -1832,8 +1877,9 @@ def add_new_data():
                         st.write("DAYY90_CPclass",dayy90_child_pugh_class_calc)
                         dayy90_meld_score_calc = meld_calc(dayy90_creatinine,dayy90_bilirubin,dayy90_inr)
                         st.write("DAYY90_MELD",dayy90_meld_score_calc)
-                        dayy90_meld_na_score_calc = dayy90_meld_score_calc + 1.32*(137-int(dayy90_sodium)) - (0.033*dayy90_meld_score_calc*(137-int(dayy90_sodium)))
-                        st.write("DAYY90_MELDNa",dayy90_meld_na_score_calc)
+                        # dayy90_meld_na_score_calc = dayy90_meld_score_calc + 1.32*(137-int(dayy90_sodium)) - (0.033*dayy90_meld_score_calc*(137-int(dayy90_sodium)))
+                        # st.write("DAYY90_MELDNa",dayy90_meld_na_score_calc)
+                        dayy90_meld_na_score_calc = None
                         dayy90_albi_score_calc = albi_calc(dayy90_bilirubin,dayy90_albumin)
                         st.write("DAYY90_Albiscore",dayy90_albi_score_calc)
                         dayy90_albi_grade = albi_class(dayy90_albi_score_calc)
@@ -1863,7 +1909,7 @@ def add_new_data():
                             placeholder="Choose an option",
                         )
 
-                        dayy90_lt_notes_ftx = st.text_area("DAYY90_LT Notes Free Text")
+                        dayy90_lt_notes_ftx = st.text_area("DAYY90_LT Notes Free Text [Excel : DAYY_LTFT] ")
 
                         ken_childpughscore = st.selectbox(
                             "ken_ChildPughscore [Excel : KEN_CPPRE]\n\n(1) A, (2) B, (3) C ",
@@ -1876,7 +1922,7 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        ken_meldpretare = st.number_input("ken_MELDpreTARE",step=0.1)
+                        ken_meldpretare = st.number_input("ken_MELDpreTARE [Excel : KEN_MELDPRE]",value = None,step=0.1)
 
 
                     # Submit button
@@ -1927,20 +1973,20 @@ def add_new_data():
                     st.warning("Please complete the Patient Information tab first.")
                 else:
                     try:
-                        posty90_date_labs = st.date_input("POSTY90_30DY_date_labs", help="Enter the date of lab tests")
-                        posty90_afp = st.text_input("POSTY90_30DY_afp", help="Enter AFP value in ng/dl or NA")
-                        posty90_afp_date = st.date_input("POSTY90_30DY_afp DATE", help="Enter the date for AFP")
-                        posty90_sodium = st.number_input("POSTY90_30DY_Sodium", help="Enter the sodium value in mmol/L",step=0.1)
-                        posty90_creatinine = st.number_input("POSTY90_30DY_creatinine", help="Enter the creatinine value in mg/dl",step=0.1)
-                        posty90_inr = st.number_input("POSTY90_30DY_INR", help="Enter the INR value",step=0.1)
-                        posty90_albumin = st.number_input("POSTY90_30DY_albumin", help="Enter the albumin value in g/dl",step=0.1)
-                        posty90_bilirubin = st.number_input("POSTY90_30DY_bilirubin", help="Enter the bilirubin value in mg/dl",min_value=1.0,step=0.1)
-                        posty90_ast = st.number_input("POSTY90_30DY_AST", help="Enter AST value in U/L",step=0.1)
-                        posty90_alt = st.number_input("POSTY90_30DY_ALT", help="Enter ALT value in U/L",step=0.1)
-                        posty90_alkaline_phosphatase = st.number_input("POSTY90_30DY_Alkaline Phosphatase", help="Enter Alkaline Phosphatase value in U/L",step=0.1)
-                        posty90_leukocytes = st.number_input("POSTY90_30DY_leukocytes", help="Enter leukocytes value in x10^3/µL",step=0.1)
-                        posty90_platelets = st.number_input("POSTY90_30DY_platelets", help="Enter platelets value in x10^3/µL",step=0.1)
-                        posty90_potassium = st.number_input("POSTY90_30DY_potassium", help="Enter the potassium value in mmol/L",step=0.1)
+                        posty90_date_labs = st.date_input("POSTY90_30DY_date_labs [ Excel : POST30_LABSDATE ] ",min_value=date(1900, 1, 1), help="Enter the date of lab tests")
+                        posty90_afp = st.text_input("POSTY90_30DY_afp [ Excel : POST30_AFP ]  ", help="Enter AFP value in ng/dl or NA")
+                        posty90_afp_date = st.date_input("POSTY90_30DY_afp DATE [ Excel : POST30_AFPDATE ] ", help="Enter the date for AFP")
+                        posty90_sodium = st.number_input("POSTY90_30DY_Sodium [ Excel : POST30_SODIUM ]  ",value = None, help="Enter the sodium value in mmol/L",step=0.1)
+                        posty90_creatinine = st.number_input("POSTY90_30DY_creatinine [ Excel : POST30_CREATININE ]",value = None, help="Enter the creatinine value in mg/dl",step=0.1)
+                        posty90_inr = st.number_input("POSTY90_30DY_INR [ Excel : POST30_INR ]  ",value = None, help="Enter the INR value",step=0.1)
+                        posty90_albumin = st.number_input("POSTY90_30DY_albumin [ Excel : POST30_ALBUMIN ]  ",value = None, help="Enter the albumin value in g/dl",step=0.1)
+                        posty90_bilirubin = st.number_input("POSTY90_30DY_bilirubin [ Excel : POST30_BILI ]",value = None, help="Enter the bilirubin value in mg/dl",min_value=0.1,step=0.1)
+                        posty90_ast = st.number_input("POSTY90_30DY_AST [ Excel : POST30_AST ] ",value = None, help="Enter AST value in U/L",step=0.1)
+                        posty90_alt = st.number_input("POSTY90_30DY_ALT [ Excel : POST30_ALT ]",value = None, help="Enter ALT value in U/L",step=0.1)
+                        posty90_alkaline_phosphatase = st.number_input("POSTY90_30DY_Alkaline Phosphatase [ Excel : POST30_ALP ]  ",value = None, help="Enter Alkaline Phosphatase value in U/L",step=0.1)
+                        posty90_leukocytes = st.number_input("POSTY90_30DY_leukocytes [ Excel : POST30_LEUK ]",value = None, help="Enter leukocytes value in x10^3/µL",step=0.1)
+                        posty90_platelets = st.number_input("POSTY90_30DY_platelets [ Excel : POST30_PLT ] ",value = None, help="Enter platelets value in x10^3/µL",step=0.1)
+                        posty90_potassium = st.number_input("POSTY90_30DY_potassium [ Excel : POST30_POTAS ] ",value = None, help="Enter the potassium value in mmol/L",step=0.1)
                         
                         posty90_ascites_ctcae = st.selectbox (
                         "30DY_AE_AscitesCTCAE [Excel : POST30_ASCITCTCAE]",
@@ -2014,7 +2060,7 @@ def add_new_data():
                         )
 
                         posty90_ascites_free_text = st.text_area(
-                            "30DY_AE_ascities_freetext",
+                            "30DY_AE_ascities_freetext [ Excel : POST30_ASCITFT ] ",
 
                         )
 
@@ -2030,8 +2076,9 @@ def add_new_data():
                         st.write("DAYY90_CPclass",posty90_child_pugh_class)
                         posty90_meld = meld_calc(posty90_creatinine,posty90_bilirubin,posty90_inr)
                         st.write("DAYY90_MELD",posty90_meld)
-                        posty90_meld_na = posty90_meld + 1.32*(137-int(posty90_sodium)) - (0.033*posty90_meld*(137-int(posty90_sodium)))
-                        st.write("DAYY90_MELDNa",posty90_meld_na)
+                        # posty90_meld_na = posty90_meld + 1.32*(137-int(posty90_sodium)) - (0.033*posty90_meld*(137-int(posty90_sodium)))
+                        # st.write("DAYY90_MELDNa",posty90_meld_na)
+                        posty90_meld_na = None
                         posty90_albi_score = albi_calc(posty90_bilirubin,posty90_albumin)
                         st.write("DAYY90_Albiscore",posty90_albi_score)
                         posty90_albi_grade = albi_class(posty90_albi_score)
@@ -2052,12 +2099,12 @@ def add_new_data():
                             )
                     
                         ken_bclc_stage_post90 = st.text_input(
-                            "Ken_BCLCStagepost90",
+                            "Ken_BCLCStagepost90 [ Excel : Ken_BCLCStagepost90 ]",
                             help="Enter BCLC Stage Post-90",
                           
                         )
                         ken_meld_stage_post90 = st.text_input(
-                            "Ken_MELD_Stagepost90",
+                            "Ken_MELD_Stagepost90 [ Excel : Ken_MELD_Stagepost90 ]  ",
                             help="Enter MELD Score Pre-TARE",
                            
                         )
@@ -2094,7 +2141,7 @@ def add_new_data():
                         DYAE_CTCAE_Increase_creatinine_emr = 0
                         try:
                             prey90_bili = get_variable_value(st.session_state.temp_mrn,"PREY_BILI")
-                           
+                            
                             if prey90_bili in [None, "", " "]:  # Ensure it's valid before using
                                 st.error("Cannot calculate 30 Days AE_hyperbilirubinemia CTCAE due to No data in PREY_BILI.")
                             else:
@@ -2237,8 +2284,8 @@ def add_new_data():
                         ae30_plt = plt_calculate(posty90_platelets)
                         st.write("30 Days AE CTCAE Platelets",ae30_plt)
 
-                        ae30_otherft = st.text_input("AE30_OTHERFT",)
-                        ae30_other = st.text_input("AE30_OTHER",)
+                        ae30_otherft = st.text_input("AE30_OTHERFT [ Excel : AE30_OTHERFT ] ",)
+                        ae30_other = st.text_input("AE30_OTHER [ Excel : AE30_OTHER ] ",)
 
                         variables = [
                                     DYAE_CTCAE_portal_htn, DYAE_CTCAE_Vascular_comp, DYAE_CTCAE_fatigue, DYAE_CTCAE_diarrhea,
@@ -2257,24 +2304,24 @@ def add_new_data():
                         ae30_gradesum345 = count1
 
                         DYAE_AE_other = st.text_area(
-                            "30DY_AE_other",
+                            "30DY_AE_other [ Excel : 30DY_AE_Other ] ",
                             help="Other Adverse Events (Free Text)",
                             
                         )
 
                         DYAE_AE_date_of_AE = st.text_input(
-                            "90DY_AE_date_of_AE",
+                            "90DY_AE_date_of_AE [ Excel : AE90_DATE ]  ",
                             help="(if AE is present after 30 days but before 90 write it here and the date)",
                             
                         )
                         ken_grandedtoxicity = st.text_area(
-                            "AE90_OTHERFT",
+                            "AE90_OTHERFT [Excel : AE90_OTHERFT]",
                             
 
                         )
                         
-                        ae90_gradesum12 = st.text_input("AE90_GRADESUM12" )
-                        ae90_gradesum345 = st.text_input("AE90_GRADESUM345")
+                        ae90_gradesum12 = st.text_input("AE90_GRADESUM12 [Excel : AE90__GRADESUM12]" )
+                        ae90_gradesum345 = st.text_input("AE90_GRADESUM345 [Excel : AE90__GRADESUM345]")
                         dy_ae_hospitalization_3 = st.selectbox(
                             "90DY_AE_Hospitalization 3 months [Excel : AE90_HOSP3]\n\n Yes (1), No (0)",
                                 options=["1", "0"],
@@ -2413,20 +2460,24 @@ def add_new_data():
                     st.warning("Please complete the Patient Information tab first.")
                 else:
                     try:
-                        oc_liver_transplant = st.radio("OC_Liver_transplant", options=["Yes", "No"])
-                        oc_liver_transplant_date = st.date_input("OC_Liver_transplant_date")
+                        oc_liver_transplant = st.radio("OC_Liver_transplant [Excel : OC_Liver_transplant]", options=["Yes", "No"])
+                        oc_liver_transplant_date = st.date_input("OC_Liver_transplant_date [Excel : OC_Liver_transplant_date]",min_value=date(1900, 1, 1))
 
                         st.subheader("K_other")
             # with st.form("k_other_form"):
 
-                        k_ken_toxgtg3 = st.number_input("K_ken_ToxgtG3",step=0.1)
-                        if k_ken_toxgtg3 > 3:
+                        k_ken_toxgtg3 = st.number_input("K_ken_ToxgtG3 [Excel : K_ken_ToxgtG3]",value = None,step=0.1)
+                        if k_ken_toxgtg3 == None:
+                            k_ken_toxgtg3 = None
+                        elif k_ken_toxgtg3 > 3:
                             k_ken_toxgtg3 = 1
                         else:
                             k_ken_toxgtg3 =0
                                         
-                        k_ken_toxgtg2 = st.number_input("K_ken_ToxgtG2",step=0.1)
-                        if k_ken_toxgtg2 > 2:
+                        k_ken_toxgtg2 = st.number_input("K_ken_ToxgtG2 [Excel : K_ken_ToxgtG2]",value = None,step=0.1)
+                        if k_ken_toxgtg2 == None:
+                            k_ken_toxgtg2 = None
+                        elif k_ken_toxgtg2 > 2:
                             k_ken_toxgtg2 = 1
                         else:
                             k_ken_toxgtg2 =0
@@ -2487,7 +2538,9 @@ def add_new_data():
                         st.warning("Please complete the Patient Information tab first.")
                     else:
                         st.subheader("Imaging PreY90")
-                        
+
+                        na_selected = st.selectbox("Is Imaging PreY90 Applicable ?", ["Yes","NA"], index=None, placeholder="Choose an option")
+                  
                         PREY90_prescan_modality = st.selectbox(
                                 "PREY90_prescan_modality [Excel : PREY_MOD]\n\n(1) CT, (2) MRI",
                                         options=["1","2"],
@@ -2498,7 +2551,7 @@ def add_new_data():
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
-                        PREY90_Imaging_Date = st.date_input("PREY90_Imaging Date")
+                        PREY90_Imaging_Date = st.date_input("PREY90_Imaging Date [Excel : PREY_IMG_DATE]",min_value=date(1900, 1, 1))
                         PREY90_total_number_of_lesions = st.selectbox(
                                 "PREY90_total number of lesions [Excel : PREY_TOTLES]\n\n(1) 1,(2) 2,(3) >=3",
                                  options=["1", "2", "3"],
@@ -2528,19 +2581,21 @@ def add_new_data():
                         )
                         PREY90_target_lesion_1_segments = ", ".join(PREY90_target_lesion_1_segments)
                         PREY90_TL1_LAD = st.number_input(
-                            "PREY90_Target Lesion_LAD",
+                            "PREY90_Target Lesion_LAD [Excel : PREY_TL1LAD]", value = None,
                             step=0.1
                         )
+                        PREY90_TL1_LAD = "NA" if PREY90_target_lesion_1_segments == "NA" else PREY90_TL1_LAD
 
                         PREY90_Target_Lesion_1_PAD = st.number_input(
-                            "PREY90_Target Lesion 1 PAD",
+                            "PREY90_Target Lesion 1 PAD [Excel : PREY_TL1PAD]", value = None,
                             step=0.1
                         )
-
+                        PREY90_Target_Lesion_1_PAD = "NA" if PREY90_target_lesion_1_segments == "NA" else PREY90_Target_Lesion_1_PAD
                         PREY90_Target_Lesion_1_CCD = st.number_input(
-                            "PREY90_Target Lesion 1 CCD",
+                            "PREY90_Target Lesion 1 CCD [Excel : PREY_TL1CCD]", value = None,
                             step=0.1
                         )
+                        PREY90_Target_Lesion_1_CCD = "NA" if PREY90_target_lesion_1_segments == "NA" else PREY90_Target_Lesion_1_CCD
                         
                         PREY90_Target_Lesion_1_VOL = calculate_target_lestion_vol(PREY90_Target_Lesion_1_PAD, PREY90_TL1_LAD, PREY90_Target_Lesion_1_CCD)
                         st.write("PREY90_Target Lesion 1 VOL",PREY90_Target_Lesion_1_VOL)
@@ -2552,45 +2607,50 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
                         PREY90_Target_Lesion_2_LAD = st.number_input(
-                            "PREY90_Target_Lesion_2_LAD",
+                            "PREY90_Target_Lesion_2_LAD [Excel : PREY_TL2LAD]", value = None,
                             step=0.1
                         )
+                        PREY90_Target_Lesion_2_LAD =  "NA" if PREY90_Target_Lesion_2_segments == "NA" else  PREY90_Target_Lesion_2_LAD
                         PREY90_Target_Lesion_2_PAD = st.number_input(
-                            "PREY90_Target Lesion 2 PAD",
+                            "PREY90_Target Lesion 2 PAD [Excel : PREY_TL2PAD]",value = None,
                             step=0.1
                         )
-
+                        PREY90_Target_Lesion_2_PAD = "NA" if PREY90_Target_Lesion_2_segments == "NA" else PREY90_Target_Lesion_2_PAD
                         PREY90_Target_Lesion_2_CCD = st.number_input(
-                            "PREY90_Target Lesion 2 CCD",
+                            "PREY90_Target Lesion 2 CCD [Excel : PREY_TL2CCD]",value = None,
                             step=0.1
                         )
-                       
+                        PREY90_Target_Lesion_2_CCD = "NA" if PREY90_Target_Lesion_2_segments == "NA" else PREY90_Target_Lesion_2_CCD
                         PREY90_Target_Lesion_2_VOL = calculate_value_v2(PREY90_Target_Lesion_2_segments, PREY90_Target_Lesion_2_LAD, PREY90_Target_Lesion_2_PAD, PREY90_Target_Lesion_2_CCD)
                         st.write("PREY90_Target Lesion 2 VOL",PREY90_Target_Lesion_2_VOL)
 
-                        PREY90_pretx_targeted_Lesion_Dia_Sum = max(PREY90_TL1_LAD,PREY90_Target_Lesion_1_PAD,PREY90_Target_Lesion_1_CCD) + max(PREY90_Target_Lesion_2_PAD,PREY90_Target_Lesion_2_LAD,PREY90_Target_Lesion_2_CCD)
+                        PREY90_pretx_targeted_Lesion_Dia_Sum = calculate_targeted_dia_sum(PREY90_TL1_LAD,PREY90_Target_Lesion_1_PAD,PREY90_Target_Lesion_1_CCD,PREY90_Target_Lesion_2_PAD,PREY90_Target_Lesion_2_LAD,PREY90_Target_Lesion_2_CCD)
                         st.write("PREY90_ pretx targeted Lesion Dia Sum",PREY90_pretx_targeted_Lesion_Dia_Sum)
                         PREY90_Non_Target_Lesion_Location = st.selectbox( "PREY90_Non-Target Lesion Location [Excel : PREY_NTLOC]" , options=["1","2","3","4a","4b","5","6","7","8","NA"],
                         index=None,  # No default selection
                         placeholder="Choose an option",)
 
                         PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
-                            "PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc",
+                            "PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc [Excel : PREY_NTL1LAD]",value = None,
                             step=0.1
                         )
+                        PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc = "NA" if PREY90_Non_Target_Lesion_Location == "NA" else PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc
                         PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
-                            "PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc",
+                            "PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc [Excel : PREY_NTL1PAD]",value = None,
                             step=0.1
                         )
+                        PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc = "NA" if PREY90_Non_Target_Lesion_Location == "NA" else PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc
 
                         PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
-                            "PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc",
+                            "PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc [Excel : PREY_NTL1CCD]",value = None,
                             step=0.1
                         )
-                        PREY90_Non_targeted_Lesion_Dia_Sum = "NA" if PREY90_Non_Target_Lesion_Location == 'NA' else max(PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc)
+                        PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc = "NA" if PREY90_Non_Target_Lesion_Location == "NA" else PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc
+                        
+                        PREY90_Non_targeted_Lesion_Dia_Sum = "NA" if PREY90_Non_Target_Lesion_Location == 'NA' else calculate_nontargeted_dia_sum(PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc)
                         st.write("PREY90_Non-targeted Lesion Dia Sum",PREY90_Non_targeted_Lesion_Dia_Sum)
                         PREY90_Reviewers_Initials = st.text_input(
-                            "PREY90_Reviewers Initials",
+                            "PREY90_Reviewers Initials [Excel : PREY_REVFT]",
                             help="Free-text input for reviewer name"
                         )
 
@@ -2606,7 +2666,7 @@ def add_new_data():
                         )
 
                         PREY90_Pre_Y90_Extrahepatic_Disease_Location = st.text_input(
-                            "PREY90_Pre Y90 Extrahepatic Disease Location",
+                            "PREY90_Pre Y90 Extrahepatic Disease Location [Excel : PREY_EHDLOCFT]",
                             help="Free Text"
                         )
 
@@ -2639,7 +2699,11 @@ def add_new_data():
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
+                        # 1st Followup
+
                         st.subheader("Imaging_1st_Followup")
+                        na1_selected = st.selectbox("Is Follow_up 1 Applicable ?", ["Yes","NA"], index=None, placeholder="Choose an option")
+                        
                         FU_Scan_Modality = st.selectbox(
                             "1st_FU_Scan Modality[Excel : FU1_MOD]\n\n(1) CT, (2) MRI",
                                         options=["1","2"],
@@ -2651,14 +2715,13 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
 
-                        FU_Imaging_Date = st.date_input("1st_FU_Imaging Date")
+                        FU_Imaging_Date = st.date_input("1st_FU_Imaging Date [Excel : FU1_IMG_DATE]",min_value=date(1900, 1, 1))
                         fetch_date = None
                         try:
                             fetch_date =  datetime.strptime(get_variable_value(st.session_state.temp_mrn,"TAREDATE"),"%Y-%m-%d")
                         except:
                             st.write("Fill Patient Info form")
-                       
-                        FU_Months_Since_Y90 = relativedelta(FU_Imaging_Date, fetch_date).months
+                        FU_Months_Since_Y90 = months_difference(FU_Imaging_Date, fetch_date)
                         st.write("1st_FU_Months Since Y90",FU_Months_Since_Y90)
                         FU_Total_number_of_lesions = st.selectbox(
                             "1st_FU_Total number of lesions [Excel : FU1_TOTLES]\n\n(1) 1,(2) 2,(3) >=3",
@@ -2673,17 +2736,17 @@ def add_new_data():
                         )
 
                         FU_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                            "1st_FU_Target Lesion 1 LAD Art Enhanc",
+                            "1st_FU_Target Lesion 1 LAD Art Enhanc [Excel : FU1_TL1LAD]",value = None,
                             step=0.1
                         )
 
                         FU_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                            "1st_FU_Target Lesion 1 PAD Art Enhanc",
+                            "1st_FU_Target Lesion 1 PAD Art Enhanc [Excel : FU1_TL1PAD]",value = None,
                             step=0.1
                         )
 
                         FU_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                            "1st_FU_Target Lesion 1 CCD Art Enhanc",
+                            "1st_FU_Target Lesion 1 CCD Art Enhanc [Excel : FU1_TL1CCD]",value = None,
                             step=0.1
                         )
 
@@ -2695,39 +2758,40 @@ def add_new_data():
                         )
 
                         FU_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
-                            "1st_FU_Target Lesion 2 LAD Art Enhanc",
+                            "1st_FU_Target Lesion 2 LAD Art Enhanc [Excel : FU1_TL2LAD]",value = None,
                             step=0.1
                         )
-
+                        FU_Target_Lesion_2_LAD_Art_Enhanc = "NA" if FU_Target_Lesion_2_Segments == "NA" else FU_Target_Lesion_2_LAD_Art_Enhanc
                         FU_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
-                            "1st_FU_Target Lesion 2 PAD Art Enhanc",
+                            "1st_FU_Target Lesion 2 PAD Art Enhanc [Excel : FU1_TL2PAD]",value = None,
                             step=0.1
                         )
-
+                        FU_Target_Lesion_2_PAD_Art_Enhanc = "NA" if FU_Target_Lesion_2_Segments == "NA" else FU_Target_Lesion_2_PAD_Art_Enhanc
                         FU_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
-                            "1st_FU_Target Lesion 2 CCD Art Enhanc",
+                            "1st_FU_Target Lesion 2 CCD Art Enhanc [Excel : FU1_TL2CCD]",value = None,
                             step=0.1
                         )
-
-                        FU_Follow_up_1_targeted_Lesion_Dia_Sum = max(FU_Target_Lesion_1_CCD_Art_Enhanc,FU_Target_Lesion_1_PAD_Art_Enhanc,FU_Target_Lesion_1_LAD_Art_Enhanc)+max(FU_Target_Lesion_2_CCD_Art_Enhanc,FU_Target_Lesion_2_PAD_Art_Enhanc,FU_Target_Lesion_2_LAD_Art_Enhanc)
+                        FU_Target_Lesion_2_CCD_Art_Enhanc = "NA" if FU_Target_Lesion_2_Segments == "NA" else FU_Target_Lesion_2_CCD_Art_Enhanc
+                        
+                        FU_Follow_up_1_targeted_Lesion_Dia_Sum = calculate_targeted_dia_sum(FU_Target_Lesion_1_CCD_Art_Enhanc,FU_Target_Lesion_1_PAD_Art_Enhanc,FU_Target_Lesion_1_LAD_Art_Enhanc,FU_Target_Lesion_2_CCD_Art_Enhanc,FU_Target_Lesion_2_PAD_Art_Enhanc,FU_Target_Lesion_2_LAD_Art_Enhanc)
                         st.write("1st_FU_Follow up 1 targeted Lesion Dia Sum",FU_Follow_up_1_targeted_Lesion_Dia_Sum)
                         FU_Non_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
-                            "1st_FU_Non-Target Lesion 2 LAD Art Enhanc",
+                            "1st_FU_Non-Target Lesion 2 LAD Art Enhanc [Excel : FU1_NTL1LAD]",value = None,
                             step=0.1
                         )
 
                         FU_Non_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
-                            "1st_FU_Non-Target Lesion 2 PAD Art Enhanc",
+                            "1st_FU_Non-Target Lesion 2 PAD Art Enhanc [Excel : FU1_NTL1PAD]",value = None,
                             step=0.1
                         )
 
                         FU_Non_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
-                            "1st_FU_Non-Target Lesion 2 CCD Art Enhanc",
+                            "1st_FU_Non-Target Lesion 2 CCD Art Enhanc [Excel : FU1_NTL1CCD]",value = None,
                             step=0.1
                         )
 
                         # Assuming "Non-targeted Lesion Dia Sum" is calculated elsewhere in the code
-                        FU_Non_targeted_Lesion_Dia_Sum = max(FU_Non_Target_Lesion_2_LAD_Art_Enhanc,FU_Non_Target_Lesion_2_PAD_Art_Enhanc,FU_Non_Target_Lesion_2_CCD_Art_Enhanc)
+                        FU_Non_targeted_Lesion_Dia_Sum = calculate_nontargeted_dia_sum(FU_Non_Target_Lesion_2_LAD_Art_Enhanc,FU_Non_Target_Lesion_2_PAD_Art_Enhanc,FU_Non_Target_Lesion_2_CCD_Art_Enhanc)
                         st.write("1st_FU_Non-targeted Lesion Dia Sum",FU_Non_targeted_Lesion_Dia_Sum)
                         FU_Lesion_Necrosis = st.selectbox(
                             "1st_FU_Lesion Necrosis [Excel : FU1_NECROSIS]\n\n Yes (1), No (0), NA",
@@ -2742,7 +2806,7 @@ def add_new_data():
                         )
 
                         FU_Reviewers_Initials = st.text_input(
-                            "1st_FU_Reviewers Initials",
+                            "1st_FU_Reviewers Initials [Excel : FU1_REVFT]",
                             help="Free-text input for reviewer name"
                         )
 
@@ -2783,15 +2847,15 @@ def add_new_data():
                         )
 
                         FU_NEW_Extrahepatic_Dz_Location = st.text_input(
-                            "1st_FU_NEW Extrahepatic Dz Location",
+                            "1st_FU_NEW Extrahepatic Dz Location [Excel : FU1_EHDLOC]",
                             help="Free text"
                         )
 
-                        FU_NEW_Extrahepatic_Dz_Date = st.date_input("1st_FU_NEW Extrahepatic Dz Date")
+                        FU_NEW_Extrahepatic_Dz_Date = st.date_input("1st_FU_NEW Extrahepatic Dz Date [Excel : FU1_EHDDATE]",min_value=date(1900, 1, 1))
 
-                        FU_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == "NA" else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU_Non_targeted_Lesion_Dia_Sum)/max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
+                        FU_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum in ["NA",0] else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU_Non_targeted_Lesion_Dia_Sum)/PREY90_Non_targeted_Lesion_Dia_Sum)*100
                         st.write("1st_FU_% change for non target lesion",FU_change_non_target_lesion)
-                        FU_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU_Follow_up_1_targeted_Lesion_Dia_Sum)/max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
+                        FU_change_target_lesion = "" if PREY90_pretx_targeted_Lesion_Dia_Sum in ["NA",0] else ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU_Follow_up_1_targeted_Lesion_Dia_Sum)/PREY90_pretx_targeted_Lesion_Dia_Sum)*100
                         st.write("1st_FU_% Change Target Dia",FU_change_target_lesion)
                         first_fu_mrecist_localized = mrecist_local(FU_change_target_lesion)
                         st.write("1st_FU_mRECIST LOCALIZED",first_fu_mrecist_localized)
@@ -2800,12 +2864,12 @@ def add_new_data():
                         st.write("1st_FU_mRECIST Overall",first_fu_mrecist_overall)
                         
                         FU_Free_Text = st.text_area(
-                            "1st_FU_Free Text",
+                            "1st_FU_Free Text [Excel : FU1_FT]",
                             help="Free text"
                         )
 
                         st.subheader("Imaging_2nd_Followup")
-
+                        na2_selected = st.selectbox("Is Follow_up 2 Applicable ?", ["Yes","NA"], index=None, placeholder="Choose an option")
                         FU2_Scan_Modality = st.selectbox(
                             "2nd_FU_Scan Modality Excel : FU2_MOD]\n\n(1) CT, (2) MRI",
                                         options=["1","2"],
@@ -2817,9 +2881,9 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
 
-                        FU2_Imaging_Date = st.date_input("2nd_FU_Imaging Date")
+                        FU2_Imaging_Date = st.date_input("2nd_FU_Imaging Date [Excel : FU2_IMG_DATE]",min_value=date(1900, 1, 1))
 
-                        FU2_Months_Since_Y90 = relativedelta(FU2_Imaging_Date, fetch_date).months
+                        FU2_Months_Since_Y90 = months_difference(FU2_Imaging_Date, fetch_date)
                         st.write("2nd_FU_Months Since Y90",FU2_Months_Since_Y90)
                         FU2_Total_number_of_lesions = st.selectbox(
                             "2nd_FU_Total number of lesions[Excel : FU2_TOTLES]\n\n(1) 1,(2) 2,(3) >=3",
@@ -2834,17 +2898,17 @@ def add_new_data():
                         )
 
                         FU2_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                            "2nd_FU_Target Lesion 1 LAD Art Enhanc",
+                            "2nd_FU_Target Lesion 1 LAD Art Enhanc [Excel : FU2_TL1LAD]",value = None,
                             step=0.1
                         )
 
                         FU2_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                            "2nd_FU_Target Lesion 1 PAD Art Enhanc",
+                            "2nd_FU_Target Lesion 1 PAD Art Enhanc [Excel : FU2_TL1PAD]",value = None,
                             step=0.1
                         )
 
                         FU2_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                            "2nd_FU_Target Lesion 1 CCD Art Enhanc",
+                            "2nd_FU_Target Lesion 1 CCD Art Enhanc [Excel : FU2_TL1CCD]",value = None,
                             step=0.1
                         )
 
@@ -2856,38 +2920,38 @@ def add_new_data():
                         )
 
                         FU2_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
-                            "2nd_FU_Target Lesion 2 LAD Art Enhanc",
+                            "2nd_FU_Target Lesion 2 LAD Art Enhanc [Excel : FU2_TL2LAD]",value = None,
                             step=0.1
                         )
-
+                        FU2_Target_Lesion_2_LAD_Art_Enhanc = "NA" if FU2_Target_Lesion_2_Segments == "NA" else FU2_Target_Lesion_2_LAD_Art_Enhanc
                         FU2_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
-                            "2nd_FU_Target Lesion 2 PAD Art Enhanc",
+                            "2nd_FU_Target Lesion 2 PAD Art Enhanc [Excel : FU2_TL2PAD]",value = None,
                             step=0.1
                         )
-
+                        FU2_Target_Lesion_2_PAD_Art_Enhanc = "NA" if FU2_Target_Lesion_2_Segments == "NA" else FU2_Target_Lesion_2_PAD_Art_Enhanc
                         FU2_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
-                            "2nd_FU_Target Lesion 2 CCD Art Enhanc",
+                            "2nd_FU_Target Lesion 2 CCD Art Enhanc [Excel : FU2_TL2CCD]",value = None,
                             step=0.1
                         )
-
-                        FU2_Follow_up_2_targeted_Lesion_Dia_Sum = max(FU2_Target_Lesion_1_CCD_Art_Enhanc, FU2_Target_Lesion_1_PAD_Art_Enhanc, FU2_Target_Lesion_1_LAD_Art_Enhanc) + max(FU2_Target_Lesion_2_CCD_Art_Enhanc, FU2_Target_Lesion_2_PAD_Art_Enhanc, FU2_Target_Lesion_2_LAD_Art_Enhanc)
+                        FU2_Target_Lesion_2_CCD_Art_Enhanc = "NA" if FU2_Target_Lesion_2_Segments == "NA" else FU2_Target_Lesion_2_CCD_Art_Enhanc
+                        FU2_Follow_up_2_targeted_Lesion_Dia_Sum = calculate_targeted_dia_sum(FU2_Target_Lesion_1_CCD_Art_Enhanc, FU2_Target_Lesion_1_PAD_Art_Enhanc, FU2_Target_Lesion_1_LAD_Art_Enhanc,FU2_Target_Lesion_2_CCD_Art_Enhanc, FU2_Target_Lesion_2_PAD_Art_Enhanc, FU2_Target_Lesion_2_LAD_Art_Enhanc)
                         st.write("2nd_FU_Follow up 2 targeted Lesion Dia Sum",FU2_Follow_up_2_targeted_Lesion_Dia_Sum)
                         FU2_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                            "2nd_FU_Non-Target Lesion 1 LAD Art Enhanc",
+                            "2nd_FU_Non-Target Lesion 1 LAD Art Enhanc [Excel : FU2_NTL1LAD]",value = None,
                             step=0.1
                         )
 
                         FU2_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                            "2nd_FU_Non-Target Lesion 1 PAD Art Enhanc",
+                            "2nd_FU_Non-Target Lesion 1 PAD Art Enhanc [Excel : FU2_NTL1PAD]",value = None,
                             step=0.1
                         )
 
                         FU2_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                            "2nd_FU_Non-Target Lesion 1 CCD Art Enhanc",
+                            "2nd_FU_Non-Target Lesion 1 CCD Art Enhanc [Excel : FU2_NTL1CCD]",value = None,
                             step=0.1
                         )
 
-                        FU2_Non_targeted_Lesion_Dia_Sum = max(FU2_Non_Target_Lesion_1_LAD_Art_Enhanc, FU2_Non_Target_Lesion_1_PAD_Art_Enhanc, FU2_Non_Target_Lesion_1_CCD_Art_Enhanc)
+                        FU2_Non_targeted_Lesion_Dia_Sum = calculate_nontargeted_dia_sum(FU2_Non_Target_Lesion_1_LAD_Art_Enhanc, FU2_Non_Target_Lesion_1_PAD_Art_Enhanc, FU2_Non_Target_Lesion_1_CCD_Art_Enhanc)
                         st.write("2nd_FU_Non-targeted Lesion Dia Sum",FU2_Non_targeted_Lesion_Dia_Sum)
                         FU2_Lesion_Necrosis = st.selectbox(
                             "2nd_FU_Lesion Necrosis  [Excel : FU2_NEC]\n\n Yes (1), No (0), NA",
@@ -2902,7 +2966,7 @@ def add_new_data():
                         )
 
                         FU2_Reviewers_Initials = st.text_input(
-                            "2nd_FU_Reviewers Initials",
+                            "2nd_FU_Reviewers Initials [Excel : FU2_REVFT]",
                             help="Free-text input for reviewer name"
                         )
 
@@ -2943,15 +3007,15 @@ def add_new_data():
                         )
 
                         FU2_NEW_Extrahepatic_Dz_Location = st.text_input(
-                            "2nd_FU_NEW Extrahepatic Dz Location",
+                            "2nd_FU_NEW Extrahepatic Dz Location [Excel : FU2_EHDLOC]",
                             help="Free text"
                         )
 
-                        FU2_NEW_Extrahepatic_Dz_Date = st.date_input("2nd_FU_NEW Extrahepatic Dz Date")
+                        FU2_NEW_Extrahepatic_Dz_Date = st.date_input("2nd_FU_NEW Extrahepatic Dz Date [Excel : FU2_EHDDATE]",min_value=date(1900, 1, 1))
 
-                        FU2_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == "NA" else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU2_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
+                        FU2_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum in ["NA", 0] else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU2_Non_targeted_Lesion_Dia_Sum) / PREY90_Non_targeted_Lesion_Dia_Sum)*100
                         st.write("2nd_FU_% change for non target lesion",FU2_change_non_target_lesion)
-                        FU2_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU2_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                        FU2_change_target_lesion = "" if PREY90_pretx_targeted_Lesion_Dia_Sum in ["NA", 0] else ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU2_Follow_up_2_targeted_Lesion_Dia_Sum) / PREY90_pretx_targeted_Lesion_Dia_Sum)*100
                         st.write("2nd_FU_% Change Target Dia",FU2_change_target_lesion)
                         
                         second_fu_mrecist_calc = mrecist_local(FU2_change_target_lesion)
@@ -2961,11 +3025,12 @@ def add_new_data():
                         second_fu_mrecist_overall = mrecist_overall(FU2_New_Lesions, FU2_NEW_Extrahepatic_Disease, FU2_change_non_target_lesion, FU2_change_target_lesion)
                         st.write("2nd_FU_mRECIST Overall", second_fu_mrecist_overall)
                         FU2_Free_Text = st.text_area(
-                            "2nd_FU_Free Text",
+                            "2nd_FU_Free Text [Excel : FU2_FT]",
                             help="Free text"
                         )
                         # 3rd Imaging Follow-up
                         st.subheader("Imaging_3rd_Followup")
+                        na3_selected = st.selectbox("Is Follow_up 3 Applicable ?", ["Yes","NA"], index=None, placeholder="Choose an option")
                         FU3_Scan_Modality = st.selectbox(
                             "3rd_FU_Scan Modality[Excel : FU3_MOD]\n\n(1) CT, (2) MRI",
                                         options=["1","2"],
@@ -2976,8 +3041,8 @@ def add_new_data():
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
-                        FU3_Imaging_Date = st.date_input("3rd_FU_Imaging Date")
-                        FU3_Months_Since_Y90 = relativedelta(FU3_Imaging_Date, fetch_date).months
+                        FU3_Imaging_Date = st.date_input("3rd_FU_Imaging Date [Excel : FU3_IMG_DATE]",min_value=date(1900, 1, 1))
+                        FU3_Months_Since_Y90 = months_difference(FU3_Imaging_Date, fetch_date)
                         st.write("3rd_FU_Months Since Y90",FU3_Months_Since_Y90)
                         FU3_Total_number_of_lesions = st.selectbox(
                             "3rd_FU_Total number of lesions[Excel : FU3_TOTLES]\n\n(1) 1,(2) 2,(3) >=3",
@@ -2993,17 +3058,17 @@ def add_new_data():
                         )
 
                         FU3_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                            "3rd_FU_Target Lesion 1 LAD Art Enhanc",
+                            "3rd_FU_Target Lesion 1 LAD Art Enhanc [Excel : FU3_TL1LAD]",value = None,
                             step=0.1
                         )
 
                         FU3_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                            "3rd_FU_Target Lesion 1 PAD Art Enhanc",
+                            "3rd_FU_Target Lesion 1 PAD Art Enhanc [Excel : FU3_TL1PAD]",value = None,
                             step=0.1
                         )
 
                         FU3_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                            "3rd_FU_Target Lesion 1 CCD Art Enhanc",
+                            "3rd_FU_Target Lesion 1 CCD Art Enhanc [Excel : FU3_TL1CCD]",value = None,
                             step=0.1
                         )
 
@@ -3015,38 +3080,39 @@ def add_new_data():
                         )
 
                         FU3_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
-                            "3rd_FU_Target Lesion 2 LAD Art Enhanc",
+                            "3rd_FU_Target Lesion 2 LAD Art Enhanc [Excel : FU3_TL2LAD]",value = None,
                             step=0.1
                         )
-
+                        FU3_Target_Lesion_2_LAD_Art_Enhanc = "NA" if FU3_Target_Lesion_2_Segments == 0 else FU3_Target_Lesion_2_LAD_Art_Enhanc
                         FU3_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
-                            "3rd_FU_Target Lesion 2 PAD Art Enhanc",
+                            "3rd_FU_Target Lesion 2 PAD Art Enhanc [Excel : FU3_TL2PAD]",value = None,
                             step=0.1
                         )
-
+                        FU3_Target_Lesion_2_PAD_Art_Enhanc = "NA" if FU3_Target_Lesion_2_Segments == 0 else FU3_Target_Lesion_2_PAD_Art_Enhanc
                         FU3_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
-                            "3rd_FU_Target Lesion 2 CCD Art Enhanc",
+                            "3rd_FU_Target Lesion 2 CCD Art Enhanc [Excel : FU3_TL2CCD]",value = None,
                             step=0.1
                         )
+                        FU3_Target_Lesion_2_CCD_Art_Enhanc = "NA" if FU3_Target_Lesion_2_Segments == 0 else FU3_Target_Lesion_2_CCD_Art_Enhanc
 
-                        FU3_Follow_up_2_targeted_Lesion_Dia_Sum = max(FU3_Target_Lesion_1_CCD_Art_Enhanc, FU3_Target_Lesion_1_PAD_Art_Enhanc, FU3_Target_Lesion_1_LAD_Art_Enhanc) + max(FU3_Target_Lesion_2_CCD_Art_Enhanc, FU3_Target_Lesion_2_PAD_Art_Enhanc, FU3_Target_Lesion_2_LAD_Art_Enhanc)
+                        FU3_Follow_up_2_targeted_Lesion_Dia_Sum = calculate_targeted_dia_sum(FU3_Target_Lesion_1_CCD_Art_Enhanc, FU3_Target_Lesion_1_PAD_Art_Enhanc, FU3_Target_Lesion_1_LAD_Art_Enhanc,FU3_Target_Lesion_2_CCD_Art_Enhanc, FU3_Target_Lesion_2_PAD_Art_Enhanc, FU3_Target_Lesion_2_LAD_Art_Enhanc)
                         st.write("3rd_FU_Follow up 3 targeted Lesion Dia Sum",FU3_Follow_up_2_targeted_Lesion_Dia_Sum)
                         FU3_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                            "3rd_FU_Non-Target Lesion 1 LAD Art Enhanc",
+                            "3rd_FU_Non-Target Lesion 1 LAD Art Enhanc [Excel : FU3_NTL1LAD]",value = None,
                             step=0.1
                         )
 
                         FU3_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                            "3rd_FU_Non-Target Lesion 1 PAD Art Enhanc",
+                            "3rd_FU_Non-Target Lesion 1 PAD Art Enhanc [Excel : FU3_NTL1PAD]",value = None,
                             step=0.1
                         )
 
                         FU3_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                            "3rd_FU_Non-Target Lesion 1 CCD Art Enhanc",
+                            "3rd_FU_Non-Target Lesion 1 CCD Art Enhanc [Excel : FU3_NTL1CCD]",value = None,
                             step=0.1
                         )
 
-                        FU3_Non_targeted_Lesion_Dia_Sum = max(FU3_Non_Target_Lesion_1_LAD_Art_Enhanc, FU3_Non_Target_Lesion_1_PAD_Art_Enhanc, FU3_Non_Target_Lesion_1_CCD_Art_Enhanc)
+                        FU3_Non_targeted_Lesion_Dia_Sum = calculate_nontargeted_dia_sum(FU3_Non_Target_Lesion_1_LAD_Art_Enhanc, FU3_Non_Target_Lesion_1_PAD_Art_Enhanc, FU3_Non_Target_Lesion_1_CCD_Art_Enhanc)
                         st.write("3rd_FU_Non-targeted Lesion Dia Sum",FU3_Non_targeted_Lesion_Dia_Sum)
                         FU3_Lesion_Necrosis = st.selectbox(
                             "3rd_FU_Lesion Necrosis[Excel : FU3_NEC]\n\n Yes (1), No (0), NA",
@@ -3061,7 +3127,7 @@ def add_new_data():
                         )
 
                         FU3_Reviewers_Initials = st.text_input(
-                            "3rd_FU_Reviewers Initials",
+                            "3rd_FU_Reviewers Initials [Excel : FU3_REVFT]",
                             help="Free-text input for reviewer name"
                         )
 
@@ -3102,13 +3168,13 @@ def add_new_data():
                         )
 
                         FU3_NEW_Extrahepatic_Dz_Location = st.text_input(
-                            "3rd_FU_NEW Extrahepatic Dz Location",
+                            "3rd_FU_NEW Extrahepatic Dz Location [Excel : FU3_EHDLOC]",
                             help="Free text"
                         )
-                        FU3_NEW_Extrahepatic_Dz_Date = st.date_input("3rd_FU_NEW Extrahepatic Dz Date")
-                        FU3_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == 'NA' else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU3_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
+                        FU3_NEW_Extrahepatic_Dz_Date = st.date_input("3rd_FU_NEW Extrahepatic Dz Date [Excel : FU3_EHDDATE]",min_value=date(1900, 1, 1))
+                        FU3_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum in ['NA' , 0] else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU3_Non_targeted_Lesion_Dia_Sum) / PREY90_Non_targeted_Lesion_Dia_Sum)*100
                         st.write("3rd_FU_% change for non target lesion",FU3_change_non_target_lesion)
-                        FU3_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU3_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                        FU3_change_target_lesion = "" if PREY90_pretx_targeted_Lesion_Dia_Sum in ['NA' , 0] else ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU3_Follow_up_2_targeted_Lesion_Dia_Sum) / PREY90_pretx_targeted_Lesion_Dia_Sum) * 100
                         st.write("3rd_FU_% Change Target Dia",FU3_change_target_lesion)
                         third_fu_mrecist_calc = mrecist_local(FU3_change_target_lesion)
                         st.write("3rd_FU_mRECIST Calc",third_fu_mrecist_calc)
@@ -3118,13 +3184,13 @@ def add_new_data():
                         third_fu_mrecist_overall = mrecist_overall (FU3_New_Lesions, FU3_NEW_Extrahepatic_Disease, FU3_change_non_target_lesion, FU3_change_target_lesion)
                         st.write("3rd_FU_mRECIST Overall", third_fu_mrecist_overall)
                         FU3_Free_Text = st.text_area(
-                            "3rd_FU_Free Text",
+                            "3rd_FU_Free Text [Excel : FU3_FT]",
                             help="Free text"
                         )
 
                         # 4th Imaging Follow-up
                         st.subheader("Imaging_4th_Followup")
-
+                        na4_selected = st.selectbox("Is Follow_up 4 Applicable ?", ["Yes","NA"], index=None, placeholder="Choose an option")
                         FU4_Scan_Modality = st.selectbox(
                             "4th_FU_Scan Modality [Excel : FU4_MOD]\n\n(1) CT, (2) MRI",
                                         options=["1","2"],
@@ -3136,9 +3202,9 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
 
-                        FU4_Imaging_Date = st.date_input("4th_FU_Imaging Date")
+                        FU4_Imaging_Date = st.date_input("4th_FU_Imaging Date [Excel : FU4_IMG_DATE]",min_value=date(1900, 1, 1))
 
-                        FU4_Months_Since_Y90 = relativedelta(FU4_Imaging_Date, fetch_date).months
+                        FU4_Months_Since_Y90 = months_difference(FU4_Imaging_Date, fetch_date)
                         st.write("4th_FU_Months Since Y90",FU4_Months_Since_Y90)
                         FU4_Total_number_of_lesions = st.selectbox(
                             "4th_FU_Total number of lesions [Excel : FU4_TOTLES]\n\n(1) 1,(2) 2,(3) >=3",
@@ -3153,17 +3219,17 @@ def add_new_data():
                         )
 
                         FU4_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                            "4th_FU_Target Lesion 1 LAD Art Enhanc",
+                            "4th_FU_Target Lesion 1 LAD Art Enhanc [Excel : FU4_TL1LAD]",value = None,
                             step=0.1
                         )
 
                         FU4_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                            "4th_FU_Target Lesion 1 PAD Art Enhanc",
+                            "4th_FU_Target Lesion 1 PAD Art Enhanc [Excel : FU4_TL1PAD]",value = None,
                             step=0.1
                         )
 
                         FU4_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                            "4th_FU_Target Lesion 1 CCD Art Enhanc",
+                            "4th_FU_Target Lesion 1 CCD Art Enhanc [Excel : FU4_TL1CCD]",value = None,
                             step=0.1
                         )
 
@@ -3175,38 +3241,38 @@ def add_new_data():
                         )
 
                         FU4_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
-                            "4th_FU_Target Lesion 2 LAD Art Enhanc",
+                            "4th_FU_Target Lesion 2 LAD Art Enhanc [Excel : FU4_TL2LAD]",value = None,
                             step=0.1
                         )
-
+                        FU4_Target_Lesion_2_LAD_Art_Enhanc = "NA" if FU4_Target_Lesion_2_Segments == "NA" else FU4_Target_Lesion_2_LAD_Art_Enhanc
                         FU4_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
-                            "4th_FU_Target Lesion 2 PAD Art Enhanc",
+                            "4th_FU_Target Lesion 2 PAD Art Enhanc [Excel : FU4_TL2PAD]",value = None,
                             step=0.1
                         )
-
+                        FU4_Target_Lesion_2_PAD_Art_Enhanc = "NA" if FU4_Target_Lesion_2_Segments == "NA" else FU4_Target_Lesion_2_PAD_Art_Enhanc
                         FU4_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
-                            "4th_FU_Target Lesion 2 CCD Art Enhanc",
+                            "4th_FU_Target Lesion 2 CCD Art Enhanc [Excel : FU4_TL2CCD]",value = None,
                             step=0.1
                         )
-
-                        FU4_Follow_up_2_targeted_Lesion_Dia_Sum = max(FU4_Target_Lesion_1_CCD_Art_Enhanc, FU4_Target_Lesion_1_PAD_Art_Enhanc, FU4_Target_Lesion_1_LAD_Art_Enhanc) + max(FU4_Target_Lesion_2_CCD_Art_Enhanc, FU4_Target_Lesion_2_PAD_Art_Enhanc, FU4_Target_Lesion_2_LAD_Art_Enhanc)
+                        FU4_Target_Lesion_2_CCD_Art_Enhanc = "NA" if FU4_Target_Lesion_2_Segments == "NA" else FU4_Target_Lesion_2_CCD_Art_Enhanc
+                        FU4_Follow_up_2_targeted_Lesion_Dia_Sum = calculate_targeted_dia_sum(FU4_Target_Lesion_1_CCD_Art_Enhanc, FU4_Target_Lesion_1_PAD_Art_Enhanc, FU4_Target_Lesion_1_LAD_Art_Enhanc,FU4_Target_Lesion_2_CCD_Art_Enhanc, FU4_Target_Lesion_2_PAD_Art_Enhanc, FU4_Target_Lesion_2_LAD_Art_Enhanc)
                         st.write("4th_FU_Follow up 4 targeted Lesion Dia Sum",FU4_Follow_up_2_targeted_Lesion_Dia_Sum)
                         FU4_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                            "4th_FU_Non-Target Lesion 1 LAD Art Enhanc",
+                            "4th_FU_Non-Target Lesion 1 LAD Art Enhanc [Excel : FU4_NTL1LAD]",value = None,
                             step=0.1
                         )
 
                         FU4_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                            "4th_FU_Non-Target Lesion 1 PAD Art Enhanc",
+                            "4th_FU_Non-Target Lesion 1 PAD Art Enhanc [Excel : FU4_NTL1PAD]",value = None,
                             step=0.1
                         )
 
                         FU4_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                            "4th_FU_Non-Target Lesion 1 CCD Art Enhanc",
+                            "4th_FU_Non-Target Lesion 1 CCD Art Enhanc [Excel : FU4_NTL1CCD]",value = None,
                             step=0.1
                         )
 
-                        FU4_Non_targeted_Lesion_Dia_Sum = max(FU4_Non_Target_Lesion_1_LAD_Art_Enhanc, FU4_Non_Target_Lesion_1_PAD_Art_Enhanc, FU4_Non_Target_Lesion_1_CCD_Art_Enhanc)
+                        FU4_Non_targeted_Lesion_Dia_Sum = calculate_nontargeted_dia_sum(FU4_Non_Target_Lesion_1_LAD_Art_Enhanc, FU4_Non_Target_Lesion_1_PAD_Art_Enhanc, FU4_Non_Target_Lesion_1_CCD_Art_Enhanc)
                         st.write("4th_FU_Non-targeted Lesion Dia Sum",FU4_Non_targeted_Lesion_Dia_Sum)
                         FU4_Lesion_Necrosis = st.selectbox(
                             "4th_FU_Lesion Necrosis  [Excel : FU4_NECROSIS]\n\n Yes (1), No (0), NA",
@@ -3221,7 +3287,7 @@ def add_new_data():
                         )
 
                         FU4_Reviewers_Initials = st.text_input(
-                            "4th_FU_Reviewers Initials",
+                            "4th_FU_Reviewers Initials [Excel : FU4_REVFT]",
                             help="Free-text input for reviewer name"
                         )
 
@@ -3262,14 +3328,14 @@ def add_new_data():
                         )
 
                         FU4_NEW_Extrahepatic_Dz_Location = st.text_input(
-                            "4th_FU_NEW Extrahepatic Dz Location",
+                            "4th_FU_NEW Extrahepatic Dz Location [Excel : FU4_EHDLOC]",
                             help="Free text"
                         )
 
-                        FU4_NEW_Extrahepatic_Dz_Date = st.date_input("4th_FU_NEW Extrahepatic Dz Date")
-                        FU4_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == "NA" else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU4_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                        FU4_NEW_Extrahepatic_Dz_Date = st.date_input("4th_FU_NEW Extrahepatic Dz Date [Excel : FU4_EHDDATE]",min_value=date(1900, 1, 1))
+                        FU4_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum in ["NA",0] else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU4_Non_targeted_Lesion_Dia_Sum) / PREY90_Non_targeted_Lesion_Dia_Sum) * 100
                         st.write("4th_FU_% change non target lesion",FU4_change_non_target_lesion)
-                        FU4_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU4_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                        FU4_change_target_lesion = "" if PREY90_pretx_targeted_Lesion_Dia_Sum in ["NA",0] else ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU4_Follow_up_2_targeted_Lesion_Dia_Sum) / PREY90_pretx_targeted_Lesion_Dia_Sum) * 100
                         st.write("4th_FU_% Change target dia",FU4_change_target_lesion)
                         fourth_fu_mrecist_calc = mrecist_local(FU4_change_target_lesion)
                         st.write("4th_FU_mRECIST Calc",fourth_fu_mrecist_calc)
@@ -3279,13 +3345,13 @@ def add_new_data():
                         st.write("4th_FU_mRECIST Overall", fourth_fu_mrecist_overall)
                         
                         FU4_Free_Text = st.text_area(
-                            "4th_FU_Free Text",
+                            "4th_FU_Free Text [Excel : FU4_FT]",
                             help="Free text"
                         )
 
                         # 5th Imaging Follow-up
                         st.subheader("Imaging_5th_Followup")
-
+                        na5_selected = st.selectbox("Is Follow_up 5 Applicable ?", ["Yes","NA"], index=None, placeholder="Choose an option")
                         FU5_Scan_Modality = st.selectbox(
                             "4th_FU_Scan Modality [Excel : FU5_MOD]\n\n(1) CT, (2) MRI",
                                         options=["1","2"],
@@ -3296,9 +3362,9 @@ def add_new_data():
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
-                        FU5_Imaging_Date = st.date_input("5th_FU_Imaging Date")
+                        FU5_Imaging_Date = st.date_input("5th_FU_Imaging Date [Excel : FU5_IMG_DATE]",min_value=date(1900, 1, 1))
 
-                        FU5_Months_Since_Y90 = relativedelta(FU5_Imaging_Date, fetch_date).months
+                        FU5_Months_Since_Y90 = months_difference(FU5_Imaging_Date, fetch_date)
                         st.write("5th_FU_Months Since Y90",FU5_Months_Since_Y90)
                         FU5_Total_number_of_lesions = st.selectbox(
                             "5th_FU_Total number of lesions [Excel : FU5_TOTLES]\n\n(1) 1,(2) 2,(3) >=3",
@@ -3312,17 +3378,17 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
                         FU5_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                            "5th_FU_Target Lesion 1 LAD Art Enhanc",
+                            "5th_FU_Target Lesion 1 LAD Art Enhanc [Excel : FU5_TL1LAD]",value = None,
                             step=0.1
                         )
 
                         FU5_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                            "5th_FU_Target Lesion 1 PAD Art Enhanc",
+                            "5th_FU_Target Lesion 1 PAD Art Enhanc [Excel : FU5_TL1PAD]",value = None,
                             step=0.1
                         )
 
                         FU5_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                            "5th_FU_Target Lesion 1 CCD Art Enhanc",
+                            "5th_FU_Target Lesion 1 CCD Art Enhanc [Excel : FU5_TL1CCD]",value = None,
                             step=0.1
                         )
 
@@ -3334,40 +3400,40 @@ def add_new_data():
                         )
 
                         FU5_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
-                            "5th_FU_Target Lesion 2 LAD Art Enhanc",
+                            "5th_FU_Target Lesion 2 LAD Art Enhanc [Excel : FU5_TL2LAD]",value = None,
                             step=0.1
                         )
-
+                        FU5_Target_Lesion_2_LAD_Art_Enhanc = "NA" if FU5_Target_Lesion_2_Segments == "NA" else FU5_Target_Lesion_2_LAD_Art_Enhanc
                         FU5_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
-                            "5th_FU_Target Lesion 2 PAD Art Enhanc",
+                            "5th_FU_Target Lesion 2 PAD Art Enhanc [Excel : FU5_TL2PAD]",value = None,
                             step=0.1
                         )
-
+                        FU5_Target_Lesion_2_PAD_Art_Enhanc = "NA" if FU5_Target_Lesion_2_Segments == "NA" else FU5_Target_Lesion_2_PAD_Art_Enhanc
                         FU5_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
-                            "5th_FU_Target Lesion 2 CCD Art Enhanc",
+                            "5th_FU_Target Lesion 2 CCD Art Enhanc [Excel : FU5_TL2CCD]",value = None,
                             step=0.1
                         )
-
-                        FU5_Follow_up_2_targeted_Lesion_Dia_Sum = max(FU5_Target_Lesion_1_CCD_Art_Enhanc, FU5_Target_Lesion_1_PAD_Art_Enhanc, FU5_Target_Lesion_1_LAD_Art_Enhanc) + max(FU5_Target_Lesion_2_CCD_Art_Enhanc, FU5_Target_Lesion_2_PAD_Art_Enhanc, FU5_Target_Lesion_2_LAD_Art_Enhanc)
+                        FU5_Target_Lesion_2_CCD_Art_Enhanc = "NA" if FU5_Target_Lesion_2_Segments == "NA" else FU5_Target_Lesion_2_CCD_Art_Enhanc
+                        FU5_Follow_up_2_targeted_Lesion_Dia_Sum = calculate_targeted_dia_sum(FU5_Target_Lesion_1_CCD_Art_Enhanc, FU5_Target_Lesion_1_PAD_Art_Enhanc, FU5_Target_Lesion_1_LAD_Art_Enhanc,FU5_Target_Lesion_2_CCD_Art_Enhanc, FU5_Target_Lesion_2_PAD_Art_Enhanc, FU5_Target_Lesion_2_LAD_Art_Enhanc)
                         st.write("5th_FU_Follow up 4 targeted Lesion Dia Sum",FU5_Follow_up_2_targeted_Lesion_Dia_Sum)
 
 
                         FU5_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                            "5th_FU_Non-Target Lesion 1 LAD Art Enhanc",
+                            "5th_FU_Non-Target Lesion 1 LAD Art Enhanc [Excel : FU5_NTL1LAD]",value = None,
                             step=0.1
                         )
 
                         FU5_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                            "5th_FU_Non-Target Lesion 1 PAD Art Enhanc",
+                            "5th_FU_Non-Target Lesion 1 PAD Art Enhanc [Excel : FU5_NTL1PAD]",value = None,
                             step=0.1
                         )
 
                         FU5_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                            "5th_FU_Non-Target Lesion 1 CCD Art Enhanc",
+                            "5th_FU_Non-Target Lesion 1 CCD Art Enhanc [Excel : FU5_NTL1CCD]",value = None,
                             step=0.1
                         )
 
-                        FU5_Non_targeted_Lesion_Dia_Sum = max(FU5_Non_Target_Lesion_1_LAD_Art_Enhanc, FU5_Non_Target_Lesion_1_PAD_Art_Enhanc, FU5_Non_Target_Lesion_1_CCD_Art_Enhanc)
+                        FU5_Non_targeted_Lesion_Dia_Sum = calculate_nontargeted_dia_sum(FU5_Non_Target_Lesion_1_LAD_Art_Enhanc, FU5_Non_Target_Lesion_1_PAD_Art_Enhanc, FU5_Non_Target_Lesion_1_CCD_Art_Enhanc)
                         st.write("5th_FU_Non-targeted Lesion Dia Sum",FU5_Non_targeted_Lesion_Dia_Sum)
                       
                         FU5_Non_target_lesion_response = st.selectbox(
@@ -3407,15 +3473,15 @@ def add_new_data():
                         )
 
                         FU5_NEW_Extrahepatic_Dz_Location = st.text_input(
-                            "5th_FU_NEW Extrahepatic Dz Location",
+                            "5th_FU_NEW Extrahepatic Dz Location [Excel : FU5_EHDLOC]",
                             help="Free text"
                         )
 
-                        FU5_NEW_Extrahepatic_Dz_Date = st.date_input("5th_FU_NEW Extrahepatic Dz Date")
+                        FU5_NEW_Extrahepatic_Dz_Date = st.date_input("5th_FU_NEW Extrahepatic Dz Date [Excel : FU5_EHDDATE]",min_value=date(1900, 1, 1))
 
-                        FU5_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == 'NA' else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU5_Non_targeted_Lesion_Dia_Sum) / max(0.1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                        FU5_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum in ['NA',0] else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU5_Non_targeted_Lesion_Dia_Sum) / PREY90_Non_targeted_Lesion_Dia_Sum) * 100
                         st.write("5th_FU_% change non target lesion ",FU5_change_non_target_lesion)
-                        FU5_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU5_Follow_up_2_targeted_Lesion_Dia_Sum) / max(0.1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                        FU5_change_target_lesion = "" if PREY90_pretx_targeted_Lesion_Dia_Sum in ['NA',0] else ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU5_Follow_up_2_targeted_Lesion_Dia_Sum) / PREY90_pretx_targeted_Lesion_Dia_Sum) * 100
                         st.write("5th_FU_% Change target dia",FU5_change_target_lesion)
 
                         fifth_fu_mrecist_calc = mrecist_local(FU5_change_target_lesion)
@@ -3427,7 +3493,7 @@ def add_new_data():
                         st.write("5th_FU_mRECIST Overall", fifth_fu_mrecist_overall)
                         
                         FU5_Free_Text = st.text_area(
-                            "5th_FU_Free Text",
+                            "5th_FU_Free Text [Excel : FU5_FT]",
                             help="Free text"
                         )
 
@@ -3444,13 +3510,13 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
 
-                        Date_of_Death = st.date_input("Date of Death")
+                        Date_of_Death = st.date_input("Date of Death [Excel : DATE_DEAD]",min_value=date(1900, 1, 1))
                         Time_to_Death = None
                         if dead == 0:
                             Date_of_Death = 'NA'
                             Time_to_Death = 'NA'
                         else :
-                            Time_to_Death = relativedelta(Date_of_Death, fetch_date).months
+                            Time_to_Death = months_difference(Date_of_Death, fetch_date)
                         st.write("Time to Death",Time_to_Death)
 
                         OLT = st.selectbox(
@@ -3464,13 +3530,13 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
 
-                        Date_of_OLT = st.date_input("Date of OLT")
+                        Date_of_OLT = st.date_input("Date of OLT [Excel : DATE_OLT]",min_value=date(1900, 1, 1))
                         Time_to_OLT = None
                         if OLT == 0:
                             Date_of_OLT = 'NA'
                             Time_to_OLT = 'NA'
                         else:
-                            Time_to_OLT = relativedelta(Date_of_OLT, fetch_date).months
+                            Time_to_OLT = months_difference(Date_of_OLT, fetch_date)
                         st.write("Time to OLT",Time_to_OLT)
 
                         Repeat_tx_post_Y90 = st.selectbox(
@@ -3484,14 +3550,14 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
 
-                        Date_of_Repeat_tx_Post_Y90 = st.date_input("Date of Repeat tx Post Y90")
+                        Date_of_Repeat_tx_Post_Y90 = st.date_input("Date of Repeat tx Post Y90 [Excel : DATE_RTX]",min_value=date(1900, 1, 1))
                         Time_to_Repeat_Tx_Post_Y90 = None
 
                         if Repeat_tx_post_Y90 == 0:
                                 Date_of_Repeat_tx_Post_Y90 = 'NA'
                                 Time_to_Repeat_Tx_Post_Y90 = 'NA'
                         else:
-                            Time_to_Repeat_Tx_Post_Y90 = relativedelta(Date_of_Repeat_tx_Post_Y90, fetch_date).months
+                            Time_to_Repeat_Tx_Post_Y90 = months_difference(Date_of_Repeat_tx_Post_Y90, fetch_date)
                         st.write("Time to Repeat Tx Post Y90",Time_to_Repeat_Tx_Post_Y90)
 
                         Date_of_Localized_Progression = detect_first_progression(first_fu_mrecist_localized, second_fu_mrecist_localized, third_fu_mrecist_localized, fourth_fu_mrecist_localized, fifth_fu_mrecist_localized, FU2_Imaging_Date, FU3_Imaging_Date, FU4_Imaging_Date, FU5_Imaging_Date)
@@ -3500,7 +3566,7 @@ def add_new_data():
                         if Date_of_Localized_Progression == "No Progression":
                                 Time_to_localized_progression = 'NA'
                         else:
-                                Time_to_localized_progression = relativedelta(Date_of_Localized_Progression, fetch_date).years
+                                Time_to_localized_progression = months_difference(Date_of_Localized_Progression, fetch_date)
                         st.write("Time to localized progression",Time_to_localized_progression)
 
                         Date_of_Overall_Progression = detect_overall_progression(first_fu_mrecist_localized, first_fu_mrecist_overall, second_fu_mrecist_localized, second_fu_mrecist_overall, third_fu_mrecist_localized, third_fu_mrecist_overall, fourth_fu_mrecist_localized, fourth_fu_mrecist_overall, fifth_fu_mrecist_localized, fifth_fu_mrecist_overall, FU_Imaging_Date, FU2_Imaging_Date, FU3_Imaging_Date, FU4_Imaging_Date, FU5_Imaging_Date)
@@ -3509,7 +3575,7 @@ def add_new_data():
                         if Date_of_Overall_Progression == "No Progression":
                                 Time_to_overall_progression = 'NA'
                         else:
-                                Time_to_overall_progression = relativedelta(Date_of_Overall_Progression, fetch_date).years
+                                Time_to_overall_progression = months_difference(Date_of_Overall_Progression, fetch_date)
                         st.write("Time to Overall (Local or systemic) Progression",Time_to_overall_progression)
 
                         lfu = st.selectbox("Last Follow up [Excel : LFU]\n\n(1) Yes, (0) No", options=["0", "1"],
@@ -3520,24 +3586,24 @@ def add_new_data():
                         index=None,  # No default selection
                         placeholder="Choose an option",)
 
-                        Date_of_Last_Follow_up_last_imaging_date = st.date_input("Date of Last Follow-up/last imaging date")
+                        Date_of_Last_Follow_up_last_imaging_date = st.date_input("Date of Last Follow-up/last imaging date [Excel : DATE_LFU]",min_value=date(1900, 1, 1))
                         Time_to_Last_Follow_up_last_imaging_date = None
                         if dead == 1 and OLT == 1 and Repeat_tx_post_Y90 == 1  and lfu == "0":
                             Date_of_Last_Follow_up_last_imaging_date = 'NA'
                             Time_to_Last_Follow_up_last_imaging_date = "NA"
                         else:
-                            Time_to_Last_Follow_up_last_imaging_date = relativedelta(Date_of_Last_Follow_up_last_imaging_date, fetch_date).years
+                            Time_to_Last_Follow_up_last_imaging_date = months_difference(Date_of_Last_Follow_up_last_imaging_date, fetch_date)
                         st.write("Time to Last follow up",Time_to_Last_Follow_up_last_imaging_date)
 
-                        notes_free_text = st.text_input("Notes Free Text")
+                        notes_free_text = st.text_input("Notes Free Text [Excel : NOTES_FT]")
 
                         bestm_recist = determine_bestmrecist(first_fu_mrecist_localized, second_fu_mrecist_localized, third_fu_mrecist_localized, fourth_fu_mrecist_localized, fifth_fu_mrecist_localized)
                         st.write("BestmRECIST", bestm_recist)
                         date_bestm_recist = determine_bestmrecist_date(fifth_fu_mrecist_overall, first_fu_mrecist_overall, second_fu_mrecist_overall, third_fu_mrecist_overall, fourth_fu_mrecist_overall, fifth_fu_mrecist_localized, FU_Imaging_Date, FU2_Imaging_Date, FU3_Imaging_Date, FU4_Imaging_Date, FU5_Imaging_Date)
                         st.write("Date BestmRECIST",date_bestm_recist)
-                        time_to_bestm_recist = "No Time" if date_bestm_recist == "No Date" else relativedelta(date_bestm_recist, fetch_date).months
+                        time_to_bestm_recist = "No Time" if date_bestm_recist == "No Date" else months_difference(date_bestm_recist, fetch_date)
                         st.write("Timeto_bestmRECIST", time_to_bestm_recist)
-                        PERCHANGE_BEST_TTR = st.number_input("Percent change till best mRECIST 1st",step=0.1)
+                        PERCHANGE_BEST_TTR = st.number_input("Percent change till best mRECIST 1st [Excel : PERCHANGE_BEST_TTR]",value = None,step=0.1)
                         def best_cr_noncr(value):
                             if value == "CR":
                                     return 1
@@ -3557,11 +3623,11 @@ def add_new_data():
                         bestm_recist_r_vs_nr = best_responce(bestm_recist)
                         st.write("BestmRECISTRvsNR" ,bestm_recist_r_vs_nr)
 
-                        DATE_BEST_MTR = st.date_input("Date of Best percent change (2)")
-                        TIME_BEST_MRT = relativedelta(DATE_BEST_MTR, fetch_date).months
-                        PERCHANGE_BEST_MTR = st.number_input("Best Overall percent change (2) ",step=0.1)
+                        DATE_BEST_MTR = st.date_input("Date of Best percent change (2) [Excel : DATE_BEST_MTR]",min_value=date(1900, 1, 1))
+                        TIME_BEST_MRT = months_difference(DATE_BEST_MTR, fetch_date)
+                        PERCHANGE_BEST_MTR = st.number_input("Best Overall percent change (2) [Excel : PERCHANGE_BEST_MTR]",value = None,step=0.1)
 
-                        OS_Date = st.date_input("Overall Survival Date")
+                        OS_Date = st.date_input("Overall Survival Date [Excel : OS_Date]",min_value=date(1900, 1, 1))
                         OS_Events = st.selectbox("Overall Survival Events [Excel : OS_Events]\n\n(1) Event: Death, (0) Censored: OLT, RTx, LFU",
                             options=["1","0"],
                             format_func=lambda x:{
@@ -3571,7 +3637,7 @@ def add_new_data():
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
-                        OS_Time = relativedelta(OS_Date, fetch_date).months
+                        OS_Time = months_difference(OS_Date, fetch_date)
                         OS_Reason = st.selectbox("Overall Survival Reaons [Excel : OS_Reason]\n\nDead = dead, OLT = liver transplant, RTx = repeat treatment, LFU = Loss to Follow up",
                             options=["Dead","OLT", "RTx", "LFU"],
                             format_func=lambda x:{
@@ -3584,7 +3650,7 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
                         #LPFS
-                        LPFS_Date = st.date_input("Local Progression Free Survival Date")
+                        LPFS_Date = st.date_input("Local Progression Free Survival Date [Excel : LPFS_Date]",min_value=date(1900, 1, 1))
                         LPFS_Events = st.selectbox("Local Progression Free Survival Event [Excel : LPFS_Events]\n\n(1) Event: Death, (0) Censored: OLT, RTx, LFU",
                             options=["1","0"],
                             format_func=lambda x:{
@@ -3594,14 +3660,14 @@ def add_new_data():
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
-                        LPFS_Time = relativedelta(LPFS_Date, fetch_date).months
+                        LPFS_Time = months_difference(LPFS_Date, fetch_date)
                         LPFS_Reason = st.selectbox("Local Progression Free Survival Reason [Excel : LPFS_Reason]",
                             options=["Dead"," LP(Local progression)", "OLT", "RTx", "LFU"],
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
                         #PFS
-                        PFS_Date = st.date_input("Progression Free Survival Date")
+                        PFS_Date = st.date_input("Progression Free Survival Date [Excel : PFS_Date]",min_value=date(1900, 1, 1))
                         PFS_Events = st.selectbox("Progression Free Survival Event [Excel : PFS_Events]\n\n(1) Event: Death, (0) Censored: OLT, RTx, LFU",
                             options=["1","0"],
                             format_func=lambda x:{
@@ -3611,7 +3677,7 @@ def add_new_data():
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
-                        PFS_Time = relativedelta(PFS_Date, fetch_date).months
+                        PFS_Time = months_difference(PFS_Date, fetch_date)
                         PFS_Reason = st.selectbox("Progression Free Survival Reason [Excel : PFS_Reason]\n\nDead = dead, OLT = liver transplant, RTx = repeat treatment, LFU = Loss to Follow up",
                             options=["Dead","OP(Overall progression)" ,"OLT", "RTx", "LFU"],
                         index=None,  # No default selection
@@ -3624,174 +3690,175 @@ def add_new_data():
                         if submit_tab10:
                             #index = st.session_state.data[st.session_state.data["MRN"] == st.session_state.temp_mrn].index[0]
                             data10={
-                                    "PREY_MOD": PREY90_prescan_modality,
-                                    "PREY_IMG_DATE": PREY90_Imaging_Date.strftime("%Y-%m-%d"),
-                                    "PREY_TOTLES": PREY90_total_number_of_lesions,
-                                    "PREY_LOBES": PREY90_Number_Involved_Lobes,
-                                    "PREY_TL1SEG": PREY90_target_lesion_1_segments,
-                                    "PREY_TL1LAD": PREY90_TL1_LAD,
-                                    "PREY_TL1PAD": PREY90_Target_Lesion_1_PAD,
-                                    "PREY_TL1CCD": PREY90_Target_Lesion_1_CCD,
-                                    "PREY_TL1VOL": PREY90_Target_Lesion_1_VOL,
-                                    "PREY_TL2SEG": PREY90_Target_Lesion_2_segments,
-                                    "PREY_TL2LAD": PREY90_Target_Lesion_2_LAD,
-                                    "PREY_TL2PAD": PREY90_Target_Lesion_2_PAD,
-                                    "PREY_TL2CCD": PREY90_Target_Lesion_2_CCD,
-                                    "PREY_TL2VOL": PREY90_Target_Lesion_2_VOL,
-                                    "PREY_TLDIA": PREY90_pretx_targeted_Lesion_Dia_Sum,
-                                    "PREY_NTLOC": PREY90_Non_Target_Lesion_Location,
-                                    "PREY_NTL1LAD": PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "PREY_NTL1PAD": PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "PREY_NTL1CCD": PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "PREY_NTLDIA": PREY90_Non_targeted_Lesion_Dia_Sum,
-                                    "PREY_REVFT": PREY90_Reviewers_Initials,
-                                    "PREY_EHD": PREY90_Pre_Y90_Extrahepatic_Disease,
-                                    "PREY_EHDLOCFT": PREY90_Pre_Y90_Extrahepatic_Disease_Location,
-                                    "PREY_PVT": PREY90_PVT,
-                                    "PREY_PVTLOC": PREY90_PVT_Location,
-                                    "PREY_CIRRH": PREY90_Features_of_cirrhosis,
-                                    "FU1_MOD": FU_Scan_Modality,
-                                    "FU1_IMG_DATE": FU_Imaging_Date.strftime("%Y-%m-%d"),
-                                    "FU1_MS_Y90": FU_Months_Since_Y90,
-                                    "FU1_TOTLES": FU_Total_number_of_lesions,
-                                    "FU1_TL1LAD": FU_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU1_TL1PAD": FU_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU1_TL1CCD": FU_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU1_TL2SEG": FU_Target_Lesion_2_Segments,
-                                    "FU1_TL2LAD": FU_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "FU1_TL2PAD": FU_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "FU1_TL2CCD": FU_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "FU1_TLDIA": FU_Follow_up_1_targeted_Lesion_Dia_Sum,
-                                    "FU1_NTL1LAD": FU_Non_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "FU1_NTL1PAD": FU_Non_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "FU1_NTL1CCD": FU_Non_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "FU1_NTLDIA": FU_Non_targeted_Lesion_Dia_Sum,
-                                    "FU1_NECROSIS": FU_Lesion_Necrosis,
-                                    "FU1_REVFT": FU_Reviewers_Initials,
-                                    "FU1_NTLRSP": FU_Non_target_lesion_response,
-                                    "FU1_NEWLESION": FU_New_Lesions,
-                                    "FU1_NEWEHD": FU_NEW_Extrahepatic_Disease,
-                                    "FU1_EHDLOC": FU_NEW_Extrahepatic_Dz_Location,
-                                    "FU1_EHDDATE": FU_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
-                                    "FU1_NTCHG": FU_change_non_target_lesion,
-                                    "FU1_TDCHG": FU_change_target_lesion,
-                                    "FU1_MREC_LOCAL": first_fu_mrecist_localized,
-                                    "FU1_MREC_OVERALL": first_fu_mrecist_overall,
-                                    "FU1_FT": FU_Free_Text,
-                                    "FU2_MOD": FU2_Scan_Modality,
-                                    "FU2_IMG_DATE": FU2_Imaging_Date.strftime("%Y-%m-%d"),
-                                    "FU2_MS_Y90": FU2_Months_Since_Y90,
-                                    "FU2_TOTLES": FU2_Total_number_of_lesions,
-                                    "FU2_TL1LAD": FU2_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU2_TL1PAD": FU2_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU2_TL1CCD": FU2_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU2_TL2SEG": FU2_Target_Lesion_2_Segments,
-                                    "FU2_TL2LAD": FU2_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "FU2_TL2PAD": FU2_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "FU2_TL2CCD": FU2_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "FU2_TLDIA": FU2_Follow_up_2_targeted_Lesion_Dia_Sum,
-                                    "FU2_NTL1LAD": FU2_Non_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU2_NTL1PAD": FU2_Non_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU2_NTL1CCD": FU2_Non_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU2_NTLDIA": FU2_Non_targeted_Lesion_Dia_Sum,
-                                    "FU2_NECROSIS": FU2_Lesion_Necrosis,
-                                    "FU2_REV": FU2_Reviewers_Initials,
-                                    "FU2_NTLRSP": FU2_Non_target_lesion_response,
-                                    "FU2_NEWLES": FU2_New_Lesions,
-                                    "FU2_EHD": FU2_NEW_Extrahepatic_Disease,
-                                    "FU2_EHDLOC": FU2_NEW_Extrahepatic_Dz_Location,
-                                    "FU2_EHDDATE": FU2_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
-                                    "FU2_NTCHG": FU2_change_non_target_lesion,
-                                    "FU2_TDCHG": FU2_change_target_lesion,
-                                    "FU2_MREC_CALC": second_fu_mrecist_calc,
-                                    "FU2_MREC_LOCAL": second_fu_mrecist_localized,
-                                    "FU2_MREC_OVERALL": second_fu_mrecist_overall,
-                                    "FU2_FT": FU2_Free_Text,
-                                    "FU3_MOD": FU3_Scan_Modality,
-                                    "FU3_IMG_DATE": FU3_Imaging_Date.strftime("%Y-%m-%d"),
-                                    "FU3_MS_Y90": FU3_Months_Since_Y90,
-                                    "FU3_TOTLES": FU3_Total_number_of_lesions,
-                                    "FU3_TL1LAD": FU3_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU3_TL1PAD": FU3_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU3_TL1CCD": FU3_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU3_TL2SEG": FU3_Target_Lesion_2_Segments,
-                                    "FU3_TL2LAD": FU3_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "FU3_TL2PAD": FU3_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "FU3_TL2CCD": FU3_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "FU3_TLDIA": FU3_Follow_up_2_targeted_Lesion_Dia_Sum,
-                                    "FU3_NTL1LAD": FU3_Non_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU3_NTL1PAD": FU3_Non_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU3_NTL1CCD": FU3_Non_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU3_NTLDIA": FU3_Non_targeted_Lesion_Dia_Sum,
-                                    "FU3_NEC": FU3_Lesion_Necrosis,
-                                    "FU3_REV": FU3_Reviewers_Initials,
-                                    "FU3_NTLRSP": FU3_Non_target_lesion_response,
-                                    "FU3_NEWLES": FU3_New_Lesions,
-                                    "FU3_EHD": FU3_NEW_Extrahepatic_Disease,
-                                    "FU3_EHDLOC": FU3_NEW_Extrahepatic_Dz_Location,
-                                    "FU3_EHDDATE": FU3_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
-                                    "FU3_NTCHG": FU3_change_non_target_lesion,
-                                    "FU3_TDCHG": FU3_change_target_lesion,
-                                    "FU3_MREC_CALC": third_fu_mrecist_calc,
-                                    "FU3_MREC_LOCAL": third_fu_mrecist_localized,
-                                    "FU3_MREC_OVERALL": third_fu_mrecist_overall,
-                                    "FU3_FT": FU3_Free_Text,
-                                    "FU4_MOD": FU4_Scan_Modality,
-                                    "FU4_IMG_DATE": FU4_Imaging_Date.strftime("%Y-%m-%d"),
-                                    "FU4_MONTHS_Y90": FU4_Months_Since_Y90,
-                                    "FU4_TOTLES": FU4_Total_number_of_lesions,
-                                    "FU4_TL1LAD": FU4_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU4_TL1PAD": FU4_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU4_TL1CCD": FU4_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU4_TL2SEG": FU4_Target_Lesion_2_Segments,
-                                    "FU4_TL2LAD": FU4_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "FU4_TL2PAD": FU4_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "FU4_TL2CCD": FU4_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "FU4_TL_DIASUM": FU4_Follow_up_2_targeted_Lesion_Dia_Sum,
-                                    "FU4_NTL1LAD": FU4_Non_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU4_NTL1PAD": FU4_Non_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU4_NTL1CCD": FU4_Non_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU4_NTL_DIASUM": FU4_Non_targeted_Lesion_Dia_Sum,
-                                    "FU4_NECROSIS": FU4_Lesion_Necrosis,
-                                    "FU4_REVFT": FU4_Reviewers_Initials,
-                                    "FU4_NTLRSP": FU4_Non_target_lesion_response,
-                                    "FU4_NEWLESION": FU4_New_Lesions,
-                                    "FU4_NEWEHD": FU4_NEW_Extrahepatic_Disease,
-                                    "FU4_EHDLOC": FU4_NEW_Extrahepatic_Dz_Location,
-                                    "FU4_EHDDATE": FU4_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
-                                    "FU4_NTL_CHANGE": FU4_change_non_target_lesion,
-                                    "FU4_TL_CHANGE": FU4_change_target_lesion,
-                                    "FU4_MREC_CALC": fourth_fu_mrecist_calc,
-                                    "FU4_MREC_LOCAL": fourth_fu_mrecist_localized,
-                                    "FU4_MREC_OVERALL": fourth_fu_mrecist_overall,
-                                    "FU4_FT": FU4_Free_Text,
-                                    "FU5_MOD": FU5_Scan_Modality,
-                                    "FU5_IMG_DATE": FU5_Imaging_Date.strftime("%Y-%m-%d"),
-                                    "FU5_MONTHS_Y90": FU5_Months_Since_Y90,
-                                    "FU5_TOTLES": FU5_Total_number_of_lesions,
-                                    "FU5_TL1LAD": FU5_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU5_TL1PAD": FU5_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU5_TL1CCD": FU5_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU5_TL2SEG": FU5_Target_Lesion_2_Segments,
-                                    "FU5_TL2LAD": FU5_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "FU5_TL2PAD": FU5_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "FU5_TL2CCD": FU5_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "FU5_TL_DIASUM": FU5_Follow_up_2_targeted_Lesion_Dia_Sum,
-                                    "FU5_NTL1LAD": FU5_Non_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU5_NTL1PAD": FU5_Non_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU5_NTL1CCD": FU5_Non_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU5_NTL_DIASUM": FU5_Non_targeted_Lesion_Dia_Sum,
-                                    "FU5_NTLRSP": FU5_Non_target_lesion_response,
-                                    "FU5_NEWLESION": FU5_New_Lesions,
-                                    "FU5_NEWEHD": FU5_NEW_Extrahepatic_Disease,
-                                    "FU5_EHDLOC": FU5_NEW_Extrahepatic_Dz_Location,
-                                    "FU5_EHDDATE": FU5_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
-                                    "FU5_NTL_CHANGE": FU5_change_non_target_lesion,
-                                    "FU5_TL_CHANGE": FU5_change_target_lesion,
-                                    "FU5_MREC_CALC": fifth_fu_mrecist_calc,
-                                    "FU5_MREC_LOCAL": fifth_fu_mrecist_localized,
-                                    "FU5_MREC_OVERALL": fifth_fu_mrecist_overall,
-                                    "FU5_FT": FU5_Free_Text,
+              
+                                    "PREY_MOD": "NA" if na_selected == "NA" else PREY90_prescan_modality,
+                                    "PREY_IMG_DATE": "NA" if na_selected == "NA" else PREY90_Imaging_Date.strftime("%Y-%m-%d"),
+                                    "PREY_TOTLES": "NA" if na_selected == "NA" else PREY90_total_number_of_lesions,
+                                    "PREY_LOBES": "NA" if na_selected == "NA" else PREY90_Number_Involved_Lobes,
+                                    "PREY_TL1SEG": "NA" if na_selected == "NA" else PREY90_target_lesion_1_segments,
+                                    "PREY_TL1LAD": "NA" if na_selected == "NA" else PREY90_TL1_LAD,
+                                    "PREY_TL1PAD": "NA" if na_selected == "NA" else PREY90_Target_Lesion_1_PAD,
+                                    "PREY_TL1CCD": "NA" if na_selected == "NA" else PREY90_Target_Lesion_1_CCD,
+                                    "PREY_TL1VOL": "NA" if na_selected == "NA" else PREY90_Target_Lesion_1_VOL,
+                                    "PREY_TL2SEG": "NA" if na_selected == "NA" else PREY90_Target_Lesion_2_segments,
+                                    "PREY_TL2LAD": "NA" if na_selected == "NA" else PREY90_Target_Lesion_2_LAD,
+                                    "PREY_TL2PAD": "NA" if na_selected == "NA" else PREY90_Target_Lesion_2_PAD,
+                                    "PREY_TL2CCD": "NA" if na_selected == "NA" else PREY90_Target_Lesion_2_CCD,
+                                    "PREY_TL2VOL": "NA" if na_selected == "NA" else PREY90_Target_Lesion_2_VOL,
+                                    "PREY_TLDIA": "NA" if na_selected == "NA" else PREY90_pretx_targeted_Lesion_Dia_Sum,
+                                    "PREY_NTLOC": "NA" if na_selected == "NA" else PREY90_Non_Target_Lesion_Location,
+                                    "PREY_NTL1LAD": "NA" if na_selected == "NA" else PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "PREY_NTL1PAD": "NA" if na_selected == "NA" else PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "PREY_NTL1CCD": "NA" if na_selected == "NA" else PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "PREY_NTLDIA": "NA" if na_selected == "NA" else PREY90_Non_targeted_Lesion_Dia_Sum,
+                                    "PREY_REVFT": "NA" if na_selected == "NA" else PREY90_Reviewers_Initials,
+                                    "PREY_EHD": "NA" if na_selected == "NA" else PREY90_Pre_Y90_Extrahepatic_Disease,
+                                    "PREY_EHDLOCFT": "NA" if na_selected == "NA" else PREY90_Pre_Y90_Extrahepatic_Disease_Location,
+                                    "PREY_PVT": "NA" if na_selected == "NA" else PREY90_PVT,
+                                    "PREY_PVTLOC": "NA" if na_selected == "NA" else PREY90_PVT_Location,
+                                    "PREY_CIRRH": "NA" if na_selected == "NA" else PREY90_Features_of_cirrhosis,
+                                    "FU1_MOD": "NA" if na1_selected == "NA" else FU_Scan_Modality,
+                                    "FU1_IMG_DATE": "NA" if na1_selected == "NA" else FU_Imaging_Date.strftime("%Y-%m-%d"),
+                                    "FU1_MS_Y90": "NA" if na1_selected == "NA" else FU_Months_Since_Y90,
+                                    "FU1_TOTLES": "NA" if na1_selected == "NA" else FU_Total_number_of_lesions,
+                                    "FU1_TL1LAD": "NA" if na1_selected == "NA" else FU_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU1_TL1PAD": "NA" if na1_selected == "NA" else FU_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU1_TL1CCD": "NA" if na1_selected == "NA" else FU_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU1_TL2SEG": "NA" if na1_selected == "NA" else FU_Target_Lesion_2_Segments,
+                                    "FU1_TL2LAD": "NA" if na1_selected == "NA" else FU_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU1_TL2PAD": "NA" if na1_selected == "NA" else FU_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU1_TL2CCD": "NA" if na1_selected == "NA" else FU_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU1_TLDIA": "NA" if na1_selected == "NA" else FU_Follow_up_1_targeted_Lesion_Dia_Sum,
+                                    "FU1_NTL1LAD": "NA" if na1_selected == "NA" else FU_Non_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU1_NTL1PAD": "NA" if na1_selected == "NA" else FU_Non_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU1_NTL1CCD": "NA" if na1_selected == "NA" else FU_Non_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU1_NTLDIA": "NA" if na1_selected == "NA" else FU_Non_targeted_Lesion_Dia_Sum,
+                                    "FU1_NECROSIS": "NA" if na1_selected == "NA" else FU_Lesion_Necrosis,
+                                    "FU1_REVFT": "NA" if na1_selected == "NA" else FU_Reviewers_Initials,
+                                    "FU1_NTLRSP": "NA" if na1_selected == "NA" else FU_Non_target_lesion_response,
+                                    "FU1_NEWLESION": "NA" if na1_selected == "NA" else FU_New_Lesions,
+                                    "FU1_NEWEHD": "NA" if na1_selected == "NA" else FU_NEW_Extrahepatic_Disease,
+                                    "FU1_EHDLOC": "NA" if na1_selected == "NA" else FU_NEW_Extrahepatic_Dz_Location,
+                                    "FU1_EHDDATE": "NA" if na1_selected == "NA" else FU_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
+                                    "FU1_NTCHG": "NA" if na1_selected == "NA" else FU_change_non_target_lesion,
+                                    "FU1_TDCHG": "NA" if na1_selected == "NA" else FU_change_target_lesion,
+                                    "FU1_MREC_LOCAL": "NA" if na1_selected == "NA" else first_fu_mrecist_localized,
+                                    "FU1_MREC_OVERALL": "NA" if na1_selected == "NA" else first_fu_mrecist_overall,
+                                    "FU1_FT": "NA" if na1_selected == "NA" else FU_Free_Text,
+                                    "FU2_MOD": "NA" if na2_selected == "NA" else FU2_Scan_Modality,
+                                    "FU2_IMG_DATE": "NA" if na2_selected == "NA" else FU2_Imaging_Date.strftime("%Y-%m-%d"),
+                                    "FU2_MS_Y90": "NA" if na2_selected == "NA" else FU2_Months_Since_Y90,
+                                    "FU2_TOTLES": "NA" if na2_selected == "NA" else FU2_Total_number_of_lesions,
+                                    "FU2_TL1LAD": "NA" if na2_selected == "NA" else FU2_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU2_TL1PAD": "NA" if na2_selected == "NA" else FU2_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU2_TL1CCD": "NA" if na2_selected == "NA" else FU2_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU2_TL2SEG": "NA" if na2_selected == "NA" else FU2_Target_Lesion_2_Segments,
+                                    "FU2_TL2LAD": "NA" if na2_selected == "NA" else FU2_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU2_TL2PAD": "NA" if na2_selected == "NA" else FU2_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU2_TL2CCD": "NA" if na2_selected == "NA" else FU2_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU2_TLDIA": "NA" if na2_selected == "NA" else FU2_Follow_up_2_targeted_Lesion_Dia_Sum,
+                                    "FU2_NTL1LAD": "NA" if na2_selected == "NA" else FU2_Non_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU2_NTL1PAD": "NA" if na2_selected == "NA" else FU2_Non_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU2_NTL1CCD": "NA" if na2_selected == "NA" else FU2_Non_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU2_NTLDIA": "NA" if na2_selected == "NA" else FU2_Non_targeted_Lesion_Dia_Sum,
+                                    "FU2_NECROSIS": "NA" if na2_selected == "NA" else FU2_Lesion_Necrosis,
+                                    "FU2_REV": "NA" if na2_selected == "NA" else FU2_Reviewers_Initials,
+                                    "FU2_NTLRSP": "NA" if na2_selected == "NA" else FU2_Non_target_lesion_response,
+                                    "FU2_NEWLES": "NA" if na2_selected == "NA" else FU2_New_Lesions,
+                                    "FU2_EHD": "NA" if na2_selected == "NA" else FU2_NEW_Extrahepatic_Disease,
+                                    "FU2_EHDLOC": "NA" if na2_selected == "NA" else FU2_NEW_Extrahepatic_Dz_Location,
+                                    "FU2_EHDDATE": "NA" if na2_selected == "NA" else FU2_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
+                                    "FU2_NTCHG": "NA" if na2_selected == "NA" else FU2_change_non_target_lesion,
+                                    "FU2_TDCHG": "NA" if na2_selected == "NA" else FU2_change_target_lesion,
+                                    "FU2_MREC_CALC": "NA" if na2_selected == "NA" else second_fu_mrecist_calc,
+                                    "FU2_MREC_LOCAL": "NA" if na2_selected == "NA" else second_fu_mrecist_localized,
+                                    "FU2_MREC_OVERALL": "NA" if na2_selected == "NA" else second_fu_mrecist_overall,
+                                    "FU2_FT": "NA" if na2_selected == "NA" else FU2_Free_Text,
+                                    "FU3_MOD": "NA" if na3_selected == "NA" else FU3_Scan_Modality,
+                                    "FU3_IMG_DATE": "NA" if na3_selected == "NA" else FU3_Imaging_Date.strftime("%Y-%m-%d"),
+                                    "FU3_MS_Y90": "NA" if na3_selected == "NA" else FU3_Months_Since_Y90,
+                                    "FU3_TOTLES": "NA" if na3_selected == "NA" else FU3_Total_number_of_lesions,
+                                    "FU3_TL1LAD": "NA" if na3_selected == "NA" else FU3_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU3_TL1PAD": "NA" if na3_selected == "NA" else FU3_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU3_TL1CCD": "NA" if na3_selected == "NA" else FU3_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU3_TL2SEG": "NA" if na3_selected == "NA" else FU3_Target_Lesion_2_Segments,
+                                    "FU3_TL2LAD": "NA" if na3_selected == "NA" else FU3_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU3_TL2PAD": "NA" if na3_selected == "NA" else FU3_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU3_TL2CCD": "NA" if na3_selected == "NA" else FU3_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU3_TLDIA": "NA" if na3_selected == "NA" else FU3_Follow_up_2_targeted_Lesion_Dia_Sum,
+                                    "FU3_NTL1LAD": "NA" if na3_selected == "NA" else FU3_Non_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU3_NTL1PAD": "NA" if na3_selected == "NA" else FU3_Non_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU3_NTL1CCD": "NA" if na3_selected == "NA" else FU3_Non_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU3_NTLDIA": "NA" if na3_selected == "NA" else FU3_Non_targeted_Lesion_Dia_Sum,
+                                    "FU3_NEC": "NA" if na3_selected == "NA" else FU3_Lesion_Necrosis,
+                                    "FU3_REV": "NA" if na3_selected == "NA" else FU3_Reviewers_Initials,
+                                    "FU3_NTLRSP": "NA" if na3_selected == "NA" else FU3_Non_target_lesion_response,
+                                    "FU3_NEWLES": "NA" if na3_selected == "NA" else FU3_New_Lesions,
+                                    "FU3_EHD": "NA" if na3_selected == "NA" else FU3_NEW_Extrahepatic_Disease,
+                                    "FU3_EHDLOC": "NA" if na3_selected == "NA" else FU3_NEW_Extrahepatic_Dz_Location,
+                                    "FU3_EHDDATE": "NA" if na3_selected == "NA" else FU3_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
+                                    "FU3_NTCHG": "NA" if na3_selected == "NA" else FU3_change_non_target_lesion,
+                                    "FU3_TDCHG": "NA" if na3_selected == "NA" else FU3_change_target_lesion,
+                                    "FU3_MREC_CALC": "NA" if na3_selected == "NA" else third_fu_mrecist_calc,
+                                    "FU3_MREC_LOCAL": "NA" if na3_selected == "NA" else third_fu_mrecist_localized,
+                                    "FU3_MREC_OVERALL": "NA" if na3_selected == "NA" else third_fu_mrecist_overall,
+                                    "FU3_FT": "NA" if na3_selected == "NA" else FU3_Free_Text,
+                                    "FU4_MOD": "NA" if na4_selected == "NA" else FU4_Scan_Modality,
+                                    "FU4_IMG_DATE": "NA" if na4_selected == "NA" else FU4_Imaging_Date.strftime("%Y-%m-%d"),
+                                    "FU4_MONTHS_Y90": "NA" if na4_selected == "NA" else FU4_Months_Since_Y90,
+                                    "FU4_TOTLES": "NA" if na4_selected == "NA" else FU4_Total_number_of_lesions,
+                                    "FU4_TL1LAD": "NA" if na4_selected == "NA" else FU4_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU4_TL1PAD": "NA" if na4_selected == "NA" else FU4_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU4_TL1CCD": "NA" if na4_selected == "NA" else FU4_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU4_TL2SEG": "NA" if na4_selected == "NA" else FU4_Target_Lesion_2_Segments,
+                                    "FU4_TL2LAD": "NA" if na4_selected == "NA" else FU4_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU4_TL2PAD": "NA" if na4_selected == "NA" else FU4_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU4_TL2CCD": "NA" if na4_selected == "NA" else FU4_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU4_TL_DIASUM": "NA" if na4_selected == "NA" else FU4_Follow_up_2_targeted_Lesion_Dia_Sum,
+                                    "FU4_NTL1LAD": "NA" if na4_selected == "NA" else FU4_Non_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU4_NTL1PAD": "NA" if na4_selected == "NA" else FU4_Non_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU4_NTL1CCD": "NA" if na4_selected == "NA" else FU4_Non_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU4_NTL_DIASUM": "NA" if na4_selected == "NA" else FU4_Non_targeted_Lesion_Dia_Sum,
+                                    "FU4_NECROSIS": "NA" if na4_selected == "NA" else FU4_Lesion_Necrosis,
+                                    "FU4_REVFT": "NA" if na4_selected == "NA" else FU4_Reviewers_Initials,
+                                    "FU4_NTLRSP": "NA" if na4_selected == "NA" else FU4_Non_target_lesion_response,
+                                    "FU4_NEWLESION": "NA" if na4_selected == "NA" else FU4_New_Lesions,
+                                    "FU4_NEWEHD": "NA" if na4_selected == "NA" else FU4_NEW_Extrahepatic_Disease,
+                                    "FU4_EHDLOC": "NA" if na4_selected == "NA" else FU4_NEW_Extrahepatic_Dz_Location,
+                                    "FU4_EHDDATE": "NA" if na4_selected == "NA" else FU4_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
+                                    "FU4_NTL_CHANGE": "NA" if na4_selected == "NA" else FU4_change_non_target_lesion,
+                                    "FU4_TL_CHANGE": "NA" if na4_selected == "NA" else FU4_change_target_lesion,
+                                    "FU4_MREC_CALC": "NA" if na4_selected == "NA" else fourth_fu_mrecist_calc,
+                                    "FU4_MREC_LOCAL": "NA" if na4_selected == "NA" else fourth_fu_mrecist_localized,
+                                    "FU4_MREC_OVERALL": "NA" if na4_selected == "NA" else fourth_fu_mrecist_overall,
+                                    "FU4_FT": "NA" if na4_selected == "NA" else FU4_Free_Text,
+                                    "FU5_MOD": "NA" if na5_selected == "NA" else FU5_Scan_Modality,
+                                    "FU5_IMG_DATE": "NA" if na5_selected == "NA" else FU5_Imaging_Date.strftime("%Y-%m-%d"),
+                                    "FU5_MONTHS_Y90": "NA" if na5_selected == "NA" else FU5_Months_Since_Y90,
+                                    "FU5_TOTLES": "NA" if na5_selected == "NA" else FU5_Total_number_of_lesions,
+                                    "FU5_TL1LAD": "NA" if na5_selected == "NA" else FU5_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU5_TL1PAD": "NA" if na5_selected == "NA" else FU5_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU5_TL1CCD": "NA" if na5_selected == "NA" else FU5_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU5_TL2SEG": "NA" if na5_selected == "NA" else FU5_Target_Lesion_2_Segments,
+                                    "FU5_TL2LAD": "NA" if na5_selected == "NA" else FU5_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU5_TL2PAD": "NA" if na5_selected == "NA" else FU5_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU5_TL2CCD": "NA" if na5_selected == "NA" else FU5_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU5_TL_DIASUM": "NA" if na5_selected == "NA" else FU5_Follow_up_2_targeted_Lesion_Dia_Sum,
+                                    "FU5_NTL1LAD": "NA" if na5_selected == "NA" else FU5_Non_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU5_NTL1PAD": "NA" if na5_selected == "NA" else FU5_Non_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU5_NTL1CCD": "NA" if na5_selected == "NA" else FU5_Non_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU5_NTL_DIASUM": "NA" if na5_selected == "NA" else FU5_Non_targeted_Lesion_Dia_Sum,
+                                    "FU5_NTLRSP": "NA" if na5_selected == "NA" else FU5_Non_target_lesion_response,
+                                    "FU5_NEWLESION": "NA" if na5_selected == "NA" else FU5_New_Lesions,
+                                    "FU5_NEWEHD": "NA" if na5_selected == "NA" else FU5_NEW_Extrahepatic_Disease,
+                                    "FU5_EHDLOC": "NA" if na5_selected == "NA" else FU5_NEW_Extrahepatic_Dz_Location,
+                                    "FU5_EHDDATE": "NA" if na5_selected == "NA" else FU5_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
+                                    "FU5_NTL_CHANGE": "NA" if na5_selected == "NA" else FU5_change_non_target_lesion,
+                                    "FU5_TL_CHANGE": "NA" if na5_selected == "NA" else FU5_change_target_lesion,
+                                    "FU5_MREC_CALC": "NA" if na5_selected == "NA" else fifth_fu_mrecist_calc,
+                                    "FU5_MREC_LOCAL": "NA" if na5_selected == "NA" else fifth_fu_mrecist_localized,
+                                    "FU5_MREC_OVERALL": "NA" if na5_selected == "NA" else fifth_fu_mrecist_overall,
+                                    "FU5_FT": "NA" if na5_selected == "NA" else FU5_Free_Text,
                                     "DEAD": dead,
                                     "DATE_DEAD": Date_of_Death.strftime("%Y-%m-%d") if Date_of_Death != "NA" else Date_of_Death,
                                     "TIME_DEAD": Time_to_Death,
@@ -3859,50 +3926,50 @@ def add_new_data():
                                 index= None,
                             placeholder="Choose an option",
                             )
-                        input_GTV_mean_dose = st.text_input("GTV mean dose")
-                        input_Tx_vol_mean_dose = st.text_input("Tx vol mean dose")
-                        input_Liver_Vol_Mean_dose = st.text_input("Liver Vol Mean dose")
-                        input_Healthy_Liver_mean_dose = st.text_input("Healthy Liver mean dose")
-                        input_GTV_Vol = st.number_input("GTV Vol",step=0.1)
-                        input_Tx_vol = st.number_input("Tx vol",step=0.1)
-                        input_Liver_vol = st.number_input("Liver vol",min_value=0.1,step=0.1)
-                        input_Healthy_Liver_Vol = st.text_input("Healthy Liver Vol")
-                        input_GTV_Liver = (input_GTV_Vol)/(input_Liver_vol)*100
+                        input_GTV_mean_dose = st.text_input("GTV mean dose [Excel : GTV_MEANDOSE]")
+                        input_Tx_vol_mean_dose = st.text_input("Tx vol mean dose [Excel : TX_VOL]")
+                        input_Liver_Vol_Mean_dose = st.text_input("Liver Vol Mean dose [Excel : LIVVOL__MEANDOSE]")
+                        input_Healthy_Liver_mean_dose = st.text_input("Healthy Liver mean dose [Excel : HEALTHYLIV_MEANDOSE]")
+                        input_GTV_Vol = st.number_input("GTV Vol [Excel : GTV_VOL]",step=0.1,value = None,)
+                        input_Tx_vol = st.number_input("Tx vol [Excel : TX_VOL]",value = None,step=0.1)
+                        input_Liver_vol = st.number_input("Liver vol [Excel : LIVER_VOL]",value = None,min_value=0.1,step=0.1)
+                        input_Healthy_Liver_Vol = st.text_input("Healthy Liver Vol [Excel : HEALTHYLIV_VOL]")
+                        input_GTV_Liver = (input_GTV_Vol)/(input_Liver_vol)*100 if input_GTV_Vol != None and input_Liver_vol != None else None
                         st.write("GTV/Liver",input_GTV_Liver)
-                        input_D98 = st.text_input("D98")
-                        input_D95 = st.text_input("D95")
-                        input_D90 = st.text_input("D90")
-                        input_D80 = st.text_input("D80")
-                        input_D70 = st.text_input("D70")
-                        input_V100 = st.text_input("V100")
-                        input_V200 = st.text_input("V200")
-                        input_V300 = st.text_input("V300")
-                        input_V400 = st.text_input("V400")
-                        input_ActivityBq = st.number_input("ActivityBq",step=0.1)
-                        input_ActivityCi = (input_ActivityBq/37000000000.0)
-                        input_Tx_vol_Activity_Density = (input_ActivityCi/max(0.1,input_Tx_vol))
-                        input_ActivityCi = format(input_ActivityCi, ".5E")
+                        input_D98 = st.text_input("D98 [Excel : D98]")
+                        input_D95 = st.text_input("D95 [Excel : D95]")
+                        input_D90 = st.text_input("D90 [Excel : D90]")
+                        input_D80 = st.text_input("D80 [Excel : D80]")
+                        input_D70 = st.text_input("D70 [Excel : D70]")
+                        input_V100 = st.text_input("V100 [Excel : V100]")
+                        input_V200 = st.text_input("V200 [Excel : V200]")
+                        input_V300 = st.text_input("V300 [Excel : V300]")
+                        input_V400 = st.text_input("V400 [Excel : V400]")
+                        input_ActivityBq = st.number_input("ActivityBq [Excel : ACTIVITYBQ]",value = None,step=0.1)
+                        input_ActivityCi = (input_ActivityBq/37000000000.0) if input_ActivityBq != None else None
+                        input_Tx_vol_Activity_Density = (input_ActivityCi/max(0.1,input_Tx_vol)) if input_ActivityCi != None and input_Tx_vol != None else None
+                        input_ActivityCi = format(input_ActivityCi, ".5E") if input_ActivityCi != None else None
                         st.write("ActivityCi", input_ActivityCi)
-                        input_Tx_vol_Activity_Density = format(input_Tx_vol_Activity_Density, ".5E")
+                        input_Tx_vol_Activity_Density = format(input_Tx_vol_Activity_Density, ".5E") if input_Tx_vol_Activity_Density != None else None
                         st.write("Tx vol Activity Density",input_Tx_vol_Activity_Density)
-                        input_GTV_less_D95_Vol_ml = st.text_input("GTV < D95 Vol_ml")
-                        input_GTV_less_D95_Mean_Dose = st.text_input("GTV < D95 Mean Dose")
-                        input_GTV_less_D95_Mx_Dose = st.text_input("GTV < D95 Max Dose",value = df.iloc[0]["GTVLT_D95MAX"])
-                        input_GTV_less_D95_Min_Dose = st.text_input("GTV < D95 Min Dose")
-                        input_GTV_less_D95_SD = st.text_input("GTV < D95 SD")
-                        input_GTV_less_D95_Vol_1 = st.text_input("GTV < D95 Vol_1")
-                        input_GTV_less_D95_Mean_Dose_1 = st.text_input("GTV < D95 Mean Dose_1")
-                        input_GTV_less_D95_Min_Dose_1 = st.text_input("GTV < D95 Min Dose_1")
-                        input_GTV_less_D95_SD_1 = st.text_input("GTV < D95 SD_1")
-                        input_GTV_less_D95_Vol_2 = st.text_input("GTV < D95 Vol_2")
-                        input_GTV_less_D95_Mean_Dose_2 = st.text_input("GTV < D95 Mean Dose_2")
-                        input_GTV_less_D95_Min_Dose_2 = st.text_input("GTV < D95 Min Dose_2")
-                        input_GTV_less_D95_SD_2 = st.text_input("GTV < D95 SD_2")
-                        input_GTV_less_100_Gy_Vol = st.text_input("GTV < 100 Gy Vol")
-                        input_GTV_less_100_Gy_Mean_Dose = st.text_input("GTV < 100 Gy Mean Dose")
-                        input_GTV_less_100_Gy_Max_Dose = st.text_input("GTV < 100 Gy Max Dose",value = df.iloc[0]["GTVLT_100MAX"])
-                        input_GTV_less_100_Gy_Min_Dose = st.text_input("GTV < 100 Gy Min Dose")
-                        input_GTV_less_100_Gy_SD = st.text_input("GTV < 100 Gy SD")
+                        input_GTV_less_D95_Vol_ml = st.text_input("GTV < D95 Vol_ml [Excel : GTVLT_D95VOL]")
+                        input_GTV_less_D95_Mean_Dose = st.text_input("GTV < D95 Mean Dose [Excel : GTVLT_D95MEAN]")
+                        input_GTV_less_D95_Mx_Dose = st.text_input("GTV < D95 Max Dose [Excel : GTVLT_D95MAX]",value = df.iloc[0]["GTVLT_D95MAX"])
+                        input_GTV_less_D95_Min_Dose = st.text_input("GTV < D95 Min Dose [Excel : GTVLT_D95MIN]")
+                        input_GTV_less_D95_SD = st.text_input("GTV < D95 SD [Excel : GTVLT_D95SD]")
+                        input_GTV_less_D95_Vol_1 = st.text_input("GTV < D95 Vol_1 [Excel : V1_GTVLT_D95VOL]")
+                        input_GTV_less_D95_Mean_Dose_1 = st.text_input("GTV < D95 Mean Dose_1 [Excel : V1_GTVLT_D95MEAN]")
+                        input_GTV_less_D95_Min_Dose_1 = st.text_input("GTV < D95 Min Dose_1 [Excel : V1_GTVLT_D95MIN]")
+                        input_GTV_less_D95_SD_1 = st.text_input("GTV < D95 SD_1 [Excel : V1_GTVLT_D95SD]")
+                        input_GTV_less_D95_Vol_2 = st.text_input("GTV < D95 Vol_2 [Excel : V2_GTVLT_D95VOL]")
+                        input_GTV_less_D95_Mean_Dose_2 = st.text_input("GTV < D95 Mean Dose_2 [Excel : V2_GTVLT_D95MEAN]")
+                        input_GTV_less_D95_Min_Dose_2 = st.text_input("GTV < D95 Min Dose_2 [Excel : V2_GTVLT_D95MIN]")
+                        input_GTV_less_D95_SD_2 = st.text_input("GTV < D95 SD_2 [Excel : V2_GTVLT_D95SD]")
+                        input_GTV_less_100_Gy_Vol = st.text_input("GTV < 100 Gy Vol [Excel : GTVLT_100VOL]")
+                        input_GTV_less_100_Gy_Mean_Dose = st.text_input("GTV < 100 Gy Mean Dose [Excel : GTVLT_100MEAN]")
+                        input_GTV_less_100_Gy_Max_Dose = st.text_input("GTV < 100 Gy Max Dose [Excel : GTVLT_100MAX]",value = df.iloc[0]["GTVLT_100MAX"])
+                        input_GTV_less_100_Gy_Min_Dose = st.text_input("GTV < 100 Gy Min Dose [Excel : GTVLT_100MIN]")
+                        input_GTV_less_100_Gy_SD = st.text_input("GTV < 100 Gy SD [Excel : GTVLT_100SD]")
 
                         submit_dosimetry_data = st.form_submit_button("Submit")
 
@@ -3963,74 +4030,74 @@ def add_new_data():
                     st.warning("Please complete the Patient Information tab first.")
                 else:
                     try:
-                        input_1AFP_DATE = st.text_area("1AFP Date")
-                        input_1AFP = st.text_area("1AFP")
-                        input_2AFP_DATE = st.text_area("2AFP Date")
-                        input_2AFP = st.text_area("2AFP")
-                        input_3AFP_DATE = st.text_area("3AFP Date")
-                        input_3AFP = st.text_area("3AFP")
-                        input_4AFP_DATE = st.text_area("4AFP Date")
-                        input_4AFP = st.text_area("4AFP")
-                        input_5AFP_DATE = st.text_area("5AFP Date")
-                        input_5AFP = st.text_area("5AFP")
-                        input_6AFP_DATE = st.text_area("6AFP Date")
-                        input_6AFP = st.text_area("6AFP")
-                        input_7AFP_DATE = st.text_area("7AFP Date")
-                        input_7AFP = st.text_area("7AFP")
-                        input_8AFP_DATE = st.text_area("8AFP Date")
-                        input_8AFP = st.text_area("8AFP")
-                        input_9AFP_DATE = st.text_area("9AFP Date")
-                        input_9AFP = st.text_area("9AFP")
-                        input_10AFP_DATE = st.text_area("10AFP Date")
-                        input_10AFP = st.text_area("10AFP")
-                        input_11AFP_DATE = st.text_area("11AFP Date")
-                        input_11AFP = st.text_area("11AFP")
-                        input_12AFP_DATE = st.text_area("12AFP Date")
-                        input_12AFP = st.text_area("12AFP")
-                        input_13AFP_DATE = st.text_area("13AFP Date")
-                        input_13AFP = st.text_area("13AFP")
-                        input_14AFP_DATE = st.text_area("14AFP Date")
-                        input_14AFP = st.text_area("14AFP")
-                        input_15AFP_DATE = st.text_area("15AFP Date")
-                        input_15AFP = st.text_area("15AFP")
-                        input_16AFP_DATE = st.text_area("16AFP Date")
-                        input_16AFP = st.text_area("16AFP")
-                        input_17AFP_DATE = st.text_area("17AFP Date")
-                        input_17AFP = st.text_area("17AFP")
-                        input_18AFP_DATE = st.text_area("18AFP DATE")
-                        input_18AFP = st.text_area("18AFP")
-                        input_19AFP_DATE = st.text_area("19AFP DATE")
-                        input_19AFP = st.text_area("19AFP")
-                        input_20AFP_DATE = st.text_area("20AFP DATE")
-                        input_20AFP = st.text_area("20AFP")
-                        input_21AFP_DATE = st.text_area("21AFP DATE")
-                        input_21AFP = st.text_area("21AFP")
-                        input_22AFP_DATE = st.text_area("22AFP DATE")
-                        input_22AFP = st.text_area("22AFP")
-                        input_23AFP_DATE = st.text_area("23AFP DATE")
-                        input_23AFP = st.text_area("23AFP")
-                        input_24AFP_DATE = st.text_area("24AFP DATE")
-                        input_24AFP = st.text_area("24AFP")
-                        input_25AFP_DATE = st.text_area("25AFP DATE")
-                        input_25AFP = st.text_area("25AFP")
-                        input_26AFP_DATE = st.text_area("26AFP DATE")
-                        input_26AFP = st.text_area("26AFP")
-                        input_27AFP_DATE = st.text_area("27AFP DATE")
-                        input_27AFP = st.text_area("27AFP")
-                        input_28AFP_DATE = st.text_area("28AFP DATE")
-                        input_28AFP = st.text_area("28AFP")
-                        input_29AFP_DATE = st.text_area("29AFP DATE")
-                        input_29AFP = st.text_area("29AFP")
-                        input_30AFP_DATE = st.text_area("30AFP DATE")
-                        input_30AFP = st.text_area("30AFP")
-                        input_31AFP_DATE = st.text_area("31AFP Date")
-                        input_31AFP = st.text_area("31AFP")
-                        input_32AFP_DATE = st.text_area("32AFP DATE")
-                        input_32AFP = st.text_area("32AFP")
-                        input_33AFP_DATE = st.text_area("33AFP DATE")
-                        input_33AFP = st.text_area("33AFP")
-                        input_34AFP_DATE = st.text_area("34AFP DATE")
-                        input_34AFP = st.text_area("34AFP")
+                        input_1AFP_DATE = st.text_area("1AFP Date [Excel :1AFPDATE]")
+                        input_1AFP = st.text_area("1AFP [Excel :1AFP]")
+                        input_2AFP_DATE = st.text_area("2AFP Date [Excel :2AFPDATE]")
+                        input_2AFP = st.text_area("2AFP [Excel :2AFP]")
+                        input_3AFP_DATE = st.text_area("3AFP Date [Excel :3AFPDATE]")
+                        input_3AFP = st.text_area("3AFP [Excel :3AFP]")
+                        input_4AFP_DATE = st.text_area("4AFP Date [Excel :4AFPDATE]")
+                        input_4AFP = st.text_area("4AFP [Excel :4AFP]")
+                        input_5AFP_DATE = st.text_area("5AFP Date [Excel :5AFPDATE]")
+                        input_5AFP = st.text_area("5AFP [Excel :5AFP]")
+                        input_6AFP_DATE = st.text_area("6AFP Date [Excel :6AFPDATE]")
+                        input_6AFP = st.text_area("6AFP [Excel :6AFP]")
+                        input_7AFP_DATE = st.text_area("7AFP Date [Excel :7AFPDATE]")
+                        input_7AFP = st.text_area("7AFP [Excel :7AFP]")
+                        input_8AFP_DATE = st.text_area("8AFP Date [Excel :8AFPDATE]")
+                        input_8AFP = st.text_area("8AFP [Excel :8AFP]")
+                        input_9AFP_DATE = st.text_area("9AFP Date [Excel :9AFPDATE]")
+                        input_9AFP = st.text_area("9AFP [Excel :9AFP]")
+                        input_10AFP_DATE = st.text_area("10AFP Date [Excel :10AFPDATE]")
+                        input_10AFP = st.text_area("10AFP [Excel :10AFP]")
+                        input_11AFP_DATE = st.text_area("11AFP Date [Excel :11AFPDATE]")
+                        input_11AFP = st.text_area("11AFP [Excel :11AFP]")
+                        input_12AFP_DATE = st.text_area("12AFP Date [Excel :12AFPDATE]")
+                        input_12AFP = st.text_area("12AFP [Excel :12AFP]")
+                        input_13AFP_DATE = st.text_area("13AFP Date [Excel :13AFPDATE]")
+                        input_13AFP = st.text_area("13AFP [Excel :13AFP]")
+                        input_14AFP_DATE = st.text_area("14AFP Date [Excel :14AFPDATE]")
+                        input_14AFP = st.text_area("14AFP [Excel :14AFP]")
+                        input_15AFP_DATE = st.text_area("15AFP Date [Excel :15AFPDATE]")
+                        input_15AFP = st.text_area("15AFP [Excel :15AFP]")
+                        input_16AFP_DATE = st.text_area("16AFP Date [Excel :16AFPDATE]")
+                        input_16AFP = st.text_area("16AFP [Excel :16AFP]")
+                        input_17AFP_DATE = st.text_area("17AFP Date [Excel :17AFPDATE]")
+                        input_17AFP = st.text_area("17AFP [Excel :17AFP]")
+                        input_18AFP_DATE = st.text_area("18AFP DATE [Excel :18AFPDATE]")
+                        input_18AFP = st.text_area("18AFP [Excel :18AFP]")
+                        input_19AFP_DATE = st.text_area("19AFP DATE [Excel :19AFPDATE]")
+                        input_19AFP = st.text_area("19AFP [Excel :19AFP]")
+                        input_20AFP_DATE = st.text_area("20AFP DATE [Excel :20AFPDATE]")
+                        input_20AFP = st.text_area("20AFP [Excel :20AFP]")
+                        input_21AFP_DATE = st.text_area("21AFP DATE [Excel :21AFPDATE]")
+                        input_21AFP = st.text_area("21AFP [Excel :21AFP]")
+                        input_22AFP_DATE = st.text_area("22AFP DATE [Excel :22AFPDATE]")
+                        input_22AFP = st.text_area("22AFP [Excel :22AFP]")
+                        input_23AFP_DATE = st.text_area("23AFP DATE [Excel :23AFPDATE]")
+                        input_23AFP = st.text_area("23AFP [Excel :23AFP]")
+                        input_24AFP_DATE = st.text_area("24AFP DATE [Excel :24AFPDATE]")
+                        input_24AFP = st.text_area("24AFP [Excel :24AFP]")
+                        input_25AFP_DATE = st.text_area("25AFP DATE [Excel :25AFPDATE]")
+                        input_25AFP = st.text_area("25AFP [Excel :25AFP]")
+                        input_26AFP_DATE = st.text_area("26AFP DATE [Excel :26AFPDATE]")
+                        input_26AFP = st.text_area("26AFP [Excel :26AFP]")
+                        input_27AFP_DATE = st.text_area("27AFP DATE [Excel :27AFPDATE]")
+                        input_27AFP = st.text_area("27AFP [Excel :27AFP]")
+                        input_28AFP_DATE = st.text_area("28AFP DATE [Excel :28AFPDATE]")
+                        input_28AFP = st.text_area("28AFP [Excel :28AFP]")
+                        input_29AFP_DATE = st.text_area("29AFP DATE [Excel :29AFPDATE]")
+                        input_29AFP = st.text_area("29AFP [Excel :29AFP]")
+                        input_30AFP_DATE = st.text_area("30AFP DATE  [Excel :30AFPDATE]")
+                        input_30AFP = st.text_area("30AFP [Excel :30AFP]")
+                        input_31AFP_DATE = st.text_area("31AFP Date [Excel :31AFPDATE]")
+                        input_31AFP = st.text_area("31AFP [Excel :31AFP]")
+                        input_32AFP_DATE = st.text_area("32AFP DATE [Excel :32AFPDATE]")
+                        input_32AFP = st.text_area("32AFP [Excel :32AFP]")
+                        input_33AFP_DATE = st.text_area("33AFP DATE [Excel :33AFPDATE]")
+                        input_33AFP = st.text_area("33AFP [Excel :33AFP]")
+                        input_34AFP_DATE = st.text_area("34AFP DATE [Excel :34AFPDATE]")
+                        input_34AFP = st.text_area("34AFP [Excel :34AFP]")
 
                         submit_afp = st.form_submit_button("Submit")
 
@@ -4113,7 +4180,7 @@ def edit_existing_data():
         df1=fetch_data_from_google_sheet()
         st.dataframe(df1)
         
-        mrn = st.number_input("Enter MRN to edit and Press Enter",step=1)
+        mrn = st.number_input("Enter MRN to edit and Press Enter",step=1,value = None,)
         
         if mrn:
             mrn_str = str(int(mrn))
@@ -4173,7 +4240,7 @@ def edit_existing_data():
                                 else:
                                     duplicate_procedure_check = "Duplicate"
                                 
-                                tare_date = st.date_input("TARE Tx Date [Excel : TAREDATE]", help="Select the treatment date",value=datetime.strptime(df.iloc[0]["TAREDATE"], "%Y-%m-%d").date())
+                                tare_date = st.date_input("TARE Tx Date [Excel : TAREDATE]",min_value=date(1900, 1, 1), help="Select the treatment date",value=datetime.strptime(df.iloc[0]["TAREDATE"], "%Y-%m-%d").date())
                                 
                                 procedure_technique = st.selectbox(
                                 "Procedure Technique    [Excel : PROTYPE]\n\nLobar (1), Segmental (2)",
@@ -4187,7 +4254,7 @@ def edit_existing_data():
                                 placeholder="Choose an option",
                                 )
 
-                                age = st.number_input("Age at time of TARE [Excel : TAREAGE]", value=int(df.iloc[0]["TAREAGE"]) ,min_value=0, max_value=150, step=1, format="%d")
+                                age = st.number_input("Age at time of TARE [Excel : TAREAGE]", value=int(df.iloc[0]["TAREAGE"]) if df.iloc[0]["TAREAGE"] not in ["",None] else 0 ,min_value=0, max_value=150, step=1, format="%d")
                             
                                 submit_tab1 = st.form_submit_button("Submit")
                                 if submit_tab1:
@@ -4426,7 +4493,7 @@ def edit_existing_data():
                                 Cirdx_Value = datetime.strptime(df.iloc[0]["CIRDX_DATE"], "%Y-%m-%d").date()
                             else:
                                 Cirdx_Value = None
-                            Cirrhosis_Dx_Diagnosis_Date = st.date_input("Cirrhosis Dx Diagnosis Date [ Excel : CIRDX_DATE ]", value = Cirdx_Value)
+                            Cirrhosis_Dx_Diagnosis_Date = st.date_input("Cirrhosis Dx Diagnosis Date [ Excel : CIRDX_DATE ]",min_value=date(1900, 1, 1), value = Cirdx_Value)
 
                             Cirrhosis_Dx_Diagnosis_Method = st.selectbox(
                                 "Cirrhosis_Dx_Diagnosis Method [ Excel : CIRDX_METHOD ]\n\n(1) Biopsy, (2) Imaging  ",
@@ -4490,7 +4557,7 @@ def edit_existing_data():
                             else:
                                 Cirdx_Dxdate_value = None 
 
-                            Cirrhosis_Dx_Date_of_Labs_in_Window = st.date_input(" Cirrhosis_Dx_Date of Labs in Window [ Excel : CIRDX_DATELABS ]", value =Cirdx_Dxdate_value)
+                            Cirrhosis_Dx_Date_of_Labs_in_Window = st.date_input(" Cirrhosis_Dx_Date of Labs in Window [ Excel : CIRDX_DATELABS ]",min_value=date(1900, 1, 1), value =Cirdx_Dxdate_value)
 
                             Cirrhosis_Dx_AFP = st.text_input(
                                 "Cirrhosis_Dx_AFP [ Excel : CIRDX_AFP ]",
@@ -4587,7 +4654,7 @@ def edit_existing_data():
                         st.subheader("HCC Diagnosis")
                         with st.form("hcc_dx_form"):
 
-                            hcc_dx_hcc_diagnosis_date = st.date_input("HCC_Dx_HCC Diagnosis Date", help="Enter the HCC diagnosis date",value = datetime.strptime(df.iloc[0]["HCCDX_DATEDX"], "%Y-%m-%d").date() if df.iloc[0]["HCCDX_DATEDX"] else None)
+                            hcc_dx_hcc_diagnosis_date = st.date_input("HCC_Dx_HCC Diagnosis Date [ Excel : HCCDX_DATEDX ]  ",min_value=date(1900, 1, 1), help="Enter the HCC diagnosis date",value = datetime.strptime(df.iloc[0]["HCCDX_DATEDX"], "%Y-%m-%d").date() if df.iloc[0]["HCCDX_DATEDX"] else None)
 
                             hcc_dx_method_of_diagnosis = st.selectbox(
                                  "HCC_Dx_Method of Diagnosis [ Excel : HCCDX_METHODDX ]\n\n(1) Biopsy, (2) Imaging, (NA) Unknown",   
@@ -4602,18 +4669,18 @@ def edit_existing_data():
                                 
                             )
 
-                            hcc_dx_date_of_labs = st.date_input("HCC_Dx_Date of Labs in Window",value=datetime.strptime(df.iloc[0]["HCCDX_LABSDATE"], "%Y-%m-%d").date() if df.iloc[0]["HCCDX_LABSDATE"] else None)
+                            hcc_dx_date_of_labs = st.date_input("HCC_Dx_Date of Labs in Window [ Excel : HCCDX_LABSDATE ]  ",min_value=date(1900, 1, 1),value=datetime.strptime(df.iloc[0]["HCCDX_LABSDATE"], "%Y-%m-%d").date() if df.iloc[0]["HCCDX_LABSDATE"] else None)
 
-                            hcc_dx_afp = st.number_input("HCC_Dx_AFP",step=0.1, help="Enter AFP value in ng/dl",value = float(df.iloc[0]["HCCDX_AFP"]) if pd.notnull(df.iloc[0]["HCCDX_AFP"]) and str(df.iloc[0]["HCCDX_AFP"]).isdigit() else 0.0 )
+                            hcc_dx_afp = st.number_input("HCC_Dx_AFP [ Excel : HCCDX_AFP ]  ",step=0.1, help="Enter AFP value in ng/dl",value = float(df.iloc[0]["HCCDX_AFP"]) if df.iloc[0]["HCCDX_AFP"] not in ["",None] else None )
 
-                            hcc_dx_afp_l3 = st.number_input("HCC_Dx_AFP L3",step=0.1, help="Enter AFP L3 and date details",value = float(df.iloc[0]["HCCDX_AFPL3"]) if pd.notnull(df.iloc[0]["HCCDX_AFPL3"]) and str(df.iloc[0]["HCCDX_AFPL3"]).isdigit() else 0.0)
-                            hcc_dx_afp_l3_date_free_text = st.text_area("HCC_Dx_AFP L3 Date Free Text",value = df.iloc[0]["HCCDX_AFPL3dateFT"])
+                            hcc_dx_afp_l3 = st.number_input("HCC_Dx_AFP L3 [ Excel : HCCDX_AFPL3 ]  ",step=0.1, help="Enter AFP L3 and date details",value = float(df.iloc[0]["HCCDX_AFPL3"]) if df.iloc[0]["HCCDX_AFPL3"]  not in ["",None] else None)
+                            hcc_dx_afp_l3_date_free_text = st.text_area("HCC_Dx_AFP L3 Date Free Text [ Excel : HCCdx_AFPL3dateFT ]  ",value = df.iloc[0]["HCCDX_AFPL3dateFT"])
 
-                            hcc_dx_bilirubin = st.number_input("HCC_Dx_Bilirubin",step=0.1, help="Enter the bilirubin value in mg/dl", min_value=1.0,value = float(df.iloc[0]["HCCDX_BILI"]) if pd.notnull(df.iloc[0]["HCCDX_BILI"]) and str(df.iloc[0]["HCCDX_BILI"]).isdigit() else 1.0)
-                            hcc_dx_albumin = st.number_input("HCC_Dx_Albumin",step=0.1, help="Enter the albumin value in g/dl",value = float(df.iloc[0]["HCCDX_ALBUMIN"]) if pd.notnull(df.iloc[0]["HCCDX_ALBUMIN"]) and str(df.iloc[0]["HCCDX_ALBUMIN"]).isdigit() else 0.0)
-                            hcc_dx_inr = st.number_input("HCC_Dx_INR",step=0.1, help="Enter the INR value", value = float(df.iloc[0]["HCCDX_INR"]) if pd.notnull(df.iloc[0]["HCCDX_INR"]) and str(df.iloc[0]["HCCDX_INR"]).isdigit() else 0.0)
-                            hcc_dx_creatinine = st.number_input("HCC_Dx_Creatinine",step=0.1, help="Enter the creatinine value in mg/dl", value = float(df.iloc[0]["HCCDX_CREATININE"]) if pd.notnull(df.iloc[0]["HCCDX_CREATININE"]) and str(df.iloc[0]["HCCDX_CREATININE"]).isdigit() else 0.0)
-                            hcc_dx_sodium = st.number_input("HCC_Dx_Sodium",step=0.1, help="Enter the sodium value in mmol/L", value = float(df.iloc[0]["HCCDX_SODIUM"]) if pd.notnull(df.iloc[0]["HCCDX_SODIUM"]) and str(df.iloc[0]["HCCDX_SODIUM"]).isdigit() else 0.0)
+                            hcc_dx_bilirubin = st.number_input("HCC_Dx_Bilirubin [ Excel : HCCDX_BILI ]  ",step=0.1, help="Enter the bilirubin value in mg/dl", min_value=0.1,value = float(df.iloc[0]["HCCDX_BILI"]) if df.iloc[0]["HCCDX_BILI"] not in ["",None] else None )
+                            hcc_dx_albumin = st.number_input("HCC_Dx_Albumin [ Excel : HCCDX_ALBUMIN ]  ",step=0.1, help="Enter the albumin value in g/dl",value = float(df.iloc[0]["HCCDX_ALBUMIN"]) if df.iloc[0]["HCCDX_ALBUMIN"] not in ["",None] else None)
+                            hcc_dx_inr = st.number_input("HCC_Dx_INR [ Excel : HCCDX_INR ]  ",step=0.1, help="Enter the INR value", value = float(df.iloc[0]["HCCDX_INR"]) if df.iloc[0]["HCCDX_INR"] not in ["",None] else None)
+                            hcc_dx_creatinine = st.number_input("HCC_Dx_Creatinine [ Excel : HCCDX_CREATININE ]",step=0.1, help="Enter the creatinine value in mg/dl", value = float(df.iloc[0]["HCCDX_CREATININE"]) if df.iloc[0]["HCCDX_CREATININE"] not in ["",None] else None)
+                            hcc_dx_sodium = st.number_input("HCC_Dx_Sodium [ Excel : HCCDX_SODIUM ]  ",step=0.1, help="Enter the sodium value in mmol/L", value = float(df.iloc[0]["HCCDX_SODIUM"]) if df.iloc[0]["HCCDX_SODIUM"] not in ["",None] else None)
 
                             hcc_dx_ascites_CTCAE = st.selectbox (
                                 "HCC_Dx_Ascites CTCAE [ Excel : HCCDX_ASCITCTCAE ] ",
@@ -4705,9 +4772,9 @@ def edit_existing_data():
                             st.write("HCCdx_CPclass ",hcc_dx_child_pugh_class_calc)
                             hcc_dx_meld_score_calc = meld_calc(hcc_dx_creatinine,hcc_dx_bilirubin,hcc_dx_inr)
                             st.write("HCCdx_MELD ",hcc_dx_meld_score_calc)
-                            hcc_dx_meld_na_score_calc = hcc_dx_meld_score_calc + 1.32*(137-int(hcc_dx_sodium)) - (0.033*hcc_dx_meld_score_calc*(137-int(hcc_dx_sodium)))
-                            st.write("HCCdx_MELDNa ",hcc_dx_meld_na_score_calc)
-                            
+                            # hcc_dx_meld_na_score_calc = hcc_dx_meld_score_calc + 1.32*(137-int(hcc_dx_sodium)) - (0.033*hcc_dx_meld_score_calc*(137-int(hcc_dx_sodium)))
+                            # st.write("HCCdx_MELDNa ",hcc_dx_meld_na_score_calc)
+                            hcc_dx_meld_na_score_calc = None
                             hcc_dx_albi_score_calc = albi_calc(hcc_dx_bilirubin, hcc_dx_albumin)
                             st.write("HCCdx_Albiscore ",hcc_dx_albi_score_calc)
                             hcc_dx_albi_grade = albi_class(hcc_dx_albi_score_calc)
@@ -4796,7 +4863,7 @@ def edit_existing_data():
                                 index=["0", "1", "NA"].index(df.iloc[0]["PTHER_RFA"]) if df.iloc[0]["PTHER_RFA"] else None,
                                 placeholder="Choose an option",
                             )
-                            PRVTHER_Prior_RFA_Date = 0 if PRVTHER_Prior_RFA_Therapy == '0' else st.date_input("PRVTHER_Prior RFA Date",value=datetime.strptime(df.iloc[0]["PTHER_RFADATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_RFADATE"] else None)
+                            PRVTHER_Prior_RFA_Date = 0 if PRVTHER_Prior_RFA_Therapy == '0' else st.date_input("PRVTHER_Prior RFA Date [ Excel : PTHER_RFADATE ]  ",min_value=date(1900, 1, 1),value=datetime.strptime(df.iloc[0]["PTHER_RFADATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_RFADATE"] else None)
                         
                             PRVTHER_Prior_TARE_Therapy = st.selectbox(
                                 "PRVTHER_Prior TARE Therapy [ Excel : PTHER_TARE ]\n\nNo (0), Yes (1), NA ",
@@ -4809,7 +4876,7 @@ def edit_existing_data():
                                 index=["0", "1", "NA"].index(df.iloc[0]["PTHER_TARE"]) if df.iloc[0]["PTHER_TARE"] else None, 
                                 placeholder="Choose an option",
                             )
-                            PRVTHER_Prior_TARE_Date = 0 if PRVTHER_Prior_TARE_Therapy == '0' else st.date_input("PRVTHER_Prior TARE Date",value=datetime.strptime(df.iloc[0]["PTHER_TAREDATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_TAREDATE"] else None)
+                            PRVTHER_Prior_TARE_Date = 0 if PRVTHER_Prior_TARE_Therapy == '0' else st.date_input("PRVTHER_Prior TARE Date [ Excel : PTHER_TAREDATE ]  ",min_value=date(1900, 1, 1),value=datetime.strptime(df.iloc[0]["PTHER_TAREDATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_TAREDATE"] else None)
                         
                             PRVTHER_Prior_SBRT_Therapy = st.selectbox(
                                 "PRVTHER_Prior SBRT Therapy [ Excel : PTHER_SBRT ]\n\nNo (0), Yes (1), NA ",
@@ -4823,7 +4890,7 @@ def edit_existing_data():
                                 placeholder="Choose an option",
                             )
                             
-                            PRVTHER_Prior_SBRT_Date = 0 if PRVTHER_Prior_SBRT_Therapy == '0' else st.date_input("PRVTHER_Prior SBRT Date",value=datetime.strptime(df.iloc[0]["PTHER_SBRTDATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_SBRTDATE"] else None)
+                            PRVTHER_Prior_SBRT_Date = 0 if PRVTHER_Prior_SBRT_Therapy == '0' else st.date_input("PRVTHER_Prior SBRT Date [ Excel : PTHER_SBRTDATE ]  ",min_value=date(1900, 1, 1),value=datetime.strptime(df.iloc[0]["PTHER_SBRTDATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_SBRTDATE"] else None)
                         
                             PRVTHER_Prior_TACE_Therapy = st.selectbox(
                                "PRVTHER_Prior TACE Therapy [ Excel : PTHER_TACE ]\n\nNo (0), Yes (1), NA ",
@@ -4837,7 +4904,7 @@ def edit_existing_data():
                                 placeholder="Choose an option",
                             )
                             
-                            PRVTHER_Prior_TACE_Date = 0 if PRVTHER_Prior_TACE_Therapy == '0' else st.date_input("PRVTHER_Prior TACE Date",value=datetime.strptime(df.iloc[0]["PTHER_TACEDATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_TACEDATE"] else None)
+                            PRVTHER_Prior_TACE_Date = 0 if PRVTHER_Prior_TACE_Therapy == '0' else st.date_input("PRVTHER_Prior TACE Date [ Excel : PTHER_TACEDATE ] ",min_value=date(1900, 1, 1),value=datetime.strptime(df.iloc[0]["PTHER_TACEDATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_TACEDATE"] else None)
 
                             PRVTHER_Prior_MWA_Therapy = st.selectbox(
                                "PRVTHER_Prior MWA Therapy [ Excel : PTHER_MWA ]\n\nNo (0), Yes (1), NA ",
@@ -4850,7 +4917,7 @@ def edit_existing_data():
                                 index=["0", "1", "NA"].index(df.iloc[0]["PTHER_MWA"]) if df.iloc[0]["PTHER_MWA"] else None, 
                                 placeholder="Choose an option",
                             )
-                            PRVTHER_Prior_MWA_Date = 0 if PRVTHER_Prior_MWA_Therapy == '0' else st.date_input("PRVTHER_Prior MWA Date",value=datetime.strptime(df.iloc[0]["PTHER_MWADATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_MWADATE"] else None)
+                            PRVTHER_Prior_MWA_Date = 0 if PRVTHER_Prior_MWA_Therapy == '0' else st.date_input("PRVTHER_Prior MWA Date [ Excel : PTHER_MWADATE ]  ",min_value=date(1900, 1, 1),value=datetime.strptime(df.iloc[0]["PTHER_MWADATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_MWADATE"] else None)
 
                             PRVTHER_Resection = st.selectbox(
                                "PRVTHER_Resection [ Excel : PTHER_RESECTION ]\n\nNo (0), Yes (1), NA ",
@@ -4863,28 +4930,21 @@ def edit_existing_data():
                                 index=["0", "1", "NA"].index(df.iloc[0]["PTHER_RESECTION"]) if df.iloc[0]["PTHER_RESECTION"] else None, 
                                 placeholder="Choose an option",
                             )
-                            PRVTHER_Resection_Date = 0 if PRVTHER_Resection == "0" else st.date_input("PRVTHER_Resection Date",value=datetime.strptime(df.iloc[0]["PTHER_RESECTIONDATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_RESECTIONDATE"] else None)
-
-
-                            list1=[PRVTHER_Prior_LDT_Therapy, PRVTHER_Prior_RFA_Therapy, PRVTHER_Prior_TARE_Therapy, PRVTHER_Prior_SBRT_Therapy, PRVTHER_Prior_TACE_Therapy, PRVTHER_Prior_MWA_Therapy, PRVTHER_Resection ]
-                            total_sum=0
-                            for item in list1:
-                                if item == "Yes" :
-                                    total_sum+=1
-                                else:
-                                    continue
+                            PRVTHER_Resection_Date = 0 if PRVTHER_Resection == "0" else st.date_input("PRVTHER_Resection Date [ Excel : PTHER_RESECTIONDATE ]",min_value=date(1900, 1, 1),value=datetime.strptime(df.iloc[0]["PTHER_RESECTIONDATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_RESECTIONDATE"] else None)
+                            def count_previous_therapies(*therapies):
+                                return sum(1 for therapy in therapies if therapy == "1")
                             
-                            PRVTHER_Previous_Therapy_Sum = total_sum
+                            PRVTHER_Previous_Therapy_Sum = count_previous_therapies(PRVTHER_Prior_LDT_Therapy, PRVTHER_Prior_RFA_Therapy, PRVTHER_Prior_TARE_Therapy, PRVTHER_Prior_SBRT_Therapy, PRVTHER_Prior_TACE_Therapy, PRVTHER_Prior_MWA_Therapy, PRVTHER_Resection)
                             st.write("PRVTHER_Prevtxsum ",PRVTHER_Previous_Therapy_Sum)
                         # PRVTHER_Previous_Therapy_Sum = PRVTHER_Prior_LDT_Therapy + PRVTHER_Prior_RFA_Therapy + PRVTHER_Prior_TARE_Therapy + PRVTHER_Prior_SBRT_Therapy + PRVTHER_Prior_TACE_Therapy + PRVTHER_Prior_MWA_Therapy
 
                             PRVTHER_NotesFT = st.text_area(
-                            "PRVTHER_NotesFT",  value=df.iloc[0]["PTHER_NOTESFT"]
+                            "PRVTHER_NotesFT [ Excel : PTHER_NOTESFT ] ",  value=df.iloc[0]["PTHER_NOTESFT"]
                         
                             )
 
                             PRVTHER_Total_Recurrences_HCC = st.text_area(
-                                "PRVTHER_Total Recurrences HCC", value=df.iloc[0]["PTHER_TOTRECUR"]
+                                "PRVTHER_Total Recurrences HCC [ Excel : PTHER_TOTRECUR ]", value=df.iloc[0]["PTHER_TOTRECUR"]
                             )
                             PRVTHER_Location_of_Previous_Treatment_segments = st.selectbox(
                                 "PRVTHER_Location of Previous Treatment Segments [Excel : PTHER_PREVSEGMENT]",
@@ -4893,7 +4953,7 @@ def edit_existing_data():
                                 placeholder="Choose an option"
                             )
                             PRVTHER_Location_of_Previous_Tx_segments_ft = st.text_area(
-                                "PRVTHER_Location of Previous Tx Segments FT",  value=df.iloc[0]["PTHER_PREVSEGMENTFT"]
+                                "PRVTHER_Location of Previous Tx Segments FT [ Excel : PTHER_PREVSEGMENTFT ]  ",  value=df.iloc[0]["PTHER_PREVSEGMENTFT"]
                             
                             )
                             PRVTHER_recurrence_location_note = st.selectbox(
@@ -4903,11 +4963,11 @@ def edit_existing_data():
                                 placeholder="Choose an option"
                             )
                             PRVTHER_recurrence_date = st.text_area(
-                                "PRVTHER_Recurrence Date", value=df.iloc[0]["PTHER_RECURDATE"],
+                                "PRVTHER_Recurrence Date [ Excel : PTHER_RECURDATE ]  ", value=df.iloc[0]["PTHER_RECURDATE"],
                             
                             )
                             PRVTHER_recurrence_seg =  st.text_input(
-                                "PRVTHER_Recurrence Seg" , value=df.iloc[0]["PTHER_RECURSEGMENT"]
+                                "PRVTHER_Recurrence Seg [ Excel : PTHER_RECURSEGMENT ] " , value=df.iloc[0]["PTHER_RECURSEGMENT"]
                             )
                             PRVTHER_New_HCC_Outside_Previous_Treatment_Site = st.selectbox(
                                 "PRVTHER_New HCC Outside Previous Treatment Site [ Excel : PTHER_NEWHCCOUT ]\n\nNo (0), Yes (1), NA",
@@ -4934,7 +4994,7 @@ def edit_existing_data():
                                 placeholder="Choose an option"
                             )   
                             PRVTHER_Residual_HCC_Note = st.text_area(
-                                "PRVTHER_Residual HCC Note",
+                                "PRVTHER_Residual HCC Note [ Excel : PTHER_RESIDUALHCCFT ]",
                                 help="Provide information of Residual HCC",
                                 value = df.iloc[0]["PTHER_RESIDUALHCCFT"]
                             ) 
@@ -4963,15 +5023,15 @@ def edit_existing_data():
                             )
 
                             PRVTHER_Date_of_Labs_in_Window = st.date_input(
-                                "PRVTHER_Date of Labs for AFP",
-                                help="select date of labs in window",
+                                "PRVTHER_Date of Labs for AFP [ Excel : PTHER_AFPDATE ]",
+                                help="select date of labs in window",min_value=date(1900, 1, 1),
                                 value=datetime.strptime(df.iloc[0]["PTHER_AFPDATE"], "%Y-%m-%d").date() if df.iloc[0]["PTHER_AFPDATE"] else None
                             )
 
                             PRVTHER_AFP = st.number_input(
-                                "PRVTHER_AFP",
+                                "PRVTHER_AFP [ Excel : PTHER_AFP ]",
                                 help="Enter AFP value in ng/dl or NA",step=0.1,
-                                value=float(df.iloc[0]["PTHER_AFP"]) if pd.notnull(df.iloc[0]["PTHER_AFP"]) and str(df.iloc[0]["PTHER_AFP"]).isdigit() else 0.0
+                                value=float(df.iloc[0]["PTHER_AFP"]) if df.iloc[0]["PTHER_AFP"] not in ["",None] else None
                             )
                             if PRVTHER_Prior_RFA_Date == 0:
                                 PRVTHER_Prior_RFA_Date = 0
@@ -5097,8 +5157,8 @@ def edit_existing_data():
                             placeholder="Select all that apply"
                             )
                             prey90_symptoms = ", ".join(prey90_symptoms)
-                            prey90_date_of_labs = st.date_input("PREY90_date of labs in window", help="Enter the date of lab tests",value = datetime.strptime(df.iloc[0]["PREY_DATELABS"], "%Y-%m-%d").date() if df.iloc[0]["PREY_DATELABS"] else None)
-                            prey90_afp = st.text_input("PREY90_AFP", help="Enter AFP value in ng/dl or NA",value = df.iloc[0]["PREY_AFP"])
+                            prey90_date_of_labs = st.date_input("PREY90_date of labs in window [ Excel : PREY_DATELABS ]  ",min_value=date(1900, 1, 1), help="Enter the date of lab tests",value = datetime.strptime(df.iloc[0]["PREY_DATELABS"], "%Y-%m-%d").date() if df.iloc[0]["PREY_DATELABS"] else None)
+                            prey90_afp = st.text_input("PREY90_AFP [ Excel : PREY_AFP ]  ", help="Enter AFP value in ng/dl or NA",value = df.iloc[0]["PREY_AFP"])
                             
                             def process_input(value):
                                 
@@ -5115,15 +5175,15 @@ def edit_existing_data():
                             prey90_afp_prior_to_tare = process_input(prey90_afp)
                             st.write("PRE90_AFPbinary ",prey90_afp_prior_to_tare)
                             
-                            prey90_bilirubin = st.number_input("PREY90_Bilirubin",step=0.1,min_value=1.0,value = float(df.iloc[0]["PREY_BILI"]) if pd.notnull(df.iloc[0]["PREY_BILI"]) and str(df.iloc[0]["PREY_BILI"]).isdigit() else 1.0)
-                            prey90_albumin = st.number_input("PREY90_Albumin",step=0.1, help="Enter the albumin value in g/dl",value = float(df.iloc[0]["PREY_ALBUMIN"]) if pd.notnull(df.iloc[0]["PREY_ALBUMIN"]) and str(df.iloc[0]["PREY_ALBUMIN"]).isdigit() else 0.0)
-                            prey90_inr = st.number_input("PREY90_inr",step=0.1, help="Enter the INR value",value = float(df.iloc[0]["PREY_INR"]) if pd.notnull(df.iloc[0]["PREY_INR"]) and str(df.iloc[0]["PREY_INR"]).isdigit() else 0.0)
-                            prey90_creatinine = st.number_input("PREY90_creatinine",step=0.1, help="Enter the creatinine value in mg/dl",value = float(df.iloc[0]["PREY_CREATININE"]) if pd.notnull(df.iloc[0]["PREY_CREATININE"]) and str(df.iloc[0]["PREY_CREATININE"]).isdigit() else 0.0)
-                            prey90_sodium = st.number_input("PREY90_sodium",step=0.1, help="Enter the sodium value in mmol/L",value = float(df.iloc[0]["PREY_SODIUM"]) if pd.notnull(df.iloc[0]["PREY_SODIUM"]) and str(df.iloc[0]["PREY_SODIUM"]).isdigit() else 0.0)
-                            prey90_ast = st.number_input("PREY90_AST",step=0.1, help="Enter AST value in U/L",value = float(df.iloc[0]["PREY_AST"]) if pd.notnull(df.iloc[0]["PREY_AST"]) and str(df.iloc[0]["PREY_AST"]).isdigit() else 0.0)
-                            prey90_alt = st.number_input("PREY90_ALT",step=0.1, help="Enter ALT value in U/L",value = float(df.iloc[0]["PREY_ALT"]) if pd.notnull(df.iloc[0]["PREY_ALT"]) and str(df.iloc[0]["PREY_ALT"]).isdigit() else 0.0)
-                            prey90_alkaline_phosphatase = st.number_input("PREY90_Alkaline Phosphatase",step=0.1, help="Enter Alkaline Phosphatase value in U/L",value = float(df.iloc[0]["PREY_ALP"]) if pd.notnull(df.iloc[0]["PREY_ALP"]) and str(df.iloc[0]["PREY_ALP"]).isdigit() else 0.0)
-                            prey90_potassium = st.number_input("PREY90_potassium",step=0.1, help="Enter the potassium value in mmol/L",value = float(df.iloc[0]["PREY_POTAS"]) if pd.notnull(df.iloc[0]["PREY_POTAS"]) and str(df.iloc[0]["PREY_POTAS"]).isdigit() else 0.0)
+                            prey90_bilirubin = st.number_input("PREY90_Bilirubin [ Excel : PREY_BILI ]",step=0.1,min_value=0.1,value = float(df.iloc[0]["PREY_BILI"]) if df.iloc[0]["PREY_BILI"] not in ["",None] else None)
+                            prey90_albumin = st.number_input("PREY90_Albumin [ Excel : PREY_ALBUMIN ]",step=0.1, help="Enter the albumin value in g/dl",value = float(df.iloc[0]["PREY_ALBUMIN"]) if df.iloc[0]["PREY_ALBUMIN"] not in ["",None] else None)
+                            prey90_inr = st.number_input("PREY90_inr [ Excel : PREY_INR ]",step=0.1, help="Enter the INR value",value = float(df.iloc[0]["PREY_INR"]) if df.iloc[0]["PREY_INR"] not in ["",None] else None)
+                            prey90_creatinine = st.number_input("PREY90_creatinine [ Excel : PREY_CREATININE ] ",step=0.1, help="Enter the creatinine value in mg/dl",value = float(df.iloc[0]["PREY_CREATININE"]) if df.iloc[0]["PREY_CREATININE"] not in ["",None] else None)
+                            prey90_sodium = st.number_input("PREY90_sodium [ Excel : PREY_SODIUM ]",step=0.1, help="Enter the sodium value in mmol/L",value = float(df.iloc[0]["PREY_SODIUM"]) if df.iloc[0]["PREY_SODIUM"] not in ["",None] else None)
+                            prey90_ast = st.number_input("PREY90_AST [ Excel : PREY_AST ]  ",step=0.1, help="Enter AST value in U/L",value = float(df.iloc[0]["PREY_AST"]) if df.iloc[0]["PREY_AST"] not in ["",None] else None)
+                            prey90_alt = st.number_input("PREY90_ALT [ Excel : PREY_ALT ] ",step=0.1, help="Enter ALT value in U/L",value = float(df.iloc[0]["PREY_ALT"]) if df.iloc[0]["PREY_ALT"] not in ["",None] else None)
+                            prey90_alkaline_phosphatase = st.number_input("PREY90_Alkaline Phosphatase [ Excel : PREY_ALP ] ",step=0.1, help="Enter Alkaline Phosphatase value in U/L",value = float(df.iloc[0]["PREY_ALP"]) if df.iloc[0]["PREY_ALP"] not in ["",None] else None)
+                            prey90_potassium = st.number_input("PREY90_potassium [ Excel : PREY_POTAS ] ",step=0.1, help="Enter the potassium value in mmol/L",value = float(df.iloc[0]["PREY_POTAS"]) if df.iloc[0]["PREY_POTAS"] not in ["",None] else None)
                             
                             prey90_ascites_ctcae = st.selectbox (
                                 "PREY90_Ascites CTCAE [ Excel : PREY_ASCITCTCAE ]",
@@ -5154,9 +5214,8 @@ def edit_existing_data():
                             st.write("PREY90_AscitesCTCAEnumb ",prey90_ascites_classification)
 
                             prey90_ascites_free_text = st.text_area(
-                                "PREY90_Ascites Free Text",
+                                "PREY90_Ascites Free Text [ Excel : PREY_ASCITFT ] ",
                                 value = df.iloc[0]["PREY_ASCITFT"],
-                            
                             )
 
                             prey90_ascites_diruetics = st.selectbox(
@@ -5169,7 +5228,6 @@ def edit_existing_data():
                             }[x],
                                 index=["1", "0","NA"].index(df.iloc[0]["PREY_ASCITDIUR"]) if df.iloc[0]["PREY_ASCITDIUR"] else None,  # No default selection
                                 placeholder="Choose an option",
-                
                             )
                             prey90_ascites_paracentesis = st.selectbox(
                                 "PREY90_Ascites Paracentesis [Excel :PREY_ASCITPARA]\n\nYes(1), No(0), NA" ,
@@ -5222,8 +5280,9 @@ def edit_existing_data():
                             prey90_meld_score_calc = meld_calc(prey90_creatinine,prey90_bilirubin,prey90_inr)
                             st.write("PREY90_MELD",prey90_meld_score_calc)
                     
-                            prey90_meld_na_score_calc = prey90_meld_score_calc + 1.32*(137-int(prey90_sodium)) - (0.033*prey90_meld_score_calc*(137-int(prey90_sodium)))
-                            st.write("PREY90_MELDNa",prey90_meld_na_score_calc)
+                            # prey90_meld_na_score_calc = prey90_meld_score_calc + 1.32*(137-int(prey90_sodium)) - (0.033*prey90_meld_score_calc*(137-int(prey90_sodium)))
+                            # st.write("PREY90_MELDNa",prey90_meld_na_score_calc)
+                            prey90_meld_na_score_calc = None
                             prey90_albi_score_calc = albi_calc(prey90_bilirubin,prey90_albumin)
                             st.write("PREY90_Albiscore",prey90_albi_score_calc)
                             prey90_albi_grade = albi_class(prey90_albi_score_calc)
@@ -5243,8 +5302,8 @@ def edit_existing_data():
                             )
                         
                             st.subheader("Mapping Y90")
-                            my90_date = st.date_input("MY90_date", help="Enter the date",value = datetime.strptime(df.iloc[0]["MY_DATE"], "%Y-%m-%d").date() if df.iloc[0]["MY_DATE"] else None)
-                            my90_lung_shunt = st.number_input("MY90_Lung_shunt", min_value=0.0, step=0.1, help="Enter the lung shunt value",value = float(df.iloc[0]["MY_LUNGSHU"]) if pd.notnull(df.iloc[0]["MY_LUNGSHU"]) and str(df.iloc[0]["MY_LUNGSHU"]).isdigit() else 0.0)
+                            my90_date = st.date_input("MY90_date [ Excel : MY_DATE ]",min_value=date(1900, 1, 1), help="Enter the date",value = datetime.strptime(df.iloc[0]["MY_DATE"], "%Y-%m-%d").date() if df.iloc[0]["MY_DATE"] else None)
+                            my90_lung_shunt = st.number_input("MY90_Lung_shunt [ Excel : MY_LUNGSHU ]  ", min_value=0.0, step=0.1, help="Enter the lung shunt value",value = float(df.iloc[0]["MY_LUNGSHU"]) if df.iloc[0]["MY_LUNGSHU"] not in ["",None] else None)
                             
                             prey90_date_of_labs = (
                                 prey90_date_of_labs.strftime("%Y-%m-%d")
@@ -5298,7 +5357,7 @@ def edit_existing_data():
                         st.subheader("Day_Y90")
                         with st.form("day_y90_form"):
 
-                            dayy90_afp = st.text_input("DAYY90_AFP",value = df.iloc[0]["DAYY_AFP"])
+                            dayy90_afp = st.text_input("DAYY90_AFP [ Excel : DAYY_AFP ] ",value = df.iloc[0]["DAYY_AFP"])
                             def process_input(value):
                                 
                     # Handle the 'NA' case
@@ -5315,21 +5374,21 @@ def edit_existing_data():
                             st.write("DAYY90_AFP Binary : ",dayy90_afp_prior_to_tare)
                         
                         # Inputs for other variables
-                            dayy90_sodium = st.number_input("DAYY90_sodium",step=0.1,value = float(df.iloc[0]["DAYY_SODIUM"]) if pd.notnull(df.iloc[0]["DAYY_SODIUM"]) and str(df.iloc[0]["DAYY_SODIUM"]).isdigit() else 0.0)
-                            dayy90_creatinine = st.number_input("DAYY90_creatinine",step=0.1,value = float(df.iloc[0]["DAYY_CREATININE"]) if pd.notnull(df.iloc[0]["DAYY_CREATININE"]) and str(df.iloc[0]["DAYY_CREATININE"]).isdigit() else 0.0
+                            dayy90_sodium = st.number_input("DAYY90_sodium [ Excel : DAYY_SODIUM ]  ",step=0.1,value = float(df.iloc[0]["DAYY_SODIUM"]) if df.iloc[0]["DAYY_SODIUM"] not in ["",None] else None)
+                            dayy90_creatinine = st.number_input("DAYY90_creatinine [ Excel : DAYY_CREATININE ] ",step=0.1,value = float(df.iloc[0]["DAYY_CREATININE"]) if df.iloc[0]["DAYY_CREATININE"] not in ["",None] else None
                                                                 )
-                            dayy90_inr = st.number_input("DAYY90_inr",step=0.1,value = float(df.iloc[0]["DAYY_INR"]) if pd.notnull(df.iloc[0]["DAYY_INR"]) and str(df.iloc[0]["DAYY_INR"]).isdigit() else 0.0)
-                            dayy90_albumin = st.number_input("DAYY90_albumin",step=0.1,value = float(df.iloc[0]["DAYY_ALBUMIN"]) if pd.notnull(df.iloc[0]["DAYY_ALBUMIN"]) and str(df.iloc[0]["DAYY_ALBUMIN"]).isdigit() else 0.0)
-                            dayy90_bilirubin = st.number_input("DAYY90_bilirubin",min_value=1.0,step=0.1,value = float(df.iloc[0]["DAYY_BILI"]) if pd.notnull(df.iloc[0]["DAYY_BILI"]) and str(df.iloc[0]["DAYY_BILI"]).isdigit() else 1.0)
-                            dayy90_ast = st.number_input("DAYY90_AST",step=0.1,value = float(df.iloc[0]["DAYY_AST"]) if pd.notnull(df.iloc[0]["DAYY_AST"]) and str(df.iloc[0]["DAYY_AST"]).isdigit() else 0.0)
-                            dayy90_alt = st.number_input("DAYY90_ALT",step=0.1,value = float(df.iloc[0]["DAYY_ALT"]) if pd.notnull(df.iloc[0]["DAYY_ALT"]) and str(df.iloc[0]["DAYY_ALT"]).isdigit() else 0.0)
+                            dayy90_inr = st.number_input("DAYY90_inr [ Excel : DAYY_INR ]",step=0.1,value = float(df.iloc[0]["DAYY_INR"]) if df.iloc[0]["DAYY_INR"] not in ["",None] else None)
+                            dayy90_albumin = st.number_input("DAYY90_albumin [ Excel : DAYY_ALBUMIN ] ",step=0.1,value = float(df.iloc[0]["DAYY_ALBUMIN"]) if df.iloc[0]["DAYY_ALBUMIN"] not in ["",None] else None)
+                            dayy90_bilirubin = st.number_input("DAYY90_bilirubin [ Excel : DAYY_BILI ]",min_value=0.1,step=0.1,value = float(df.iloc[0]["DAYY_BILI"]) if df.iloc[0]["DAYY_BILI"] not in ["",None] else None)
+                            dayy90_ast = st.number_input("DAYY90_AST [ Excel : DAYY_AST ]",step=0.1,value = float(df.iloc[0]["DAYY_AST"]) if df.iloc[0]["DAYY_AST"] not in ["",None] else None)
+                            dayy90_alt = st.number_input("DAYY90_ALT [ Excel : DAYY_ALT ]  ",step=0.1,value = float(df.iloc[0]["DAYY_ALT"]) if df.iloc[0]["DAYY_ALT"] not in ["",None] else None)
                             dayy90_alkaline_phosphatase = st.number_input(
                                 "DAYY90_Alkaline Phosphatase",step=0.1,
-                                value = float(df.iloc[0]["DAYY_ALP"]) if pd.notnull(df.iloc[0]["DAYY_ALP"]) and str(df.iloc[0]["DAYY_ALP"]).isdigit() else 0.0
+                                value = float(df.iloc[0]["DAYY_ALP"]) if df.iloc[0]["DAYY_ALP"] not in ["",None] else None
                             )
-                            dayy90_leukocytes = st.number_input("DAYY90_leukocytes",step=0.1,value = float(df.iloc[0]["DAYY_LEUK"]) if pd.notnull(df.iloc[0]["DAYY_LEUK"]) and str(df.iloc[0]["DAYY_LEUK"]).isdigit() else 0.0)
-                            dayy90_platelets = st.number_input("DAYY90_platelets",step=0.1,value = float(df.iloc[0]["DAYY_PLT"]) if pd.notnull(df.iloc[0]["DAYY_PLT"]) and str(df.iloc[0]["DAYY_PLT"]).isdigit() else 0.0)
-                            dayy90_potassium = st.number_input("DAY90_Potassium",step=0.1,value = float(df.iloc[0]["DAYY_POTAS"]) if pd.notnull(df.iloc[0]["DAYY_POTAS"]) and str(df.iloc[0]["DAYY_POTAS"]).isdigit() else 0.0)
+                            dayy90_leukocytes = st.number_input("DAYY90_leukocytes [ Excel : DAYY_LEUK ]",step=0.1,value = float(df.iloc[0]["DAYY_LEUK"]) if df.iloc[0]["DAYY_LEUK"] not in ["",None] else None)
+                            dayy90_platelets = st.number_input("DAYY90_platelets [ Excel : DAYY_PLT ]",step=0.1,value = float(df.iloc[0]["DAYY_PLT"]) if df.iloc[0]["DAYY_PLT"] not in ["",None] else None)
+                            dayy90_potassium = st.number_input("DAY90_Potassium [ Excel : DAYY_POTAS ] ",step=0.1,value = float(df.iloc[0]["DAYY_POTAS"]) if df.iloc[0]["DAYY_POTAS"] not in ["",None] else None)
 
                             dayy90_ascites_ctcae = st.selectbox (
                                 "DAYY90_Ascites CTCAE [Excel : DAYY_ASCITCTCAE]  ",
@@ -5383,8 +5442,9 @@ def edit_existing_data():
                             st.write("DAYY90_CPclass",dayy90_child_pugh_class_calc)
                             dayy90_meld_score_calc = meld_calc(dayy90_creatinine,dayy90_bilirubin,dayy90_inr)
                             st.write("DAYY90_MELD",dayy90_meld_score_calc)
-                            dayy90_meld_na_score_calc = dayy90_meld_score_calc + 1.32*(137-int(dayy90_sodium)) - (0.033*dayy90_meld_score_calc*(137-int(dayy90_sodium)))
-                            st.write("DAYY90_MELDNa",dayy90_meld_na_score_calc)
+                            # dayy90_meld_na_score_calc = dayy90_meld_score_calc + 1.32*(137-int(dayy90_sodium)) - (0.033*dayy90_meld_score_calc*(137-int(dayy90_sodium)))
+                            # st.write("DAYY90_MELDNa",dayy90_meld_na_score_calc)
+                            dayy90_meld_na_score_calc = None
                             dayy90_albi_score_calc = albi_calc(dayy90_bilirubin,dayy90_albumin)
                             st.write("DAYY90_Albiscore",dayy90_albi_score_calc)
                             dayy90_albi_grade = albi_class(dayy90_albi_score_calc)
@@ -5414,7 +5474,7 @@ def edit_existing_data():
                                 placeholder="Choose an option",
                             )
 
-                            dayy90_lt_notes_ftx = st.text_area("DAYY90_LT Notes Free Text",value = df.iloc[0]["DAYY_LTFT"])
+                            dayy90_lt_notes_ftx = st.text_area("DAYY90_LT Notes Free Text [ Excel : DAYY_LTFT ]  ",value = df.iloc[0]["DAYY_LTFT"])
 
                             ken_childpughscore = st.selectbox(
                                 "ken_ChildPughscore [Excel : KEN_CPPRE]\n\n(1) A, (2) B, (3) C ",
@@ -5428,8 +5488,7 @@ def edit_existing_data():
                                 index=["1","2","3"].index(df.iloc[0]["KEN_CPPRE"]) if df.iloc[0]["KEN_CPPRE"] else None,  
                                 placeholder="Choose an option",
                             )
-                            ken_meldpretare = st.number_input("ken_MELDpreTARE",step=0.1,value = float(df.iloc[0]["KEN_MELDPRE"]) if pd.notnull(df.iloc[0]["KEN_MELDPRE"]) and str(df.iloc[0]["KEN_MELDPRE"]).isdigit() else 0.0)
-
+                            ken_meldpretare = st.number_input("ken_MELDpreTARE [ Excel : KEN_MELDPRE ] ",step=0.1,value = float(df.iloc[0]["KEN_MELDPRE"]) if df.iloc[0]["KEN_MELDPRE"] not in ["",None] else None)
 
                         # Submit button
                             submit_tab7 = st.form_submit_button("Submit")
@@ -5471,20 +5530,20 @@ def edit_existing_data():
                         st.subheader("Post Y90 Within 30 Days Labs")
                         with st.form("post_y90_form"):
 
-                            posty90_date_labs = st.date_input("POSTY90_30DY_date_labs", value = datetime.strptime(df.iloc[0]["POST30_LABSDATE"], "%Y-%m-%d").date() if df.iloc[0]["POST30_LABSDATE"] else None)
-                            posty90_afp = st.text_input("POSTY90_30DY_afp", value = df.iloc[0]["POST30_AFP"])
-                            posty90_afp_date = st.date_input("POSTY90_30DY_afp DATE", value = datetime.strptime(df.iloc[0]["POST30_AFPDATE"], "%Y-%m-%d").date() if df.iloc[0]["POST30_AFPDATE"] else None)
-                            posty90_sodium = st.number_input("POSTY90_30DY_Sodium", step=0.1, value = float(df.iloc[0]["POST30_SODIUM"]) if pd.notnull(df.iloc[0]["POST30_SODIUM"]) and str(df.iloc[0]["POST30_SODIUM"]).isdigit() else 0.0)
-                            posty90_creatinine = st.number_input("POSTY90_30DY_creatinine", step=0.1, value = float(df.iloc[0]["POST30_CREATININE"]) if pd.notnull(df.iloc[0]["POST30_CREATININE"]) and str(df.iloc[0]["POST30_CREATININE"]).isdigit() else 0.0)
-                            posty90_inr = st.number_input("POSTY90_30DY_INR", step=0.1, value = float(df.iloc[0]["POST30_INR"]) if pd.notnull(df.iloc[0]["POST30_INR"]) and str(df.iloc[0]["POST30_INR"]).isdigit() else 0.0)
-                            posty90_albumin = st.number_input("POSTY90_30DY_albumin", step=0.1, value = float(df.iloc[0]["POST30_ALBUMIN"]) if pd.notnull(df.iloc[0]["POST30_ALBUMIN"]) and str(df.iloc[0]["POST30_ALBUMIN"]).isdigit() else 0.0)
-                            posty90_bilirubin = st.number_input("POSTY90_30DY_bilirubin", min_value=1.0, step=0.1, value = float(df.iloc[0]["POST30_BILI"]) if pd.notnull(df.iloc[0]["POST30_BILI"]) and str(df.iloc[0]["POST30_BILI"]).isdigit() else 1.0)
-                            posty90_ast = st.number_input("POSTY90_30DY_AST", step=0.1, value = float(df.iloc[0]["POST30_AST"]) if pd.notnull(df.iloc[0]["POST30_AST"]) and str(df.iloc[0]["POST30_AST"]).isdigit() else 0.0)
-                            posty90_alt = st.number_input("POSTY90_30DY_ALT", step=0.1, value = float(df.iloc[0]["POST30_ALT"]) if pd.notnull(df.iloc[0]["POST30_ALT"]) and str(df.iloc[0]["POST30_ALT"]).isdigit() else 0.0)
-                            posty90_alkaline_phosphatase = st.number_input("POSTY90_30DY_Alkaline Phosphatase", step=0.1, value = float(df.iloc[0]["POST30_ALP"]) if pd.notnull(df.iloc[0]["POST30_ALP"]) and str(df.iloc[0]["POST30_ALP"]).isdigit() else 0.0)
-                            posty90_leukocytes = st.number_input("POSTY90_30DY_leukocytes", step=0.1, value = float(df.iloc[0]["POST30_LEUK"]) if pd.notnull(df.iloc[0]["POST30_LEUK"]) and str(df.iloc[0]["POST30_LEUK"]).isdigit() else 0.0)
-                            posty90_platelets = st.number_input("POSTY90_30DY_platelets", step=0.1, value = float(df.iloc[0]["POST30_PLT"]) if pd.notnull(df.iloc[0]["POST30_PLT"]) and str(df.iloc[0]["POST30_PLT"]).isdigit() else 0.0)
-                            posty90_potassium = st.number_input("POSTY90_30DY_potassium", step=0.1, value = float(df.iloc[0]["POST30_POTAS"]) if pd.notnull(df.iloc[0]["POST30_POTAS"]) and str(df.iloc[0]["POST30_POTAS"]).isdigit() else 0.0)
+                            posty90_date_labs = st.date_input("POSTY90_30DY_date_labs [ Excel : POST30_LABSDATE ] ",min_value=date(1900, 1, 1), value = datetime.strptime(df.iloc[0]["POST30_LABSDATE"], "%Y-%m-%d").date() if df.iloc[0]["POST30_LABSDATE"] else None)
+                            posty90_afp = st.text_input("POSTY90_30DY_afp [ Excel : POST30_AFP ]  ", value = df.iloc[0]["POST30_AFP"])
+                            posty90_afp_date = st.date_input("POSTY90_30DY_afp DATE [ Excel : POST30_AFPDATE ] ", value = datetime.strptime(df.iloc[0]["POST30_AFPDATE"], "%Y-%m-%d").date() if df.iloc[0]["POST30_AFPDATE"] else None)
+                            posty90_sodium = st.number_input("POSTY90_30DY_Sodium [ Excel : POST30_SODIUM ]  ", step=0.1, value = float(df.iloc[0]["POST30_SODIUM"]) if pd.notnull(df.iloc[0]["POST30_SODIUM"]) and str(df.iloc[0]["POST30_SODIUM"]).isdigit() else 0.0)
+                            posty90_creatinine = st.number_input("POSTY90_30DY_creatinine [ Excel : POST30_CREATININE ]", step=0.1, value = float(df.iloc[0]["POST30_CREATININE"]) if df.iloc[0]["POST30_CREATININE"] not in ["",None] else None)
+                            posty90_inr = st.number_input("POSTY90_30DY_INR [ Excel : POST30_INR ]  ", step=0.1, value = float(df.iloc[0]["POST30_INR"]) if df.iloc[0]["POST30_INR"] not in ["",None] else None)
+                            posty90_albumin = st.number_input("POSTY90_30DY_albumin [ Excel : POST30_ALBUMIN ]  ", step=0.1, value = float(df.iloc[0]["POST30_ALBUMIN"]) if df.iloc[0]["POST30_ALBUMIN"] not in ["",None] else None)
+                            posty90_bilirubin = st.number_input("POSTY90_30DY_bilirubin [ Excel : POST30_BILI ]", min_value=0.1, step=0.1, value = float(df.iloc[0]["POST30_BILI"]) if df.iloc[0]["POST30_BILI"] not in ["",None] else None)
+                            posty90_ast = st.number_input("POSTY90_30DY_AST [ Excel : POST30_AST ] ", step=0.1, value = float(df.iloc[0]["POST30_AST"]) if df.iloc[0]["POST30_AST"] not in ["",None] else None)
+                            posty90_alt = st.number_input("POSTY90_30DY_ALT [ Excel : POST30_ALT ]", step=0.1, value = float(df.iloc[0]["POST30_ALT"]) if df.iloc[0]["POST30_ALT"] not in ["",None] else None)
+                            posty90_alkaline_phosphatase = st.number_input("POSTY90_30DY_Alkaline Phosphatase [ Excel : POST30_ALP ]  ", step=0.1, value = float(df.iloc[0]["POST30_ALP"]) if df.iloc[0]["POST30_ALP"] not in ["",None] else None)
+                            posty90_leukocytes = st.number_input("POSTY90_30DY_leukocytes [ Excel : POST30_LEUK ]", step=0.1, value = float(df.iloc[0]["POST30_LEUK"]) if df.iloc[0]["POST30_LEUK"] not in ["",None] else None)
+                            posty90_platelets = st.number_input("POSTY90_30DY_platelets [ Excel : POST30_PLT ] ", step=0.1, value = float(df.iloc[0]["POST30_PLT"]) if df.iloc[0]["POST30_PLT"] not in ["",None] else None)
+                            posty90_potassium = st.number_input("POSTY90_30DY_potassium [ Excel : POST30_POTAS ] ", step=0.1, value = float(df.iloc[0]["POST30_POTAS"]) if df.iloc[0]["POST30_POTAS"] not in ["",None] else None)
                             
                             posty90_ascites_ctcae = st.selectbox (
                             "30DY_AE_AscitesCTCAE [Excel : POST30_ASCITCTCAE]",
@@ -5561,7 +5620,7 @@ def edit_existing_data():
                             )
 
                             posty90_ascites_free_text = st.text_area(
-                                "30DY_AE_ascities_freetext",
+                                "30DY_AE_ascities_freetext [ Excel : POST30_ASCITFT ]  ",
                                 value = df.iloc[0]["POST30_ASCITFT"]
                             
                             )
@@ -5576,8 +5635,9 @@ def edit_existing_data():
                             st.write("DAYY90_CPclass",posty90_child_pugh_class)
                             posty90_meld = meld_calc(posty90_creatinine,posty90_bilirubin,posty90_inr)
                             st.write("DAYY90_MELD",posty90_meld)
-                            posty90_meld_na = posty90_meld + 1.32*(137-int(posty90_sodium)) - (0.033*posty90_meld*(137-int(posty90_sodium)))
-                            st.write("DAYY90_MELDNa",posty90_meld_na)
+                            # posty90_meld_na = posty90_meld + 1.32*(137-int(posty90_sodium)) - (0.033*posty90_meld*(137-int(posty90_sodium)))
+                            # st.write("DAYY90_MELDNa",posty90_meld_na)
+                            posty90_meld_na = None
                             posty90_albi_score = albi_calc(posty90_bilirubin,posty90_albumin)
                             st.write("DAYY90_Albiscore",posty90_albi_score)
                             posty90_albi_grade = albi_class(posty90_albi_score)
@@ -5598,13 +5658,13 @@ def edit_existing_data():
                                 )
                         
                             ken_bclc_stage_post90 = st.text_input(
-                                "Ken_BCLCStagepost90",
+                                "Ken_BCLCStagepost90 [ Excel : Ken_BCLCStagepost90 ]",
                                 help="Enter BCLC Stage Post-90",
                                 value=df.iloc[0]["Ken_BCLCStagepost90"]
                             )
 
                             ken_meld_stage_post90 = st.text_input(
-                                "Ken_MELD_Stagepost90",
+                                "Ken_MELD_Stagepost90 [ Excel : Ken_MELD_Stagepost90 ]  ",
                                 help="Enter MELD Score Pre-TARE",
                                 value=df.iloc[0]["Ken_MELD_Stagepost90"]
                             )
@@ -5774,8 +5834,8 @@ def edit_existing_data():
                             ae30_plt = plt_calculate(posty90_platelets)
                             st.write("30 Days AE CTCAE Platelets",ae30_plt)
 
-                            ae30_otherft = st.text_input("AE30_OTHERFT", value=df.iloc[0]["AE30_OTHERFT"] if "AE30_OTHERFT" in df.columns else "")
-                            ae30_other = st.text_input("AE30_OTHER", value=df.iloc[0]["AE30_OTHER"] if "AE30_OTHER" in df.columns else "")
+                            ae30_otherft = st.text_input("AE30_OTHERFT [ Excel : AE30_OTHERFT ] ", value=df.iloc[0]["AE30_OTHERFT"] if "AE30_OTHERFT" in df.columns else "")
+                            ae30_other = st.text_input("AE30_OTHER [ Excel : AE30_OTHER ]  ", value=df.iloc[0]["AE30_OTHER"] if "AE30_OTHER" in df.columns else "")
 
                             variables = [
                                     DYAE_CTCAE_portal_htn, DYAE_CTCAE_Vascular_comp, DYAE_CTCAE_fatigue, DYAE_CTCAE_diarrhea,
@@ -5794,24 +5854,24 @@ def edit_existing_data():
                             ae30_gradesum345 = count1
 
                             DYAE_AE_other = st.text_area(
-                                "30DY_AE_other",
+                                "30DY_AE_other [ Excel : 30DY_AE_Other ] ",
                                 help="Other Adverse Events (Free Text)",
                                 value=df.iloc[0]["30DY_AE_Other"]
                             )
 
                             DYAE_AE_date_of_AE = st.text_input(
-                                "90DY_AE_date_of_AE",
+                                "90DY_AE_date_of_AE [ Excel : AE90_DATE ]  ",
                                 help="(if AE is present after 30 days but before 90 write it here and the date)",
                                 value=df.iloc[0]["AE90_DATE"]
                             )
                             ken_grandedtoxicity = st.text_area(
-                                "AE90_OTHERFT",
+                                "AE90_OTHERFT [ Excel : AE90_OTHERFT ]  ",
                                 value=df.iloc[0]["AE90_OTHERFT"]
 
                             )
                             
-                            ae90_gradesum12 = st.text_input("AE90_GRADESUM12", value=df.iloc[0]["AE90_GRADESUM12"] )
-                            ae90_gradesum345 = st.text_input("AE90_GRADESUM345", value=df.iloc[0]["AE90_GRADESUM345"] )
+                            ae90_gradesum12 = st.text_input("AE90_GRADESUM12 [Excel : AE90__GRADESUM12]", value=df.iloc[0]["AE90_GRADESUM12"] )
+                            ae90_gradesum345 = st.text_input("AE90_GRADESUM345 [Excel : AE90__GRADESUM345]", value=df.iloc[0]["AE90_GRADESUM345"] )
                             dy_ae_hospitalization_3 = st.selectbox(
                                 "90DY_AE_Hospitalization 3 months [Excel : AE90_HOSP3]\n\n Yes (1), No (0)",
                                     options=["1", "0"],
@@ -5947,17 +6007,21 @@ def edit_existing_data():
                     elif st.session_state.selected_tab == "Other Post Tare":
                         st.subheader("Other_post_TARE")
                         with st.form("other_post_tare_form"):
-                            oc_liver_transplant = st.radio("OC_Liver_transplant", options=["yes", "no"])
-                            oc_liver_transplant_date = st.date_input("OC_Liver_transplant_date")
+                            oc_liver_transplant = st.radio("OC_Liver_transplant [Excel : OC_Liver_transplant]", options=["yes", "no"])
+                            oc_liver_transplant_date = st.date_input("OC_Liver_transplant_date [Excel : OC_Liver_transplant_date]",min_value=date(1900, 1, 1))
                             st.subheader("K_other")
                 
-                            k_ken_toxgtg3 = st.number_input("K_ken_ToxgtG3",step=0.1, value = float(df.iloc[0]["K_ken_ToxgtG3"]) if pd.notnull(df.iloc[0]["K_ken_ToxgtG3"]) and df.iloc[0]["K_ken_ToxgtG3"] != ""  else 0.0)
-                            if k_ken_toxgtg3 > 3:
+                            k_ken_toxgtg3 = st.number_input("K_ken_ToxgtG3 [Excel : K_ken_ToxgtG3]",step=0.1, value = float(df.iloc[0]["K_ken_ToxgtG3"]) if df.iloc[0]["K_ken_ToxgtG3"] not in ["",None] else None)
+                            if k_ken_toxgtg3 == None:
+                                k_ken_toxgtg3 = None
+                            elif k_ken_toxgtg3 > 3:
                                 k_ken_toxgtg3 = 1
                             else:
                                 k_ken_toxgtg3 =0
-                            k_ken_toxgtg2 = st.number_input("K_ken_ToxgtG2",step=0.1,value = float(df.iloc[0]["K_ken_ToxgtG2"]) if pd.notnull(df.iloc[0]["K_ken_ToxgtG2"]) and df.iloc[0]["K_ken_ToxgtG2"] != ""  else 0.0)
-                            if k_ken_toxgtg2 > 2:
+                            k_ken_toxgtg2 = st.number_input("K_ken_ToxgtG2 [Excel : K_ken_ToxgtG2]",step=0.1,value = float(df.iloc[0]["K_ken_ToxgtG2"]) if df.iloc[0]["K_ken_ToxgtG2"] not in ["",None] else None)
+                            if k_ken_toxgtg2 == None:
+                                k_ken_toxgtg2 = None
+                            elif k_ken_toxgtg2 > 2:
                                 k_ken_toxgtg2 = 1
                             else:
                                 k_ken_toxgtg2 =0
@@ -6004,6 +6068,14 @@ def edit_existing_data():
                     elif st.session_state.selected_tab == "Imaging Date":
                         st.subheader("Imaging Date")
                         with st.form("imaging_date_form"):
+                                st.subheader("Imaging PreY90")
+                                select1=None
+                                if df.iloc[0]["PREY_MOD"]:
+                                    if df.iloc[0]["PREY_MOD"] == "NA":
+                                        select1 = "NA"
+                                    else :
+                                        select1 = "Yes"
+                                na_selected = st.selectbox("Is Imaging PreY90 Applicable ?", ["Yes","NA"], index=["Yes","NA"].index(select1) if select1 != None else None, placeholder="Choose an option")
                                 PREY90_prescan_modality = st.selectbox(
                                         "PREY90_prescan_modality [Excel : PREY_MOD]\n\n(1) CT, (2) MRI",
                                         options=["1","2"],
@@ -6011,15 +6083,15 @@ def edit_existing_data():
                                             "1": "CT",
                                             "2": "MRI",
                                         }[x],
-                                index=["1","2"].index(df.iloc[0]["PREY_MOD"]) if df.iloc[0]["PREY_MOD"] else None,
+                                index=["1","2"].index(df.iloc[0]["PREY_MOD"]) if df.iloc[0]["PREY_MOD"] in ["1", "2"] else None,
                                 placeholder="Choose an option",
                                 )
-                                PREY90_Imaging_Date = st.date_input("PREY90_Imaging Date" ,value = datetime.strptime(df.iloc[0]["PREY_IMG_DATE"], "%Y-%m-%d").date() if df.iloc[0]["PREY_IMG_DATE"] else None
+                                PREY90_Imaging_Date = st.date_input("PREY90_Imaging Date [Excel : PREY_IMG_DATE]" ,min_value=date(1900, 1, 1),value = datetime.strptime(df.iloc[0]["PREY_IMG_DATE"], "%Y-%m-%d").date() if df.iloc[0]["PREY_IMG_DATE"] not in ["NA","",None] else None
                                 )
                                 PREY90_total_number_of_lesions = st.selectbox(
                                         "PREY90_total number of lesions [Excel : PREY_TOTLES]",
                                         options=["1","2",">3"],
-                                index=["1","2",">3"].index(df.iloc[0]["PREY_TOTLES"]) if df.iloc[0]["PREY_TOTLES"] else None,
+                                index=["1","2",">3"].index(df.iloc[0]["PREY_TOTLES"]) if df.iloc[0]["PREY_TOTLES"] in ["1","2",">3"] else None,
                                 placeholder="Choose an option",
                                 )
                                 PREY90_Number_Involved_Lobes = st.selectbox(
@@ -6029,7 +6101,7 @@ def edit_existing_data():
                                             "1": "Unilobar",
                                             "2": "Bilobar",
                                         }[x],
-                                index=["1","2"].index(df.iloc[0]["PREY_LOBES"]) if df.iloc[0]["PREY_LOBES"] else None,
+                                index=["1","2"].index(df.iloc[0]["PREY_LOBES"]) if df.iloc[0]["PREY_LOBES"] in ["1","2"] else None,
                                 placeholder="Choose an option",
                                 )
                                 prey90_sx = df.loc[df["MRN"] == mrn, "PREY_TL1SEG"].values[0]
@@ -6048,20 +6120,21 @@ def edit_existing_data():
                                 )
                                 PREY90_target_lesion_1_segments = ", ".join(PREY90_target_lesion_1_segments)
                                 PREY90_TL1_LAD = st.number_input(
-                                    "PREY90_TL1_LAD",
+                                    "PREY90_TL1_LAD [Excel : PREY_TL1LAD]",
                                     step=0.1,
-                                    value = float(df.iloc[0]["PREY_TL1LAD"]) if pd.notnull(df.iloc[0]["PREY_TL1LAD"]) and df.iloc[0]["PREY_TL1LAD"] != "" else 0.0
+                                    value = float(df.iloc[0]["PREY_TL1LAD"]) if df.iloc[0]["PREY_TL1LAD"] not in ["NA","",None] else None
                                 )
+                                PREY90_TL1_LAD = "NA" if PREY90_target_lesion_1_segments == "NA" else PREY90_TL1_LAD
                                 PREY90_Target_Lesion_1_PAD = st.number_input(
-                                    "PREY90_Target Lesion 1 PAD",step=0.1,
-                                    value = float(df.iloc[0]["PREY_TL1PAD"]) if pd.notnull(df.iloc[0]["PREY_TL1PAD"]) and df.iloc[0]["PREY_TL1PAD"] != "" else 0.0
+                                    "PREY90_Target Lesion 1 PAD [Excel : PREY_TL1PAD]",step=0.1,
+                                    value = float(df.iloc[0]["PREY_TL1PAD"]) if df.iloc[0]["PREY_TL1PAD"] not in ["NA","",None] else None
                                 )
+                                PREY90_Target_Lesion_1_PAD = "NA" if PREY90_target_lesion_1_segments == "NA" else PREY90_Target_Lesion_1_PAD
                                 PREY90_Target_Lesion_1_CCD = st.number_input(
-                                    "PREY90_Target Lesion 1 CCD",step=0.1,
-                                    value = float(df.iloc[0]["PREY_TL1CCD"]) if pd.notnull(df.iloc[0]["PREY_TL1CCD"]) and df.iloc[0]["PREY_TL1CCD"] != "" else 0.0
+                                    "PREY90_Target Lesion 1 CCD [Excel : PREY_TL1CCD]",step=0.1,
+                                    value = float(df.iloc[0]["PREY_TL1CCD"]) if df.iloc[0]["PREY_TL1CCD"] not in ["NA","",None] else None
                                 )
-                                
-                               
+                                PREY90_Target_Lesion_1_CCD = "NA" if PREY90_target_lesion_1_segments == "NA" else PREY90_Target_Lesion_1_CCD
                                 PREY90_Target_Lesion_1_VOL = calculate_target_lestion_vol(PREY90_Target_Lesion_1_PAD, PREY90_TL1_LAD, PREY90_Target_Lesion_1_CCD)
                                 st.write("PREY90_Target Lesion 1 VOL",PREY90_Target_Lesion_1_VOL)
                                 
@@ -6072,22 +6145,24 @@ def edit_existing_data():
                         placeholder="Choose an option",
                                 )
                                 PREY90_Target_Lesion_2_LAD = st.number_input(
-                                    "PREY90_Target_Lesion_2_LAD",step=0.1,
-                                    value = float(df.iloc[0]["PREY_TL2LAD"]) if pd.notnull(df.iloc[0]["PREY_TL2LAD"]) and df.iloc[0]["PREY_TL2LAD"] != "" else 0.0
+                                    "PREY90_Target_Lesion_2_LAD [Excel : PREY_TL2LAD]",step=0.1,
+                                    value = float(df.iloc[0]["PREY_TL2LAD"]) if df.iloc[0]["PREY_TL2LAD"] not in ["NA","",None] else None
                                 )
+                                PREY90_Target_Lesion_2_LAD =  "NA" if PREY90_Target_Lesion_2_segments == "NA" else  PREY90_Target_Lesion_2_LAD
                                 PREY90_Target_Lesion_2_PAD = st.number_input(
-                                    "PREY90_Target Lesion 2 PAD",
-                                    step=0.1,value = float(df.iloc[0]["PREY_TL2PAD"]) if pd.notnull(df.iloc[0]["PREY_TL2PAD"]) and df.iloc[0]["PREY_TL2PAD"] != "" else 0.0
+                                    "PREY90_Target Lesion 2 PAD [Excel : PREY_TL2PAD]",
+                                    step=0.1,value = float(df.iloc[0]["PREY_TL2PAD"]) if df.iloc[0]["PREY_TL2PAD"] not in ["NA","",None] else None
                                 )
+                                PREY90_Target_Lesion_2_PAD = "NA" if PREY90_Target_Lesion_2_segments == "NA" else PREY90_Target_Lesion_2_PAD
                                 PREY90_Target_Lesion_2_CCD = st.number_input(
-                                    "PREY90_Target Lesion 2 CCD",
-                                    step=0.1,value = float(df.iloc[0]["PREY_TL2CCD"]) if pd.notnull(df.iloc[0]["PREY_TL2CCD"]) and df.iloc[0]["PREY_TL2CCD"] != "" else 0.0
+                                    "PREY90_Target Lesion 2 CCD [Excel : PREY_TL2CCD]",
+                                    step=0.1,value = float(df.iloc[0]["PREY_TL2CCD"]) if df.iloc[0]["PREY_TL2CCD"] not in ["NA","",None] else None
                                 )
-                        
+                                PREY90_Target_Lesion_2_CCD = "NA" if PREY90_Target_Lesion_2_segments == "NA" else PREY90_Target_Lesion_2_CCD                        
                                 PREY90_Target_Lesion_2_VOL = calculate_value_v2(PREY90_Target_Lesion_2_segments, PREY90_Target_Lesion_2_LAD, PREY90_Target_Lesion_2_PAD, PREY90_Target_Lesion_2_CCD)
                                 st.write("PREY90_Target Lesion 2 VOL",PREY90_Target_Lesion_2_VOL)
                                 
-                                PREY90_pretx_targeted_Lesion_Dia_Sum = max(PREY90_TL1_LAD,PREY90_Target_Lesion_1_PAD,PREY90_Target_Lesion_1_CCD)+max(PREY90_Target_Lesion_2_PAD,PREY90_Target_Lesion_2_LAD,PREY90_Target_Lesion_2_CCD)
+                                PREY90_pretx_targeted_Lesion_Dia_Sum = calculate_targeted_dia_sum(PREY90_TL1_LAD,PREY90_Target_Lesion_1_PAD,PREY90_Target_Lesion_1_CCD,PREY90_Target_Lesion_2_PAD,PREY90_Target_Lesion_2_LAD,PREY90_Target_Lesion_2_CCD)
                                 st.write("PREY90_ pretx targeted Lesion Dia Sum",PREY90_pretx_targeted_Lesion_Dia_Sum)
                                 PREY90_Non_Target_Lesion_Location = st.selectbox( 
                                     "PREY90_Non-Target Lesion Location [Excel : PREY_NTLOC]" , options=["1","2","3","4a","4b","5","6","7","8","NA"],
@@ -6095,21 +6170,24 @@ def edit_existing_data():
                                 placeholder="Choose an option",
                                 )
                                 PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
-                                    "PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["PREY_NTL1LAD"]) if pd.notnull(df.iloc[0]["PREY_NTL1LAD"]) and df.iloc[0]["PREY_NTL1LAD"] != "" else 0.0
+                                    "PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc [Excel : PREY_NTL1LAD]",
+                                    step=0.1,value = float(df.iloc[0]["PREY_NTL1LAD"]) if df.iloc[0]["PREY_NTL1LAD"] not in ["NA","",None] else None
                                 )
+                                PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc = "NA" if PREY90_Non_Target_Lesion_Location == "NA" else PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc
                                 PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
-                                    "PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["PREY_NTL1PAD"]) if pd.notnull(df.iloc[0]["PREY_NTL1PAD"]) and df.iloc[0]["PREY_NTL1PAD"] != "" else 0.0
+                                    "PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc [Excel : PREY_NTL1PAD]",
+                                    step=0.1,value = float(df.iloc[0]["PREY_NTL1PAD"]) if df.iloc[0]["PREY_NTL1PAD"] not in ["NA","",None] else None
                                 )
+                                PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc = "NA" if PREY90_Non_Target_Lesion_Location == "NA" else PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc
                                 PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
-                                    "PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["PREY_NTL1CCD"]) if pd.notnull(df.iloc[0]["PREY_NTL1CCD"]) and df.iloc[0]["PREY_NTL1CCD"] != "" else 0.0
+                                    "PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc [Excel : PREY_NTL1CCD]",
+                                    step=0.1,value = float(df.iloc[0]["PREY_NTL1CCD"]) if df.iloc[0]["PREY_NTL1CCD"] not in ["NA","",None] else None
                                 )
-                                PREY90_Non_targeted_Lesion_Dia_Sum = 'NA' if PREY90_Non_Target_Lesion_Location == 'NA' or PREY90_Non_Target_Lesion_Location == None else max(PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc)
+                                PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc = "NA" if PREY90_Non_Target_Lesion_Location == "NA" else PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc
+                                PREY90_Non_targeted_Lesion_Dia_Sum = 'NA' if PREY90_Non_Target_Lesion_Location in ['NA',None] else calculate_nontargeted_dia_sum(PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc)
                                 st.write("PREY90_Non-targeted Lesion Dia Sum",PREY90_Non_targeted_Lesion_Dia_Sum)
                                 PREY90_Reviewers_Initials = st.text_input(
-                                    "PREY90_Reviewers Initials",
+                                    "PREY90_Reviewers Initials [Excel : PREY_REVFT]",
                                     help="Free-text input for reviewer name",
                                     value = df.iloc[0]["PREY_REVFT"]
                                 )
@@ -6120,11 +6198,11 @@ def edit_existing_data():
                                             "1": "Yes",
                                             "0": "No",
                                         }[x],
-                        index=["1", "0"].index(df.iloc[0]["PREY_EHD"]) if df.iloc[0]["PREY_EHD"] else None,
+                        index=["1", "0"].index(df.iloc[0]["PREY_EHD"]) if df.iloc[0]["PREY_EHD"] in ["1", "0"] else None,
                         placeholder="Choose an option",
                                 )
                                 PREY90_Pre_Y90_Extrahepatic_Disease_Location = st.text_input(
-                                    "PREY90_Pre Y90 Extrahepatic Disease Location",
+                                    "PREY90_Pre Y90 Extrahepatic Disease Location [Excel : PREY_EHDLOCFT]",
                                     help="Free Text",
                                     value=df.iloc[0]["PREY_EHDLOCFT"]
                                 )
@@ -6136,13 +6214,13 @@ def edit_existing_data():
                                             "0": "No",
                                             "NA": "NA"
                                         }[x],
-                        index=["1", "0", "NA"].index(df.iloc[0]["PREY_PVT"]) if df.iloc[0]["PREY_PVT"] else None,
+                        index=["1", "0", "NA"].index(df.iloc[0]["PREY_PVT"]) if df.iloc[0]["PREY_PVT"] in ["1", "0", "NA"] else None,
                         placeholder="Choose an option",
                                 )
                                 PREY90_PVT_Location = st.selectbox(
                                     "PREY90_PVT Location [Excel : PREY_PVTLOC]",
                                     options=["RPV", "LPV"],
-                        index=["RPV", "LPV"].index(df.iloc[0]["PREY_PVTLOC"]) if df.iloc[0]["PREY_PVTLOC"] else None,
+                        index=["RPV", "LPV"].index(df.iloc[0]["PREY_PVTLOC"]) if df.iloc[0]["PREY_PVTLOC"] in ["RPV", "LPV"] else None,
                         placeholder="Choose an option",
                                 )
                                 PREY90_Features_of_cirrhosis = st.selectbox(
@@ -6152,11 +6230,18 @@ def edit_existing_data():
                                             "1": "Yes",
                                             "0": "No",
                                         }[x],
-                                    index=["1", "0"].index(df.iloc[0]["PREY_CIRRH"]) if df.iloc[0]["PREY_CIRRH"] else None,
+                                    index=["1", "0"].index(df.iloc[0]["PREY_CIRRH"]) if df.iloc[0]["PREY_CIRRH"] in ["1", "0"] else None,
                                     placeholder="Choose an option",
                                 )
+                                # 1st_Follow UP
                                 st.subheader("Imaging_1st_Followup")
-
+                                select2=None
+                                if df.iloc[0]["FU1_MOD"]:
+                                    if df.iloc[0]["FU1_MOD"] == "NA":
+                                        select2 = "NA"
+                                    else :
+                                        select2 = "Yes"
+                                na1_selected = st.selectbox("Is 1st Follow_up Applicable ?", ["Yes","NA"], index=["Yes","NA"].index(select2) if select2 != None else None, placeholder="Choose an option")
                                 FU_Scan_Modality = st.selectbox(
                                     "1st_FU_Scan Modality[Excel : FU1_MOD]\n\n(1) CT, (2) MRI",
                                         options=["1","2"],
@@ -6164,11 +6249,11 @@ def edit_existing_data():
                                             "1": "CT",
                                             "2": "MRI",
                                         }[x],
-                        index=["1", "2"].index(df.iloc[0]["FU1_MOD"]) if df.iloc[0]["FU1_MOD"] else None,
+                        index=["1", "2"].index(df.iloc[0]["FU1_MOD"]) if df.iloc[0]["FU1_MOD"] in ["1", "2"] else None,
                         placeholder="Choose an option",
                                 )
-                                FU_Imaging_Date = st.date_input("1st_FU_Imaging Date",value = datetime.strptime(df.iloc[0]["FU1_IMG_DATE"], "%Y-%m-%d").date() if df.iloc[0]["FU1_IMG_DATE"] else None)
-                                FU_Months_Since_Y90 = relativedelta(FU_Imaging_Date, fetch_date).months
+                                FU_Imaging_Date = st.date_input("1st_FU_Imaging Date [Excel : FU1_IMG_DATE]",min_value=date(1900, 1, 1),value = datetime.strptime(df.iloc[0]["FU1_IMG_DATE"], "%Y-%m-%d").date() if df.iloc[0]["FU1_IMG_DATE"] not in ["NA","",None] else None)
+                                FU_Months_Since_Y90 = months_difference(FU_Imaging_Date, fetch_date)
                                 st.write("1st_FU_Months Since Y90",FU_Months_Since_Y90)
                                 FU_Total_number_of_lesions = st.selectbox(
                                    "1st_FU_Total number of lesions [Excel : FU1_TOTLES]\n\n(1) 1,(2) 2,(3) >=3",
@@ -6178,20 +6263,20 @@ def edit_existing_data():
                                             "2": "2",
                                             "3" : ">=3"
                                         }[x],
-                        index=["1", "2", "3"].index(df.iloc[0]["FU1_TOTLES"]) if df.iloc[0]["FU1_TOTLES"] else None, 
+                        index=["1", "2", "3"].index(df.iloc[0]["FU1_TOTLES"]) if df.iloc[0]["FU1_TOTLES"] in ["1", "2", "3"] else None, 
                         placeholder="Choose an option",
                                 )
                                 FU_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                                    "1st_FU_Target Lesion 1 LAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["FU1_TL1LAD"]) if pd.notnull(df.iloc[0]["FU1_TL1LAD"]) and df.iloc[0]["FU1_TL1LAD"] != "" else 0.0
+                                    "1st_FU_Target Lesion 1 LAD Art Enhanc [Excel : FU1_TL1LAD]",
+                                    step=0.1,value = float(df.iloc[0]["FU1_TL1LAD"]) if df.iloc[0]["FU1_TL1LAD"] not in ["NA","",None] else None
                                 )
                                 FU_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                                    "1st_FU_Target Lesion 1 PAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["FU1_TL1PAD"]) if pd.notnull(df.iloc[0]["FU1_TL1PAD"]) and df.iloc[0]["FU1_TL1PAD"] != "" else 0.0
+                                    "1st_FU_Target Lesion 1 PAD Art Enhanc [Excel : FU1_TL1PAD]",
+                                    step=0.1,value = float(df.iloc[0]["FU1_TL1PAD"]) if df.iloc[0]["FU1_TL1PAD"] not in ["NA","",None] else None
                                 )
                                 FU_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                                    "1st_FU_Target Lesion 1 CCD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["FU1_TL1CCD"]) if pd.notnull(df.iloc[0]["FU1_TL1CCD"]) and df.iloc[0]["FU1_TL1CCD"] != "" else 0.0
+                                    "1st_FU_Target Lesion 1 CCD Art Enhanc [Excel : FU1_TL1CCD]",
+                                    step=0.1,value = float(df.iloc[0]["FU1_TL1CCD"]) if df.iloc[0]["FU1_TL1CCD"] not in ["NA","",None] else None
                                 )
                                 FU_Target_Lesion_2_Segments = st.selectbox(
                                     "1st_FU_Target Lesion 2 Segments [Excel : 1st_FU_Target Lesion 2 Segments]",
@@ -6200,32 +6285,35 @@ def edit_existing_data():
                         placeholder="Choose an option",
                                 )
                                 FU_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
-                                    "1st_FU_Target Lesion 2 LAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["FU1_TL2LAD"]) if pd.notnull(df.iloc[0]["FU1_TL2LAD"]) and df.iloc[0]["FU1_TL2LAD"] != "" else 0.0
+                                    "1st_FU_Target Lesion 2 LAD Art Enhanc [Excel : FU1_TL2LAD]",
+                                    step=0.1,value = float(df.iloc[0]["FU1_TL2LAD"]) if df.iloc[0]["FU1_TL2LAD"] not in ["NA","",None] else None
                                 )
+                                FU_Target_Lesion_2_LAD_Art_Enhanc = "NA" if FU_Target_Lesion_2_Segments == "NA" else FU_Target_Lesion_2_LAD_Art_Enhanc
                                 FU_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
-                                    "1st_FU_Target Lesion 2 PAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["FU1_TL2PAD"]) if pd.notnull(df.iloc[0]["FU1_TL2PAD"]) and df.iloc[0]["FU1_TL2PAD"] !="" else 0.0
+                                    "1st_FU_Target Lesion 2 PAD Art Enhanc [Excel : FU1_TL2PAD]",
+                                    step=0.1,value = float(df.iloc[0]["FU1_TL2PAD"]) if df.iloc[0]["FU1_TL2PAD"] not in ["NA","",None] else None
                                 )
+                                FU_Target_Lesion_2_PAD_Art_Enhanc = "NA" if FU_Target_Lesion_2_Segments == "NA" else FU_Target_Lesion_2_PAD_Art_Enhanc
                                 FU_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
-                                    "1st_FU_Target Lesion 2 CCD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["FU1_TL2CCD"]) if pd.notnull(df.iloc[0]["FU1_TL2CCD"]) and df.iloc[0]["FU1_TL2CCD"] !="" else 0.0
+                                    "1st_FU_Target Lesion 2 CCD Art Enhanc [Excel : FU1_TL2CCD]",
+                                    step=0.1,value = float(df.iloc[0]["FU1_TL2CCD"]) if df.iloc[0]["FU1_TL2CCD"] not in ["NA","",None] else None
                                 )
-                                FU_Follow_up_1_targeted_Lesion_Dia_Sum = max(FU_Target_Lesion_1_CCD_Art_Enhanc,FU_Target_Lesion_1_PAD_Art_Enhanc,FU_Target_Lesion_1_LAD_Art_Enhanc)+max(FU_Target_Lesion_2_CCD_Art_Enhanc,FU_Target_Lesion_2_PAD_Art_Enhanc,FU_Target_Lesion_2_LAD_Art_Enhanc)
+                                FU_Target_Lesion_2_CCD_Art_Enhanc = "NA" if FU_Target_Lesion_2_Segments == "NA" else FU_Target_Lesion_2_CCD_Art_Enhanc
+                                FU_Follow_up_1_targeted_Lesion_Dia_Sum = calculate_targeted_dia_sum(FU_Target_Lesion_1_CCD_Art_Enhanc,FU_Target_Lesion_1_PAD_Art_Enhanc,FU_Target_Lesion_1_LAD_Art_Enhanc,FU_Target_Lesion_2_CCD_Art_Enhanc,FU_Target_Lesion_2_PAD_Art_Enhanc,FU_Target_Lesion_2_LAD_Art_Enhanc)
                                 st.write("1st_FU_Follow up 1 targeted Lesion Dia Sum",FU_Follow_up_1_targeted_Lesion_Dia_Sum)
                                 FU_Non_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
-                                    "1st_FU_Non-Target Lesion 2 LAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["FU1_NTL1LAD"]) if pd.notnull(df.iloc[0]["FU1_NTL1LAD"]) and df.iloc[0]["FU1_NTL1LAD"] !="" else 0.0
+                                    "1st_FU_Non-Target Lesion 2 LAD Art Enhanc [Excel : FU1_NTL1LAD]",
+                                    step=0.1,value = float(df.iloc[0]["FU1_NTL1LAD"]) if df.iloc[0]["FU1_NTL1LAD"] not in ["NA","",None] else None
                                 )
                                 FU_Non_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
-                                    "1st_FU_Non-Target Lesion 2 PAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["FU1_NTL1PAD"]) if pd.notnull(df.iloc[0]["FU1_NTL1PAD"]) and df.iloc[0]["FU1_NTL1PAD"] !="" else 0.0
+                                    "1st_FU_Non-Target Lesion 2 PAD Art Enhanc [Excel : FU1_NTL1PAD]",
+                                    step=0.1,value = float(df.iloc[0]["FU1_NTL1PAD"]) if df.iloc[0]["FU1_NTL1PAD"] not in ["NA","",None] else None
                                 )
                                 FU_Non_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
-                                    "1st_FU_Non-Target Lesion 2 CCD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["FU1_NTL1CCD"]) if pd.notnull(df.iloc[0]["FU1_NTL1CCD"]) and df.iloc[0]["FU1_NTL1CCD"] !=""  else 0.0
+                                    "1st_FU_Non-Target Lesion 2 CCD Art Enhanc [Excel : FU1_NTL1CCD]",
+                                    step=0.1,value = float(df.iloc[0]["FU1_NTL1CCD"]) if df.iloc[0]["FU1_NTL1CCD"] not in ["NA","",None] else None
                                 )
-                                FU_Non_targeted_Lesion_Dia_Sum = max(FU_Non_Target_Lesion_2_LAD_Art_Enhanc,FU_Non_Target_Lesion_2_PAD_Art_Enhanc,FU_Non_Target_Lesion_2_CCD_Art_Enhanc)
+                                FU_Non_targeted_Lesion_Dia_Sum = calculate_nontargeted_dia_sum(FU_Non_Target_Lesion_2_LAD_Art_Enhanc,FU_Non_Target_Lesion_2_PAD_Art_Enhanc,FU_Non_Target_Lesion_2_CCD_Art_Enhanc)
                                 st.write("1st_FU_Non-targeted Lesion Dia Sum",FU_Non_targeted_Lesion_Dia_Sum)
                                 FU_Lesion_Necrosis = st.selectbox(
                                    "1st_FU_Lesion Necrosis [Excel : FU1_NECROSIS]\n\n Yes (1), No (0), NA",
@@ -6239,7 +6327,7 @@ def edit_existing_data():
                         placeholder="Choose an option",
                                 )
                                 FU_Reviewers_Initials = st.text_input(
-                                    "1st_FU_Reviewers Initials",
+                                    "1st_FU_Reviewers Initials [Excel : FU1_REVFT]",
                                     help="Free-text input for reviewer name",
                                     value = df.iloc[0]["FU1_REVFT"]
                                 )
@@ -6277,15 +6365,15 @@ def edit_existing_data():
                         placeholder="Choose an option",
                                 )
                                 FU_NEW_Extrahepatic_Dz_Location = st.text_input(
-                                    "1st_FU_NEW Extrahepatic Dz Location",
+                                    "1st_FU_NEW Extrahepatic Dz Location [Excel : FU1_EHDLOC]",
                                     help="Free text",
                                     value=df.iloc[0]["FU1_EHDLOC"]
                                 )
-                                FU_NEW_Extrahepatic_Dz_Date = st.date_input("1st_FU_NEW Extrahepatic Dz Date",value = datetime.strptime(df.iloc[0]["FU1_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU1_EHDDATE"] else None)
+                                FU_NEW_Extrahepatic_Dz_Date = st.date_input("1st_FU_NEW Extrahepatic Dz Date [Excel : FU1_EHDDATE]",min_value=date(1900, 1, 1),value = datetime.strptime(df.iloc[0]["FU1_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU1_EHDDATE"] not in ["NA","",None] else None)
                                 
-                                FU_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == "NA" else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU_Non_targeted_Lesion_Dia_Sum)/max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
+                                FU_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum in ["NA",0] else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU_Non_targeted_Lesion_Dia_Sum)/PREY90_Non_targeted_Lesion_Dia_Sum)*100
                                 st.write("1st_FU_% change for non target lesion",FU_change_non_target_lesion)
-                                FU_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU_Follow_up_1_targeted_Lesion_Dia_Sum)/max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
+                                FU_change_target_lesion = "" if PREY90_pretx_targeted_Lesion_Dia_Sum in ["NA",0] else ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU_Follow_up_1_targeted_Lesion_Dia_Sum)/PREY90_pretx_targeted_Lesion_Dia_Sum)*100
                                 st.write("1st_FU_% Change Target Dia",FU_change_target_lesion)
                                 first_fu_mrecist_localized = mrecist_local(FU_change_target_lesion)
                                 st.write("1st_FU_mRECIST LOCALIZED",first_fu_mrecist_localized)
@@ -6294,12 +6382,19 @@ def edit_existing_data():
                                 st.write("1st_FU_mRECIST Overall",first_fu_mrecist_overall)
 
                                 FU_Free_Text = st.text_area(
-                                    "1st_FU_Free Text",
+                                    "1st_FU_Free Text [Excel : FU1_FT]",
                                     help="Free text",
                                     value = df.iloc[0]["FU1_FT"]
                                 )
+                                #2nd Follow_up
                                 st.subheader("Imaging_2nd_Followup")
-                               
+                                select3=None
+                                if df.iloc[0]["FU2_MOD"]:
+                                    if df.iloc[0]["FU2_MOD"] == "NA":
+                                        select3 = "NA"
+                                    else :
+                                        select3 = "Yes"
+                                na2_selected = st.selectbox("Is 2nd Follow_up Applicable ?", ["Yes","NA"], index=["Yes","NA"].index(select3) if select3 != None else None, placeholder="Choose an option")
                                 FU2_Scan_Modality = st.selectbox(
                                     "2nd_FU_Scan Modality Excel : FU2_MOD]\n\n(1) CT, (2) MRI",
                                         options=["1","2"],
@@ -6307,15 +6402,15 @@ def edit_existing_data():
                                             "1": "CT",
                                             "2": "MRI",
                                         }[x],
-                                    index=["1", "2"].index(df.iloc[0]["FU2_MOD"]) if df.iloc[0]["FU2_MOD"] else None,
+                                    index=["1", "2"].index(df.iloc[0]["FU2_MOD"]) if df.iloc[0]["FU2_MOD"] in ["1","2"] else None,
                                     placeholder="Choose an option",
                                 )
                                 FU2_Imaging_Date = st.date_input(
-                                        "2nd_FU_Imaging Date",
-                                        value=datetime.strptime(df.iloc[0]["FU2_IMG_DATE"], "%Y-%m-%d").date() if df.iloc[0]["FU2_IMG_DATE"] else None,
+                                        "2nd_FU_Imaging Date [Excel : FU2_IMG_DATE]",min_value=date(1900, 1, 1),
+                                        value=datetime.strptime(df.iloc[0]["FU2_IMG_DATE"], "%Y-%m-%d").date() if df.iloc[0]["FU2_IMG_DATE"] not in ["NA","",None] else None,
                                     )
 
-                                FU2_Months_Since_Y90 = relativedelta(FU2_Imaging_Date, fetch_date).months
+                                FU2_Months_Since_Y90 = months_difference(FU2_Imaging_Date, fetch_date)
                                 st.write("2nd_FU_Months Since Y90",FU2_Months_Since_Y90)
 
                                 FU2_Total_number_of_lesions = st.selectbox(
@@ -6326,24 +6421,23 @@ def edit_existing_data():
                                             "2": "2",
                                             "3" : ">=3"
                                         }[x],
-                                    index=["1", "2", "3"].index(df.iloc[0]["FU2_TOTLES"]) if df.iloc[0]["FU2_TOTLES"] else None,
+                                    index=["1", "2", "3"].index(df.iloc[0]["FU2_TOTLES"]) if df.iloc[0]["FU2_TOTLES"] in ["1","2","3"] else None,
                                     placeholder="Choose an option",
                                 )
                                 FU2_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                                    "2nd_FU_Target Lesion 1 LAD Art Enhanc",
+                                    "2nd_FU_Target Lesion 1 LAD Art Enhanc [Excel : FU2_TL1LAD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU2_TL1LAD"]) if pd.notnull(df.iloc[0]["FU2_TL1LAD"]) and df.iloc[0]["FU2_TL1LAD"] != "" else 0.0,
-                                )
+                                    value=float(df.iloc[0]["FU2_TL1LAD"]) if df.iloc[0]["FU2_TL1LAD"] not in ["NA","",None] else None)
                                 FU2_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                                    "2nd_FU_Target Lesion 1 PAD Art Enhanc",
+                                    "2nd_FU_Target Lesion 1 PAD Art Enhanc [Excel : FU2_TL1PAD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU2_TL1PAD"]) if pd.notnull(df.iloc[0]["FU2_TL1PAD"]) and df.iloc[0]["FU2_TL1PAD"] != "" else 0.0,
+                                    value=float(df.iloc[0]["FU2_TL1PAD"]) if df.iloc[0]["FU2_TL1PAD"] not in ["NA","",None] else None
                                 )
 
                                 FU2_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                                    "2nd_FU_Target Lesion 1 CCD Art Enhanc",
+                                    "2nd_FU_Target Lesion 1 CCD Art Enhanc [Excel : FU2_TL1CCD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU2_TL1CCD"]) if pd.notnull(df.iloc[0]["FU2_TL1CCD"]) and df.iloc[0]["FU2_TL1CCD"] != "" else 0.0,
+                                    value=float(df.iloc[0]["FU2_TL1CCD"]) if df.iloc[0]["FU2_TL1CCD"] not in ["NA","",None] else None
                                 )
                                 FU2_Target_Lesion_2_Segments = st.selectbox(
                                    "2nd_FU_Target Lesion 2 Segments [Excel : FU2_TL2SEG]",
@@ -6353,45 +6447,45 @@ def edit_existing_data():
                                 )
 
                                 FU2_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
-                                    "2nd_FU_Target Lesion 2 LAD Art Enhanc",
+                                    "2nd_FU_Target Lesion 2 LAD Art Enhanc [Excel : FU2_TL2LAD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU2_TL2LAD"]) if pd.notnull(df.iloc[0]["FU2_TL2LAD"]) and df.iloc[0]["FU2_TL2LAD"] != "" else 0.0,
+                                    value=float(df.iloc[0]["FU2_TL2LAD"]) if df.iloc[0]["FU2_TL2LAD"] not in ["NA","",None] else None
                                 )
-
+                                FU2_Target_Lesion_2_LAD_Art_Enhanc = "NA" if FU2_Target_Lesion_2_Segments == "NA" else FU2_Target_Lesion_2_LAD_Art_Enhanc
                                 FU2_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
-                                    "2nd_FU_Target Lesion 2 PAD Art Enhanc",
+                                    "2nd_FU_Target Lesion 2 PAD Art Enhanc [Excel : FU2_TL2PAD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU2_TL2PAD"]) if pd.notnull(df.iloc[0]["FU2_TL2PAD"]) and df.iloc[0]["FU2_TL2PAD"] != "" else 0.0,
+                                    value=float(df.iloc[0]["FU2_TL2PAD"]) if df.iloc[0]["FU2_TL2PAD"] not in ["NA","",None] else None
                                 )
-
+                                FU2_Target_Lesion_2_PAD_Art_Enhanc = "NA" if FU2_Target_Lesion_2_Segments == "NA" else FU2_Target_Lesion_2_PAD_Art_Enhanc
                                 FU2_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
-                                    "2nd_FU_Target Lesion 2 CCD Art Enhanc",
+                                    "2nd_FU_Target Lesion 2 CCD Art Enhanc [Excel : FU2_TL2CCD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU2_TL2CCD"]) if pd.notnull(df.iloc[0]["FU2_TL2CCD"]) and df.iloc[0]["FU2_TL2CCD"] != "" else 0.0,
+                                    value=float(df.iloc[0]["FU2_TL2CCD"]) if df.iloc[0]["FU2_TL2CCD"] not in ["NA","",None] else None
                                 )
-
-                                FU2_Follow_up_2_targeted_Lesion_Dia_Sum = max(FU2_Target_Lesion_1_CCD_Art_Enhanc, FU2_Target_Lesion_1_PAD_Art_Enhanc, FU2_Target_Lesion_1_LAD_Art_Enhanc) + max(FU2_Target_Lesion_2_CCD_Art_Enhanc, FU2_Target_Lesion_2_PAD_Art_Enhanc, FU2_Target_Lesion_2_LAD_Art_Enhanc)
+                                FU2_Target_Lesion_2_CCD_Art_Enhanc = "NA" if FU2_Target_Lesion_2_Segments == "NA" else FU2_Target_Lesion_2_CCD_Art_Enhanc
+                                FU2_Follow_up_2_targeted_Lesion_Dia_Sum = calculate_targeted_dia_sum(FU2_Target_Lesion_1_CCD_Art_Enhanc, FU2_Target_Lesion_1_PAD_Art_Enhanc, FU2_Target_Lesion_1_LAD_Art_Enhanc,FU2_Target_Lesion_2_CCD_Art_Enhanc, FU2_Target_Lesion_2_PAD_Art_Enhanc, FU2_Target_Lesion_2_LAD_Art_Enhanc)
                                 st.write("2nd_FU_Follow up 2 targeted Lesion Dia Sum",FU2_Follow_up_2_targeted_Lesion_Dia_Sum)
                                 
                                 FU2_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                                    "2nd_FU_Non-Target Lesion 1 LAD Art Enhanc",
+                                    "2nd_FU_Non-Target Lesion 1 LAD Art Enhanc [Excel : FU2_NTL1LAD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU2_NTL1LAD"]) if pd.notnull(df.iloc[0]["FU2_NTL1LAD"]) and df.iloc[0]["FU2_NTL1LAD"] != "" else 0.0,
+                                    value=float(df.iloc[0]["FU2_NTL1LAD"]) if df.iloc[0]["FU2_NTL1LAD"] not in ["NA","",None] else None
                                 )
 
                                 FU2_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                                    "2nd_FU_Non-Target Lesion 1 PAD Art Enhanc",
+                                    "2nd_FU_Non-Target Lesion 1 PAD Art Enhanc [Excel : FU2_NTL1PAD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU2_NTL1PAD"]) if pd.notnull(df.iloc[0]["FU2_NTL1PAD"]) and df.iloc[0]["FU2_NTL1PAD"] != "" else 0.0,
+                                    value=float(df.iloc[0]["FU2_NTL1PAD"]) if df.iloc[0]["FU2_NTL1PAD"] not in ["NA","",None] else None
                                 )
 
                                 FU2_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                                    "2nd_FU_Non-Target Lesion 1 CCD Art Enhanc",
+                                    "2nd_FU_Non-Target Lesion 1 CCD Art Enhanc [Excel : FU2_NTL1CCD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU2_NTL1CCD"]) if pd.notnull(df.iloc[0]["FU2_NTL1CCD"]) and df.iloc[0]["FU2_NTL1CCD"] != "" else 0.0,
+                                    value=float(df.iloc[0]["FU2_NTL1CCD"]) if df.iloc[0]["FU2_NTL1CCD"] not in ["NA","",None] else None,
                                 )
 
-                                FU2_Non_targeted_Lesion_Dia_Sum = max(FU2_Non_Target_Lesion_1_LAD_Art_Enhanc, FU2_Non_Target_Lesion_1_PAD_Art_Enhanc, FU2_Non_Target_Lesion_1_CCD_Art_Enhanc)
+                                FU2_Non_targeted_Lesion_Dia_Sum = calculate_nontargeted_dia_sum(FU2_Non_Target_Lesion_1_LAD_Art_Enhanc, FU2_Non_Target_Lesion_1_PAD_Art_Enhanc, FU2_Non_Target_Lesion_1_CCD_Art_Enhanc)
                                 st.write("2nd_FU_Non-targeted Lesion Dia Sum",FU2_Non_targeted_Lesion_Dia_Sum)
                                 
                                 FU2_Lesion_Necrosis = st.selectbox(
@@ -6407,7 +6501,7 @@ def edit_existing_data():
                                 )
 
                                 FU2_Reviewers_Initials = st.text_input(
-                                    "2nd_FU_Reviewers Initials",
+                                    "2nd_FU_Reviewers Initials [Excel : FU2_REVFT]",
                                     help="Free-text input for reviewer name",
                                     value=df.iloc[0]["FU2_REV"],
                                 )
@@ -6450,19 +6544,19 @@ def edit_existing_data():
                                 )
 
                                 FU2_NEW_Extrahepatic_Dz_Location = st.text_input(
-                                    "2nd_FU_NEW Extrahepatic Dz Location",
+                                    "2nd_FU_NEW Extrahepatic Dz Location [Excel : FU2_EHDLOC]",
                                     help="Free text",
                                     value=df.iloc[0]["FU2_EHDLOC"],
                                 )
 
                                 FU2_NEW_Extrahepatic_Dz_Date = st.date_input(
-                                    "2nd_FU_NEW Extrahepatic Dz Date",
-                                    value=datetime.strptime(df.iloc[0]["FU2_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU2_EHDDATE"] else None,
+                                    "2nd_FU_NEW Extrahepatic Dz Date [Excel : FU2_EHDDATE]",min_value=date(1900, 1, 1),
+                                    value=datetime.strptime(df.iloc[0]["FU2_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU2_EHDDATE"] not in ["NA","",None] else None,
                                 )
 
-                                FU2_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == "NA" else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU2_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
+                                FU2_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum in ["NA", 0] else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU2_Non_targeted_Lesion_Dia_Sum) / PREY90_Non_targeted_Lesion_Dia_Sum)*100
                                 st.write("2nd_FU_% change for non target lesion",FU2_change_non_target_lesion)
-                                FU2_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU2_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                                FU2_change_target_lesion = "" if PREY90_pretx_targeted_Lesion_Dia_Sum in ["NA", 0] else ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU2_Follow_up_2_targeted_Lesion_Dia_Sum) / PREY90_pretx_targeted_Lesion_Dia_Sum)*100
                                 st.write("2nd_FU_% Change Target Dia",FU2_change_target_lesion)
                                 
                                 second_fu_mrecist_calc = mrecist_local(FU2_change_target_lesion)
@@ -6473,11 +6567,19 @@ def edit_existing_data():
                                 st.write("2nd_FU_mRECIST Overall", second_fu_mrecist_overall)
 
                                 FU2_Free_Text = st.text_area(
-                                    "2nd_FU_Free Text",
+                                    "2nd_FU_Free Text [Excel : FU2_FT]",
                                     help="Free text",
                                     value = df.iloc[0]["FU2_FT"]
                                 )
+                                #3rd Follow_up
                                 st.subheader("Imaging_3rd_Followup")
+                                select4=None
+                                if df.iloc[0]["FU3_MOD"]:
+                                    if df.iloc[0]["FU3_MOD"] == "NA":
+                                        select4 = "NA"
+                                    else :
+                                        select4 = "Yes"
+                                na3_selected = st.selectbox("Is 3rd Follow_up Applicable ?", ["Yes","NA"], index=["Yes","NA"].index(select4) if select4 != None else None, placeholder="Choose an option")
                                 FU3_Scan_Modality = st.selectbox(
                                     "3rd_FU_Scan Modality[Excel : FU3_MOD]\n\n(1) CT, (2) MRI",
                                         options=["1","2"],
@@ -6485,16 +6587,16 @@ def edit_existing_data():
                                             "1": "CT",
                                             "2": "MRI",
                                         }[x],
-                                    index=["1", "2"].index(df.iloc[0]["FU3_MOD"]) if df.iloc[0]["FU3_MOD"] else None,
+                                    index=["1", "2"].index(df.iloc[0]["FU3_MOD"]) if df.iloc[0]["FU3_MOD"] in ["1","2"] else None,
                                     placeholder="Choose an option",
                                 )
 
                                 FU3_Imaging_Date = st.date_input(
-                                    "3rd_FU_Imaging Date",
+                                    "3rd_FU_Imaging Date [Excel : FU3_IMG_DATE]",min_value=date(1900, 1, 1),
                                     value=datetime.strptime(df.iloc[0]["FU3_IMG_DATE"], "%Y-%m-%d").date()
-                                    if df.iloc[0]["FU3_IMG_DATE"] else None
+                                    if df.iloc[0]["FU3_IMG_DATE"] not in ["NA","",None] else None
                                 )
-                                FU3_Months_Since_Y90 = relativedelta(FU3_Imaging_Date, fetch_date).months
+                                FU3_Months_Since_Y90 = months_difference(FU3_Imaging_Date, fetch_date)
                                 st.write("3rd_FU_Months Since Y90",FU3_Months_Since_Y90)
                                 
                                 FU3_Total_number_of_lesions = st.selectbox(
@@ -6505,26 +6607,25 @@ def edit_existing_data():
                                             "2": "2",
                                             "3" : ">=3"
                                         }[x],
-                                    index=["1", "2", "3"].index(df.iloc[0]["FU3_TOTLES"]) if df.iloc[0]["FU3_TOTLES"] else None,
+                                    index=["1", "2", "3"].index(df.iloc[0]["FU3_TOTLES"]) if df.iloc[0]["FU3_TOTLES"] in ["1","2","3"] else None,
                                     placeholder="Choose an option",
                                 )
 
                                 FU3_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                                    "3rd_FU_Target Lesion 1 LAD Art Enhanc",
+                                    "3rd_FU_Target Lesion 1 LAD Art Enhanc [Excel : FU3_TL1LAD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU3_TL1LAD"]) if pd.notnull(df.iloc[0]["FU3_TL1LAD"]) and df.iloc[0]["FU3_TL1LAD"] != "" else 0.0
+                                    value=float(df.iloc[0]["FU3_TL1LAD"]) if df.iloc[0]["FU3_TL1LAD"] not in ["NA","",None] else None
                                 )
-
                                 FU3_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                                    "3rd_FU_Target Lesion 1 PAD Art Enhanc",
+                                    "3rd_FU_Target Lesion 1 PAD Art Enhanc [Excel : FU3_TL1PAD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU3_TL1PAD"]) if pd.notnull(df.iloc[0]["FU3_TL1PAD"]) and df.iloc[0]["FU3_TL1PAD"] != "" else 0.0
+                                    value=float(df.iloc[0]["FU3_TL1PAD"]) if df.iloc[0]["FU3_TL1PAD"] not in ["NA","",None] else None
                                 )
 
                                 FU3_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                                    "3rd_FU_Target Lesion 1 CCD Art Enhanc",
+                                    "3rd_FU_Target Lesion 1 CCD Art Enhanc [Excel : FU3_TL1CCD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU3_TL1CCD"]) if pd.notnull(df.iloc[0]["FU3_TL1CCD"]) and df.iloc[0]["FU3_TL1CCD"] != "" else 0.0
+                                    value=float(df.iloc[0]["FU3_TL1CCD"]) if df.iloc[0]["FU3_TL1CCD"] not in ["NA","",None] else None
                                 )
 
                                 FU3_Target_Lesion_2_Segments = st.selectbox(
@@ -6535,45 +6636,45 @@ def edit_existing_data():
                                 )
 
                                 FU3_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
-                                    "3rd_FU_Target Lesion 2 LAD Art Enhanc",
+                                    "3rd_FU_Target Lesion 2 LAD Art Enhanc [Excel : FU3_TL2LAD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU3_TL2LAD"]) if pd.notnull(df.iloc[0]["FU3_TL2LAD"]) and df.iloc[0]["FU3_TL2LAD"] != "" else 0.0
+                                    value=float(df.iloc[0]["FU3_TL2LAD"]) if df.iloc[0]["FU3_TL2LAD"] not in ["NA","",None] else None
                                 )
-
+                                FU3_Target_Lesion_2_LAD_Art_Enhanc = "NA" if FU3_Target_Lesion_2_Segments == 0 else FU3_Target_Lesion_2_LAD_Art_Enhanc
                                 FU3_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
-                                    "3rd_FU_Target Lesion 2 PAD Art Enhanc",
+                                    "3rd_FU_Target Lesion 2 PAD Art Enhanc [Excel : FU3_TL2PAD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU3_TL2PAD"]) if pd.notnull(df.iloc[0]["FU3_TL2PAD"]) and df.iloc[0]["FU3_TL2PAD"] != "" else 0.0
+                                    value=float(df.iloc[0]["FU3_TL2PAD"]) if df.iloc[0]["FU3_TL2PAD"] not in ["NA","",None] else None
                                 )
-
+                                FU3_Target_Lesion_2_PAD_Art_Enhanc = "NA" if FU3_Target_Lesion_2_Segments == 0 else FU3_Target_Lesion_2_PAD_Art_Enhanc
                                 FU3_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
-                                    "3rd_FU_Target Lesion 2 CCD Art Enhanc",
+                                    "3rd_FU_Target Lesion 2 CCD Art Enhanc [Excel : FU3_TL2CCD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU3_TL2CCD"]) if pd.notnull(df.iloc[0]["FU3_TL2CCD"]) and df.iloc[0]["FU3_TL2CCD"] != "" else 0.0
+                                    value=float(df.iloc[0]["FU3_TL2CCD"]) if df.iloc[0]["FU3_TL2CCD"] not in ["NA","",None] else None
                                 )
-
-                                FU3_Follow_up_2_targeted_Lesion_Dia_Sum = max(FU3_Target_Lesion_1_CCD_Art_Enhanc, FU3_Target_Lesion_1_PAD_Art_Enhanc, FU3_Target_Lesion_1_LAD_Art_Enhanc) + max(FU3_Target_Lesion_2_CCD_Art_Enhanc, FU3_Target_Lesion_2_PAD_Art_Enhanc, FU3_Target_Lesion_2_LAD_Art_Enhanc)
+                                FU3_Target_Lesion_2_CCD_Art_Enhanc = "NA" if FU3_Target_Lesion_2_Segments == 0 else FU3_Target_Lesion_2_CCD_Art_Enhanc
+                                FU3_Follow_up_2_targeted_Lesion_Dia_Sum = calculate_targeted_dia_sum(FU3_Target_Lesion_1_CCD_Art_Enhanc, FU3_Target_Lesion_1_PAD_Art_Enhanc, FU3_Target_Lesion_1_LAD_Art_Enhanc,FU3_Target_Lesion_2_CCD_Art_Enhanc, FU3_Target_Lesion_2_PAD_Art_Enhanc, FU3_Target_Lesion_2_LAD_Art_Enhanc)
                                 st.write("3rd_FU_Follow up 3 targeted Lesion Dia Sum",FU3_Follow_up_2_targeted_Lesion_Dia_Sum)
                                 
                                 FU3_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                                    "3rd_FU_Non-Target Lesion 1 LAD Art Enhanc",
+                                    "3rd_FU_Non-Target Lesion 1 LAD Art Enhanc [Excel : FU3_NTL1LAD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU3_NTL1LAD"]) if pd.notnull(df.iloc[0]["FU3_NTL1LAD"]) and df.iloc[0]["FU3_NTL1LAD"] != "" else 0.0
+                                    value=float(df.iloc[0]["FU3_NTL1LAD"]) if df.iloc[0]["FU3_NTL1LAD"] not in ["NA","",None] else None
                                 )
 
                                 FU3_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                                    "3rd_FU_Non-Target Lesion 1 PAD Art Enhanc",
+                                    "3rd_FU_Non-Target Lesion 1 PAD Art Enhanc [Excel : FU3_NTL1PAD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU3_NTL1PAD"]) if pd.notnull(df.iloc[0]["FU3_NTL1PAD"]) and df.iloc[0]["FU3_NTL1PAD"] != "" else 0.0
+                                    value=float(df.iloc[0]["FU3_NTL1PAD"]) if df.iloc[0]["FU3_NTL1PAD"] not in ["NA","",None] else None
                                 )
 
                                 FU3_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                                    "3rd_FU_Non-Target Lesion 1 CCD Art Enhanc",
+                                    "3rd_FU_Non-Target Lesion 1 CCD Art Enhanc [Excel : FU3_NTL1CCD]",
                                     step=0.1,
-                                    value=float(df.iloc[0]["FU3_NTL1CCD"]) if pd.notnull(df.iloc[0]["FU3_NTL1CCD"]) and df.iloc[0]["FU3_NTL1CCD"] != "" else 0.0
+                                    value=float(df.iloc[0]["FU3_NTL1CCD"]) if df.iloc[0]["FU3_NTL1CCD"] not in ["NA","",None] else None
                                 )
 
-                                FU3_Non_targeted_Lesion_Dia_Sum = max(FU3_Non_Target_Lesion_1_LAD_Art_Enhanc, FU3_Non_Target_Lesion_1_PAD_Art_Enhanc, FU3_Non_Target_Lesion_1_CCD_Art_Enhanc)
+                                FU3_Non_targeted_Lesion_Dia_Sum = calculate_nontargeted_dia_sum(FU3_Non_Target_Lesion_1_LAD_Art_Enhanc, FU3_Non_Target_Lesion_1_PAD_Art_Enhanc, FU3_Non_Target_Lesion_1_CCD_Art_Enhanc)
                                 st.write("3rd_FU_Non-targeted Lesion Dia Sum",FU3_Non_targeted_Lesion_Dia_Sum)
 
                                 FU3_Lesion_Necrosis = st.selectbox(
@@ -6589,7 +6690,7 @@ def edit_existing_data():
                                 )
 
                                 FU3_Reviewers_Initials = st.text_input(
-                                    "3rd_FU_Reviewers Initials",
+                                    "3rd_FU_Reviewers Initials [Excel : FU3_REVFT]",
                                     help="Free-text input for reviewer name",
                                     value=df.iloc[0]["FU3_REV"]
                                 )
@@ -6631,19 +6732,19 @@ def edit_existing_data():
                                 )
 
                                 FU3_NEW_Extrahepatic_Dz_Location = st.text_input(
-                                    "3rd_FU_NEW Extrahepatic Dz Location",
+                                    "3rd_FU_NEW Extrahepatic Dz Location [Excel : FU3_EHDLOC]",
                                     help="Free text",
                                     value=df.iloc[0]["FU3_EHDLOC"]
                                 )
 
                                 FU3_NEW_Extrahepatic_Dz_Date = st.date_input(
-                                    "3rd_FU_NEW Extrahepatic Dz Date",
-                                    value=datetime.strptime(df.iloc[0]["FU3_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU3_EHDDATE"] else None
+                                    "3rd_FU_NEW Extrahepatic Dz Date [Excel : FU3_EHDDATE]",min_value=date(1900, 1, 1),
+                                    value=datetime.strptime(df.iloc[0]["FU3_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU3_EHDDATE"] not in ["NA","",None] else None
                                 )
 
-                                FU3_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == 'NA' else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU3_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum))*100
+                                FU3_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum in ['NA' , 0] else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU3_Non_targeted_Lesion_Dia_Sum) / PREY90_Non_targeted_Lesion_Dia_Sum)*100
                                 st.write("3rd_FU_% change for non target lesion",FU3_change_non_target_lesion)
-                                FU3_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU3_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                                FU3_change_target_lesion = "" if PREY90_pretx_targeted_Lesion_Dia_Sum in ['NA' , 0] else ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU3_Follow_up_2_targeted_Lesion_Dia_Sum) / PREY90_pretx_targeted_Lesion_Dia_Sum) * 100
                                 st.write("3rd_FU_% Change Target Dia",FU3_change_target_lesion)
                                 third_fu_mrecist_calc = mrecist_local(FU3_change_target_lesion)
                                 st.write("3rd_FU_mRECIST Calc",third_fu_mrecist_calc)
@@ -6654,12 +6755,19 @@ def edit_existing_data():
                                 st.write("3rd_FU_mRECIST Overall", third_fu_mrecist_overall)
 
                                 FU3_Free_Text = st.text_area(
-                                    "3rd_FU_Free Text",
+                                    "3rd_FU_Free Text [Excel : FU3_FT]",
                                     help="Free text",
                                     value=df.iloc[0]["FU3_FT"]
                                 )
                                 # 4th Imaging Follow-up
                                 st.subheader("Imaging_4th_Followup")
+                                select5=None
+                                if df.iloc[0]["FU4_MOD"]:
+                                    if df.iloc[0]["FU4_MOD"] == "NA":
+                                        select5 = "NA"
+                                    else :
+                                        select5 = "Yes"
+                                na4_selected = st.selectbox("Is 4th Follow_up Applicable ?", ["Yes","NA"], index=["Yes","NA"].index(select5) if select5 != None else None, placeholder="Choose an option")
 
                                 FU4_Scan_Modality = st.selectbox(
                                     "4th_FU_Scan Modality [Excel : FU4_MOD]\n\n(1) CT, (2) MRI",
@@ -6668,13 +6776,13 @@ def edit_existing_data():
                                             "1": "CT",
                                             "2": "MRI",
                                         }[x],
-                        index=["1", "2"].index(df.iloc[0]["FU4_MOD"]) if df.iloc[0]["FU4_MOD"] else None, 
+                        index=["1", "2"].index(df.iloc[0]["FU4_MOD"]) if df.iloc[0]["FU4_MOD"] in ["1","2"] else None, 
                         placeholder="Choose an option",
                                 )
 
-                                FU4_Imaging_Date = st.date_input("4th_FU_Imaging Date",value = datetime.strptime(df.iloc[0]["FU4_IMG_DATE"], "%Y-%m-%d").date() if df.iloc[0]["FU4_IMG_DATE"] else None)
+                                FU4_Imaging_Date = st.date_input("4th_FU_Imaging Date [Excel : FU4_IMG_DATE]",min_value=date(1900, 1, 1),value = datetime.strptime(df.iloc[0]["FU4_IMG_DATE"], "%Y-%m-%d").date() if df.iloc[0]["FU4_IMG_DATE"] not in ["NA","",None] else None)
 
-                                FU4_Months_Since_Y90 = relativedelta(FU4_Imaging_Date, fetch_date).months
+                                FU4_Months_Since_Y90 = months_difference(FU4_Imaging_Date, fetch_date)
                                 st.write("4th_FU_Months Since Y90",FU4_Months_Since_Y90)
                                 FU4_Total_number_of_lesions = st.selectbox(
                                     "4th_FU_Total number of lesions [Excel : FU4_TOTLES]\n\n(1) 1,(2) 2,(3) >=3",
@@ -6684,20 +6792,20 @@ def edit_existing_data():
                                             "2": "2",
                                             "3" : ">=3"
                                         }[x],
-                        index=["1", "2", "3"].index(df.iloc[0]["FU4_TOTLES"]) if df.iloc[0]["FU4_TOTLES"] else None,  # No default selection
+                        index=["1", "2", "3"].index(df.iloc[0]["FU4_TOTLES"]) if df.iloc[0]["FU4_TOTLES"] in ["1", "2", "3"] else None,  # No default selection
                         placeholder="Choose an option",
                                 )
                                 FU4_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                                    "4th_FU_Target Lesion 1 LAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["FU4_TL1LAD"]) if pd.notnull(df.iloc[0]["FU4_TL1LAD"]) and df.iloc[0]["FU4_TL1LAD"]!="" else 0.0
+                                    "4th_FU_Target Lesion 1 LAD Art Enhanc [Excel : FU4_TL1LAD]",
+                                    step=0.1,value = float(df.iloc[0]["FU4_TL1LAD"]) if df.iloc[0]["FU4_TL1LAD"] not in ["NA","",None] else None
                                 )
                                 FU4_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                                    "4th_FU_Target Lesion 1 PAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["FU4_TL1PAD"]) if pd.notnull(df.iloc[0]["FU4_TL1PAD"]) and df.iloc[0]["FU4_TL1PAD"] !="" else 0.0
+                                    "4th_FU_Target Lesion 1 PAD Art Enhanc [Excel : FU4_TL1PAD]",
+                                    step=0.1,value = float(df.iloc[0]["FU4_TL1PAD"]) if df.iloc[0]["FU4_TL1PAD"] not in ["NA","",None] else None
                                 )
                                 FU4_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                                    "4th_FU_Target Lesion 1 CCD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["FU4_TL1CCD"]) if pd.notnull(df.iloc[0]["FU4_TL1CCD"]) and df.iloc[0]["FU4_TL1CCD"] !="" else 0.0
+                                    "4th_FU_Target Lesion 1 CCD Art Enhanc [Excel : FU4_TL1CCD]",
+                                    step=0.1,value = float(df.iloc[0]["FU4_TL1CCD"]) if df.iloc[0]["FU4_TL1CCD"] not in ["NA","",None] else None
                                 )
                                 FU4_Target_Lesion_2_Segments = st.selectbox(
                                     "4th_FU_Target Lesion 2 Segments [Excel : FU4_TL2SEG]",
@@ -6706,37 +6814,38 @@ def edit_existing_data():
                         placeholder="Choose an option",
                                 )
                                 FU4_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
-                                    "4th_FU_Target Lesion 2 LAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["FU4_TL2LAD"]) if pd.notnull(df.iloc[0]["FU4_TL2LAD"]) and df.iloc[0]["FU4_TL2LAD"] !="" else 0.0
+                                    "4th_FU_Target Lesion 2 LAD Art Enhanc [Excel : FU4_TL2LAD]",
+                                    step=0.1,value = float(df.iloc[0]["FU4_TL2LAD"]) if df.iloc[0]["FU4_TL2LAD"] not in ["NA","",None] else None
                                 )
+                                FU4_Target_Lesion_2_LAD_Art_Enhanc = "NA" if FU4_Target_Lesion_2_Segments == "NA" else FU4_Target_Lesion_2_LAD_Art_Enhanc
                                 FU4_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
-                                    "4th_FU_Target Lesion 2 PAD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["FU4_TL2PAD"]) if pd.notnull(df.iloc[0]["FU4_TL2PAD"]) and df.iloc[0]["FU4_TL2PAD"] !="" else 0.0
+                                    "4th_FU_Target Lesion 2 PAD Art Enhanc [Excel : FU4_TL2PAD]",
+                                    step=0.1,value = float(df.iloc[0]["FU4_TL2PAD"]) if df.iloc[0]["FU4_TL2PAD"] not in ["NA","",None] else None
                                 )
-
+                                FU4_Target_Lesion_2_PAD_Art_Enhanc = "NA" if FU4_Target_Lesion_2_Segments == "NA" else FU4_Target_Lesion_2_PAD_Art_Enhanc
                                 FU4_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
-                                    "4th_FU_Target Lesion 2 CCD Art Enhanc",
-                                    step=0.1,value = float(df.iloc[0]["FU4_TL2CCD"]) if pd.notnull(df.iloc[0]["FU4_TL2CCD"]) and df.iloc[0]["FU4_TL2CCD"] !="" else 0.0
+                                    "4th_FU_Target Lesion 2 CCD Art Enhanc [Excel : FU4_TL2CCD]",
+                                    step=0.1,value = float(df.iloc[0]["FU4_TL2CCD"]) if df.iloc[0]["FU4_TL2CCD"] not in ["NA","",None] else None
                                 )
-
-                                FU4_Follow_up_2_targeted_Lesion_Dia_Sum = max(FU4_Target_Lesion_1_CCD_Art_Enhanc, FU4_Target_Lesion_1_PAD_Art_Enhanc, FU4_Target_Lesion_1_LAD_Art_Enhanc) + max(FU4_Target_Lesion_2_CCD_Art_Enhanc, FU4_Target_Lesion_2_PAD_Art_Enhanc, FU4_Target_Lesion_2_LAD_Art_Enhanc)
+                                FU4_Target_Lesion_2_CCD_Art_Enhanc = "NA" if FU4_Target_Lesion_2_Segments == "NA" else FU4_Target_Lesion_2_CCD_Art_Enhanc
+                                FU4_Follow_up_2_targeted_Lesion_Dia_Sum = calculate_targeted_dia_sum(FU4_Target_Lesion_1_CCD_Art_Enhanc, FU4_Target_Lesion_1_PAD_Art_Enhanc, FU4_Target_Lesion_1_LAD_Art_Enhanc,FU4_Target_Lesion_2_CCD_Art_Enhanc, FU4_Target_Lesion_2_PAD_Art_Enhanc, FU4_Target_Lesion_2_LAD_Art_Enhanc)
                                 st.write("4th_FU_Follow up 4 targeted Lesion Dia Sum",FU4_Follow_up_2_targeted_Lesion_Dia_Sum)
                                 FU4_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                                    "4th_FU_Non-Target Lesion 1 LAD Art Enhanc",
-                                    step=0.1, value=float(df.iloc[0]["FU4_NTL1LAD"]) if pd.notnull(df.iloc[0]["FU4_NTL1LAD"]) and df.iloc[0]["FU4_NTL1LAD"] != "" else 0.0
+                                    "4th_FU_Non-Target Lesion 1 LAD Art Enhanc [Excel : FU4_NTL1LAD]",
+                                    step=0.1, value=float(df.iloc[0]["FU4_NTL1LAD"]) if df.iloc[0]["FU4_NTL1LAD"] not in ["NA","",None] else None
                                 )
 
                                 FU4_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                                    "4th_FU_Non-Target Lesion 1 PAD Art Enhanc",
-                                    step=0.1, value=float(df.iloc[0]["FU4_NTL1PAD"]) if pd.notnull(df.iloc[0]["FU4_NTL1PAD"]) and df.iloc[0]["FU4_NTL1PAD"] != "" else 0.0
+                                    "4th_FU_Non-Target Lesion 1 PAD Art Enhanc [Excel : FU4_NTL1PAD]",
+                                    step=0.1, value=float(df.iloc[0]["FU4_NTL1PAD"]) if df.iloc[0]["FU4_NTL1PAD"] not in ["NA","",None] else None
                                 )
 
                                 FU4_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                                    "4th_FU_Non-Target Lesion 1 CCD Art Enhanc",
-                                    step=0.1, value=float(df.iloc[0]["FU4_NTL1CCD"]) if pd.notnull(df.iloc[0]["FU4_NTL1CCD"]) and df.iloc[0]["FU4_NTL1CCD"] != "" else 0.0
+                                    "4th_FU_Non-Target Lesion 1 CCD Art Enhanc [Excel : FU4_NTL1CCD]",
+                                    step=0.1, value=float(df.iloc[0]["FU4_NTL1CCD"]) if df.iloc[0]["FU4_NTL1CCD"] not in ["NA","",None] else None
                                 )
 
-                                FU4_Non_targeted_Lesion_Dia_Sum = max(FU4_Non_Target_Lesion_1_LAD_Art_Enhanc, FU4_Non_Target_Lesion_1_PAD_Art_Enhanc, FU4_Non_Target_Lesion_1_CCD_Art_Enhanc)
+                                FU4_Non_targeted_Lesion_Dia_Sum = calculate_nontargeted_dia_sum(FU4_Non_Target_Lesion_1_LAD_Art_Enhanc, FU4_Non_Target_Lesion_1_PAD_Art_Enhanc, FU4_Non_Target_Lesion_1_CCD_Art_Enhanc)
                                 st.write("4th_FU_Non-targeted Lesion Dia Sum",FU4_Non_targeted_Lesion_Dia_Sum)
                                 FU4_Lesion_Necrosis = st.selectbox(
                                     "4th_FU_Lesion Necrosis  [Excel : FU4_NECROSIS]\n\n Yes (1), No (0), NA",
@@ -6747,7 +6856,7 @@ def edit_existing_data():
                                 )
 
                                 FU4_Reviewers_Initials = st.text_input(
-                                    "4th_FU_Reviewers Initials",
+                                    "4th_FU_Reviewers Initials [Excel : FU4_REVFT]",
                                     help="Free-text input for reviewer name",
                                     value=df.iloc[0]["FU4_REVFT"]
                                 )
@@ -6777,19 +6886,19 @@ def edit_existing_data():
                                 )
 
                                 FU4_NEW_Extrahepatic_Dz_Location = st.text_input(
-                                    "4th_FU_NEW Extrahepatic Dz Location",
+                                    "4th_FU_NEW Extrahepatic Dz Location [Excel : FU4_EHDLOC]",
                                     help="Free text",
                                     value=df.iloc[0]["FU4_EHDLOC"]
                                 )
 
                                 FU4_NEW_Extrahepatic_Dz_Date = st.date_input(
-                                    "4th_FU_NEW Extrahepatic Dz Date",
-                                    value=datetime.strptime(df.iloc[0]["FU4_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU4_EHDDATE"] else None
+                                    "4th_FU_NEW Extrahepatic Dz Date [Excel : FU4_EHDDATE]",min_value=date(1900, 1, 1),
+                                    value=datetime.strptime(df.iloc[0]["FU4_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU4_EHDDATE"] not in ["NA","",None] else None
                                 )
 
-                                FU4_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == "NA" else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU4_Non_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                                FU4_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum in ["NA",0] else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU4_Non_targeted_Lesion_Dia_Sum) / PREY90_Non_targeted_Lesion_Dia_Sum) * 100
                                 st.write("4th_FU_% change non target lesion",FU4_change_non_target_lesion)
-                                FU4_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU4_Follow_up_2_targeted_Lesion_Dia_Sum) / max(1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                                FU4_change_target_lesion = "" if PREY90_pretx_targeted_Lesion_Dia_Sum in ["NA",0] else ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU4_Follow_up_2_targeted_Lesion_Dia_Sum) / PREY90_pretx_targeted_Lesion_Dia_Sum) * 100
                                 st.write("4th_FU_% Change target dia",FU4_change_target_lesion)
                                 fourth_fu_mrecist_calc = mrecist_local(FU4_change_target_lesion)
                                 st.write("4th_FU_mRECIST Calc",fourth_fu_mrecist_calc)
@@ -6799,47 +6908,54 @@ def edit_existing_data():
                                 st.write("4th_FU_mRECIST Overall", fourth_fu_mrecist_overall)
                                 
                                 FU4_Free_Text = st.text_area(
-                                    "4th_FU_Free Text",
+                                    "4th_FU_Free Text [Excel : FU4_FT]",
                                     help="Free text", value = df.iloc[0]["FU4_FT"]
                                 )
 
                                 # 5th Imaging Follow-up
-
+                                
                                 st.subheader("Imaging_5th_Followup")
+                                select6=None
+                                if df.iloc[0]["FU5_MOD"]:
+                                    if df.iloc[0]["FU5_MOD"] == "NA":
+                                        select6 = "NA"
+                                    else :
+                                        select6 = "Yes"
+                                na5_selected = st.selectbox("Is 5th Follow_up Applicable ?", ["Yes","NA"], index=["Yes","NA"].index(select6) if select6 != None else None, placeholder="Choose an option")
                                 FU5_Scan_Modality = st.selectbox(
                                     "5th_FU_Scan Modality [Excel : FU5_MOD]\n\n(1) CT, (2) MRI",
                                     options=["1", "2"],
                                     format_func=lambda x: {"1": "CT", "2": "MRI"}[x],
-                                    index=["1", "2"].index(df.iloc[0]["FU5_MOD"]) if df.iloc[0]["FU5_MOD"] else None,
+                                    index=["1", "2"].index(df.iloc[0]["FU5_MOD"]) if df.iloc[0]["FU5_MOD"] in ["1", "2"] else None,
                                     placeholder="Choose an option",
                                 )
 
-                                FU5_Imaging_Date = st.date_input("5th_FU_Imaging Date", value=datetime.strptime(df.iloc[0]["FU5_IMG_DATE"], "%Y-%m-%d").date() if df.iloc[0]["FU5_IMG_DATE"] else None)
+                                FU5_Imaging_Date = st.date_input("5th_FU_Imaging Date [Excel : FU5_IMG_DATE]",min_value=date(1900, 1, 1), value=datetime.strptime(df.iloc[0]["FU5_IMG_DATE"], "%Y-%m-%d").date() if df.iloc[0]["FU5_IMG_DATE"] not in ["NA","",None] else None)
 
-                                FU5_Months_Since_Y90 = relativedelta(FU5_Imaging_Date, fetch_date).months
+                                FU5_Months_Since_Y90 = months_difference(FU5_Imaging_Date, fetch_date)
                                 st.write("5th_FU_Months Since Y90",FU5_Months_Since_Y90)
 
                                 FU5_Total_number_of_lesions = st.selectbox(
                                     "5th_FU_Total number of lesions [Excel : FU5_TOTLES]\n\n(1) 1, (2) 2, (3) >=3",
                                     options=["1", "2", "3"],
                                     format_func=lambda x: {"1": "1", "2": "2", "3": ">=3"}[x],
-                                    index=["1", "2", "3"].index(df.iloc[0]["FU5_TOTLES"]) if df.iloc[0]["FU5_TOTLES"] else None,
+                                    index=["1", "2", "3"].index(df.iloc[0]["FU5_TOTLES"]) if df.iloc[0]["FU5_TOTLES"] in ["1", "2", "3"] else None,
                                     placeholder="Choose an option",
                                 )
 
                                 FU5_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                                    "5th_FU_Target Lesion 1 LAD Art Enhanc",
-                                    step=0.1, value=float(df.iloc[0]["FU5_TL1LAD"]) if pd.notnull(df.iloc[0]["FU5_TL1LAD"]) and df.iloc[0]["FU5_TL1LAD"] != "" else 0.0
+                                    "5th_FU_Target Lesion 1 LAD Art Enhanc [Excel : FU5_TL1LAD]",
+                                    step=0.1, value=float(df.iloc[0]["FU5_TL1LAD"]) if df.iloc[0]["FU5_TL1LAD"] not in ["NA","",None] else None
                                 )
 
                                 FU5_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                                    "5th_FU_Target Lesion 1 PAD Art Enhanc",
-                                    step=0.1, value=float(df.iloc[0]["FU5_TL1PAD"]) if pd.notnull(df.iloc[0]["FU5_TL1PAD"]) and df.iloc[0]["FU5_TL1PAD"] != "" else 0.0
+                                    "5th_FU_Target Lesion 1 PAD Art Enhanc [Excel : FU5_TL1PAD]",
+                                    step=0.1, value=float(df.iloc[0]["FU5_TL1PAD"]) if df.iloc[0]["FU5_TL1PAD"] not in ["NA","",None] else None
                                 )
 
                                 FU5_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                                    "5th_FU_Target Lesion 1 CCD Art Enhanc",
-                                    step=0.1, value=float(df.iloc[0]["FU5_TL1CCD"]) if pd.notnull(df.iloc[0]["FU5_TL1CCD"]) and df.iloc[0]["FU5_TL1CCD"] != "" else 0.0
+                                    "5th_FU_Target Lesion 1 CCD Art Enhanc [Excel : FU5_TL1CCD]",
+                                    step=0.1, value=float(df.iloc[0]["FU5_TL1CCD"]) if df.iloc[0]["FU5_TL1CCD"] not in ["NA","",None] else None
                                 )
 
                                 FU5_Target_Lesion_2_Segments = st.selectbox(
@@ -6850,38 +6966,37 @@ def edit_existing_data():
                                 )
 
                                 FU5_Target_Lesion_2_LAD_Art_Enhanc = st.number_input(
-                                    "5th_FU_Target Lesion 2 LAD Art Enhanc",
-                                    step=0.1, value=float(df.iloc[0]["FU5_TL2LAD"]) if pd.notnull(df.iloc[0]["FU5_TL2LAD"]) and df.iloc[0]["FU5_TL2LAD"] != "" else 0.0
+                                    "5th_FU_Target Lesion 2 LAD Art Enhanc [Excel : FU5_TL2LAD]",
+                                    step=0.1, value=float(df.iloc[0]["FU5_TL2LAD"]) if df.iloc[0]["FU5_TL2LAD"] not in ["NA","",None] else None
                                 )
-
+                                FU5_Target_Lesion_2_LAD_Art_Enhanc = "NA" if FU5_Target_Lesion_2_Segments == "NA" else FU5_Target_Lesion_2_LAD_Art_Enhanc
                                 FU5_Target_Lesion_2_PAD_Art_Enhanc = st.number_input(
-                                    "5th_FU_Target Lesion 2 PAD Art Enhanc",
-                                    step=0.1, value=float(df.iloc[0]["FU5_TL2PAD"]) if pd.notnull(df.iloc[0]["FU5_TL2PAD"]) and df.iloc[0]["FU5_TL2PAD"] != "" else 0.0
+                                    "5th_FU_Target Lesion 2 PAD Art Enhanc [Excel : FU5_TL2PAD]",
+                                    step=0.1, value=float(df.iloc[0]["FU5_TL2PAD"]) if df.iloc[0]["FU5_TL2PAD"] not in ["NA","",None] else None
                                 )
-
+                                FU5_Target_Lesion_2_PAD_Art_Enhanc = "NA" if FU5_Target_Lesion_2_Segments == "NA" else FU5_Target_Lesion_2_PAD_Art_Enhanc
                                 FU5_Target_Lesion_2_CCD_Art_Enhanc = st.number_input(
-                                    "5th_FU_Target Lesion 2 CCD Art Enhanc",
-                                    step=0.1, value=float(df.iloc[0]["FU5_TL2CCD"]) if pd.notnull(df.iloc[0]["FU5_TL2CCD"]) and df.iloc[0]["FU5_TL2CCD"] != "" else 0.0
+                                    "5th_FU_Target Lesion 2 CCD Art Enhanc [Excel : FU5_TL2CCD]",
+                                    step=0.1, value=float(df.iloc[0]["FU5_TL2CCD"]) if df.iloc[0]["FU5_TL2CCD"] not in ["NA","",None] else None
                                 )
-
-                                FU5_Follow_up_2_targeted_Lesion_Dia_Sum = max(FU5_Target_Lesion_1_CCD_Art_Enhanc, FU5_Target_Lesion_1_PAD_Art_Enhanc, FU5_Target_Lesion_1_LAD_Art_Enhanc) + max(FU5_Target_Lesion_2_CCD_Art_Enhanc, FU5_Target_Lesion_2_PAD_Art_Enhanc, FU5_Target_Lesion_2_LAD_Art_Enhanc)
+                                FU5_Target_Lesion_2_CCD_Art_Enhanc = "NA" if FU5_Target_Lesion_2_Segments == "NA" else FU5_Target_Lesion_2_CCD_Art_Enhanc
+                                FU5_Follow_up_2_targeted_Lesion_Dia_Sum = calculate_targeted_dia_sum(FU5_Target_Lesion_1_CCD_Art_Enhanc, FU5_Target_Lesion_1_PAD_Art_Enhanc, FU5_Target_Lesion_1_LAD_Art_Enhanc,FU5_Target_Lesion_2_CCD_Art_Enhanc, FU5_Target_Lesion_2_PAD_Art_Enhanc, FU5_Target_Lesion_2_LAD_Art_Enhanc)
                                 st.write("5th_FU_Follow up 4 targeted Lesion Dia Sum",FU5_Follow_up_2_targeted_Lesion_Dia_Sum)
 
                                 FU5_Non_Target_Lesion_1_LAD_Art_Enhanc = st.number_input(
-                                    "5th_FU_Non-Target Lesion 1 LAD Art Enhanc",
-                                    step=0.1, value=float(df.iloc[0]["FU5_NTL1LAD"]) if pd.notnull(df.iloc[0]["FU5_NTL1LAD"]) and df.iloc[0]["FU5_NTL1LAD"] != "" else 0.0
+                                    "5th_FU_Non-Target Lesion 1 LAD Art Enhanc [Excel : FU5_NTL1LAD]",
+                                    step=0.1, value=float(df.iloc[0]["FU5_NTL1LAD"]) if df.iloc[0]["FU5_NTL1LAD"] not in ["NA","",None] else None
                                 )
 
                                 FU5_Non_Target_Lesion_1_PAD_Art_Enhanc = st.number_input(
-                                    "5th_FU_Non-Target Lesion 1 PAD Art Enhanc",
-                                    step=0.1, value=float(df.iloc[0]["FU5_NTL1PAD"]) if pd.notnull(df.iloc[0]["FU5_NTL1PAD"]) and df.iloc[0]["FU5_NTL1PAD"] != "" else 0.0
+                                    "5th_FU_Non-Target Lesion 1 PAD Art Enhanc [Excel : FU5_NTL1PAD]",
+                                    step=0.1, value=float(df.iloc[0]["FU5_NTL1PAD"]) if df.iloc[0]["FU5_NTL1PAD"] not in ["NA","",None] else None
                                 )
 
                                 FU5_Non_Target_Lesion_1_CCD_Art_Enhanc = st.number_input(
-                                    "5th_FU_Non-Target Lesion 1 CCD Art Enhanc",
-                                    step=0.1, value=float(df.iloc[0]["FU5_NTL1CCD"]) if pd.notnull(df.iloc[0]["FU5_NTL1CCD"]) and df.iloc[0]["FU5_NTL1CCD"] != "" else 0.0
-                                )
-                                FU5_Non_targeted_Lesion_Dia_Sum = max(FU5_Non_Target_Lesion_1_LAD_Art_Enhanc, FU5_Non_Target_Lesion_1_PAD_Art_Enhanc, FU5_Non_Target_Lesion_1_CCD_Art_Enhanc)
+                                    "5th_FU_Non-Target Lesion 1 CCD Art Enhanc [Excel : FU5_NTL1CCD]",
+                                    step=0.1, value=float(df.iloc[0]["FU5_NTL1CCD"]) if df.iloc[0]["FU5_NTL1CCD"] not in ["NA","",None] else None)
+                                FU5_Non_targeted_Lesion_Dia_Sum = calculate_nontargeted_dia_sum(FU5_Non_Target_Lesion_1_LAD_Art_Enhanc, FU5_Non_Target_Lesion_1_PAD_Art_Enhanc, FU5_Non_Target_Lesion_1_CCD_Art_Enhanc)
                                 st.write("5th_FU_Non-targeted Lesion Dia Sum",FU5_Non_targeted_Lesion_Dia_Sum)
                                 
                                 FU5_Non_target_lesion_response = st.selectbox(
@@ -6909,19 +7024,19 @@ def edit_existing_data():
                                 )
 
                                 FU5_NEW_Extrahepatic_Dz_Location = st.text_input(
-                                    "5th_FU_NEW Extrahepatic Dz Location",
+                                    "5th_FU_NEW Extrahepatic Dz Location [Excel : FU5_EHDLOC]",
                                     help="Free text",
                                     value=df.iloc[0]["FU5_EHDLOC"]
                                 )
 
                                 FU5_NEW_Extrahepatic_Dz_Date = st.date_input(
-                                    "5th_FU_NEW Extrahepatic Dz Date",
-                                    value=datetime.strptime(df.iloc[0]["FU5_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU5_EHDDATE"] else None
+                                    "5th_FU_NEW Extrahepatic Dz Date [Excel : FU5_EHDDATE]",min_value=date(1900, 1, 1),
+                                    value=datetime.strptime(df.iloc[0]["FU5_EHDDATE"], "%Y-%m-%d").date() if df.iloc[0]["FU5_EHDDATE"] not in ["NA","",None] else None
                                 )
 
-                                FU5_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum == 'NA' else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU5_Non_targeted_Lesion_Dia_Sum) / max(0.1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                                FU5_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum in ['NA',0] else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU5_Non_targeted_Lesion_Dia_Sum) / PREY90_Non_targeted_Lesion_Dia_Sum) * 100
                                 st.write("5th_FU_% change non target lesion ",FU5_change_non_target_lesion)
-                                FU5_change_target_lesion = ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU5_Follow_up_2_targeted_Lesion_Dia_Sum) / max(0.1,PREY90_pretx_targeted_Lesion_Dia_Sum)) * 100
+                                FU5_change_target_lesion = "" if PREY90_pretx_targeted_Lesion_Dia_Sum in ['NA',0] else ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU5_Follow_up_2_targeted_Lesion_Dia_Sum) / PREY90_pretx_targeted_Lesion_Dia_Sum) * 100
                                 st.write("5th_FU_% Change target dia",FU5_change_target_lesion)
                                 fifth_fu_mrecist_calc = mrecist_local(FU5_change_target_lesion)
                                 st.write("5th_FU_mRECIST Calc",fifth_fu_mrecist_calc)
@@ -6932,7 +7047,7 @@ def edit_existing_data():
                                 st.write("5th_FU_mRECIST Overall", fifth_fu_mrecist_overall)
                                 
                                 FU5_Free_Text = st.text_area(
-                                    "5th_FU_Free Text",
+                                    "5th_FU_Free Text [Excel : FU5_FT]",
                                     help="Free text", value = df.iloc[0]["FU5_FT"]
                                 )
                                
@@ -6949,13 +7064,13 @@ def edit_existing_data():
                                         placeholder="Choose an option",
                                 )
 
-                                Date_of_Death = st.date_input("Date of Death",value = datetime.strptime(df.iloc[0]["DATE_DEAD"], "%Y-%m-%d").date() if df.iloc[0]["DATE_DEAD"] != "NA" and df.iloc[0]["DATE_DEAD"] != "" else None)
+                                Date_of_Death = st.date_input("Date of Death  [Excel : DATE_DEAD]",min_value=date(1900, 1, 1),value = datetime.strptime(df.iloc[0]["DATE_DEAD"], "%Y-%m-%d").date() if df.iloc[0]["DATE_DEAD"] != "NA" and df.iloc[0]["DATE_DEAD"] != "" else None)
                                 Time_to_Death = None
                                 if dead == 0:
                                     Date_of_Death = 'NA'
                                     Time_to_Death = 'NA'
                                 else :
-                                    Time_to_Death = relativedelta(Date_of_Death, fetch_date).months
+                                    Time_to_Death = months_difference(Date_of_Death, fetch_date)
                                 st.write("Time to Death",Time_to_Death)
 
                                 OLT = st.selectbox(
@@ -6969,13 +7084,13 @@ def edit_existing_data():
                                         placeholder="Choose an option",
                                 )
 
-                                Date_of_OLT = st.date_input("Date of OLT",value = datetime.strptime(df.iloc[0]["DATE_OLT"], "%Y-%m-%d").date() if df.iloc[0]["DATE_OLT"] != "NA" and df.iloc[0]["DATE_OLT"] != "" else None)
+                                Date_of_OLT = st.date_input("Date of OLT [Excel : DATE_OLT]",min_value=date(1900, 1, 1),value = datetime.strptime(df.iloc[0]["DATE_OLT"], "%Y-%m-%d").date() if df.iloc[0]["DATE_OLT"] != "NA" and df.iloc[0]["DATE_OLT"] != "" else None)
                                 Time_to_OLT = None
                                 if OLT == 0:
                                     Date_of_OLT = 'NA'
                                     Time_to_OLT = 'NA'
                                 else:
-                                    Time_to_OLT = relativedelta(Date_of_OLT, fetch_date).months
+                                    Time_to_OLT = months_difference(Date_of_OLT, fetch_date)
                                 st.write("Time to OLT",Time_to_OLT)
 
                                 Repeat_tx_post_Y90 = st.selectbox(
@@ -6989,13 +7104,13 @@ def edit_existing_data():
                                         placeholder="Choose an option",
                                 )
 
-                                Date_of_Repeat_tx_Post_Y90 = st.date_input("Date of Repeat tx Post Y90",value = datetime.strptime(df.iloc[0]["DATE_RTX"], "%Y-%m-%d").date() if df.iloc[0]["DATE_RTX"] != "NA" and df.iloc[0]["DATE_RTX"] != "" else None)
+                                Date_of_Repeat_tx_Post_Y90 = st.date_input("Date of Repeat tx Post Y90 [Excel : DATE_RTX]",min_value=date(1900, 1, 1),value = datetime.strptime(df.iloc[0]["DATE_RTX"], "%Y-%m-%d").date() if df.iloc[0]["DATE_RTX"] != "NA" and df.iloc[0]["DATE_RTX"] != "" else None)
                                 Time_to_Repeat_Tx_Post_Y90 = None
                                 if Repeat_tx_post_Y90 == 0:
                                     Date_of_Repeat_tx_Post_Y90 = 'NA'
                                     Time_to_Repeat_Tx_Post_Y90 = 'NA'
                                 else:
-                                    Time_to_Repeat_Tx_Post_Y90 = relativedelta(Date_of_Repeat_tx_Post_Y90, fetch_date).months
+                                    Time_to_Repeat_Tx_Post_Y90 = months_difference(Date_of_Repeat_tx_Post_Y90, fetch_date)
                                 st.write("Time to Repeat Tx Post Y90",Time_to_Repeat_Tx_Post_Y90)
 
                                 Date_of_Localized_Progression = detect_first_progression(first_fu_mrecist_localized, second_fu_mrecist_localized, third_fu_mrecist_localized, fourth_fu_mrecist_localized, fifth_fu_mrecist_localized, FU2_Imaging_Date, FU3_Imaging_Date, FU4_Imaging_Date, FU5_Imaging_Date)
@@ -7004,7 +7119,7 @@ def edit_existing_data():
                                 if Date_of_Localized_Progression == "No Progression":
                                         Time_to_localized_progression = 'NA'
                                 else:
-                                        Time_to_localized_progression = relativedelta(Date_of_Localized_Progression, fetch_date).years
+                                        Time_to_localized_progression = months_difference(Date_of_Localized_Progression, fetch_date)
                                 st.write("Time to localized progression",Time_to_localized_progression)
 
                                 Date_of_Overall_Progression = detect_overall_progression(first_fu_mrecist_localized, first_fu_mrecist_overall, second_fu_mrecist_localized, second_fu_mrecist_overall, third_fu_mrecist_localized, third_fu_mrecist_overall, fourth_fu_mrecist_localized, fourth_fu_mrecist_overall, fifth_fu_mrecist_localized, fifth_fu_mrecist_overall, FU_Imaging_Date, FU2_Imaging_Date, FU3_Imaging_Date, FU4_Imaging_Date, FU5_Imaging_Date)
@@ -7013,7 +7128,7 @@ def edit_existing_data():
                                 if Date_of_Overall_Progression == "No Progression":
                                         Time_to_overall_progression = 'NA'
                                 else:
-                                        Time_to_overall_progression = relativedelta(Date_of_Overall_Progression, fetch_date).years
+                                        Time_to_overall_progression = months_difference(Date_of_Overall_Progression, fetch_date)
                                 st.write("Time to Overall (Local or systemic) Progression",Time_to_overall_progression)
                                 lfu = st.selectbox("Last Follow up [Excel : LFU]\n\n(1) Yes, (0) No", options=["0", "1"],
                                 format_func=lambda x:{
@@ -7022,22 +7137,22 @@ def edit_existing_data():
                                     }[x],
                                 index=None,  # No default selection
                                 placeholder="Choose an option",)
-                                Date_of_Last_Follow_up_last_imaging_date = st.date_input("Date of Last Follow-up/last imaging date",value = datetime.strptime(df.iloc[0]["DATE_LFU"], "%Y-%m-%d").date() if df.iloc[0]["DATE_LFU"] != "NA" and df.iloc[0]["DATE_LFU"] != ""else None)
+                                Date_of_Last_Follow_up_last_imaging_date = st.date_input("Date of Last Follow-up/last imaging date [Excel : DATE_LFU]",min_value=date(1900, 1, 1),value = datetime.strptime(df.iloc[0]["DATE_LFU"], "%Y-%m-%d").date() if df.iloc[0]["DATE_LFU"] != "NA" and df.iloc[0]["DATE_LFU"] != ""else None)
                                 Time_to_Last_Follow_up_last_imaging_date = None
                                 if dead == 1 and OLT == 1 and Repeat_tx_post_Y90 == 1 and lfu == "0":
                                     Date_of_Last_Follow_up_last_imaging_date = 'NA'
                                     Time_to_Last_Follow_up_last_imaging_date = "NA"
                                 else:
-                                    Time_to_Last_Follow_up_last_imaging_date = relativedelta(Date_of_Last_Follow_up_last_imaging_date, fetch_date).years 
+                                    Time_to_Last_Follow_up_last_imaging_date = months_difference(Date_of_Last_Follow_up_last_imaging_date, fetch_date)
 
                                 st.write("Time to Last follow up",Time_to_Last_Follow_up_last_imaging_date)
-                                notes_free_text = st.text_input("Notes Free Text",value=df.iloc[0]["NOTES_FT"])
+                                notes_free_text = st.text_input("Notes Free Text [Excel : NOTES_FT]",value=df.iloc[0]["NOTES_FT"])
 
                                 bestm_recist = determine_bestmrecist(first_fu_mrecist_localized, second_fu_mrecist_localized, third_fu_mrecist_localized, fourth_fu_mrecist_localized, fifth_fu_mrecist_localized)
                                 st.write("BestmRECIST", bestm_recist)
                                 date_bestm_recist = determine_bestmrecist_date(fifth_fu_mrecist_overall, first_fu_mrecist_overall, second_fu_mrecist_overall, third_fu_mrecist_overall, fourth_fu_mrecist_overall, fifth_fu_mrecist_localized, FU_Imaging_Date, FU2_Imaging_Date, FU3_Imaging_Date, FU4_Imaging_Date, FU5_Imaging_Date)
                                 st.write("Date BestmRECIST",date_bestm_recist)
-                                time_to_bestm_recist = "No Time" if date_bestm_recist == "No Date" else relativedelta(date_bestm_recist, fetch_date).months
+                                time_to_bestm_recist = "No Time" if date_bestm_recist == "No Date" else months_difference(date_bestm_recist, fetch_date)
                                 st.write("Timeto_bestmRECIST", time_to_bestm_recist)
                                 PERCHANGE_BEST_TTR = st.number_input("Percent change till best mRECIST 1st",step=0.1, value=float(df.iloc[0]["PERCHANGE_BEST_TTR"]) if pd.notnull(df.iloc[0]["PERCHANGE_BEST_TTR"]) and df.iloc[0]["PERCHANGE_BEST_TTR"] != "" else 0.0 )
                                 def best_cr_noncr(value):
@@ -7059,11 +7174,11 @@ def edit_existing_data():
                                 bestm_recist_r_vs_nr = best_responce(bestm_recist)
                                 st.write("BestmRECISTRvsNR" ,bestm_recist_r_vs_nr)
 
-                                DATE_BEST_MTR = st.date_input("Date of Best percent change (2)",value = datetime.strptime(df.iloc[0]["DATE_BEST_MTR"], "%Y-%m-%d").date() if df.iloc[0]["DATE_BEST_MTR"] != "NA" and df.iloc[0]["DATE_BEST_MTR"] != "" else None)
-                                TIME_BEST_MRT = relativedelta(DATE_BEST_MTR, fetch_date).months
-                                PERCHANGE_BEST_MTR = st.number_input("Best Overall percent change (2) ",step=0.1, value=float(df.iloc[0]["PERCHANGE_BEST_MTR"]) if pd.notnull(df.iloc[0]["PERCHANGE_BEST_MTR"]) and df.iloc[0]["PERCHANGE_BEST_MTR"] != "" else 0.0)
+                                DATE_BEST_MTR = st.date_input("Date of Best percent change (2) [Excel : DATE_BEST_MTR]",min_value=date(1900, 1, 1),value = datetime.strptime(df.iloc[0]["DATE_BEST_MTR"], "%Y-%m-%d").date() if df.iloc[0]["DATE_BEST_MTR"] != "NA" and df.iloc[0]["DATE_BEST_MTR"] != "" else None)
+                                TIME_BEST_MRT = months_difference(DATE_BEST_MTR, fetch_date)
+                                PERCHANGE_BEST_MTR = st.number_input("Best Overall percent change (2) [Excel : PERCHANGE_BEST_MTR]",step=0.1, value=float(df.iloc[0]["PERCHANGE_BEST_MTR"]) if pd.notnull(df.iloc[0]["PERCHANGE_BEST_MTR"]) and df.iloc[0]["PERCHANGE_BEST_MTR"] != "" else 0.0)
 
-                                OS_Date = st.date_input("Overall Survival Date" ,value = datetime.strptime(df.iloc[0]["OS_Date"], "%Y-%m-%d").date() if df.iloc[0]["OS_Date"] != "NA" and df.iloc[0]["OS_Date"] != "" else None)
+                                OS_Date = st.date_input("Overall Survival Date [Excel : OS_Date]",min_value=date(1900, 1, 1) ,value = datetime.strptime(df.iloc[0]["OS_Date"], "%Y-%m-%d").date() if df.iloc[0]["OS_Date"] != "NA" and df.iloc[0]["OS_Date"] != "" else None)
                                 OS_Events = st.selectbox("Overall Survival Events [Excel : OS_Events]\n\n(1) Event: Death, (0) Censored: OLT, RTx, LFU",
                                     options=["1","0"],
                                     format_func=lambda x:{
@@ -7073,7 +7188,7 @@ def edit_existing_data():
                                 index=["1","0"].index(df.iloc[0]["OS_Events"]) if df.iloc[0]["OS_Events"] else None,  # No default selection
                                 placeholder="Choose an option",
                                 )
-                                OS_Time = relativedelta(OS_Date, fetch_date).months
+                                OS_Time = months_difference(OS_Date, fetch_date)
                                 OS_Reason = st.selectbox("Overall Survival Reaons [Excel : OS_Reason]\n\nDead = dead, OLT = liver transplant, RTx = repeat treatment, LFU = Loss to Follow up",
                                     options=["Dead","OLT", "RTx", "LFU"],
                                     format_func=lambda x:{
@@ -7086,7 +7201,7 @@ def edit_existing_data():
                                 placeholder="Choose an option",
                                 )
                                 #LPFS
-                                LPFS_Date = st.date_input("Local Progression Free Survival Date",value = datetime.strptime(df.iloc[0]["LPFS_Date"], "%Y-%m-%d").date() if df.iloc[0]["LPFS_Date"] != "NA" and df.iloc[0]["LPFS_Date"] != "" else None)
+                                LPFS_Date = st.date_input("Local Progression Free Survival Date [Excel : LPFS_Date]",min_value=date(1900, 1, 1),value = datetime.strptime(df.iloc[0]["LPFS_Date"], "%Y-%m-%d").date() if df.iloc[0]["LPFS_Date"] != "NA" and df.iloc[0]["LPFS_Date"] != "" else None)
                                 LPFS_Events = st.selectbox("Local Progression Free Survival Event [Excel : LPFS_Events]\n\n(1) Event: Death, (0) Censored: OLT, RTx, LFU",
                                     options=["1","0"],
                                     format_func=lambda x:{
@@ -7096,14 +7211,14 @@ def edit_existing_data():
                                 index=["1","0"].index(df.iloc[0]["LPFS_Events"]) if df.iloc[0]["LPFS_Events"] else None,  # No default selection
                                 placeholder="Choose an option",
                                 )
-                                LPFS_Time = relativedelta(LPFS_Date, fetch_date).months
+                                LPFS_Time = months_difference(LPFS_Date, fetch_date)
                                 LPFS_Reason = st.selectbox("Local Progression Free Survival Reason [Excel : LPFS_Reason]",
                                     options=["Dead"," LP(Local progression)", "OLT", "RTx", "LFU"],
                                 index=["Dead"," LP(Local progression)", "OLT", "RTx", "LFU"].index(df.iloc[0]["LPFS_Reason"]) if df.iloc[0]["LPFS_Reason"] else None,  # No default selection
                                 placeholder="Choose an option",
                                 )
                                 #PFS
-                                PFS_Date = st.date_input("Progression Free Survival Date",value = datetime.strptime(df.iloc[0]["PFS_Date"], "%Y-%m-%d").date() if df.iloc[0]["PFS_Date"] != "NA" and df.iloc[0]["PFS_Date"] != "" else None)
+                                PFS_Date = st.date_input("Progression Free Survival Date [Excel : PFS_Date]",min_value=date(1900, 1, 1),value = datetime.strptime(df.iloc[0]["PFS_Date"], "%Y-%m-%d").date() if df.iloc[0]["PFS_Date"] != "NA" and df.iloc[0]["PFS_Date"] != "" else None)
                                 PFS_Events = st.selectbox("Progression Free Survival Event [Excel : PFS_Events]\n\n(1) Event: Death, (0) Censored: OLT, RTx, LFU",
                                     options=["1","0"],
                                     format_func=lambda x:{
@@ -7113,7 +7228,7 @@ def edit_existing_data():
                                 index=["1","0"].index(df.iloc[0]["PFS_Events"]) if df.iloc[0]["PFS_Events"] else None,  # No default selection
                                 placeholder="Choose an option",
                                 )
-                                PFS_Time = relativedelta(PFS_Date, fetch_date).months
+                                PFS_Time = months_difference(PFS_Date, fetch_date)
                                 PFS_Reason = st.selectbox("Progression Free Survival Reason [Excel : PFS_Reason]\n\nDead = dead, OLT = liver transplant, RTx = repeat treatment, LFU = Loss to Follow up",
                                     options=["Dead","OP(Overall progression)" ,"OLT", "RTx", "LFU"],
                                 index=["Dead","OP(Overall progression)" ,"OLT", "RTx", "LFU"].index(df.iloc[0]["PFS_Reason"]) if df.iloc[0]["PFS_Reason"] else None,  # No default selection
@@ -7205,174 +7320,174 @@ def edit_existing_data():
                                 if submit_tab10:
                                     
                                     data10={
-                                    "PREY_MOD": PREY90_prescan_modality,
-                                    "PREY_IMG_DATE": PREY90_Imaging_Date,
-                                    "PREY_TOTLES": PREY90_total_number_of_lesions,
-                                    "PREY_LOBES": PREY90_Number_Involved_Lobes,
-                                    "PREY_TL1SEG": PREY90_target_lesion_1_segments,
-                                    "PREY_TL1LAD": PREY90_TL1_LAD,
-                                    "PREY_TL1PAD": PREY90_Target_Lesion_1_PAD,
-                                    "PREY_TL1CCD": PREY90_Target_Lesion_1_CCD,
-                                    "PREY_TL1VOL": PREY90_Target_Lesion_1_VOL,
-                                    "PREY_TL2SEG": PREY90_Target_Lesion_2_segments,
-                                    "PREY_TL2LAD": PREY90_Target_Lesion_2_LAD,
-                                    "PREY_TL2PAD": PREY90_Target_Lesion_2_PAD,
-                                    "PREY_TL2CCD": PREY90_Target_Lesion_2_CCD,
-                                    "PREY_TL2VOL": PREY90_Target_Lesion_2_VOL,
-                                    "PREY_TLDIA": PREY90_pretx_targeted_Lesion_Dia_Sum,
-                                    "PREY_NTLOC": PREY90_Non_Target_Lesion_Location,
-                                    "PREY_NTL1LAD": PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "PREY_NTL1PAD": PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "PREY_NTL1CCD": PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "PREY_NTLDIA": PREY90_Non_targeted_Lesion_Dia_Sum,
-                                    "PREY_REVFT": PREY90_Reviewers_Initials,
-                                    "PREY_EHD": PREY90_Pre_Y90_Extrahepatic_Disease,
-                                    "PREY_EHDLOCFT": PREY90_Pre_Y90_Extrahepatic_Disease_Location,
-                                    "PREY_PVT": PREY90_PVT,
-                                    "PREY_PVTLOC": PREY90_PVT_Location,
-                                    "PREY_CIRRH": PREY90_Features_of_cirrhosis,
-                                    "FU1_MOD": FU_Scan_Modality,
-                                    "FU1_IMG_DATE": FU_Imaging_Date,
-                                    "FU1_MS_Y90": FU_Months_Since_Y90,
-                                    "FU1_TOTLES": FU_Total_number_of_lesions,
-                                    "FU1_TL1LAD": FU_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU1_TL1PAD": FU_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU1_TL1CCD": FU_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU1_TL2SEG": FU_Target_Lesion_2_Segments,
-                                    "FU1_TL2LAD": FU_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "FU1_TL2PAD": FU_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "FU1_TL2CCD": FU_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "FU1_TLDIA": FU_Follow_up_1_targeted_Lesion_Dia_Sum,
-                                    "FU1_NTL1LAD": FU_Non_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "FU1_NTL1PAD": FU_Non_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "FU1_NTL1CCD": FU_Non_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "FU1_NTLDIA": FU_Non_targeted_Lesion_Dia_Sum,
-                                    "FU1_NECROSIS": FU_Lesion_Necrosis,
-                                    "FU1_REVFT": FU_Reviewers_Initials,
-                                    "FU1_NTLRSP": FU_Non_target_lesion_response,
-                                    "FU1_NEWLESION": FU_New_Lesions,
-                                    "FU1_NEWEHD": FU_NEW_Extrahepatic_Disease,
-                                    "FU1_EHDLOC": FU_NEW_Extrahepatic_Dz_Location,
-                                    "FU1_EHDDATE": FU_NEW_Extrahepatic_Dz_Date,
-                                    "FU1_NTCHG": FU_change_non_target_lesion,
-                                    "FU1_TDCHG": FU_change_target_lesion,
-                                    "FU1_MREC_LOCAL": first_fu_mrecist_localized,
-                                    "FU1_MREC_OVERALL": first_fu_mrecist_overall,
-                                    "FU1_FT": FU_Free_Text,
-                                    "FU2_MOD": FU2_Scan_Modality,
-                                    "FU2_IMG_DATE": FU2_Imaging_Date,
-                                    "FU2_MS_Y90": FU2_Months_Since_Y90,
-                                    "FU2_TOTLES": FU2_Total_number_of_lesions,
-                                    "FU2_TL1LAD": FU2_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU2_TL1PAD": FU2_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU2_TL1CCD": FU2_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU2_TL2SEG": FU2_Target_Lesion_2_Segments,
-                                    "FU2_TL2LAD": FU2_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "FU2_TL2PAD": FU2_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "FU2_TL2CCD": FU2_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "FU2_TLDIA": FU2_Follow_up_2_targeted_Lesion_Dia_Sum,
-                                    "FU2_NTL1LAD": FU2_Non_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU2_NTL1PAD": FU2_Non_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU2_NTL1CCD": FU2_Non_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU2_NTLDIA": FU2_Non_targeted_Lesion_Dia_Sum,
-                                    "FU2_NECROSIS": FU2_Lesion_Necrosis,
-                                    "FU2_REV": FU2_Reviewers_Initials,
-                                    "FU2_NTLRSP": FU2_Non_target_lesion_response,
-                                    "FU2_NEWLES": FU2_New_Lesions,
-                                    "FU2_EHD": FU2_NEW_Extrahepatic_Disease,
-                                    "FU2_EHDLOC": FU2_NEW_Extrahepatic_Dz_Location,
-                                    "FU2_EHDDATE": FU2_NEW_Extrahepatic_Dz_Date,
-                                    "FU2_NTCHG": FU2_change_non_target_lesion,
-                                    "FU2_TDCHG": FU2_change_target_lesion,
-                                    "FU2_MREC_CALC": second_fu_mrecist_calc,
-                                    "FU2_MREC_LOCAL": second_fu_mrecist_localized,
-                                    "FU2_MREC_OVERALL": second_fu_mrecist_overall,
-                                    "FU2_FT": FU2_Free_Text,
-                                    "FU3_MOD": FU3_Scan_Modality,
-                                    "FU3_IMG_DATE": FU3_Imaging_Date,
-                                    "FU3_MS_Y90": FU3_Months_Since_Y90,
-                                    "FU3_TOTLES": FU3_Total_number_of_lesions,
-                                    "FU3_TL1LAD": FU3_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU3_TL1PAD": FU3_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU3_TL1CCD": FU3_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU3_TL2SEG": FU3_Target_Lesion_2_Segments,
-                                    "FU3_TL2LAD": FU3_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "FU3_TL2PAD": FU3_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "FU3_TL2CCD": FU3_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "FU3_TLDIA": FU3_Follow_up_2_targeted_Lesion_Dia_Sum,
-                                    "FU3_NTL1LAD": FU3_Non_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU3_NTL1PAD": FU3_Non_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU3_NTL1CCD": FU3_Non_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU3_NTLDIA": FU3_Non_targeted_Lesion_Dia_Sum,
-                                    "FU3_NEC": FU3_Lesion_Necrosis,
-                                    "FU3_REV": FU3_Reviewers_Initials,
-                                    "FU3_NTLRSP": FU3_Non_target_lesion_response,
-                                    "FU3_NEWLES": FU3_New_Lesions,
-                                    "FU3_EHD": FU3_NEW_Extrahepatic_Disease,
-                                    "FU3_EHDLOC": FU3_NEW_Extrahepatic_Dz_Location,
-                                    "FU3_EHDDATE": FU3_NEW_Extrahepatic_Dz_Date,
-                                    "FU3_NTCHG": FU3_change_non_target_lesion,
-                                    "FU3_TDCHG": FU3_change_target_lesion,
-                                    "FU3_MREC_CALC": third_fu_mrecist_calc,
-                                    "FU3_MREC_LOCAL": third_fu_mrecist_localized,
-                                    "FU3_MREC_OVERALL": third_fu_mrecist_overall,
-                                    "FU3_FT": FU3_Free_Text,
-                                    "FU4_MOD": FU4_Scan_Modality,
-                                    "FU4_IMG_DATE": FU4_Imaging_Date,
-                                    "FU4_MONTHS_Y90": FU4_Months_Since_Y90,
-                                    "FU4_TOTLES": FU4_Total_number_of_lesions,
-                                    "FU4_TL1LAD": FU4_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU4_TL1PAD": FU4_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU4_TL1CCD": FU4_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU4_TL2SEG": FU4_Target_Lesion_2_Segments,
-                                    "FU4_TL2LAD": FU4_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "FU4_TL2PAD": FU4_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "FU4_TL2CCD": FU4_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "FU4_TL_DIASUM": FU4_Follow_up_2_targeted_Lesion_Dia_Sum,
-                                    "FU4_NTL1LAD": FU4_Non_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU4_NTL1PAD": FU4_Non_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU4_NTL1CCD": FU4_Non_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU4_NTL_DIASUM": FU4_Non_targeted_Lesion_Dia_Sum,
-                                    "FU4_NECROSIS": FU4_Lesion_Necrosis,
-                                    "FU4_REVFT": FU4_Reviewers_Initials,
-                                    "FU4_NTLRSP": FU4_Non_target_lesion_response,
-                                    "FU4_NEWLESION": FU4_New_Lesions,
-                                    "FU4_NEWEHD": FU4_NEW_Extrahepatic_Disease,
-                                    "FU4_EHDLOC": FU4_NEW_Extrahepatic_Dz_Location,
-                                    "FU4_EHDDATE": FU4_NEW_Extrahepatic_Dz_Date,
-                                    "FU4_NTL_CHANGE": FU4_change_non_target_lesion,
-                                    "FU4_TL_CHANGE": FU4_change_target_lesion,
-                                    "FU4_MREC_CALC": fourth_fu_mrecist_calc,
-                                    "FU4_MREC_LOCAL": fourth_fu_mrecist_localized,
-                                    "FU4_MREC_OVERALL": fourth_fu_mrecist_overall,
-                                    "FU4_FT": FU4_Free_Text,
-                                    "FU5_MOD": FU5_Scan_Modality,
-                                    "FU5_IMG_DATE": FU5_Imaging_Date,
-                                    "FU5_MONTHS_Y90": FU5_Months_Since_Y90,
-                                    "FU5_TOTLES": FU5_Total_number_of_lesions,
-                                    "FU5_TL1LAD": FU5_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU5_TL1PAD": FU5_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU5_TL1CCD": FU5_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU5_TL2SEG": FU5_Target_Lesion_2_Segments,
-                                    "FU5_TL2LAD": FU5_Target_Lesion_2_LAD_Art_Enhanc,
-                                    "FU5_TL2PAD": FU5_Target_Lesion_2_PAD_Art_Enhanc,
-                                    "FU5_TL2CCD": FU5_Target_Lesion_2_CCD_Art_Enhanc,
-                                    "FU5_TL_DIASUM": FU5_Follow_up_2_targeted_Lesion_Dia_Sum,
-                                    "FU5_NTL1LAD": FU5_Non_Target_Lesion_1_LAD_Art_Enhanc,
-                                    "FU5_NTL1PAD": FU5_Non_Target_Lesion_1_PAD_Art_Enhanc,
-                                    "FU5_NTL1CCD": FU5_Non_Target_Lesion_1_CCD_Art_Enhanc,
-                                    "FU5_NTL_DIASUM": FU5_Non_targeted_Lesion_Dia_Sum,
-                                    "FU5_NTLRSP": FU5_Non_target_lesion_response,
-                                    "FU5_NEWLESION": FU5_New_Lesions,
-                                    "FU5_NEWEHD": FU5_NEW_Extrahepatic_Disease,
-                                    "FU5_EHDLOC": FU5_NEW_Extrahepatic_Dz_Location,
-                                    "FU5_EHDDATE": FU5_NEW_Extrahepatic_Dz_Date,
-                                    "FU5_NTL_CHANGE": FU5_change_non_target_lesion,
-                                    "FU5_TL_CHANGE": FU5_change_target_lesion,
-                                    "FU5_MREC_CALC": fifth_fu_mrecist_calc,
-                                    "FU5_MREC_LOCAL": fifth_fu_mrecist_localized,
-                                    "FU5_MREC_OVERALL": fifth_fu_mrecist_overall,
-                                    "FU5_FT": FU5_Free_Text,
+                                    "PREY_MOD": "NA" if na_selected == "NA" else PREY90_prescan_modality,
+                                    "PREY_IMG_DATE": "NA" if na_selected == "NA" else PREY90_Imaging_Date,
+                                    "PREY_TOTLES": "NA" if na_selected == "NA" else PREY90_total_number_of_lesions,
+                                    "PREY_LOBES": "NA" if na_selected == "NA" else PREY90_Number_Involved_Lobes,
+                                    "PREY_TL1SEG": "NA" if na_selected == "NA" else PREY90_target_lesion_1_segments,
+                                    "PREY_TL1LAD": "NA" if na_selected == "NA" else PREY90_TL1_LAD,
+                                    "PREY_TL1PAD": "NA" if na_selected == "NA" else PREY90_Target_Lesion_1_PAD,
+                                    "PREY_TL1CCD": "NA" if na_selected == "NA" else PREY90_Target_Lesion_1_CCD,
+                                    "PREY_TL1VOL": "NA" if na_selected == "NA" else PREY90_Target_Lesion_1_VOL,
+                                    "PREY_TL2SEG": "NA" if na_selected == "NA" else PREY90_Target_Lesion_2_segments,
+                                    "PREY_TL2LAD": "NA" if na_selected == "NA" else PREY90_Target_Lesion_2_LAD,
+                                    "PREY_TL2PAD": "NA" if na_selected == "NA" else PREY90_Target_Lesion_2_PAD,
+                                    "PREY_TL2CCD": "NA" if na_selected == "NA" else PREY90_Target_Lesion_2_CCD,
+                                    "PREY_TL2VOL": "NA" if na_selected == "NA" else PREY90_Target_Lesion_2_VOL,
+                                    "PREY_TLDIA": "NA" if na_selected == "NA" else PREY90_pretx_targeted_Lesion_Dia_Sum,
+                                    "PREY_NTLOC": "NA" if na_selected == "NA" else PREY90_Non_Target_Lesion_Location,
+                                    "PREY_NTL1LAD": "NA" if na_selected == "NA" else PREY90_Non_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "PREY_NTL1PAD": "NA" if na_selected == "NA" else PREY90_Non_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "PREY_NTL1CCD": "NA" if na_selected == "NA" else PREY90_Non_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "PREY_NTLDIA": "NA" if na_selected == "NA" else PREY90_Non_targeted_Lesion_Dia_Sum,
+                                    "PREY_REVFT": "NA" if na_selected == "NA" else PREY90_Reviewers_Initials,
+                                    "PREY_EHD": "NA" if na_selected == "NA" else PREY90_Pre_Y90_Extrahepatic_Disease,
+                                    "PREY_EHDLOCFT": "NA" if na_selected == "NA" else PREY90_Pre_Y90_Extrahepatic_Disease_Location,
+                                    "PREY_PVT": "NA" if na_selected == "NA" else PREY90_PVT,
+                                    "PREY_PVTLOC": "NA" if na_selected == "NA" else PREY90_PVT_Location,
+                                    "PREY_CIRRH": "NA" if na_selected == "NA" else PREY90_Features_of_cirrhosis,
+                                    "FU1_MOD": "NA" if na1_selected == "NA" else FU_Scan_Modality,
+                                    "FU1_IMG_DATE": "NA" if na1_selected == "NA" else FU_Imaging_Date,
+                                    "FU1_MS_Y90": "NA" if na1_selected == "NA" else FU_Months_Since_Y90,
+                                    "FU1_TOTLES": "NA" if na1_selected == "NA" else FU_Total_number_of_lesions,
+                                    "FU1_TL1LAD": "NA" if na1_selected == "NA" else FU_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU1_TL1PAD": "NA" if na1_selected == "NA" else FU_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU1_TL1CCD": "NA" if na1_selected == "NA" else FU_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU1_TL2SEG": "NA" if na1_selected == "NA" else FU_Target_Lesion_2_Segments,
+                                    "FU1_TL2LAD": "NA" if na1_selected == "NA" else FU_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU1_TL2PAD": "NA" if na1_selected == "NA" else FU_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU1_TL2CCD": "NA" if na1_selected == "NA" else FU_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU1_TLDIA": "NA" if na1_selected == "NA" else FU_Follow_up_1_targeted_Lesion_Dia_Sum,
+                                    "FU1_NTL1LAD": "NA" if na1_selected == "NA" else FU_Non_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU1_NTL1PAD": "NA" if na1_selected == "NA" else FU_Non_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU1_NTL1CCD": "NA" if na1_selected == "NA" else FU_Non_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU1_NTLDIA": "NA" if na1_selected == "NA" else FU_Non_targeted_Lesion_Dia_Sum,
+                                    "FU1_NECROSIS": "NA" if na1_selected == "NA" else FU_Lesion_Necrosis,
+                                    "FU1_REVFT": "NA" if na1_selected == "NA" else FU_Reviewers_Initials,
+                                    "FU1_NTLRSP": "NA" if na1_selected == "NA" else FU_Non_target_lesion_response,
+                                    "FU1_NEWLESION": "NA" if na1_selected == "NA" else FU_New_Lesions,
+                                    "FU1_NEWEHD": "NA" if na1_selected == "NA" else FU_NEW_Extrahepatic_Disease,
+                                    "FU1_EHDLOC": "NA" if na1_selected == "NA" else FU_NEW_Extrahepatic_Dz_Location,
+                                    "FU1_EHDDATE": "NA" if na1_selected == "NA" else FU_NEW_Extrahepatic_Dz_Date,
+                                    "FU1_NTCHG": "NA" if na1_selected == "NA" else FU_change_non_target_lesion,
+                                    "FU1_TDCHG": "NA" if na1_selected == "NA" else FU_change_target_lesion,
+                                    "FU1_MREC_LOCAL": "NA" if na1_selected == "NA" else first_fu_mrecist_localized,
+                                    "FU1_MREC_OVERALL": "NA" if na1_selected == "NA" else first_fu_mrecist_overall,
+                                    "FU1_FT": "NA" if na1_selected == "NA" else FU_Free_Text,
+                                    "FU2_MOD": "NA" if na2_selected == "NA" else FU2_Scan_Modality,
+                                    "FU2_IMG_DATE": "NA" if na2_selected == "NA" else FU2_Imaging_Date,
+                                    "FU2_MS_Y90": "NA" if na2_selected == "NA" else FU2_Months_Since_Y90,
+                                    "FU2_TOTLES": "NA" if na2_selected == "NA" else FU2_Total_number_of_lesions,
+                                    "FU2_TL1LAD": "NA" if na2_selected == "NA" else FU2_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU2_TL1PAD": "NA" if na2_selected == "NA" else FU2_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU2_TL1CCD": "NA" if na2_selected == "NA" else FU2_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU2_TL2SEG": "NA" if na2_selected == "NA" else FU2_Target_Lesion_2_Segments,
+                                    "FU2_TL2LAD": "NA" if na2_selected == "NA" else FU2_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU2_TL2PAD": "NA" if na2_selected == "NA" else FU2_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU2_TL2CCD": "NA" if na2_selected == "NA" else FU2_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU2_TLDIA": "NA" if na2_selected == "NA" else FU2_Follow_up_2_targeted_Lesion_Dia_Sum,
+                                    "FU2_NTL1LAD": "NA" if na2_selected == "NA" else FU2_Non_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU2_NTL1PAD": "NA" if na2_selected == "NA" else FU2_Non_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU2_NTL1CCD": "NA" if na2_selected == "NA" else FU2_Non_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU2_NTLDIA": "NA" if na2_selected == "NA" else FU2_Non_targeted_Lesion_Dia_Sum,
+                                    "FU2_NECROSIS": "NA" if na2_selected == "NA" else FU2_Lesion_Necrosis,
+                                    "FU2_REV": "NA" if na2_selected == "NA" else FU2_Reviewers_Initials,
+                                    "FU2_NTLRSP": "NA" if na2_selected == "NA" else FU2_Non_target_lesion_response,
+                                    "FU2_NEWLES": "NA" if na2_selected == "NA" else FU2_New_Lesions,
+                                    "FU2_EHD": "NA" if na2_selected == "NA" else FU2_NEW_Extrahepatic_Disease,
+                                    "FU2_EHDLOC": "NA" if na2_selected == "NA" else FU2_NEW_Extrahepatic_Dz_Location,
+                                    "FU2_EHDDATE": "NA" if na2_selected == "NA" else FU2_NEW_Extrahepatic_Dz_Date,
+                                    "FU2_NTCHG": "NA" if na2_selected == "NA" else FU2_change_non_target_lesion,
+                                    "FU2_TDCHG": "NA" if na2_selected == "NA" else FU2_change_target_lesion,
+                                    "FU2_MREC_CALC": "NA" if na2_selected == "NA" else second_fu_mrecist_calc,
+                                    "FU2_MREC_LOCAL": "NA" if na2_selected == "NA" else second_fu_mrecist_localized,
+                                    "FU2_MREC_OVERALL": "NA" if na2_selected == "NA" else second_fu_mrecist_overall,
+                                    "FU2_FT": "NA" if na2_selected == "NA" else FU2_Free_Text,
+                                    "FU3_MOD": "NA" if na3_selected == "NA" else FU3_Scan_Modality,
+                                    "FU3_IMG_DATE": "NA" if na3_selected == "NA" else FU3_Imaging_Date,
+                                    "FU3_MS_Y90": "NA" if na3_selected == "NA" else FU3_Months_Since_Y90,
+                                    "FU3_TOTLES": "NA" if na3_selected == "NA" else FU3_Total_number_of_lesions,
+                                    "FU3_TL1LAD": "NA" if na3_selected == "NA" else FU3_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU3_TL1PAD": "NA" if na3_selected == "NA" else FU3_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU3_TL1CCD": "NA" if na3_selected == "NA" else FU3_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU3_TL2SEG": "NA" if na3_selected == "NA" else FU3_Target_Lesion_2_Segments,
+                                    "FU3_TL2LAD": "NA" if na3_selected == "NA" else FU3_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU3_TL2PAD": "NA" if na3_selected == "NA" else FU3_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU3_TL2CCD": "NA" if na3_selected == "NA" else FU3_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU3_TLDIA": "NA" if na3_selected == "NA" else FU3_Follow_up_2_targeted_Lesion_Dia_Sum,
+                                    "FU3_NTL1LAD": "NA" if na3_selected == "NA" else FU3_Non_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU3_NTL1PAD": "NA" if na3_selected == "NA" else FU3_Non_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU3_NTL1CCD": "NA" if na3_selected == "NA" else FU3_Non_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU3_NTLDIA": "NA" if na3_selected == "NA" else FU3_Non_targeted_Lesion_Dia_Sum,
+                                    "FU3_NEC": "NA" if na3_selected == "NA" else FU3_Lesion_Necrosis,
+                                    "FU3_REV": "NA" if na3_selected == "NA" else FU3_Reviewers_Initials,
+                                    "FU3_NTLRSP": "NA" if na3_selected == "NA" else FU3_Non_target_lesion_response,
+                                    "FU3_NEWLES": "NA" if na3_selected == "NA" else FU3_New_Lesions,
+                                    "FU3_EHD": "NA" if na3_selected == "NA" else FU3_NEW_Extrahepatic_Disease,
+                                    "FU3_EHDLOC": "NA" if na3_selected == "NA" else FU3_NEW_Extrahepatic_Dz_Location,
+                                    "FU3_EHDDATE": "NA" if na3_selected == "NA" else FU3_NEW_Extrahepatic_Dz_Date,
+                                    "FU3_NTCHG": "NA" if na3_selected == "NA" else FU3_change_non_target_lesion,
+                                    "FU3_TDCHG": "NA" if na3_selected == "NA" else FU3_change_target_lesion,
+                                    "FU3_MREC_CALC": "NA" if na3_selected == "NA" else third_fu_mrecist_calc,
+                                    "FU3_MREC_LOCAL": "NA" if na3_selected == "NA" else third_fu_mrecist_localized,
+                                    "FU3_MREC_OVERALL": "NA" if na3_selected == "NA" else third_fu_mrecist_overall,
+                                    "FU3_FT": "NA" if na3_selected == "NA" else FU3_Free_Text,
+                                    "FU4_MOD": "NA" if na4_selected == "NA" else FU4_Scan_Modality,
+                                    "FU4_IMG_DATE": "NA" if na4_selected == "NA" else FU4_Imaging_Date,
+                                    "FU4_MONTHS_Y90": "NA" if na4_selected == "NA" else FU4_Months_Since_Y90,
+                                    "FU4_TOTLES": "NA" if na4_selected == "NA" else FU4_Total_number_of_lesions,
+                                    "FU4_TL1LAD": "NA" if na4_selected == "NA" else FU4_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU4_TL1PAD": "NA" if na4_selected == "NA" else FU4_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU4_TL1CCD": "NA" if na4_selected == "NA" else FU4_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU4_TL2SEG": "NA" if na4_selected == "NA" else FU4_Target_Lesion_2_Segments,
+                                    "FU4_TL2LAD": "NA" if na4_selected == "NA" else FU4_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU4_TL2PAD": "NA" if na4_selected == "NA" else FU4_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU4_TL2CCD": "NA" if na4_selected == "NA" else FU4_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU4_TL_DIASUM": "NA" if na4_selected == "NA" else FU4_Follow_up_2_targeted_Lesion_Dia_Sum,
+                                    "FU4_NTL1LAD": "NA" if na4_selected == "NA" else FU4_Non_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU4_NTL1PAD": "NA" if na4_selected == "NA" else FU4_Non_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU4_NTL1CCD": "NA" if na4_selected == "NA" else FU4_Non_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU4_NTL_DIASUM": "NA" if na4_selected == "NA" else FU4_Non_targeted_Lesion_Dia_Sum,
+                                    "FU4_NECROSIS": "NA" if na4_selected == "NA" else FU4_Lesion_Necrosis,
+                                    "FU4_REVFT": "NA" if na4_selected == "NA" else FU4_Reviewers_Initials,
+                                    "FU4_NTLRSP": "NA" if na4_selected == "NA" else FU4_Non_target_lesion_response,
+                                    "FU4_NEWLESION": "NA" if na4_selected == "NA" else FU4_New_Lesions,
+                                    "FU4_NEWEHD": "NA" if na4_selected == "NA" else FU4_NEW_Extrahepatic_Disease,
+                                    "FU4_EHDLOC": "NA" if na4_selected == "NA" else FU4_NEW_Extrahepatic_Dz_Location,
+                                    "FU4_EHDDATE": "NA" if na4_selected == "NA" else FU4_NEW_Extrahepatic_Dz_Date,
+                                    "FU4_NTL_CHANGE": "NA" if na4_selected == "NA" else FU4_change_non_target_lesion,
+                                    "FU4_TL_CHANGE": "NA" if na4_selected == "NA" else FU4_change_target_lesion,
+                                    "FU4_MREC_CALC": "NA" if na4_selected == "NA" else fourth_fu_mrecist_calc,
+                                    "FU4_MREC_LOCAL": "NA" if na4_selected == "NA" else fourth_fu_mrecist_localized,
+                                    "FU4_MREC_OVERALL": "NA" if na4_selected == "NA" else fourth_fu_mrecist_overall,
+                                    "FU4_FT": "NA" if na4_selected == "NA" else FU4_Free_Text,
+                                    "FU5_MOD": "NA" if na5_selected == "NA" else FU5_Scan_Modality,
+                                    "FU5_IMG_DATE": "NA" if na5_selected == "NA" else FU5_Imaging_Date,
+                                    "FU5_MONTHS_Y90": "NA" if na5_selected == "NA" else FU5_Months_Since_Y90,
+                                    "FU5_TOTLES": "NA" if na5_selected == "NA" else FU5_Total_number_of_lesions,
+                                    "FU5_TL1LAD": "NA" if na5_selected == "NA" else FU5_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU5_TL1PAD": "NA" if na5_selected == "NA" else FU5_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU5_TL1CCD": "NA" if na5_selected == "NA" else FU5_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU5_TL2SEG": "NA" if na5_selected == "NA" else FU5_Target_Lesion_2_Segments,
+                                    "FU5_TL2LAD": "NA" if na5_selected == "NA" else FU5_Target_Lesion_2_LAD_Art_Enhanc,
+                                    "FU5_TL2PAD": "NA" if na5_selected == "NA" else FU5_Target_Lesion_2_PAD_Art_Enhanc,
+                                    "FU5_TL2CCD": "NA" if na5_selected == "NA" else FU5_Target_Lesion_2_CCD_Art_Enhanc,
+                                    "FU5_TL_DIASUM": "NA" if na5_selected == "NA" else FU5_Follow_up_2_targeted_Lesion_Dia_Sum,
+                                    "FU5_NTL1LAD": "NA" if na5_selected == "NA" else FU5_Non_Target_Lesion_1_LAD_Art_Enhanc,
+                                    "FU5_NTL1PAD": "NA" if na5_selected == "NA" else FU5_Non_Target_Lesion_1_PAD_Art_Enhanc,
+                                    "FU5_NTL1CCD": "NA" if na5_selected == "NA" else FU5_Non_Target_Lesion_1_CCD_Art_Enhanc,
+                                    "FU5_NTL_DIASUM": "NA" if na5_selected == "NA" else FU5_Non_targeted_Lesion_Dia_Sum,
+                                    "FU5_NTLRSP": "NA" if na5_selected == "NA" else FU5_Non_target_lesion_response,
+                                    "FU5_NEWLESION": "NA" if na5_selected == "NA" else FU5_New_Lesions,
+                                    "FU5_NEWEHD": "NA" if na5_selected == "NA" else FU5_NEW_Extrahepatic_Disease,
+                                    "FU5_EHDLOC": "NA" if na5_selected == "NA" else FU5_NEW_Extrahepatic_Dz_Location,
+                                    "FU5_EHDDATE": "NA" if na5_selected == "NA" else FU5_NEW_Extrahepatic_Dz_Date,
+                                    "FU5_NTL_CHANGE": "NA" if na5_selected == "NA" else FU5_change_non_target_lesion,
+                                    "FU5_TL_CHANGE": "NA" if na5_selected == "NA" else FU5_change_target_lesion,
+                                    "FU5_MREC_CALC": "NA" if na5_selected == "NA" else fifth_fu_mrecist_calc,
+                                    "FU5_MREC_LOCAL": "NA" if na5_selected == "NA" else fifth_fu_mrecist_localized,
+                                    "FU5_MREC_OVERALL": "NA" if na5_selected == "NA" else fifth_fu_mrecist_overall,
+                                    "FU5_FT": "NA" if na5_selected == "NA" else FU5_Free_Text,
                                     
                                     "DEAD": dead,
                                     "DATE_DEAD": Date_of_Death if Date_of_Death != "NA" else Date_of_Death,
@@ -7430,50 +7545,50 @@ def edit_existing_data():
                                 index=["1","2"].index(df.iloc[0]["TRLNKID"]) if df.iloc[0]["TRLNKID"] else None,
                             placeholder="Choose an option",
                             )
-                            input_GTV_mean_dose = st.text_input("GTV mean dose",value = df.iloc[0]["GTV_MEANDOSE"])
-                            input_Tx_vol_mean_dose = st.text_input("Tx vol mean dose",value = df.iloc[0]["TXVOL_MEANDOSE"])
-                            input_Liver_Vol_Mean_dose = st.text_input("Liver Vol Mean dose",value = df.iloc[0]["LIVVOL__MEANDOSE"])
-                            input_Healthy_Liver_mean_dose = st.text_input("Healthy Liver mean dose",value = df.iloc[0]["HEALTHYLIV_MEANDOSE"])
-                            input_GTV_Vol = st.number_input("GTV Vol",step=0.1,value = float(df.iloc[0]["GTV_VOL"]) if pd.notnull(df.iloc[0]["GTV_VOL"]) and df.iloc[0]["GTV_VOL"] != "" else 0.0 )
-                            input_Tx_vol = st.number_input("Tx vol",step=0.1,value = float(df.iloc[0]["TX_VOL"]) if pd.notnull(df.iloc[0]["TX_VOL"]) and df.iloc[0]["TX_VOL"] != "" else 0.0)
-                            input_Liver_vol = st.number_input("Liver vol",step=0.1, min_value=0.1,value = float(df.iloc[0]["LIVER_VOL"]) if pd.notnull(df.iloc[0]["LIVER_VOL"]) and df.iloc[0]["LIVER_VOL"] != "" else 0.10)
-                            input_Healthy_Liver_Vol = st.text_input("Healthy Liver Vol",value = df.iloc[0]["HEALTHYLIV_VOL"])
-                            input_GTV_Liver = (input_GTV_Vol)/(input_Liver_vol)*100
+                            input_GTV_mean_dose = st.text_input("GTV mean dose [Excel : GTV_MEANDOSE]",value = df.iloc[0]["GTV_MEANDOSE"])
+                            input_Tx_vol_mean_dose = st.text_input("Tx vol mean dose [Excel : TXVOL_MEANDOSE]",value = df.iloc[0]["TXVOL_MEANDOSE"])
+                            input_Liver_Vol_Mean_dose = st.text_input("Liver Vol Mean dose [Excel : LIVVOL__MEANDOSE]",value = df.iloc[0]["LIVVOL__MEANDOSE"])
+                            input_Healthy_Liver_mean_dose = st.text_input("Healthy Liver mean dose [Excel : HEALTHYLIV_MEANDOSE]",value = df.iloc[0]["HEALTHYLIV_MEANDOSE"])
+                            input_GTV_Vol = st.number_input("GTV Vol [Excel : GTV_VOL]",step=0.1,value = float(df.iloc[0]["GTV_VOL"]) if df.iloc[0]["GTV_VOL"] not in ["",None] else None )
+                            input_Tx_vol = st.number_input("Tx vol [Excel : TX_VOL]",step=0.1,value = float(df.iloc[0]["TX_VOL"]) if df.iloc[0]["TX_VOL"] not in ["",None] else None)
+                            input_Liver_vol = st.number_input("Liver vol [Excel : LIVER_VOL]",step=0.1, min_value=0.1,value = float(df.iloc[0]["LIVER_VOL"]) if df.iloc[0]["LIVER_VOL"] not in ["",None] else None)
+                            input_Healthy_Liver_Vol = st.text_input("Healthy Liver Vol [Excel : HEALTHYLIV_VOL]",value = df.iloc[0]["HEALTHYLIV_VOL"])
+                            input_GTV_Liver = (input_GTV_Vol)/(input_Liver_vol)*100 if input_GTV_Vol != None and input_Liver_vol != None else None
                             st.write("GTV/Liver ",input_GTV_Liver)
-                            input_D98 = st.text_input("D98",value = df.iloc[0]["D98"])
-                            input_D95 = st.text_input("D95",value = df.iloc[0]["D95"])
-                            input_D90 = st.text_input("D90",value = df.iloc[0]["D90"])
-                            input_D80 = st.text_input("D80",value = df.iloc[0]["D80"])
-                            input_D70 = st.text_input("D70",value = df.iloc[0]["D70"])
-                            input_V100 = st.text_input("V100",value = df.iloc[0]["V100"])
-                            input_V200 = st.text_input("V200",value = df.iloc[0]["V200"])
-                            input_V300 = st.text_input("V300",value = df.iloc[0]["V300"])
-                            input_V400 = st.text_input("V400",value = df.iloc[0]["V400"])
-                            input_ActivityBq = st.number_input("ActivityBq",step=0.1, value = float(df.iloc[0]["ACTIVITYBQ"]) if pd.notnull(df.iloc[0]["ACTIVITYBQ"]) and df.iloc[0]["ACTIVITYBQ"] != "" else 0.0)
-                            input_ActivityCi = (input_ActivityBq/37000000000.0)
-                            input_Tx_vol_Activity_Density = (input_ActivityCi/max(0.10,input_Tx_vol))
-                            input_ActivityCi = format(input_ActivityCi, ".5E")
+                            input_D98 = st.text_input("D98 [Excel : D98]",value = df.iloc[0]["D98"])
+                            input_D95 = st.text_input("D95 [Excel : D95]",value = df.iloc[0]["D95"])
+                            input_D90 = st.text_input("D90 [Excel : D90]",value = df.iloc[0]["D90"])
+                            input_D80 = st.text_input("D80 [Excel : D80]",value = df.iloc[0]["D80"])
+                            input_D70 = st.text_input("D70 [Excel : D70]",value = df.iloc[0]["D70"])
+                            input_V100 = st.text_input("V100 [Excel : V100]",value = df.iloc[0]["V100"])
+                            input_V200 = st.text_input("V200 [Excel : V200]",value = df.iloc[0]["V200"])
+                            input_V300 = st.text_input("V300 [Excel : V300]",value = df.iloc[0]["V300"])
+                            input_V400 = st.text_input("V400 [Excel : V400]",value = df.iloc[0]["V400"])
+                            input_ActivityBq = st.number_input("ActivityBq [Excel : ACTIVITYBQ]",step=0.1, value = float(df.iloc[0]["ACTIVITYBQ"]) if df.iloc[0]["ACTIVITYBQ"] not in [None,""] else None)
+                            input_ActivityCi = (input_ActivityBq/37000000000.0) if input_ActivityBq != None else None
+                            input_Tx_vol_Activity_Density = (input_ActivityCi/max(0.10,input_Tx_vol)) if input_ActivityCi != None and input_Tx_vol != None else None
+                            input_ActivityCi = format(input_ActivityCi, ".5E") if input_ActivityCi != None else None
                             st.write("ActivityCi", input_ActivityCi)
-                            input_Tx_vol_Activity_Density = format(input_Tx_vol_Activity_Density, ".5E")
+                            input_Tx_vol_Activity_Density = format(input_Tx_vol_Activity_Density, ".5E") if input_Tx_vol_Activity_Density != None else None
                             st.write("Tx vol Activity Density",input_Tx_vol_Activity_Density)
-                            input_GTV_less_D95_Vol_ml = st.text_input("GTV < D95 Vol_ml",value = df.iloc[0]["GTVLT_D95VOL"])
-                            input_GTV_less_D95_Mean_Dose = st.text_input("GTV < D95 Mean Dose",value = df.iloc[0]["GTVLT_D95MEAN"])
-                            input_GTV_less_D95_Mx_Dose = st.text_input("GTV < D95 Max Dose",value = df.iloc[0]["GTVLT_D95MAX"])
-                            input_GTV_less_D95_Min_Dose = st.text_input("GTV < D95 Min Dose",value = df.iloc[0]["GTVLT_D95MIN"])
-                            input_GTV_less_D95_SD = st.text_input("GTV < D95 SD",value = df.iloc[0]["GTVLT_D95SD"])
-                            input_GTV_less_D95_Vol_1 = st.text_input("GTV < D95 Vol_1",value = df.iloc[0]["V1_GTVLT_D95VOL"])
-                            input_GTV_less_D95_Mean_Dose_1 = st.text_input("GTV < D95 Mean Dose_1",value = df.iloc[0]["V1_GTVLT_D95MEAN"])
-                            input_GTV_less_D95_Min_Dose_1 = st.text_input("GTV < D95 Min Dose_1",value = df.iloc[0]["V1_GTVLT_D95MIN"])
-                            input_GTV_less_D95_SD_1 = st.text_input("GTV < D95 SD_1",value = df.iloc[0]["V1_GTVLT_D95SD"])
-                            input_GTV_less_D95_Vol_2 = st.text_input("GTV < D95 Vol_2",value = df.iloc[0]["V2_GTVLT_D95VOL"])
-                            input_GTV_less_D95_Mean_Dose_2 = st.text_input("GTV < D95 Mean Dose_2",value = df.iloc[0]["V2_GTVLT_D95MEAN"])
-                            input_GTV_less_D95_Min_Dose_2 = st.text_input("GTV < D95 Min Dose_2",value = df.iloc[0]["V2_GTVLT_D95MIN"])
-                            input_GTV_less_D95_SD_2 = st.text_input("GTV < D95 SD_2",value = df.iloc[0]["V2_GTVLT_D95SD"])
-                            input_GTV_less_100_Gy_Vol = st.text_input("GTV < 100 Gy Vol",value = df.iloc[0]["GTVLT_100VOL"])
-                            input_GTV_less_100_Gy_Mean_Dose = st.text_input("GTV < 100 Gy Mean Dose",value = df.iloc[0]["GTVLT_100MEAN"])
-                            input_GTV_less_100_Gy_Max_Dose = st.text_input("GTV < 100 Gy Max Dose",value = df.iloc[0]["GTVLT_100MAX"])
-                            input_GTV_less_100_Gy_Min_Dose = st.text_input("GTV < 100 Gy Min Dose",value = df.iloc[0]["GTVLT_100MIN"])
-                            input_GTV_less_100_Gy_SD = st.text_input("GTV < 100 Gy SD",value = df.iloc[0]["GTVLT_100SD"])
+                            input_GTV_less_D95_Vol_ml = st.text_input("GTV < D95 Vol_ml [Excel : GTVLT_D95VOL]",value = df.iloc[0]["GTVLT_D95VOL"])
+                            input_GTV_less_D95_Mean_Dose = st.text_input("GTV < D95 Mean Dose [Excel : GTVLT_D95MEAN]",value = df.iloc[0]["GTVLT_D95MEAN"])
+                            input_GTV_less_D95_Mx_Dose = st.text_input("GTV < D95 Max Dose [Excel : GTVLT_D95MAX]",value = df.iloc[0]["GTVLT_D95MAX"])
+                            input_GTV_less_D95_Min_Dose = st.text_input("GTV < D95 Min Dose [Excel : GTVLT_D95MIN]",value = df.iloc[0]["GTVLT_D95MIN"])
+                            input_GTV_less_D95_SD = st.text_input("GTV < D95 SD [Excel : GTVLT_D95SD]",value = df.iloc[0]["GTVLT_D95SD"])
+                            input_GTV_less_D95_Vol_1 = st.text_input("GTV < D95 Vol_1 [Excel : V1_GTVLT_D95VOL]",value = df.iloc[0]["V1_GTVLT_D95VOL"])
+                            input_GTV_less_D95_Mean_Dose_1 = st.text_input("GTV < D95 Mean Dose_1 [Excel : V1_GTVLT_D95MEAN]",value = df.iloc[0]["V1_GTVLT_D95MEAN"])
+                            input_GTV_less_D95_Min_Dose_1 = st.text_input("GTV < D95 Min Dose_1 [Excel : V1_GTVLT_D95MIN]",value = df.iloc[0]["V1_GTVLT_D95MIN"])
+                            input_GTV_less_D95_SD_1 = st.text_input("GTV < D95 SD_1 [Excel : V2_GTVLT_D95SD]",value = df.iloc[0]["V1_GTVLT_D95SD"])
+                            input_GTV_less_D95_Vol_2 = st.text_input("GTV < D95 Vol_2 [Excel : V2_GTVLT_D95VOL]",value = df.iloc[0]["V2_GTVLT_D95VOL"])
+                            input_GTV_less_D95_Mean_Dose_2 = st.text_input("GTV < D95 Mean Dose_2 [Excel : V2_GTVLT_D95MEAN]",value = df.iloc[0]["V2_GTVLT_D95MEAN"])
+                            input_GTV_less_D95_Min_Dose_2 = st.text_input("GTV < D95 Min Dose_2 [Excel : V2_GTVLT_D95MIN]",value = df.iloc[0]["V2_GTVLT_D95MIN"])
+                            input_GTV_less_D95_SD_2 = st.text_input("GTV < D95 SD_2 [Excel : V2_GTVLT_D95SD]",value = df.iloc[0]["V2_GTVLT_D95SD"])
+                            input_GTV_less_100_Gy_Vol = st.text_input("GTV < 100 Gy Vol [Excel : GTVLT_100VOL]",value = df.iloc[0]["GTVLT_100VOL"])
+                            input_GTV_less_100_Gy_Mean_Dose = st.text_input("GTV < 100 Gy Mean Dose [Excel : GTVLT_100MEAN]",value = df.iloc[0]["GTVLT_100MEAN"])
+                            input_GTV_less_100_Gy_Max_Dose = st.text_input("GTV < 100 Gy Max Dose [Excel : GTVLT_100MAX]",value = df.iloc[0]["GTVLT_100MAX"])
+                            input_GTV_less_100_Gy_Min_Dose = st.text_input("GTV < 100 Gy Min Dose [Excel : GTVLT_100MIN]",value = df.iloc[0]["GTVLT_100MIN"])
+                            input_GTV_less_100_Gy_SD = st.text_input("GTV < 100 Gy SD [Excel : GTVLT_100SD]",value = df.iloc[0]["GTVLT_100SD"])
 
                             submit_dosimetry_data = st.form_submit_button("Submit")
 
@@ -7526,74 +7641,74 @@ def edit_existing_data():
                         st.subheader("Dosimetry Data")
                         with st.form("dosimetry_data_form"):
                             
-                                input_1AFP_DATE = st.text_area("1AFP Date",value = df.iloc[0]["1AFPDATE"])
-                                input_1AFP = st.text_area("1AFP",value = df.iloc[0]["1AFP"])
-                                input_2AFP_DATE = st.text_area("2AFP Date",value = df.iloc[0]["2AFPDATE"])
-                                input_2AFP = st.text_area("2AFP",value = df.iloc[0]["2AFP"])
-                                input_3AFP_DATE = st.text_area("3AFP Date",value = df.iloc[0]["3AFPDATE"])
-                                input_3AFP = st.text_area("3AFP",value = df.iloc[0]["3AFP"])
-                                input_4AFP_DATE = st.text_area("4AFP Date",value = df.iloc[0]["4AFPDATE"])
-                                input_4AFP = st.text_area("4AFP",value = df.iloc[0]["4AFP"])
-                                input_5AFP_DATE = st.text_area("5AFP Date",value = df.iloc[0]["5AFPDATE"])
-                                input_5AFP = st.text_area("5AFP",value = df.iloc[0]["5AFP"])
-                                input_6AFP_DATE = st.text_area("6AFP Date",value = df.iloc[0]["6AFPDATE"])
-                                input_6AFP = st.text_area("6AFP",value = df.iloc[0]["6AFP"])
-                                input_7AFP_DATE = st.text_area("7AFP Date",value = df.iloc[0]["7AFPDATE"])
-                                input_7AFP = st.text_area("7AFP",value = df.iloc[0]["7AFP"])
-                                input_8AFP_DATE = st.text_area("8AFP Date",value = df.iloc[0]["8AFPDATE"])
-                                input_8AFP = st.text_area("8AFP",value = df.iloc[0]["8AFP"])
-                                input_9AFP_DATE = st.text_area("9AFP Date",value = df.iloc[0]["9AFPDATE"])
-                                input_9AFP = st.text_area("9AFP",value = df.iloc[0]["9AFP"])
-                                input_10AFP_DATE = st.text_area("10AFP Date",value = df.iloc[0]["10AFPDATE"])
-                                input_10AFP = st.text_area("10AFP",value = df.iloc[0]["10AFPDATE"])
-                                input_11AFP_DATE = st.text_area("11AFP Date",value = df.iloc[0]["11AFPDATE"])
-                                input_11AFP = st.text_area("11AFP",value = df.iloc[0]["11AFP"])
-                                input_12AFP_DATE = st.text_area("12AFP Date",value = df.iloc[0]["12AFPDATE"])
-                                input_12AFP = st.text_area("12AFP",value = df.iloc[0]["12AFP"])
-                                input_13AFP_DATE = st.text_area("13AFP Date",value = df.iloc[0]["13AFPDATE"])
-                                input_13AFP = st.text_area("13AFP",value = df.iloc[0]["13AFP"])
-                                input_14AFP_DATE = st.text_area("14AFP Date",value = df.iloc[0]["14AFPDATE"])
-                                input_14AFP = st.text_area("14AFP",value = df.iloc[0]["14AFP"])
-                                input_15AFP_DATE = st.text_area("15AFP Date",value = df.iloc[0]["15AFPDATE"])
-                                input_15AFP = st.text_area("15AFP",value = df.iloc[0]["15AFP"])
-                                input_16AFP_DATE = st.text_area("16AFP Date",value = df.iloc[0]["16AFPDATE"])
-                                input_16AFP = st.text_area("16AFP",value = df.iloc[0]["16AFP"])
-                                input_17AFP_DATE = st.text_area("17AFP Date",value = df.iloc[0]["17AFPDATE"])
-                                input_17AFP = st.text_area("17AFP",value = df.iloc[0]["17AFP"])
-                                input_18AFP_DATE = st.text_area("18AFP DATE",value = df.iloc[0]["18AFPDATE"])
-                                input_18AFP = st.text_area("18AFP",value = df.iloc[0]["18AFP"])
-                                input_19AFP_DATE = st.text_area("19AFP DATE",value = df.iloc[0]["19AFPDATE"])
-                                input_19AFP = st.text_area("19AFP",value = df.iloc[0]["19AFP"])
-                                input_20AFP_DATE = st.text_area("20AFP DATE",value = df.iloc[0]["20AFPDATE"])
-                                input_20AFP = st.text_area("20AFP",value = df.iloc[0]["20AFP"])
-                                input_21AFP_DATE = st.text_area("21AFP DATE",value = df.iloc[0]["21AFPDATE"])
-                                input_21AFP = st.text_area("21AFP",value = df.iloc[0]["21AFP"])
-                                input_22AFP_DATE = st.text_area("22AFP DATE",value = df.iloc[0]["22AFPDATE"])
-                                input_22AFP = st.text_area("22AFP",value = df.iloc[0]["22AFP"])
-                                input_23AFP_DATE = st.text_area("23AFP DATE",value = df.iloc[0]["23AFPDATE"])
-                                input_23AFP = st.text_area("23AFP",value = df.iloc[0]["23AFP"])
-                                input_24AFP_DATE = st.text_area("24AFP DATE",value = df.iloc[0]["24AFPDATE"])
-                                input_24AFP = st.text_area("24AFP",value = df.iloc[0]["24AFP"])
-                                input_25AFP_DATE = st.text_area("25AFP DATE",value = df.iloc[0]["25AFPDATE"])
-                                input_25AFP = st.text_area("25AFP",value = df.iloc[0]["25AFP"])
-                                input_26AFP_DATE = st.text_area("26AFP DATE",value = df.iloc[0]["26AFPDATE"])
-                                input_26AFP = st.text_area("26AFP",value = df.iloc[0]["26AFP"])
-                                input_27AFP_DATE = st.text_area("27AFP DATE",value = df.iloc[0]["27AFPDATE"])
-                                input_27AFP = st.text_area("27AFP",value = df.iloc[0]["27AFP"])
-                                input_28AFP_DATE = st.text_area("28AFP DATE",value = df.iloc[0]["28AFPDATE"])
-                                input_28AFP = st.text_area("28AFP",value = df.iloc[0]["28AFP"])
-                                input_29AFP_DATE = st.text_area("29AFP DATE",value = df.iloc[0]["29AFPDATE"])
-                                input_29AFP = st.text_area("29AFP",value = df.iloc[0]["29AFP"])
-                                input_30AFP_DATE = st.text_area("30AFP DATE",value = df.iloc[0]["30AFPDATE"])
-                                input_30AFP = st.text_area("30AFP",value = df.iloc[0]["30AFP"])
-                                input_31AFP_DATE = st.text_area("31AFP Date",value = df.iloc[0]["31AFPDATE"])
-                                input_31AFP = st.text_area("31AFP",value = df.iloc[0]["31AFP"])
-                                input_32AFP_DATE = st.text_area("32AFP DATE",value = df.iloc[0]["32AFPDATE"])
-                                input_32AFP = st.text_area("32AFP",value = df.iloc[0]["32AFP"])
-                                input_33AFP_DATE = st.text_area("33AFP DATE",value = df.iloc[0]["33AFPDATE"])
-                                input_33AFP = st.text_area("33AFP",value = df.iloc[0]["33AFP"])
-                                input_34AFP_DATE = st.text_area("34AFP DATE",value = df.iloc[0]["34AFPDATE"])
-                                input_34AFP = st.text_area("34AFP",value = df.iloc[0]["34AFP"])
+                                input_1AFP_DATE = st.text_area("1AFP Date [Excel : 1AFPDATE]",value = df.iloc[0]["1AFPDATE"])
+                                input_1AFP = st.text_area("1AFP [Excel : 1AFP]",value = df.iloc[0]["1AFP"])
+                                input_2AFP_DATE = st.text_area("2AFP Date [Excel : 2AFPDATE]",value = df.iloc[0]["2AFPDATE"])
+                                input_2AFP = st.text_area("2AFP [Excel : 2AFP]",value = df.iloc[0]["2AFP"])
+                                input_3AFP_DATE = st.text_area("3AFP Date [Excel : 3AFPDATE]",value = df.iloc[0]["3AFPDATE"])
+                                input_3AFP = st.text_area("3AFP [Excel : 3AFP]",value = df.iloc[0]["3AFP"])
+                                input_4AFP_DATE = st.text_area("4AFP Date [Excel : 4AFPDATE]",value = df.iloc[0]["4AFPDATE"])
+                                input_4AFP = st.text_area("4AFP [Excel : 4AFP]",value = df.iloc[0]["4AFP"])
+                                input_5AFP_DATE = st.text_area("5AFP Date [Excel : 5AFPDATE]",value = df.iloc[0]["5AFPDATE"])
+                                input_5AFP = st.text_area("5AFP [Excel : 5AFP]",value = df.iloc[0]["5AFP"])
+                                input_6AFP_DATE = st.text_area("6AFP Date [Excel : 6AFPDATE]",value = df.iloc[0]["6AFPDATE"])
+                                input_6AFP = st.text_area("6AFP [Excel : 6AFP]",value = df.iloc[0]["6AFP"])
+                                input_7AFP_DATE = st.text_area("7AFP Date [Excel : 7AFPDATE]",value = df.iloc[0]["7AFPDATE"])
+                                input_7AFP = st.text_area("7AFP [Excel : 7AFP]",value = df.iloc[0]["7AFP"])
+                                input_8AFP_DATE = st.text_area("8AFP Date [Excel : 8AFPDATE]",value = df.iloc[0]["8AFPDATE"])
+                                input_8AFP = st.text_area("8AFP [Excel : 8AFP]",value = df.iloc[0]["8AFP"])
+                                input_9AFP_DATE = st.text_area("9AFP Date [Excel : 9AFPDATE]",value = df.iloc[0]["9AFPDATE"])
+                                input_9AFP = st.text_area("9AFP [Excel : 9AFP]",value = df.iloc[0]["9AFP"])
+                                input_10AFP_DATE = st.text_area("10AFP Date [Excel : 10AFPDATE]",value = df.iloc[0]["10AFPDATE"])
+                                input_10AFP = st.text_area("10AFP [Excel : 10AFPDATE]",value = df.iloc[0]["10AFPDATE"])
+                                input_11AFP_DATE = st.text_area("11AFP Date [Excel : 11AFPDATE]",value = df.iloc[0]["11AFPDATE"])
+                                input_11AFP = st.text_area("11AFP [Excel : 11AFP]",value = df.iloc[0]["11AFP"])
+                                input_12AFP_DATE = st.text_area("12AFP Date [Excel : 12AFPDATE]",value = df.iloc[0]["12AFPDATE"])
+                                input_12AFP = st.text_area("12AFP [Excel : 12AFP]",value = df.iloc[0]["12AFP"])
+                                input_13AFP_DATE = st.text_area("13AFP Date [Excel : 13AFPDATE]",value = df.iloc[0]["13AFPDATE"])
+                                input_13AFP = st.text_area("13AFP [Excel : 13AFP]",value = df.iloc[0]["13AFP"])
+                                input_14AFP_DATE = st.text_area("14AFP Date [Excel : 14AFPDATE]",value = df.iloc[0]["14AFPDATE"])
+                                input_14AFP = st.text_area("14AFP [Excel : 14AFP]",value = df.iloc[0]["14AFP"])
+                                input_15AFP_DATE = st.text_area("15AFP Date [Excel : 15AFPDATE]",value = df.iloc[0]["15AFPDATE"])
+                                input_15AFP = st.text_area("15AFP [Excel : 15AFP]",value = df.iloc[0]["15AFP"])
+                                input_16AFP_DATE = st.text_area("16AFP Date [Excel : 16AFPDATE]",value = df.iloc[0]["16AFPDATE"])
+                                input_16AFP = st.text_area("16AFP [Excel : 16AFP]",value = df.iloc[0]["16AFP"])
+                                input_17AFP_DATE = st.text_area("17AFP Date [Excel : 17AFPDATE]",value = df.iloc[0]["17AFPDATE"])
+                                input_17AFP = st.text_area("17AFP [Excel : 17AFP]",value = df.iloc[0]["17AFP"])
+                                input_18AFP_DATE = st.text_area("18AFP DATE [Excel : 18AFPDATE]",value = df.iloc[0]["18AFPDATE"])
+                                input_18AFP = st.text_area("18AFP [Excel : 18AFP]",value = df.iloc[0]["18AFP"])
+                                input_19AFP_DATE = st.text_area("19AFP DATE [Excel : 19AFPDATE]",value = df.iloc[0]["19AFPDATE"])
+                                input_19AFP = st.text_area("19AFP [Excel : 19AFP]",value = df.iloc[0]["19AFP"])
+                                input_20AFP_DATE = st.text_area("20AFP DATE [Excel : 20AFPDATE]",value = df.iloc[0]["20AFPDATE"])
+                                input_20AFP = st.text_area("20AFP [Excel : 20AFP]",value = df.iloc[0]["20AFP"])
+                                input_21AFP_DATE = st.text_area("21AFP DATE [Excel : 21AFPDATE]",value = df.iloc[0]["21AFPDATE"])
+                                input_21AFP = st.text_area("21AFP [Excel : 21AFP]",value = df.iloc[0]["21AFP"])
+                                input_22AFP_DATE = st.text_area("22AFP DATE [Excel : 22AFPDATE]",value = df.iloc[0]["22AFPDATE"])
+                                input_22AFP = st.text_area("22AFP [Excel : 22AFP]",value = df.iloc[0]["22AFP"])
+                                input_23AFP_DATE = st.text_area("23AFP DATE [Excel : 23AFPDATE]",value = df.iloc[0]["23AFPDATE"])
+                                input_23AFP = st.text_area("23AFP [Excel : 23AFP]",value = df.iloc[0]["23AFP"])
+                                input_24AFP_DATE = st.text_area("24AFP DATE [Excel : 24AFPDATE]",value = df.iloc[0]["24AFPDATE"])
+                                input_24AFP = st.text_area("24AFP [Excel : 24AFP]",value = df.iloc[0]["24AFP"])
+                                input_25AFP_DATE = st.text_area("25AFP DATE [Excel : 25AFPDATE]",value = df.iloc[0]["25AFPDATE"])
+                                input_25AFP = st.text_area("25AFP [Excel : 25AFP]",value = df.iloc[0]["25AFP"])
+                                input_26AFP_DATE = st.text_area("26AFP DATE [Excel : 26AFPDATE]",value = df.iloc[0]["26AFPDATE"])
+                                input_26AFP = st.text_area("26AFP [Excel : 26AFP]",value = df.iloc[0]["26AFP"])
+                                input_27AFP_DATE = st.text_area("27AFP DATE [Excel : 27AFPDATE]",value = df.iloc[0]["27AFPDATE"])
+                                input_27AFP = st.text_area("27AFP [Excel : 27AFP]",value = df.iloc[0]["27AFP"])
+                                input_28AFP_DATE = st.text_area("28AFP DATE [Excel : 28AFPDATE]",value = df.iloc[0]["28AFPDATE"])
+                                input_28AFP = st.text_area("28AFP [Excel : 28AFP]",value = df.iloc[0]["28AFP"])
+                                input_29AFP_DATE = st.text_area("29AFP DATE [Excel : 29AFPDATE]",value = df.iloc[0]["29AFPDATE"])
+                                input_29AFP = st.text_area("29AFP [Excel : 29AFP]",value = df.iloc[0]["29AFP"])
+                                input_30AFP_DATE = st.text_area("30AFP DATE [Excel : 30AFPDATE]",value = df.iloc[0]["30AFPDATE"])
+                                input_30AFP = st.text_area("30AFP [Excel : 30AFP]",value = df.iloc[0]["30AFP"])
+                                input_31AFP_DATE = st.text_area("31AFP Date [Excel : 31AFPDATE]",value = df.iloc[0]["31AFPDATE"])
+                                input_31AFP = st.text_area("31AFP [Excel : 31AFP]",value = df.iloc[0]["31AFP"])
+                                input_32AFP_DATE = st.text_area("32AFP DATE [Excel : 32AFPDATE]",value = df.iloc[0]["32AFPDATE"])
+                                input_32AFP = st.text_area("32AFP [Excel : 32AFP]",value = df.iloc[0]["32AFP"])
+                                input_33AFP_DATE = st.text_area("33AFP DATE [Excel : 33AFPDATE]",value = df.iloc[0]["33AFPDATE"])
+                                input_33AFP = st.text_area("33AFP [Excel : 33AFP]",value = df.iloc[0]["33AFP"])
+                                input_34AFP_DATE = st.text_area("34AFP DATE [Excel : 34AFPDATE]",value = df.iloc[0]["34AFPDATE"])
+                                input_34AFP = st.text_area("34AFP [Excel : 34AFP]",value = df.iloc[0]["34AFP"])
 
                                 submit_afp = st.form_submit_button("Submit")
 
