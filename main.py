@@ -475,6 +475,17 @@ def meld_calc(N, K, M):
     except ValueError:
         return "NA" 
 
+def meld_na_calc(MELD, Sodium):
+        if MELD is None or Sodium is None or MELD == "" or Sodium == "" or MELD == "NA" or Sodium == "NA":
+            return "NA"
+        try:
+            MELD, Sodium = float(MELD), float(Sodium)
+            result = MELD + 1.32 * (137 - Sodium)-(0.033 * MELD * (137 - Sodium))
+            return result
+        except ValueError:
+            return "NA"
+
+
 def albi_calc(K,L):
         if K is None or L is None or K == "" or L == "" or K == "NA" or L == "NA":
             return "NA"
@@ -1277,7 +1288,7 @@ def add_new_data():
                         hcc_dx_meld_score_calc = meld_calc(hcc_dx_creatinine,hcc_dx_bilirubin,hcc_dx_inr)
                         # hcc_dx_meld_na_score_calc = hcc_dx_meld_score_calc + 1.32*(137-int(hcc_dx_sodium)) - (0.033*hcc_dx_meld_score_calc*(137-int(hcc_dx_sodium)))
                         # st.write("HCC_Dx_MELD Score calc",hcc_dx_meld_score_calc)                        
-                        hcc_dx_meld_na_score_calc = None
+                        hcc_dx_meld_na_score_calc = meld_na_calc(hcc_dx_meld_score_calc, hcc_dx_sodium)
                         hcc_dx_albi_score_calc = albi_calc(hcc_dx_bilirubin, hcc_dx_albumin)
                         hcc_dx_albi_grade = albi_class(hcc_dx_albi_score_calc)
                         st.write("HCC_Dx_ALBI Score calc : ",hcc_dx_albi_score_calc)
@@ -1722,7 +1733,7 @@ def add_new_data():
                         st.write("PREY90_MELD",prey90_meld_score_calc)
                         # prey90_meld_na_score_calc = prey90_meld_score_calc + 1.32*(137-int(prey90_sodium)) - (0.033*prey90_meld_score_calc*(137-int(prey90_sodium)))
                         # st.write("PREY90_MELDNa",prey90_meld_na_score_calc)
-                        prey90_meld_na_score_calc = None
+                        prey90_meld_na_score_calc = meld_na_calc(prey90_meld_score_calc, prey90_sodium)
                         prey90_albi_score_calc = albi_calc(prey90_bilirubin,prey90_albumin)
                         st.write("PREY90_Albiscore",prey90_albi_score_calc)
                         prey90_albi_grade = albi_class(prey90_albi_score_calc)
@@ -1879,7 +1890,7 @@ def add_new_data():
                         st.write("DAYY90_MELD",dayy90_meld_score_calc)
                         # dayy90_meld_na_score_calc = dayy90_meld_score_calc + 1.32*(137-int(dayy90_sodium)) - (0.033*dayy90_meld_score_calc*(137-int(dayy90_sodium)))
                         # st.write("DAYY90_MELDNa",dayy90_meld_na_score_calc)
-                        dayy90_meld_na_score_calc = None
+                        dayy90_meld_na_score_calc = meld_na_calc(dayy90_meld_score_calc, dayy90_sodium)
                         dayy90_albi_score_calc = albi_calc(dayy90_bilirubin,dayy90_albumin)
                         st.write("DAYY90_Albiscore",dayy90_albi_score_calc)
                         dayy90_albi_grade = albi_class(dayy90_albi_score_calc)
@@ -2078,7 +2089,7 @@ def add_new_data():
                         st.write("DAYY90_MELD",posty90_meld)
                         # posty90_meld_na = posty90_meld + 1.32*(137-int(posty90_sodium)) - (0.033*posty90_meld*(137-int(posty90_sodium)))
                         # st.write("DAYY90_MELDNa",posty90_meld_na)
-                        posty90_meld_na = None
+                        posty90_meld_na = meld_na_calc(posty90_meld, posty90_sodium)
                         posty90_albi_score = albi_calc(posty90_bilirubin,posty90_albumin)
                         st.write("DAYY90_Albiscore",posty90_albi_score)
                         posty90_albi_grade = albi_class(posty90_albi_score)
@@ -4774,7 +4785,7 @@ def edit_existing_data():
                             st.write("HCCdx_MELD ",hcc_dx_meld_score_calc)
                             # hcc_dx_meld_na_score_calc = hcc_dx_meld_score_calc + 1.32*(137-int(hcc_dx_sodium)) - (0.033*hcc_dx_meld_score_calc*(137-int(hcc_dx_sodium)))
                             # st.write("HCCdx_MELDNa ",hcc_dx_meld_na_score_calc)
-                            hcc_dx_meld_na_score_calc = None
+                            hcc_dx_meld_na_score_calc = meld_na_calc(hcc_dx_meld_score_calc,hcc_dx_sodium)
                             hcc_dx_albi_score_calc = albi_calc(hcc_dx_bilirubin, hcc_dx_albumin)
                             st.write("HCCdx_Albiscore ",hcc_dx_albi_score_calc)
                             hcc_dx_albi_grade = albi_class(hcc_dx_albi_score_calc)
@@ -5279,10 +5290,10 @@ def edit_existing_data():
                             st.write("PREY90_CPclass",prey90_child_pugh_class_calc)
                             prey90_meld_score_calc = meld_calc(prey90_creatinine,prey90_bilirubin,prey90_inr)
                             st.write("PREY90_MELD",prey90_meld_score_calc)
-                    
+
                             # prey90_meld_na_score_calc = prey90_meld_score_calc + 1.32*(137-int(prey90_sodium)) - (0.033*prey90_meld_score_calc*(137-int(prey90_sodium)))
                             # st.write("PREY90_MELDNa",prey90_meld_na_score_calc)
-                            prey90_meld_na_score_calc = None
+                            prey90_meld_na_score_calc = meld_na_calc(prey90_meld_score_calc,prey90_sodium)
                             prey90_albi_score_calc = albi_calc(prey90_bilirubin,prey90_albumin)
                             st.write("PREY90_Albiscore",prey90_albi_score_calc)
                             prey90_albi_grade = albi_class(prey90_albi_score_calc)
@@ -5444,7 +5455,7 @@ def edit_existing_data():
                             st.write("DAYY90_MELD",dayy90_meld_score_calc)
                             # dayy90_meld_na_score_calc = dayy90_meld_score_calc + 1.32*(137-int(dayy90_sodium)) - (0.033*dayy90_meld_score_calc*(137-int(dayy90_sodium)))
                             # st.write("DAYY90_MELDNa",dayy90_meld_na_score_calc)
-                            dayy90_meld_na_score_calc = None
+                            dayy90_meld_na_score_calc = meld_na_calc(dayy90_meld_score_calc,dayy90_sodium)
                             dayy90_albi_score_calc = albi_calc(dayy90_bilirubin,dayy90_albumin)
                             st.write("DAYY90_Albiscore",dayy90_albi_score_calc)
                             dayy90_albi_grade = albi_class(dayy90_albi_score_calc)
@@ -5637,7 +5648,7 @@ def edit_existing_data():
                             st.write("DAYY90_MELD",posty90_meld)
                             # posty90_meld_na = posty90_meld + 1.32*(137-int(posty90_sodium)) - (0.033*posty90_meld*(137-int(posty90_sodium)))
                             # st.write("DAYY90_MELDNa",posty90_meld_na)
-                            posty90_meld_na = None
+                            posty90_meld_na = meld_na_calc(posty90_meld, posty90_sodium)
                             posty90_albi_score = albi_calc(posty90_bilirubin,posty90_albumin)
                             st.write("DAYY90_Albiscore",posty90_albi_score)
                             posty90_albi_grade = albi_class(posty90_albi_score)
@@ -7768,7 +7779,3 @@ if st.session_state.logged_in:
         st.rerun()
 else:
     login_page()        
-
-
-
-
