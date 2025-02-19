@@ -691,14 +691,14 @@ def add_new_data():
     def process_input(value):
                         
             # Handle the 'NA' case
-                        if value.upper() == "NA":
-                            return "NA"
-            # Handle numeric cases
-                        elif value.isdigit():
-                            numeric_value = int(value)
-                            return 1 if numeric_value < 200 else 2
-                        else:
-                            return "Invalid Input"
+                        def process_input(value):
+                            if value.upper() == "NA":
+                                return "NA"
+                            try:
+                                numeric_value = float(value)
+                                return 1 if numeric_value < 200 else 2
+                            except ValueError:
+                                return "Fill AFP"
     
     def validate_input(value):
                         if value.isdigit() and 5 <= int(value) <= 15:
@@ -930,11 +930,11 @@ def add_new_data():
                             placeholder="Choose an option",
                         )
 
-                        cir_pmh_hbv_free_text = "0" if cir_pmh_hbv_status == "No" else st.text_input(
+                        cir_pmh_hbv_free_text = st.text_input(
                             "Cir PMH HBV Free Text [ Excel : CIRPMH_HBVFT ]"
                         )
                         
-                        cir_pmh_hbv_art = "0" if cir_pmh_hbv_status == "No" else st.selectbox(
+                        cir_pmh_hbv_art = st.selectbox(
                             "Cir PMH HBV ART [ Excel : CIRPMH_HBVART ]\n\n(1) Entecavir, (2) Tenofovir, (3) NA  ",
                             options=["1", "2", "3"],
                             format_func=lambda x: {
@@ -957,12 +957,12 @@ def add_new_data():
                             placeholder="Choose an option",
                         )
 
-                        cir_pmh_hcv_free_text = "No" if cir_pmh_hcv_status == "No" else st.text_input(
+                        cir_pmh_hcv_free_text = st.text_input(
                             "Cir_PMH_HCV Free Text [ Excel : CIRPMH_HCVFT ]",
                             help="Provide additional details for HCV Status",
                         )
 
-                        cir_pmh_hcv_art = "No" if cir_pmh_hcv_status == "No" else st.selectbox(
+                        cir_pmh_hcv_art = st.selectbox(
                             "Cir_PMH_HCV ART [ Excel : CIRPMH_HCVART ]\n\n(1) sofosbuvir/velpatasvir , (2) ledipasvir/sofosbuvir, (3) NA (if u can't find a med or if they arent on it), (4) Glecaprevir/pibrentasvir",
                             options=["1", "2", "3", "4"],
                             format_func=lambda x: {
@@ -989,7 +989,7 @@ def add_new_data():
                             placeholder="Choose an option",
                         )
 
-                        cir_pmh_alcohol_free_text = "0" if cir_pmh_alcohol_use_disorder == "No" else st.text_input(
+                        cir_pmh_alcohol_free_text = st.text_input(
                             "Cir_PMH_Alcohol Free Text [ Excel : CIRPMH_AUDFT ]",
                             help="Provide additional details for Alcohol Disorder",
                         )
@@ -1007,7 +1007,7 @@ def add_new_data():
                             placeholder="Choose an option",
                         )
 
-                        cir_pmh_ivdu_free_text = "0" if cir_pmh_ivdu_status == "No" else st.text_input(
+                        cir_pmh_ivdu_free_text = st.text_input(
                             "Cir_PMH_IVDU Free Text [ Excel : CIRPMH_IVDUFT ]",
                             help="Provide additional details for IVDU"
                     
@@ -1030,14 +1030,14 @@ def add_new_data():
                         )
                 
                         st.subheader("Cirrhosis Dx")
-                        Cirrhosis_Dx_Diagnosis_Date = st.date_input("Cirrhosis Dx Diagnosis Date [ Excel : CIRDX_DATE ]",min_value=date(1900, 1, 1),help="Select Diagnosis date")
+                        Cirrhosis_Dx_Diagnosis_Date = st.date_input("Cirrhosis Dx Diagnosis Date [ Excel : CIRDX_DATE ]",min_value=date(1900, 1, 1),help="Select Diagnosis date", value = None)
 
                         Cirrhosis_Dx_Diagnosis_Method = st.selectbox(
                             "Cirrhosis_Dx_Diagnosis Method [ Excel : CIRDX_METHOD ]\n\n(1) Biopsy, (2) Imaging  ",
                             options=["1", "2"],
                             format_func=lambda x: {
                                                     "1": "Biopsy",
-                                                    "2": "maging",
+                                                    "2": "Imaging",
                                                 }[x],
                             index=None,  # No default selection
                             placeholder="Choose an option",
@@ -1061,20 +1061,20 @@ def add_new_data():
 
                         Cirrhosis_Dx_Complications_at_Time_of_Diagnosis = st.multiselect(
                             "Cirrhosis_Dx_Complications at Time of Diagnosis [ Excel : CIRDX_COMPLDX ] ",
-                            options=["ascites", " ariceal hemorrhage","Hepatic encephalopathy","jaundice","SBP", "Hepatorenal Syndrome", "Coagulopathy", "Portal HTN", "PVT", "PVTT","Portal Vein Thrombosis" "none"],
+                            options=["ascites", " ariceal hemorrhage","Hepatic encephalopathy","jaundice","SBP", "Hepatorenal Syndrome", "Coagulopathy", "Portal HTN", "PVT", "PVTT","Portal Vein Thrombosis","none"],
                             help="Provide details of Compilications at time of Diagnosis",
                             placeholder="Select all that apply"
                         )
-                        Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_String = ", ".join(Cirrhosis_Dx_Complications_at_Time_of_Diagnosis)
-
-                        Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary = 1 if Cirrhosis_Dx_Complications_at_Time_of_Diagnosis != "none" or Cirrhosis_Dx_Complications_at_Time_of_Diagnosis != None else 0
+                        Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_String = ",".join(Cirrhosis_Dx_Complications_at_Time_of_Diagnosis)
+    
+                        Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary = 1 if Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_String != "none" and Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_String != None else 0
 
                         Cirrhosis_Dx_Complications_Free_Text =  st.text_area(
                             "Cirrhosis_Dx_Complications Free Text [ Excel : CIRDX_COMPLFT ]",
                             help="Provide details of Complications"
                         )
 
-                        Cirrhosis_Dx_Date_of_Labs_in_Window = st.date_input(" Cirrhosis_Dx_Date of Labs in Window [ Excel : CIRDX_DATELABS ]",min_value=date(1900, 1, 1),help="Select the date of lab test")
+                        Cirrhosis_Dx_Date_of_Labs_in_Window = st.date_input(" Cirrhosis_Dx_Date of Labs in Window [ Excel : CIRDX_DATELABS ]", value = None,min_value=date(1900, 1, 1),help="Select the date of lab test")
 
                         Cirrhosis_Dx_AFP = st.text_input(
                             "Cirrhosis_Dx_AFP [ Excel : CIRDX_AFP ]",
@@ -1115,28 +1115,29 @@ def add_new_data():
                         
                         Cirrhosis_Dx_Ascites_Classification = 1 if Cirrhosis_Dx_Ascites_CTCAE == "none" else findascitesclass(Cirrhosis_Dx_Ascites_CTCAE)
                         st.write("Cirrhosis_Dx_Ascites Classification ",Cirrhosis_Dx_Ascites_Classification)
-                        Cirrhosis_Dx_Ascites_Free_Text = "NA" if Cirrhosis_Dx_Ascites_CTCAE == "none" else st.text_area(
+                        Cirrhosis_Dx_Ascites_Free_Text = st.text_area(
                             "Cirrhosis_Dx_Ascites Free Text [ Excel : CIRDX_ASCITFT ]",
-                            
                         
                         )
+                        if Cirrhosis_Dx_Ascites_CTCAE == "none" :
+                            Cirrhosis_Dx_Ascites_Free_Text = "NA" 
 
                         submit_tab3 = st.form_submit_button("Submit")
                         if submit_tab3:
 
                             data2={
                             "CIRPMH_HBV" : cir_pmh_hbv_status,
-                            "CIRPMH_HBVFT" : cir_pmh_hbv_free_text,
-                            "CIRPMH_HBVART" : cir_pmh_hbv_art,
+                            "CIRPMH_HBVFT" : "0" if cir_pmh_hbv_status == "0" else cir_pmh_hbv_free_text,
+                            "CIRPMH_HBVART" : "0" if cir_pmh_hbv_status == "0" else cir_pmh_hbv_art,
                             "CIRPMH_HCV" : cir_pmh_hcv_status,
-                            "CIRPMH_HCVFT" : cir_pmh_hcv_free_text,
-                            "CIRPMH_HCVART" : cir_pmh_hcv_art,
+                            "CIRPMH_HCVFT" : "0" if cir_pmh_hcv_status == "0" else  cir_pmh_hcv_free_text,
+                            "CIRPMH_HCVART" : "0" if cir_pmh_hcv_status == "0" else cir_pmh_hcv_art,
                             "CIRPMH_AUD" : cir_pmh_alcohol_use_disorder,
-                            "CIRPMH_AUDFT" : cir_pmh_alcohol_free_text,
+                            "CIRPMH_AUDFT" : "0" if cir_pmh_alcohol_use_disorder == "0" else cir_pmh_alcohol_free_text,
                             "CIRPMH_IVDU" : cir_pmh_ivdu_status,
-                            "CIRPMH_IVDUFT" : cir_pmh_ivdu_free_text,
+                            "CIRPMH_IVDUFT" : "0" if cir_pmh_ivdu_status == "0" else cir_pmh_ivdu_free_text,
                             "CIRPMH_LIVERFAC" : cir_pmh_liver_addtional_factor,
-                            "CIRDX_DATE" : Cirrhosis_Dx_Diagnosis_Date.strftime("%Y-%m-%d"),
+                            "CIRDX_DATE" : None if Cirrhosis_Dx_Diagnosis_Date == None else Cirrhosis_Dx_Diagnosis_Date.strftime("%Y-%m-%d"),
                             "CIRDX_METHOD" : Cirrhosis_Dx_Diagnosis_Method,
                             "CIRDX_HPIFT" : Cirrhosis_Dx_HPI_EMR_Note_Free_Text,
                             "CIRDX_IMAGEFT" : Cirrhosis_Dx_Imaging_Findings_EMR_Note_Free_Text,
@@ -1144,7 +1145,7 @@ def add_new_data():
                             "CIRDX_COMPLDX" : Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_String,
                             "CIRDX_COMPLDXBIN" : Cirrhosis_Dx_Complications_at_Time_of_Diagnosis_Binary,
                             "CIRDX_COMPLFT" : Cirrhosis_Dx_Complications_Free_Text,
-                            "CIRDX_DATELABS" : Cirrhosis_Dx_Date_of_Labs_in_Window.strftime("%Y-%m-%d"),
+                            "CIRDX_DATELABS" : None if Cirrhosis_Dx_Date_of_Labs_in_Window == None else Cirrhosis_Dx_Date_of_Labs_in_Window.strftime("%Y-%m-%d"),
                             "CIRDX_AFP" : Cirrhosis_Dx_AFP,
                             "CIRDX_AFPL3" : Cirrhosis_Dx_AFP_L3,
                             "CIRDX_AFPL3DATEFT" : Cirrhosis_Dx_AFP_L3_Date_Free_Text,
@@ -1169,7 +1170,7 @@ def add_new_data():
                     st.warning("Please complete the Patient Information tab first.")
                 else:
                     try:
-                        hcc_dx_hcc_diagnosis_date = st.date_input("HCC_Dx_HCC Diagnosis Date [ Excel : HCCDX_DATEDX ]  ", min_value=date(1900, 1, 1),help="Enter the HCC diagnosis date")
+                        hcc_dx_hcc_diagnosis_date = st.date_input("HCC_Dx_HCC Diagnosis Date [ Excel : HCCDX_DATEDX ]  ",value = None, min_value=date(1900, 1, 1),help="Enter the HCC diagnosis date")
 
                         hcc_dx_method_of_diagnosis = st.selectbox(
                             "HCC_Dx_Method of Diagnosis [ Excel : HCCDX_METHODDX ]\n\n(1) Biopsy, (2) Imaging, (NA) Unknown  ",   
@@ -1184,10 +1185,10 @@ def add_new_data():
                             
                         )
 
-                        hcc_dx_date_of_labs = st.date_input("HCC_Dx_Date of Labs in Window [ Excel : HCCDX_LABSDATE ]",min_value=date(1900, 1, 1),)
+                        hcc_dx_date_of_labs = st.date_input("HCC_Dx_Date of Labs in Window [ Excel : HCCDX_LABSDATE ]",value = None,min_value=date(1900, 1, 1),)
 
-                        hcc_dx_afp = st.number_input("HCC_Dx_AFP [ Excel : HCCDX_AFP ]  ",value = None, help="Enter AFP value in ng/dl", step=0.1)
-                        hcc_dx_afp_l3 = st.number_input("HCC_Dx_AFP L3 [ Excel : HCCDX_AFPL3 ]  ",value = None, help="Enter AFP L3 and date details",step=0.1)
+                        hcc_dx_afp = st.text_input("HCC_Dx_AFP [ Excel : HCCDX_AFP ]  ",value = None, help="Enter AFP value in ng/dl")
+                        hcc_dx_afp_l3 = st.text_input("HCC_Dx_AFP L3 [ Excel : HCCDX_AFPL3 ]  ",value = None, help="Enter AFP L3 and date details")
                         hcc_dx_afp_l3_date_free_text = st.text_area("HCC_Dx_AFP L3 Date Free Text [ Excel : HCCdx_AFPL3dateFT ]  ",value = None,)
 
                         hcc_dx_bilirubin = st.number_input("HCC_Dx_Bilirubin [ Excel : HCCDX_BILI ]  ",value = None, help="Enter the bilirubin value in mg/dl", min_value=0.1,step=0.1)
@@ -1286,9 +1287,11 @@ def add_new_data():
                         st.write("HCC_Dx_Child-Pugh Class calc",hcc_dx_child_pugh_class_calc)
                         st.write("HCC_Dx_Child-Pugh Points calc", hcc_dx_child_pugh_points_calc)
                         hcc_dx_meld_score_calc = meld_calc(hcc_dx_creatinine,hcc_dx_bilirubin,hcc_dx_inr)
+                        st.write("HCC_Dx_MELD Score calc : ",hcc_dx_meld_score_calc)
                         # hcc_dx_meld_na_score_calc = hcc_dx_meld_score_calc + 1.32*(137-int(hcc_dx_sodium)) - (0.033*hcc_dx_meld_score_calc*(137-int(hcc_dx_sodium)))
-                        # st.write("HCC_Dx_MELD Score calc",hcc_dx_meld_score_calc)                        
+                        # st.write("",hcc_dx_meld_score_calc)                        
                         hcc_dx_meld_na_score_calc = meld_na_calc(hcc_dx_meld_score_calc, hcc_dx_sodium)
+                        st.write("HCC_Dx_MELD Score calc : ",hcc_dx_meld_na_score_calc)
                         hcc_dx_albi_score_calc = albi_calc(hcc_dx_bilirubin, hcc_dx_albumin)
                         hcc_dx_albi_grade = albi_class(hcc_dx_albi_score_calc)
                         st.write("HCC_Dx_ALBI Score calc : ",hcc_dx_albi_score_calc)
@@ -1309,9 +1312,9 @@ def add_new_data():
                         submit_tab4 = st.form_submit_button("Submit")
                         if submit_tab4:
                                 data4 = {
-                                    "HCCDX_DATEDX": hcc_dx_hcc_diagnosis_date.strftime("%Y-%m-%d"),
+                                    "HCCDX_DATEDX": None if hcc_dx_hcc_diagnosis_date == None else hcc_dx_hcc_diagnosis_date.strftime("%Y-%m-%d"),
                                     "HCCDX_METHODDX": hcc_dx_method_of_diagnosis,
-                                    "HCCDX_LABSDATE": hcc_dx_date_of_labs.strftime("%Y-%m-%d"),
+                                    "HCCDX_LABSDATE": None if hcc_dx_date_of_labs == None else hcc_dx_date_of_labs.strftime("%Y-%m-%d"),
                                     "HCCDX_AFP": hcc_dx_afp,
                                     "HCCDX_AFPL3": hcc_dx_afp_l3,
                                     "HCCDX_AFPL3dateFT": hcc_dx_afp_l3_date_free_text,
@@ -1377,7 +1380,7 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        PRVTHER_Prior_RFA_Date = 0 if PRVTHER_Prior_RFA_Therapy == '0' else st.date_input("PRVTHER_Prior RFA Date [ Excel : PTHER_RFADATE ]  ",min_value=date(1900, 1, 1),)
+                        PRVTHER_Prior_RFA_Date = st.date_input("PRVTHER_Prior RFA Date [ Excel : PTHER_RFADATE ]  ",value = None,min_value=date(1900, 1, 1),)
 
                     
                         PRVTHER_Prior_TARE_Therapy = st.selectbox(
@@ -1392,7 +1395,7 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        PRVTHER_Prior_TARE_Date = 0 if PRVTHER_Prior_TARE_Therapy == '0' else st.date_input("PRVTHER_Prior TARE Date [ Excel : PTHER_TAREDATE ]  ",min_value=date(1900, 1, 1),)
+                        PRVTHER_Prior_TARE_Date = st.date_input("PRVTHER_Prior TARE Date [ Excel : PTHER_TAREDATE ]  ",value = None,min_value=date(1900, 1, 1),)
                     
                         PRVTHER_Prior_SBRT_Therapy = st.selectbox(
                             "PRVTHER_Prior SBRT Therapy [ Excel : PTHER_SBRT ]\n\nNo (0), Yes (1), NA",
@@ -1407,7 +1410,7 @@ def add_new_data():
                             placeholder="Choose an option",
                         )
                         
-                        PRVTHER_Prior_SBRT_Date = 0 if PRVTHER_Prior_SBRT_Therapy == '0' else st.date_input("PRVTHER_Prior SBRT Date ",min_value=date(1900, 1, 1),)
+                        PRVTHER_Prior_SBRT_Date = st.date_input("PRVTHER_Prior SBRT Date ",value = None,min_value=date(1900, 1, 1),)
                         PRVTHER_Prior_TACE_Therapy = st.selectbox(
                             "PRVTHER_Prior TACE Therapy [ Excel : PTHER_TACE ]\n\nNo (0), Yes (1), NA ",
                             options=["0", "1", "NA"], 
@@ -1420,7 +1423,7 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        PRVTHER_Prior_TACE_Date = 0 if PRVTHER_Prior_TACE_Therapy == '0' else st.date_input("PRVTHER_Prior TACE Date [ Excel : PTHER_TACEDATE ] ",min_value=date(1900, 1, 1))
+                        PRVTHER_Prior_TACE_Date = st.date_input("PRVTHER_Prior TACE Date [ Excel : PTHER_TACEDATE ] ",value = None,min_value=date(1900, 1, 1))
 
                         PRVTHER_Prior_MWA_Therapy = st.selectbox(
                             "PRVTHER_Prior MWA Therapy [ Excel : PTHER_MWA ]\n\nNo (0), Yes (1), NA",
@@ -1434,7 +1437,7 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        PRVTHER_Prior_MWA_Date = 0 if PRVTHER_Prior_MWA_Therapy == '0' else st.date_input("PRVTHER_Prior MWA Date [ Excel : PTHER_MWADATE ]  ",min_value=date(1900, 1, 1))
+                        PRVTHER_Prior_MWA_Date = st.date_input("PRVTHER_Prior MWA Date [ Excel : PTHER_MWADATE ]  ",value = None, min_value=date(1900, 1, 1))
 
                         PRVTHER_Resection = st.selectbox(
                             "PRVTHER_Resection [ Excel : PTHER_RESECTION ]\n\nNo (0), Yes (1), NA ",
@@ -1448,7 +1451,7 @@ def add_new_data():
                             index=None,  # No default selection
                             placeholder="Choose an option",
                         )
-                        PRVTHER_Resection_Date = 0 if PRVTHER_Resection == '0' else st.date_input("PRVTHER_Resection Date [ Excel : PTHER_RESECTIONDATE ]",min_value=date(1900, 1, 1))
+                        PRVTHER_Resection_Date = st.date_input("PRVTHER_Resection Date [ Excel : PTHER_RESECTIONDATE ]",value = None,min_value=date(1900, 1, 1))
                         def count_previous_therapies(*therapies):
                             return sum(1 for therapy in therapies if therapy == "1")
                         PRVTHER_Previous_Therapy_Sum = count_previous_therapies(PRVTHER_Prior_LDT_Therapy, PRVTHER_Prior_RFA_Therapy, PRVTHER_Prior_TARE_Therapy, PRVTHER_Prior_SBRT_Therapy, PRVTHER_Prior_TACE_Therapy, PRVTHER_Prior_MWA_Therapy, PRVTHER_Resection)
@@ -1536,7 +1539,7 @@ def add_new_data():
 
                         PRVTHER_Date_of_Labs_in_Window = st.date_input(
                             "PRVTHER_Date of Labs for AFP [ Excel : PTHER_AFPDATE ]",
-                            help="select date of labs in window",min_value=date(1900, 1, 1)
+                            help="select date of labs in window",value = None,min_value=date(1900, 1, 1)
                         )
 
                         PRVTHER_AFP = st.number_input(
@@ -1551,17 +1554,17 @@ def add_new_data():
                             data5 = {
                             "PTHER_LDT": PRVTHER_Prior_LDT_Therapy,
                             "PTHER_RFA": PRVTHER_Prior_RFA_Therapy,
-                            "PTHER_RFADATE": PRVTHER_Prior_RFA_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_RFA_Date != 0 else PRVTHER_Prior_RFA_Date,
+                            "PTHER_RFADATE": 0 if PRVTHER_Prior_RFA_Therapy == '0' else  PRVTHER_Prior_RFA_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_RFA_Date != None else None,
                             "PTHER_TARE": PRVTHER_Prior_TARE_Therapy,
-                            "PTHER_TAREDATE": PRVTHER_Prior_TARE_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_TARE_Date != 0 else PRVTHER_Prior_TARE_Date,
+                            "PTHER_TAREDATE": 0 if PRVTHER_Prior_TARE_Therapy == '0' else PRVTHER_Prior_TARE_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_TARE_Date != None else None,
                             "PTHER_SBRT": PRVTHER_Prior_SBRT_Therapy,
-                            "PTHER_SBRTDATE": PRVTHER_Prior_SBRT_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_SBRT_Date != 0 else PRVTHER_Prior_SBRT_Date,
+                            "PTHER_SBRTDATE": 0 if PRVTHER_Prior_SBRT_Therapy == '0' else PRVTHER_Prior_SBRT_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_SBRT_Date != None else None,
                             "PTHER_TACE": PRVTHER_Prior_TACE_Therapy,
-                            "PTHER_TACEDATE": PRVTHER_Prior_TACE_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_TACE_Date != 0 else PRVTHER_Prior_TACE_Date,
+                            "PTHER_TACEDATE": 0 if PRVTHER_Prior_TACE_Therapy == '0' else PRVTHER_Prior_TACE_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_TACE_Date != None else None,
                             "PTHER_MWA": PRVTHER_Prior_MWA_Therapy,
-                            "PTHER_MWADATE": PRVTHER_Prior_MWA_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_MWA_Date != 0 else PRVTHER_Prior_MWA_Date,
+                            "PTHER_MWADATE": 0 if PRVTHER_Prior_MWA_Therapy == '0' else PRVTHER_Prior_MWA_Date.strftime("%Y-%m-%d") if PRVTHER_Prior_MWA_Date != None else None,
                             "PTHER_RESECTION": PRVTHER_Resection,
-                            "PTHER_RESECTIONDATE": PRVTHER_Resection_Date.strftime("%Y-%m-%d") if PRVTHER_Resection_Date != 0 else PRVTHER_Resection_Date,
+                            "PTHER_RESECTIONDATE": 0 if PRVTHER_Resection == '0' else PRVTHER_Resection_Date.strftime("%Y-%m-%d") if PRVTHER_Resection_Date != None else None,
                             "PTHER_PREVSUM": PRVTHER_Previous_Therapy_Sum,
                             "PTHER_NOTESFT": PRVTHER_NotesFT,
                             "PTHER_TOTRECUR": PRVTHER_Total_Recurrences_HCC,
@@ -1575,7 +1578,7 @@ def add_new_data():
                             "PTHER_RESIDUALHCCFT": PRVTHER_Residual_HCC_Note,
                             "PTHER_RESIDUALHCC": PRVTHER_Residual_HCC,
                             "PTHER_SYSTHER": PRVTHER_Systemic_Therapy_Free_Text,
-                            "PTHER_AFPDATE": PRVTHER_Date_of_Labs_in_Window.strftime("%Y-%m-%d"),
+                            "PTHER_AFPDATE": PRVTHER_Date_of_Labs_in_Window.strftime("%Y-%m-%d") if PRVTHER_Date_of_Labs_in_Window != None else None,
                             "PTHER_AFP": PRVTHER_AFP,
                             }
                             if "patient_info" in st.session_state and st.session_state.patient_info["MRN"] == st.session_state.temp_mrn:
@@ -1607,26 +1610,32 @@ def add_new_data():
                         ],
                             placeholder="Select all that apply"
                         )
+                        PREY_SXTOT = len(prey90_symptoms)
                         prey90_symptoms = ", ".join(prey90_symptoms)
-                        
-                        prey90_date_of_labs = st.date_input("PREY90_date of labs in window [ Excel : PREY_DATELABS ] ",min_value=date(1900, 1, 1), help="Enter the date of lab tests")
+                        PREY_PHTN = st.selectbox( "PREY90_Portal HTN [Excel : PREY_PHTN]\n\n (1) Portal HTN (0) none",
+                        options=["1", "0"],
+                        format_func=lambda x: {
+                            "1": "Portal HTN",
+                            "0": "none",
+                        }[x],
+                        index = None,
+                        placeholder="Choose an option"
+                        )
+                        prey90_date_of_labs = st.date_input("PREY90_date of labs in window [ Excel : PREY_DATELABS ] ",value = None,min_value=date(1900, 1, 1), help="Enter the date of lab tests")
                         prey90_afp = st.text_input("PREY90_AFP [ Excel : PREY_AFP ] ", help="Enter AFP value in ng/dl or NA")
                         
                         def process_input(value):
-                            
-                # Handle the 'NA' case
                             if value.upper() == "NA":
                                 return "NA"
-                # Handle numeric cases
-                            elif value.isdigit():
-                                numeric_value = int(value)
+                            try:
+                                numeric_value = float(value)
                                 return 1 if numeric_value < 200 else 2
-                            else:
-                                return "Invalid Input"
+                            except ValueError:
+                                return "Fill AFP"
                     
                         prey90_afp_prior_to_tare = process_input(prey90_afp)
                         
-                        prey90_bilirubin = st.number_input("PREY90_Bilirubin [ Excel : PREY_BILI ]",value = None, help="Enter the bilirubin value in mg/dl",min_value=1.0,step=0.1)
+                        prey90_bilirubin = st.number_input("PREY90_Bilirubin [ Excel : PREY_BILI ]",value = None, help="Enter the bilirubin value in mg/dl",min_value=0.1,step=0.1)
                         prey90_albumin = st.number_input("PREY90_Albumin [ Excel : PREY_ALBUMIN ]",value = None, help="Enter the albumin value in g/dl",step=0.1)
                         prey90_inr = st.number_input("PREY90_inr [ Excel : PREY_INR ]",value = None, help="Enter the INR value",step=0.1)
                         prey90_creatinine = st.number_input("PREY90_creatinine [ Excel : PREY_CREATININE ] ",value = None, help="Enter the creatinine value in mg/dl",step=0.1)
@@ -1753,7 +1762,7 @@ def add_new_data():
                             )
                     
                         st.subheader("Mapping Y90")
-                        my90_date = st.date_input("MY90_date [ Excel : MY_DATE ]",min_value=date(1900, 1, 1), help="Enter the date")
+                        my90_date = st.date_input("MY90_date [ Excel : MY_DATE ]",value = None,min_value=date(1900, 1, 1), help="Enter the date")
                         my90_lung_shunt = st.number_input("MY90_Lung_shunt [ Excel : MY_LUNGSHU ]  ",value = None, min_value=0.0, step=0.1, help="Enter the lung shunt value")
 
                         submit_tab6 = st.form_submit_button("Submit")
@@ -1762,6 +1771,8 @@ def add_new_data():
 
                             data6 = {
                             "PREY_SX": prey90_symptoms,
+                            "PREY_SXTOT": PREY_SXTOT,
+                            "PREY_PHTN" : PREY_PHTN,
                             "PREY_DATELABS": prey90_date_of_labs.strftime("%Y-%m-%d"),
                             "PREY_AFP": prey90_afp,
                             "PREY_AFPBINARY": prey90_afp_prior_to_tare,
@@ -1811,15 +1822,12 @@ def add_new_data():
                     try:
                         dayy90_afp = st.text_input("DAYY90_AFP [Excel : DAYY_AFP] ")
                         def process_input(value):
-                            
-                # Handle the 'NA' case
                             if value.upper() == "NA":
                                 return "NA"
-                # Handle numeric cases
-                            elif value.isdigit():
-                                numeric_value = int(value)
+                            try:
+                                numeric_value = float(value)
                                 return 1 if numeric_value < 200 else 2
-                            else:
+                            except ValueError:
                                 return "Fill AFP"
                         #df.loc[df["MRN"] == mrn, "PREY_AFPBINARY"].values[0]
                         dayy90_afp_prior_to_tare = process_input(dayy90_afp)
@@ -1984,9 +1992,9 @@ def add_new_data():
                     st.warning("Please complete the Patient Information tab first.")
                 else:
                     try:
-                        posty90_date_labs = st.date_input("POSTY90_30DY_date_labs [ Excel : POST30_LABSDATE ] ",min_value=date(1900, 1, 1), help="Enter the date of lab tests")
+                        posty90_date_labs = st.date_input("POSTY90_30DY_date_labs [ Excel : POST30_LABSDATE ] ",value = None,min_value=date(1900, 1, 1), help="Enter the date of lab tests")
                         posty90_afp = st.text_input("POSTY90_30DY_afp [ Excel : POST30_AFP ]  ", help="Enter AFP value in ng/dl or NA")
-                        posty90_afp_date = st.date_input("POSTY90_30DY_afp DATE [ Excel : POST30_AFPDATE ] ", help="Enter the date for AFP")
+                        posty90_afp_date = st.date_input("POSTY90_30DY_afp DATE [ Excel : POST30_AFPDATE ] ",value = None, help="Enter the date for AFP")
                         posty90_sodium = st.number_input("POSTY90_30DY_Sodium [ Excel : POST30_SODIUM ]  ",value = None, help="Enter the sodium value in mmol/L",step=0.1)
                         posty90_creatinine = st.number_input("POSTY90_30DY_creatinine [ Excel : POST30_CREATININE ]",value = None, help="Enter the creatinine value in mg/dl",step=0.1)
                         posty90_inr = st.number_input("POSTY90_30DY_INR [ Excel : POST30_INR ]  ",value = None, help="Enter the INR value",step=0.1)
@@ -2288,7 +2296,7 @@ def add_new_data():
                                 st.error("Cannot calculate AE30_AST due to No data in DAYY_ALP.")
                             else:
                                 day90_alp= float(day90_alp)
-                                ae30_alp = ast_calculate(day90_alp, posty90_alkaline_phosphatase)
+                                ae30_alp = alp_calculate(day90_alp, posty90_alkaline_phosphatase)
                                 st.write("30 Days AE CTCAE  Alkaline Phosphatase",ae30_alp)
                         except:
                             st.warning("Fill Patient Info.")
@@ -2384,9 +2392,9 @@ def add_new_data():
                         if submit_tab8:
                                 
                                 data8={
-                                    "POST30_LABSDATE": posty90_date_labs.strftime("%Y-%m-%d"),
+                                    "POST30_LABSDATE": posty90_date_labs.strftime("%Y-%m-%d") if posty90_date_labs != None else None,
                                     "POST30_AFP": posty90_afp,
-                                    "POST30_AFPDATE": posty90_afp_date.strftime("%Y-%m-%d"),
+                                    "POST30_AFPDATE": posty90_afp_date.strftime("%Y-%m-%d") if posty90_afp_date != None else None,
                                     "POST30_SODIUM": posty90_sodium,
                                     "POST30_CREATININE": posty90_creatinine,
                                     "POST30_INR": posty90_inr,
@@ -2472,7 +2480,7 @@ def add_new_data():
                 else:
                     try:
                         oc_liver_transplant = st.radio("OC_Liver_transplant [Excel : OC_Liver_transplant]", options=["Yes", "No"])
-                        oc_liver_transplant_date = st.date_input("OC_Liver_transplant_date [Excel : OC_Liver_transplant_date]",min_value=date(1900, 1, 1))
+                        oc_liver_transplant_date = st.date_input("OC_Liver_transplant_date [Excel : OC_Liver_transplant_date]",value = None,min_value=date(1900, 1, 1))
 
                         st.subheader("K_other")
             # with st.form("k_other_form"):
@@ -2544,7 +2552,7 @@ def add_new_data():
         elif st.session_state.selected_tab == "Imaging Date":
             st.subheader("Imaging Date")
             with st.form("imaging_date_form"):
-                try:
+                # try:
                     if "MRN" not in st.session_state.data:
                         st.warning("Please complete the Patient Information tab first.")
                     else:
@@ -2562,7 +2570,7 @@ def add_new_data():
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
-                        PREY90_Imaging_Date = st.date_input("PREY90_Imaging Date [Excel : PREY_IMG_DATE]",min_value=date(1900, 1, 1))
+                        PREY90_Imaging_Date = st.date_input("PREY90_Imaging Date [Excel : PREY_IMG_DATE]",value = None,min_value=date(1900, 1, 1))
                         PREY90_total_number_of_lesions = st.selectbox(
                                 "PREY90_total number of lesions [Excel : PREY_TOTLES]\n\n(1) 1,(2) 2,(3) >=3",
                                  options=["1", "2", "3"],
@@ -2726,7 +2734,7 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
 
-                        FU_Imaging_Date = st.date_input("1st_FU_Imaging Date [Excel : FU1_IMG_DATE]",min_value=date(1900, 1, 1))
+                        FU_Imaging_Date = st.date_input("1st_FU_Imaging Date [Excel : FU1_IMG_DATE]",value = None,min_value=date(1900, 1, 1))
                         fetch_date = None
                         try:
                             fetch_date =  datetime.strptime(get_variable_value(st.session_state.temp_mrn,"TAREDATE"),"%Y-%m-%d")
@@ -2862,7 +2870,7 @@ def add_new_data():
                             help="Free text"
                         )
 
-                        FU_NEW_Extrahepatic_Dz_Date = st.date_input("1st_FU_NEW Extrahepatic Dz Date [Excel : FU1_EHDDATE]",min_value=date(1900, 1, 1))
+                        FU_NEW_Extrahepatic_Dz_Date = st.date_input("1st_FU_NEW Extrahepatic Dz Date [Excel : FU1_EHDDATE]",value = None,min_value=date(1900, 1, 1))
 
                         FU_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum in ["NA",0] else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU_Non_targeted_Lesion_Dia_Sum)/PREY90_Non_targeted_Lesion_Dia_Sum)*100
                         st.write("1st_FU_% change for non target lesion",FU_change_non_target_lesion)
@@ -2892,7 +2900,7 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
 
-                        FU2_Imaging_Date = st.date_input("2nd_FU_Imaging Date [Excel : FU2_IMG_DATE]",min_value=date(1900, 1, 1))
+                        FU2_Imaging_Date = st.date_input("2nd_FU_Imaging Date [Excel : FU2_IMG_DATE]",value = None,min_value=date(1900, 1, 1))
 
                         FU2_Months_Since_Y90 = months_difference(FU2_Imaging_Date, fetch_date)
                         st.write("2nd_FU_Months Since Y90",FU2_Months_Since_Y90)
@@ -3022,7 +3030,7 @@ def add_new_data():
                             help="Free text"
                         )
 
-                        FU2_NEW_Extrahepatic_Dz_Date = st.date_input("2nd_FU_NEW Extrahepatic Dz Date [Excel : FU2_EHDDATE]",min_value=date(1900, 1, 1))
+                        FU2_NEW_Extrahepatic_Dz_Date = st.date_input("2nd_FU_NEW Extrahepatic Dz Date [Excel : FU2_EHDDATE]",value = None,min_value=date(1900, 1, 1))
 
                         FU2_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum in ["NA", 0] else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU2_Non_targeted_Lesion_Dia_Sum) / PREY90_Non_targeted_Lesion_Dia_Sum)*100
                         st.write("2nd_FU_% change for non target lesion",FU2_change_non_target_lesion)
@@ -3052,7 +3060,7 @@ def add_new_data():
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
-                        FU3_Imaging_Date = st.date_input("3rd_FU_Imaging Date [Excel : FU3_IMG_DATE]",min_value=date(1900, 1, 1))
+                        FU3_Imaging_Date = st.date_input("3rd_FU_Imaging Date [Excel : FU3_IMG_DATE]",value = None,min_value=date(1900, 1, 1))
                         FU3_Months_Since_Y90 = months_difference(FU3_Imaging_Date, fetch_date)
                         st.write("3rd_FU_Months Since Y90",FU3_Months_Since_Y90)
                         FU3_Total_number_of_lesions = st.selectbox(
@@ -3126,7 +3134,7 @@ def add_new_data():
                         FU3_Non_targeted_Lesion_Dia_Sum = calculate_nontargeted_dia_sum(FU3_Non_Target_Lesion_1_LAD_Art_Enhanc, FU3_Non_Target_Lesion_1_PAD_Art_Enhanc, FU3_Non_Target_Lesion_1_CCD_Art_Enhanc)
                         st.write("3rd_FU_Non-targeted Lesion Dia Sum",FU3_Non_targeted_Lesion_Dia_Sum)
                         FU3_Lesion_Necrosis = st.selectbox(
-                            "3rd_FU_Lesion Necrosis[Excel : FU3_NEC]\n\n Yes (1), No (0), NA",
+                            "3rd_FU_Lesion Necrosis[Excel : FU3_NECROSIS]\n\n Yes (1), No (0), NA",
                                     options=["1", "0", "NA"],
                                     format_func=lambda x: {
                                             "1": "Yes",
@@ -3182,7 +3190,7 @@ def add_new_data():
                             "3rd_FU_NEW Extrahepatic Dz Location [Excel : FU3_EHDLOC]",
                             help="Free text"
                         )
-                        FU3_NEW_Extrahepatic_Dz_Date = st.date_input("3rd_FU_NEW Extrahepatic Dz Date [Excel : FU3_EHDDATE]",min_value=date(1900, 1, 1))
+                        FU3_NEW_Extrahepatic_Dz_Date = st.date_input("3rd_FU_NEW Extrahepatic Dz Date [Excel : FU3_EHDDATE]",value = None,min_value=date(1900, 1, 1))
                         FU3_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum in ['NA' , 0] else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU3_Non_targeted_Lesion_Dia_Sum) / PREY90_Non_targeted_Lesion_Dia_Sum)*100
                         st.write("3rd_FU_% change for non target lesion",FU3_change_non_target_lesion)
                         FU3_change_target_lesion = "" if PREY90_pretx_targeted_Lesion_Dia_Sum in ['NA' , 0] else ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU3_Follow_up_2_targeted_Lesion_Dia_Sum) / PREY90_pretx_targeted_Lesion_Dia_Sum) * 100
@@ -3213,7 +3221,7 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
 
-                        FU4_Imaging_Date = st.date_input("4th_FU_Imaging Date [Excel : FU4_IMG_DATE]",min_value=date(1900, 1, 1))
+                        FU4_Imaging_Date = st.date_input("4th_FU_Imaging Date [Excel : FU4_IMG_DATE]",value = None,min_value=date(1900, 1, 1))
 
                         FU4_Months_Since_Y90 = months_difference(FU4_Imaging_Date, fetch_date)
                         st.write("4th_FU_Months Since Y90",FU4_Months_Since_Y90)
@@ -3343,7 +3351,7 @@ def add_new_data():
                             help="Free text"
                         )
 
-                        FU4_NEW_Extrahepatic_Dz_Date = st.date_input("4th_FU_NEW Extrahepatic Dz Date [Excel : FU4_EHDDATE]",min_value=date(1900, 1, 1))
+                        FU4_NEW_Extrahepatic_Dz_Date = st.date_input("4th_FU_NEW Extrahepatic Dz Date [Excel : FU4_EHDDATE]",value = None,min_value=date(1900, 1, 1))
                         FU4_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum in ["NA",0] else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU4_Non_targeted_Lesion_Dia_Sum) / PREY90_Non_targeted_Lesion_Dia_Sum) * 100
                         st.write("4th_FU_% change non target lesion",FU4_change_non_target_lesion)
                         FU4_change_target_lesion = "" if PREY90_pretx_targeted_Lesion_Dia_Sum in ["NA",0] else ((PREY90_pretx_targeted_Lesion_Dia_Sum - FU4_Follow_up_2_targeted_Lesion_Dia_Sum) / PREY90_pretx_targeted_Lesion_Dia_Sum) * 100
@@ -3373,7 +3381,7 @@ def add_new_data():
                         index=None,  # No default selection
                         placeholder="Choose an option",
                         )
-                        FU5_Imaging_Date = st.date_input("5th_FU_Imaging Date [Excel : FU5_IMG_DATE]",min_value=date(1900, 1, 1))
+                        FU5_Imaging_Date = st.date_input("5th_FU_Imaging Date [Excel : FU5_IMG_DATE]",value = None,min_value=date(1900, 1, 1))
 
                         FU5_Months_Since_Y90 = months_difference(FU5_Imaging_Date, fetch_date)
                         st.write("5th_FU_Months Since Y90",FU5_Months_Since_Y90)
@@ -3488,7 +3496,7 @@ def add_new_data():
                             help="Free text"
                         )
 
-                        FU5_NEW_Extrahepatic_Dz_Date = st.date_input("5th_FU_NEW Extrahepatic Dz Date [Excel : FU5_EHDDATE]",min_value=date(1900, 1, 1))
+                        FU5_NEW_Extrahepatic_Dz_Date = st.date_input("5th_FU_NEW Extrahepatic Dz Date [Excel : FU5_EHDDATE]",value = None,min_value=date(1900, 1, 1))
 
                         FU5_change_non_target_lesion = 0 if PREY90_Non_targeted_Lesion_Dia_Sum in ['NA',0] else ((PREY90_Non_targeted_Lesion_Dia_Sum - FU5_Non_targeted_Lesion_Dia_Sum) / PREY90_Non_targeted_Lesion_Dia_Sum) * 100
                         st.write("5th_FU_% change non target lesion ",FU5_change_non_target_lesion)
@@ -3521,7 +3529,7 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
 
-                        Date_of_Death = st.date_input("Date of Death [Excel : DATE_DEAD]",min_value=date(1900, 1, 1))
+                        Date_of_Death = st.date_input("Date of Death [Excel : DATE_DEAD]",value = None,min_value=date(1900, 1, 1))
                         Time_to_Death = None
                         if dead == 0:
                             Date_of_Death = 'NA'
@@ -3541,7 +3549,7 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
 
-                        Date_of_OLT = st.date_input("Date of OLT [Excel : DATE_OLT]",min_value=date(1900, 1, 1))
+                        Date_of_OLT = st.date_input("Date of OLT [Excel : DATE_OLT]",value = None,min_value=date(1900, 1, 1))
                         Time_to_OLT = None
                         if OLT == 0:
                             Date_of_OLT = 'NA'
@@ -3561,7 +3569,7 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
 
-                        Date_of_Repeat_tx_Post_Y90 = st.date_input("Date of Repeat tx Post Y90 [Excel : DATE_RTX]",min_value=date(1900, 1, 1))
+                        Date_of_Repeat_tx_Post_Y90 = st.date_input("Date of Repeat tx Post Y90 [Excel : DATE_RTX]",value = None,min_value=date(1900, 1, 1))
                         Time_to_Repeat_Tx_Post_Y90 = None
 
                         if Repeat_tx_post_Y90 == 0:
@@ -3597,7 +3605,7 @@ def add_new_data():
                         index=None,  # No default selection
                         placeholder="Choose an option",)
 
-                        Date_of_Last_Follow_up_last_imaging_date = st.date_input("Date of Last Follow-up/last imaging date [Excel : DATE_LFU]",min_value=date(1900, 1, 1))
+                        Date_of_Last_Follow_up_last_imaging_date = st.date_input("Date of Last Follow-up/last imaging date [Excel : DATE_LFU]",value = None,min_value=date(1900, 1, 1))
                         Time_to_Last_Follow_up_last_imaging_date = None
                         if dead == 1 and OLT == 1 and Repeat_tx_post_Y90 == 1  and lfu == "0":
                             Date_of_Last_Follow_up_last_imaging_date = 'NA'
@@ -3634,11 +3642,11 @@ def add_new_data():
                         bestm_recist_r_vs_nr = best_responce(bestm_recist)
                         st.write("BestmRECISTRvsNR" ,bestm_recist_r_vs_nr)
 
-                        DATE_BEST_MTR = st.date_input("Date of Best percent change (2) [Excel : DATE_BEST_MTR]",min_value=date(1900, 1, 1))
+                        DATE_BEST_MTR = st.date_input("Date of Best percent change (2) [Excel : DATE_BEST_MTR]",value = None,min_value=date(1900, 1, 1))
                         TIME_BEST_MRT = months_difference(DATE_BEST_MTR, fetch_date)
                         PERCHANGE_BEST_MTR = st.number_input("Best Overall percent change (2) [Excel : PERCHANGE_BEST_MTR]",value = None,step=0.1)
 
-                        OS_Date = st.date_input("Overall Survival Date [Excel : OS_Date]",min_value=date(1900, 1, 1))
+                        OS_Date = st.date_input("Overall Survival Date [Excel : OS_Date]",value = None,min_value=date(1900, 1, 1))
                         OS_Events = st.selectbox("Overall Survival Events [Excel : OS_Events]\n\n(1) Event: Death, (0) Censored: OLT, RTx, LFU",
                             options=["1","0"],
                             format_func=lambda x:{
@@ -3661,7 +3669,7 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
                         #LPFS
-                        LPFS_Date = st.date_input("Local Progression Free Survival Date [Excel : LPFS_Date]",min_value=date(1900, 1, 1))
+                        LPFS_Date = st.date_input("Local Progression Free Survival Date [Excel : LPFS_Date]",value = None,min_value=date(1900, 1, 1))
                         LPFS_Events = st.selectbox("Local Progression Free Survival Event [Excel : LPFS_Events]\n\n(1) Event: Death, (0) Censored: OLT, RTx, LFU",
                             options=["1","0"],
                             format_func=lambda x:{
@@ -3678,7 +3686,7 @@ def add_new_data():
                         placeholder="Choose an option",
                         )
                         #PFS
-                        PFS_Date = st.date_input("Progression Free Survival Date [Excel : PFS_Date]",min_value=date(1900, 1, 1))
+                        PFS_Date = st.date_input("Progression Free Survival Date [Excel : PFS_Date]",value = None,min_value=date(1900, 1, 1))
                         PFS_Events = st.selectbox("Progression Free Survival Event [Excel : PFS_Events]\n\n(1) Event: Death, (0) Censored: OLT, RTx, LFU",
                             options=["1","0"],
                             format_func=lambda x:{
@@ -3703,7 +3711,7 @@ def add_new_data():
                             data10={
               
                                     "PREY_MOD": "NA" if na_selected == "NA" else PREY90_prescan_modality,
-                                    "PREY_IMG_DATE": "NA" if na_selected == "NA" else PREY90_Imaging_Date.strftime("%Y-%m-%d"),
+                                    "PREY_IMG_DATE": "NA" if na_selected == "NA" else PREY90_Imaging_Date.strftime("%Y-%m-%d") if PREY90_Imaging_Date != None else None,
                                     "PREY_TOTLES": "NA" if na_selected == "NA" else PREY90_total_number_of_lesions,
                                     "PREY_LOBES": "NA" if na_selected == "NA" else PREY90_Number_Involved_Lobes,
                                     "PREY_TL1SEG": "NA" if na_selected == "NA" else PREY90_target_lesion_1_segments,
@@ -3729,7 +3737,7 @@ def add_new_data():
                                     "PREY_PVTLOC": "NA" if na_selected == "NA" else PREY90_PVT_Location,
                                     "PREY_CIRRH": "NA" if na_selected == "NA" else PREY90_Features_of_cirrhosis,
                                     "FU1_MOD": "NA" if na1_selected == "NA" else FU_Scan_Modality,
-                                    "FU1_IMG_DATE": "NA" if na1_selected == "NA" else FU_Imaging_Date.strftime("%Y-%m-%d"),
+                                    "FU1_IMG_DATE": "NA" if na1_selected == "NA" else FU_Imaging_Date.strftime("%Y-%m-%d") if FU_Imaging_Date != None else None,
                                     "FU1_MS_Y90": "NA" if na1_selected == "NA" else FU_Months_Since_Y90,
                                     "FU1_TOTLES": "NA" if na1_selected == "NA" else FU_Total_number_of_lesions,
                                     "FU1_TL1LAD": "NA" if na1_selected == "NA" else FU_Target_Lesion_1_LAD_Art_Enhanc,
@@ -3750,14 +3758,14 @@ def add_new_data():
                                     "FU1_NEWLESION": "NA" if na1_selected == "NA" else FU_New_Lesions,
                                     "FU1_NEWEHD": "NA" if na1_selected == "NA" else FU_NEW_Extrahepatic_Disease,
                                     "FU1_EHDLOC": "NA" if na1_selected == "NA" else FU_NEW_Extrahepatic_Dz_Location,
-                                    "FU1_EHDDATE": "NA" if na1_selected == "NA" else FU_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
+                                    "FU1_EHDDATE": "NA" if na1_selected == "NA" else FU_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d") if FU_NEW_Extrahepatic_Dz_Date != None else None,
                                     "FU1_NTCHG": "NA" if na1_selected == "NA" else FU_change_non_target_lesion,
                                     "FU1_TDCHG": "NA" if na1_selected == "NA" else FU_change_target_lesion,
                                     "FU1_MREC_LOCAL": "NA" if na1_selected == "NA" else first_fu_mrecist_localized,
                                     "FU1_MREC_OVERALL": "NA" if na1_selected == "NA" else first_fu_mrecist_overall,
                                     "FU1_FT": "NA" if na1_selected == "NA" else FU_Free_Text,
                                     "FU2_MOD": "NA" if na2_selected == "NA" else FU2_Scan_Modality,
-                                    "FU2_IMG_DATE": "NA" if na2_selected == "NA" else FU2_Imaging_Date.strftime("%Y-%m-%d"),
+                                    "FU2_IMG_DATE": "NA" if na2_selected == "NA" else FU2_Imaging_Date.strftime("%Y-%m-%d") if FU2_Imaging_Date != None else None,
                                     "FU2_MS_Y90": "NA" if na2_selected == "NA" else FU2_Months_Since_Y90,
                                     "FU2_TOTLES": "NA" if na2_selected == "NA" else FU2_Total_number_of_lesions,
                                     "FU2_TL1LAD": "NA" if na2_selected == "NA" else FU2_Target_Lesion_1_LAD_Art_Enhanc,
@@ -3778,7 +3786,7 @@ def add_new_data():
                                     "FU2_NEWLES": "NA" if na2_selected == "NA" else FU2_New_Lesions,
                                     "FU2_EHD": "NA" if na2_selected == "NA" else FU2_NEW_Extrahepatic_Disease,
                                     "FU2_EHDLOC": "NA" if na2_selected == "NA" else FU2_NEW_Extrahepatic_Dz_Location,
-                                    "FU2_EHDDATE": "NA" if na2_selected == "NA" else FU2_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
+                                    "FU2_EHDDATE": "NA" if na2_selected == "NA" else FU2_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d") if FU2_NEW_Extrahepatic_Dz_Date != None else None,
                                     "FU2_NTCHG": "NA" if na2_selected == "NA" else FU2_change_non_target_lesion,
                                     "FU2_TDCHG": "NA" if na2_selected == "NA" else FU2_change_target_lesion,
                                     "FU2_MREC_CALC": "NA" if na2_selected == "NA" else second_fu_mrecist_calc,
@@ -3786,7 +3794,7 @@ def add_new_data():
                                     "FU2_MREC_OVERALL": "NA" if na2_selected == "NA" else second_fu_mrecist_overall,
                                     "FU2_FT": "NA" if na2_selected == "NA" else FU2_Free_Text,
                                     "FU3_MOD": "NA" if na3_selected == "NA" else FU3_Scan_Modality,
-                                    "FU3_IMG_DATE": "NA" if na3_selected == "NA" else FU3_Imaging_Date.strftime("%Y-%m-%d"),
+                                    "FU3_IMG_DATE": "NA" if na3_selected == "NA" else FU3_Imaging_Date.strftime("%Y-%m-%d") if FU3_Imaging_Date != None else None,
                                     "FU3_MS_Y90": "NA" if na3_selected == "NA" else FU3_Months_Since_Y90,
                                     "FU3_TOTLES": "NA" if na3_selected == "NA" else FU3_Total_number_of_lesions,
                                     "FU3_TL1LAD": "NA" if na3_selected == "NA" else FU3_Target_Lesion_1_LAD_Art_Enhanc,
@@ -3807,7 +3815,7 @@ def add_new_data():
                                     "FU3_NEWLES": "NA" if na3_selected == "NA" else FU3_New_Lesions,
                                     "FU3_EHD": "NA" if na3_selected == "NA" else FU3_NEW_Extrahepatic_Disease,
                                     "FU3_EHDLOC": "NA" if na3_selected == "NA" else FU3_NEW_Extrahepatic_Dz_Location,
-                                    "FU3_EHDDATE": "NA" if na3_selected == "NA" else FU3_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
+                                    "FU3_EHDDATE": "NA" if na3_selected == "NA" else FU3_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d") if FU3_NEW_Extrahepatic_Dz_Date != None else None,
                                     "FU3_NTCHG": "NA" if na3_selected == "NA" else FU3_change_non_target_lesion,
                                     "FU3_TDCHG": "NA" if na3_selected == "NA" else FU3_change_target_lesion,
                                     "FU3_MREC_CALC": "NA" if na3_selected == "NA" else third_fu_mrecist_calc,
@@ -3815,7 +3823,7 @@ def add_new_data():
                                     "FU3_MREC_OVERALL": "NA" if na3_selected == "NA" else third_fu_mrecist_overall,
                                     "FU3_FT": "NA" if na3_selected == "NA" else FU3_Free_Text,
                                     "FU4_MOD": "NA" if na4_selected == "NA" else FU4_Scan_Modality,
-                                    "FU4_IMG_DATE": "NA" if na4_selected == "NA" else FU4_Imaging_Date.strftime("%Y-%m-%d"),
+                                    "FU4_IMG_DATE": "NA" if na4_selected == "NA" else FU4_Imaging_Date.strftime("%Y-%m-%d") if FU4_Imaging_Date != None else None,
                                     "FU4_MONTHS_Y90": "NA" if na4_selected == "NA" else FU4_Months_Since_Y90,
                                     "FU4_TOTLES": "NA" if na4_selected == "NA" else FU4_Total_number_of_lesions,
                                     "FU4_TL1LAD": "NA" if na4_selected == "NA" else FU4_Target_Lesion_1_LAD_Art_Enhanc,
@@ -3836,7 +3844,7 @@ def add_new_data():
                                     "FU4_NEWLESION": "NA" if na4_selected == "NA" else FU4_New_Lesions,
                                     "FU4_NEWEHD": "NA" if na4_selected == "NA" else FU4_NEW_Extrahepatic_Disease,
                                     "FU4_EHDLOC": "NA" if na4_selected == "NA" else FU4_NEW_Extrahepatic_Dz_Location,
-                                    "FU4_EHDDATE": "NA" if na4_selected == "NA" else FU4_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
+                                    "FU4_EHDDATE": "NA" if na4_selected == "NA" else FU4_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d") if FU4_NEW_Extrahepatic_Dz_Date != None else None,
                                     "FU4_NTL_CHANGE": "NA" if na4_selected == "NA" else FU4_change_non_target_lesion,
                                     "FU4_TL_CHANGE": "NA" if na4_selected == "NA" else FU4_change_target_lesion,
                                     "FU4_MREC_CALC": "NA" if na4_selected == "NA" else fourth_fu_mrecist_calc,
@@ -3844,7 +3852,7 @@ def add_new_data():
                                     "FU4_MREC_OVERALL": "NA" if na4_selected == "NA" else fourth_fu_mrecist_overall,
                                     "FU4_FT": "NA" if na4_selected == "NA" else FU4_Free_Text,
                                     "FU5_MOD": "NA" if na5_selected == "NA" else FU5_Scan_Modality,
-                                    "FU5_IMG_DATE": "NA" if na5_selected == "NA" else FU5_Imaging_Date.strftime("%Y-%m-%d"),
+                                    "FU5_IMG_DATE": "NA" if na5_selected == "NA" else FU5_Imaging_Date.strftime("%Y-%m-%d") if FU5_Imaging_Date != None else None,
                                     "FU5_MONTHS_Y90": "NA" if na5_selected == "NA" else FU5_Months_Since_Y90,
                                     "FU5_TOTLES": "NA" if na5_selected == "NA" else FU5_Total_number_of_lesions,
                                     "FU5_TL1LAD": "NA" if na5_selected == "NA" else FU5_Target_Lesion_1_LAD_Art_Enhanc,
@@ -3863,7 +3871,7 @@ def add_new_data():
                                     "FU5_NEWLESION": "NA" if na5_selected == "NA" else FU5_New_Lesions,
                                     "FU5_NEWEHD": "NA" if na5_selected == "NA" else FU5_NEW_Extrahepatic_Disease,
                                     "FU5_EHDLOC": "NA" if na5_selected == "NA" else FU5_NEW_Extrahepatic_Dz_Location,
-                                    "FU5_EHDDATE": "NA" if na5_selected == "NA" else FU5_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d"),
+                                    "FU5_EHDDATE": "NA" if na5_selected == "NA" else FU5_NEW_Extrahepatic_Dz_Date.strftime("%Y-%m-%d") if FU5_NEW_Extrahepatic_Dz_Date != None else None,
                                     "FU5_NTL_CHANGE": "NA" if na5_selected == "NA" else FU5_change_non_target_lesion,
                                     "FU5_TL_CHANGE": "NA" if na5_selected == "NA" else FU5_change_target_lesion,
                                     "FU5_MREC_CALC": "NA" if na5_selected == "NA" else fifth_fu_mrecist_calc,
@@ -3888,23 +3896,23 @@ def add_new_data():
                                     "TIME_LFU": Time_to_Last_Follow_up_last_imaging_date,
                                     "NOTES_FT" : notes_free_text,
                                     "BMRECIST" :bestm_recist,
-                                    "DATE_BMREC_TTR":date_bestm_recist.strftime("%Y-%m-%d") if date_bestm_recist != "No Date" else date_bestm_recist,
+                                    "DATE_BMREC_TTR": None if date_bestm_recist == None else date_bestm_recist.strftime("%Y-%m-%d") if date_bestm_recist != "No Date" else date_bestm_recist,
                                     "TIME_BMREC_TTR":time_to_bestm_recist,
                                     "PERCHANGE_BEST_TTR": PERCHANGE_BEST_TTR,
                                     "BM_CRVSNON":bestm_recist_cr_vs_non_cr,
                                     "MR_RVSNR":bestm_recist_r_vs_nr,
-                                    "DATE_BEST_MTR":DATE_BEST_MTR.strftime("%Y-%m-%d"),
+                                    "DATE_BEST_MTR":DATE_BEST_MTR.strftime("%Y-%m-%d") if DATE_BEST_MTR != None else None,
                                     "TIME_BEST_MRT":TIME_BEST_MRT,
                                     "PERCHANGE_BEST_MTR":PERCHANGE_BEST_MTR,
-                                    "OS_Date":OS_Date.strftime("%Y-%m-%d"),
+                                    "OS_Date":OS_Date.strftime("%Y-%m-%d") if OS_Date != None else None,
                                     "OS_Events":OS_Events,
                                     "OS_Time": OS_Time,
                                     "OS_Reason":OS_Reason,
-                                    "LPFS_Date":LPFS_Date.strftime("%Y-%m-%d"),
+                                    "LPFS_Date":LPFS_Date.strftime("%Y-%m-%d") if LPFS_Date != None else None,
                                     "LPFS_Events":LPFS_Events,
                                     "LPFS_Time":LPFS_Time,
                                     "LPFS_Reason":LPFS_Reason,
-                                    "PFS_Date" : PFS_Date.strftime("%Y-%m-%d"),
+                                    "PFS_Date" : PFS_Date.strftime("%Y-%m-%d") if PFS_Date != None else None,
                                     "PFS_Events":PFS_Events,
                                     "PFS_Time": PFS_Time,
                                     "PFS_Reason" : PFS_Reason,
@@ -3916,8 +3924,8 @@ def add_new_data():
                             else:
                                 st.error(f"No patient information found for MRN {st.session_state.temp_mrn}")
                             
-                except:
-                    st.warning("Please Fill Patient Information Page")
+                # except:
+                    # st.warning("Please Fill Patient Information Page")
     
         elif st.session_state.selected_tab == "Dosimetry Data":
             st.subheader("Dosimetry Data")
@@ -4397,12 +4405,12 @@ def edit_existing_data():
                                 placeholder="Choose an option",
                             )
 
-                            cir_pmh_hbv_free_text = "0" if cir_pmh_hbv_status == "No" else st.text_input(
+                            cir_pmh_hbv_free_text = "0" if cir_pmh_hbv_status == "0" else st.text_input(
                                 "Cir PMH HBV Free Text [ Excel : CIRPMH_HBVFT ]",
                                 value = df.iloc[0]["CIRPMH_HBVFT"],
                             )
                             
-                            cir_pmh_hbv_art = "0" if cir_pmh_hbv_status == "No" else st.selectbox(
+                            cir_pmh_hbv_art = "0" if cir_pmh_hbv_status == "0" else st.selectbox(
                                 "Cir PMH HBV ART [ Excel : CIRPMH_HBVART ]\n\n(1) Entecavir, (2) Tenofovir, (3) NA ",
                             options=["1", "2", "3"],
                             format_func=lambda x: {
@@ -4410,7 +4418,7 @@ def edit_existing_data():
                                                     "2": "Tenofovir ",
                                                     "3": "NA "
                                                 }[x],
-                                index=["1", "2", "3"].index(df.iloc[0]["CIRPMH_HBVART"]) if df.iloc[0]["CIRPMH_HBVART"] else None,  # No default selection
+                                index=["1", "2", "3"].index(df.iloc[0]["CIRPMH_HBVART"]) if df.iloc[0]["CIRPMH_HBVART"] in ["1", "2", "3"] else None,  # No default selection
                                 placeholder="Choose an option",
                             )
 
@@ -4425,13 +4433,13 @@ def edit_existing_data():
                                 placeholder="Choose an option",
                             )
 
-                            cir_pmh_hcv_free_text = "No" if cir_pmh_hcv_status == "No" else st.text_input(
+                            cir_pmh_hcv_free_text = "0" if cir_pmh_hcv_status == "0" else st.text_input(
                                 "Cir_PMH_HCV Free Text [ Excel : CIRPMH_HCVFT ]",
                                 value = df.iloc[0]["CIRPMH_HCVFT"],
                                 help="Provide additional details for HCV Status",
                             )
 
-                            cir_pmh_hcv_art = "No" if cir_pmh_hcv_status == "No" else st.selectbox(
+                            cir_pmh_hcv_art = "0" if cir_pmh_hcv_status == "0" else st.selectbox(
                                 "Cir_PMH_HCV ART [ Excel : CIRPMH_HCVART ]\n\n(1) sofosbuvir/velpatasvir , (2) ledipasvir/sofosbuvir, (3) NA (if u can't find a med or if they arent on it), (4) Glecaprevir/pibrentasvir",
                             options=["1", "2", "3", "4"],
                             format_func=lambda x: {
@@ -4441,7 +4449,7 @@ def edit_existing_data():
                                                     "4": " Glecaprevir/pibrentasvir"
                                                 }[x],
                                 help="Select ART treatment for HCV",
-                                index=["1", "2", "3", "4"].index(df.iloc[0]["CIRPMH_HCVART"]) if df.iloc[0]["CIRPMH_HCVART"] else None, 
+                                index=["1", "2", "3", "4"].index(df.iloc[0]["CIRPMH_HCVART"]) if df.iloc[0]["CIRPMH_HCVART"] in ["1", "2", "3", "4"] else None, 
                                 placeholder="Choose an option",
                         
                             )
@@ -4458,7 +4466,7 @@ def edit_existing_data():
                                 placeholder="Choose an option",
                             )
 
-                            cir_pmh_alcohol_free_text = "0" if cir_pmh_alcohol_use_disorder == "No" else st.text_input(
+                            cir_pmh_alcohol_free_text = "0" if cir_pmh_alcohol_use_disorder == "0" else st.text_input(
                                 "Cir_PMH_Alcohol Free Text [ Excel : CIRPMH_AUDFT ]",
                                 value = df.iloc[0]["CIRPMH_AUDFT"],
                                 help="Provide additional details for Alcohol Disorder",
@@ -4476,7 +4484,7 @@ def edit_existing_data():
                                 placeholder="Choose an option",
                             )
 
-                            cir_pmh_ivdu_free_text = "0" if cir_pmh_ivdu_status == "No" else st.text_input(
+                            cir_pmh_ivdu_free_text = "0" if cir_pmh_ivdu_status == "0" else st.text_input(
                                 "Cir_PMH_IVDU Free Text [ Excel : CIRPMH_IVDUFT ]",
                                 value = df.iloc[0]["CIRPMH_IVDUFT"],
                                 help="Provide additional details for IVDU"
@@ -4682,9 +4690,9 @@ def edit_existing_data():
 
                             hcc_dx_date_of_labs = st.date_input("HCC_Dx_Date of Labs in Window [ Excel : HCCDX_LABSDATE ]  ",min_value=date(1900, 1, 1),value=datetime.strptime(df.iloc[0]["HCCDX_LABSDATE"], "%Y-%m-%d").date() if df.iloc[0]["HCCDX_LABSDATE"] else None)
 
-                            hcc_dx_afp = st.number_input("HCC_Dx_AFP [ Excel : HCCDX_AFP ]  ",step=0.1, help="Enter AFP value in ng/dl",value = float(df.iloc[0]["HCCDX_AFP"]) if df.iloc[0]["HCCDX_AFP"] not in ["",None] else None )
+                            hcc_dx_afp = st.text_input("HCC_Dx_AFP [ Excel : HCCDX_AFP ]  ", help="Enter AFP value in ng/dl",value = df.iloc[0]["HCCDX_AFP"] if df.iloc[0]["HCCDX_AFP"] not in ["",None] else None )
 
-                            hcc_dx_afp_l3 = st.number_input("HCC_Dx_AFP L3 [ Excel : HCCDX_AFPL3 ]  ",step=0.1, help="Enter AFP L3 and date details",value = float(df.iloc[0]["HCCDX_AFPL3"]) if df.iloc[0]["HCCDX_AFPL3"]  not in ["",None] else None)
+                            hcc_dx_afp_l3 = st.text_input("HCC_Dx_AFP L3 [ Excel : HCCDX_AFPL3 ]  ",value = df.iloc[0]["HCCDX_AFPL3"] if df.iloc[0]["HCCDX_AFPL3"]  not in ["",None] else None)
                             hcc_dx_afp_l3_date_free_text = st.text_area("HCC_Dx_AFP L3 Date Free Text [ Excel : HCCdx_AFPL3dateFT ]  ",value = df.iloc[0]["HCCDX_AFPL3dateFT"])
 
                             hcc_dx_bilirubin = st.number_input("HCC_Dx_Bilirubin [ Excel : HCCDX_BILI ]  ",step=0.1, help="Enter the bilirubin value in mg/dl", min_value=0.1,value = float(df.iloc[0]["HCCDX_BILI"]) if df.iloc[0]["HCCDX_BILI"] not in ["",None] else None )
@@ -5167,21 +5175,28 @@ def edit_existing_data():
                             default=prey90_sx_list,
                             placeholder="Select all that apply"
                             )
+                            PREY_SXTOT = len(prey90_symptoms)
                             prey90_symptoms = ", ".join(prey90_symptoms)
+                            PREY_PHTN = st.selectbox( "PREY90_Portal HTN [Excel : PREY_PHTN]\n\n (1) Portal HTN (0) none",
+                                options=["1", "0"],
+                                format_func=lambda x: {
+                                    "1": "Portal HTN",
+                                    "0": "none",
+                                }[x],
+                                index = ["1", "0"].index(df.iloc[0]["PREY_PHTN"]) if df.iloc[0]["PREY_PHTN"] else None, 
+                                placeholder="Choose an option"
+                                )
                             prey90_date_of_labs = st.date_input("PREY90_date of labs in window [ Excel : PREY_DATELABS ]  ",min_value=date(1900, 1, 1), help="Enter the date of lab tests",value = datetime.strptime(df.iloc[0]["PREY_DATELABS"], "%Y-%m-%d").date() if df.iloc[0]["PREY_DATELABS"] else None)
                             prey90_afp = st.text_input("PREY90_AFP [ Excel : PREY_AFP ]  ", help="Enter AFP value in ng/dl or NA",value = df.iloc[0]["PREY_AFP"])
                             
                             def process_input(value):
-                                
-                    # Handle the 'NA' case
                                 if value.upper() == "NA":
                                     return "NA"
-                    # Handle numeric cases
-                                elif value.isdigit():
-                                    numeric_value = int(value)
+                                try:
+                                    numeric_value = float(value)
                                     return 1 if numeric_value < 200 else 2
-                                else:
-                                    return "Invalid Input"
+                                except ValueError:
+                                    return "Fill AFP"
                         
                             prey90_afp_prior_to_tare = process_input(prey90_afp)
                             st.write("PRE90_AFPbinary ",prey90_afp_prior_to_tare)
@@ -5332,6 +5347,8 @@ def edit_existing_data():
                                
                                 data6 = {
                                 "PREY_SX": prey90_symptoms,
+                                "PREY_SXTOT": PREY_SXTOT,
+                                "PREY_PHTN" : PREY_PHTN,
                                 "PREY_DATELABS": prey90_date_of_labs,
                                 "PREY_AFP": prey90_afp,
                                 "PREY_AFPBINARY": prey90_afp_prior_to_tare,
@@ -5370,15 +5387,12 @@ def edit_existing_data():
 
                             dayy90_afp = st.text_input("DAYY90_AFP [ Excel : DAYY_AFP ] ",value = df.iloc[0]["DAYY_AFP"])
                             def process_input(value):
-                                
-                    # Handle the 'NA' case
                                 if value.upper() == "NA":
                                     return "NA"
-                    # Handle numeric cases
-                                elif value.isdigit():
-                                    numeric_value = int(value)
+                                try:
+                                    numeric_value = float(value)
                                     return 1 if numeric_value < 200 else 2
-                                else:
+                                except ValueError:
                                     return "Fill AFP"
 
                             dayy90_afp_prior_to_tare = process_input(dayy90_afp)
